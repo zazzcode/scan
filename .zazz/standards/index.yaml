@@ -1,0 +1,135 @@
+# .zazz/standards/index.yaml
+# Index of scan engineering standards. Agents consult this index to decide which
+# standard(s) to inject into context before performing a task.
+#
+# Fields:
+#   file        - document filename in this directory
+#   applies_to  - situations where the standard applies
+#   purpose     - concise description of decisions governed by the file
+#
+# Curation policy: only stack-agnostic methodology standards are vendored from
+# zazz-skills/docs/standards, and the two that described the upstream repo's own
+# stack (contextual-split, pr-process) were rewritten for scan. The scan stack
+# (Go + Tree-sitter + an OpenAI-compatible LLM broker) deliberately does NOT vendor
+# the upstream stack-specific baselines (Python/Flask, SQL Server sprocs, React/Next,
+# Lambda, Drizzle/Neon). Stack standards are authored for this repo with the
+# standard-builder skill and appended here as they land.
+standards:
+  - file: code-structure.md
+    applies_to:
+      paths:
+        - cmd/
+        - internal/
+        - .agents/skills/
+        - .zazz/
+      activities:
+        - creating or modifying Go packages, tests, scripts, standards docs, or agent skills
+        - splitting oversized files or agent guides
+        - reviewing package layout, module cohesion, duplicated logic, or redundant computation
+    purpose: >-
+      Go package layout (cmd/, internal/), file-size thresholds, contextual splitting, module cohesion,
+      incrementally discoverable skills and docs, anti-slop structure, compute-once guidance, and
+      determinism requirements for graph and path output.
+
+  - file: testing.md
+    applies_to:
+      paths:
+        - cmd/
+        - internal/
+        - testdata/
+        - .github/workflows/
+    activities:
+        - writing or reviewing Go unit, golden-file, graph-fixture, or end-to-end tests
+        - deciding what evidence a change must carry before it lands on stage
+    purpose: >-
+      Table-driven Go tests, golden-file parsing fixtures, deterministic graph fixtures for path tracking,
+      a stubbed LLM broker, no network or wall-clock dependence in unit tests, and the evidence expected on
+      a PR.
+
+  - file: pr-process.md
+    applies_to:
+      paths: []
+      activities:
+        - creating PRs, writing PR titles and bodies
+        - reviewing or merging PRs into stage
+        - preparing release PRs into main
+    purpose: >-
+      Bracketed scope labels that map to the package layout, one-logical-change-per-PR, no transitional
+      cruft on merge, CVE identifiers in titles, and the draft-first human-merge workflow. Integration
+      branch is stage; release PRs target main and are tagged on merge.
+
+  - file: agent-skills.md
+    applies_to:
+      paths:
+        - .agents/skills/
+      activities:
+        - creating or modifying shared agent skills
+        - editing SKILL.md front matter, descriptions, metadata, scripts, references, or assets
+        - reviewing skill discoverability or cross-harness compatibility
+    purpose: >-
+      Agent Skills directory shape, portable front matter, metadata placement, description quality,
+      progressive disclosure, and validation checks.
+
+  - file: contextual-split.md
+    applies_to:
+      paths: []
+      activities:
+        - deciding which document or standard to load for a task
+        - organizing standards tiers (repo-specific vs generic methodology)
+        - adding a standard or reviewing the standards set
+    purpose: >-
+      Contextual splitting model and the map of scan's standards: load the smallest relevant document set
+      per task, tier precedence for repo-specific standards over generic methodology baselines, and the
+      backlog of stack standards still to be authored.
+
+  - file: docs-hygiene.md
+    applies_to:
+      paths:
+        - .zazz/
+        - .agents/skills/
+      activities:
+        - creating or editing durable project, architecture, standards, or guide documents
+        - pruning or archiving stale documentation
+        - writing or reviewing cross-document links
+    purpose: >-
+      Durable-document hygiene: voice, Desired/Not-desired examples, cross-document links, cleanup clauses,
+      banned transient identifiers, and single-home rules.
+
+  - file: docs-hygiene-reference-structure.md
+    applies_to:
+      paths:
+        - .zazz/standards/
+      activities:
+        - shaping a standards document
+        - adding citations, section ordering, or worked examples to a standard
+    purpose: >-
+      Standard-doc exclusions, citation formats and traceability, section ordering, and a worked structure
+      for a well-formed standards section.
+
+  - file: spec-hygiene.md
+    applies_to:
+      paths:
+        - .zazz/specifications/
+      activities:
+        - authoring or updating deliverable specifications
+        - reviewing spec quality before greenlight
+    purpose: >-
+      Specification hygiene: bounded scope, acceptance criteria quality, test-plan linkage, halt
+      conditions, and avoiding spec drift.
+
+# ---------------------------------------------------------------------------
+# To be authored for the scan stack (add entries here as they land).
+# Use the standard-builder skill against real code before writing these; do not
+# copy upstream baselines from a different stack.
+#
+#   path-tracking.md   the code path model: what a path is, what the tool does and does not claim,
+#                      how reachability differs from dataflow, and how findings are phrased
+#   parse-layer.md     Tree-sitter grammar registry, worker pool, error handling, binding abstraction
+#   rule-authoring.md  .scm query conventions, rule naming, sink classes, OWASP/CWE/severity declaration
+#   graph-model.md     node/edge schema evolution, node identity, graph export compatibility
+#   arg-binding.md     call-site argument annotation conventions and the local binding table
+#   llm-broker.md      prompt shape, structured response schema, verdict semantics, retry and cost control
+#   finding-record.md  finding schema, fingerprint, previous-findings log, baseline format, gating policy
+#   cli-surface.md     flags, output formats, exit codes, CI usage
+#   ci-workflows.md    GitHub Actions triggers, Go build/vet/test/race jobs, lint and format gates
+#   observability.md   structured logging and progress reporting for long scans

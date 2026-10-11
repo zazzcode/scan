@@ -1,0 +1,34 @@
+# Go build output and test artifacts
+bin/
+dist/
+*.test
+*.out
+coverage.out
+coverage.html
+coverage.txt
+
+# Go workspace scratch (single-module repo; not committed)
+go.work
+go.work.sum
+
+# Environment and secrets
+.env
+.env.*
+!.env.sample
+
+# graphify generated output (rebuild with `graphify update .`)
+graphify-out/
+
+# Zazz ephemeral working directory (run logs, QA notes, handoffs). Never commit it.
+.zazz/ephemeral/
+
+# Machine-local Worktrunk project config (propagated via `wt step copy-ignored`)
+.config/wt.toml
+
+# macOS
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,659 @@
+# Using gh-stack with Worktree Lanes
+
+This guide defines how the methodology uses GitHub Stacked PRs with Git worktrees. A stack is a chain of two or more PRs: the bottom PR targets the integration branch and each higher PR targets the branch below it. Each branch and PR is therefore an independently reviewable deliverable layer.
+
+> **Scope:** Use the locally managed `gh-stack` workflow only for a traditional Git branch stack in which every stacked branch is available from one shared stack-lane worktree. Do not use it for a set of stacked branches that are separately checked out into individual worktrees. Use separate worktrees and ordinary PRs for that case.
+
+GitHub Stacked PRs is currently preview functionality. Use the workflow below when the repository has the feature enabled; keep the same branch and worktree discipline when it is not.
+
+## Assessment
+
+Yes: GitHub can represent the PR dependency chain regardless of local worktree layout. The methodology, however, requires one shared stack-lane worktree when using gh-stack's full local workflow.
+
+| Topology | Use it when | Operating model |
+| --- | --- | --- |
+| **Shared stack-lane worktree** | A complex initiative contains dependent deliverables that should be managed with gh-stack. | **Required for the full gh-stack workflow.** One worktree moves through the ordered stack; each branch remains one deliverable and one PR. |
+| **One worktree per branch** | Work is independent, or separate contributors need concurrent isolation. | Use ordinary branch/PR workflow. Do not treat these independently checked-out branches as a locally managed gh-stack lane. |
+
+Do not use a stack merely because work is large. Use it when the deliverables have a real dependency order and each layer remains atomic and reviewable. Use independent worktrees and ordinary PRs for unrelated work.
+
+### Example: a complex report initiative
+
+One report initiative can be decomposed into deliverables whose PRs form one stack:
+
+```text
+dev
+└── deliverable-report-data          PR: database contract and independently testable data layer
+    └── deliverable-report-api       PR: service and API layer
+        └── deliverable-report-ui    PR: UI layer
+            └── deliverable-report-follow-up PR: dependent follow-on capability
+```
+
+The Project Owner places these deliverables in the applicable milestone. The Deliverable Owner retains intent, scope, acceptance, and readiness accountability for each deliverable. A Lead Agent, when assigned, coordinates Contributor Agents and QA / Verifier Agents; it does not become a human owner.
+
+The useful mental model is:
+
+- **One branch = one deliverable and one review unit, represented by commits, not by a remembered file list.**
+- **One PR = one atomic review and merge unit in an ordered dependency chain.**
+- **A worktree is an execution workspace, not the definition of the PR stack.**
+
+The shared lane is required for a locally managed gh-stack workflow. Separate worktrees remain the standard pattern for independent or concurrent work. gh-stack manages branch/PR relationships; Git worktrees manage checked-out copies of branches.
+
+### Recommended stack-lane names
+
+Recommended, not required: name the shared worktree after the initiative and number its
+branches in dependency order.
+
+```text
+worktree: my-feature/
+
+<integration-branch>
+└── my-feature-1  bottom branch / PR #1
+    └── my-feature-2  PR #2
+        └── my-feature-3  top branch / PR #3
+```
+
+`my-feature-1` is based on the integration branch; every later number is stacked on the
+branch before it. The names make the lane and its order visible in ordinary Git output.
+
+## Worktree versus branch
+
+A worktree is associated with **one checked-out branch at a time**, but that association is not permanent. The worktree is a working directory with its own index and checkout. You can switch which branch is checked out inside that directory, as long as Git allows the checkout.
+
+So the lane model is:
+
+```text
+worktree directory = one working directory / one index / one checked-out branch at a time
+branch stack = multiple branches you move between inside that directory
+```
+
+Example:
+
+```bash
+cd /path/to/repo-wt/dev
+git worktree add ../feature-next-report-lane -b feature-next-report-svc-1 dev
+
+cd ../feature-next-report-lane
+# currently on feature-next-report-svc-1
+
+gh stack init --base dev feature-next-report-svc-1
+# Older extensions: gh stack init --base dev --adopt feature-next-report-svc-1
+gh stack add feature-next-report-svc-2
+# same directory, now checked out to feature-next-report-svc-2
+```
+
+After that, `gh stack bottom`, `gh stack top`, `gh stack up`, and `gh stack down` are controlled branch checkouts inside the same worktree. Dependencies, scratch output, venvs, IDE indexing, and build artifacts stay in the same folder; the checked-out branch content changes as you move up and down the stack.
+
+Git generally does not let the same branch be checked out in two worktrees at once. That is fine for the lane workflow because the stack branches are unique to the lane.
+
+### Constraint for one-worktree-per-branch stacks
+
+GitHub can represent a PR stack when its branches are checked out in separate worktrees.
+PR base relationships are remote branch relationships, not worktree relationships.
+
+The full local gh-stack workflow does **not** work reliably in that layout. Commands such
+as `up`, `down`, `top`, `bottom`, and `checkout` must check out the target branch in the
+current worktree. Git blocks that checkout when the target branch is already checked out
+elsewhere.
+
+The official [`gh stack link` command](https://github.github.com/gh-stack/reference/cli/)
+supports externally managed local branches. It creates or updates the remote PR stack, but
+does not provide local gh-stack tracking or navigation. See the [gh-stack FAQ](https://github.github.com/gh-stack/faq/) for the external-tool workflow.
+
+Therefore the methodology uses these explicit operating modes:
+
+1. **gh-stack lane:** use local gh-stack tracking and navigation in one worktree that owns every branch in the stack. This is required for the methodology's gh-stack workflow.
+2. **Separate worktrees:** keep each contributor in its assigned branch worktree for independent PRs. Do not call this a gh-stack lane.
+
+`gh stack link` is a documented advanced command for teams that use another tool to manage local branches. It creates or updates the remote PR stack but deliberately does not establish local gh-stack tracking. It is not the methodology's default separate-worktree workflow.
+
+### Stack map in the PR UI
+
+When GitHub Stacked PRs is enabled and a PR belongs to a stack, GitHub displays a **stack map** at the top of the PR page. It shows every PR in the stack, its status, and lets reviewers navigate to each layer. Treat this preview UI as useful review context, not as a replacement for the specification, acceptance evidence, or normal PR review.
+
+## When Branch 2 sees Branch 1 changes
+
+Branch 2 can see Branch 1 changes only when those Branch 1 commits are in Branch 2's history.
+
+When Branch 2 is first created on top of Branch 1, it sees everything Branch 1 had at that moment:
+
+```text
+dev
+└── feature-next-report-svc-1
+    └── feature-next-report-svc-2
+```
+
+If you later switch back to Branch 1 and add a commit, Branch 2 does not automatically see that new commit:
+
+```text
+dev
+└── feature-next-report-svc-1 -- new data-contract commit
+    \
+     feature-next-report-svc-2   # still based on the older Branch 1 tip
+```
+
+Rebase upward after Branch 1 changes:
+
+```bash
+gh stack bottom
+# edit Branch 1 files
+git add backend/database/sql_migrations/stored-procedure/R__dbo.app_FeatureFoo.sql
+git add backend/src/data/sprocs/app_FeatureFoo.py
+git commit -m "Update Report Foo data contract"
+
+gh stack rebase --upstack
+gh stack top
+```
+
+After the upstack rebase, Branch 2 sees the new Branch 1 commit:
+
+```text
+dev
+└── feature-next-report-svc-1 -- new data-contract commit
+    └── feature-next-report-svc-2
+```
+
+Rule:
+
+```text
+Branch 2 sees Branch 1 as of the last time Branch 2 was created from, based on, or rebased onto Branch 1.
+After new Branch 1 commits, run gh stack rebase --upstack.
+```
+
+## Sync versus rebase
+
+`gh stack sync` and `gh stack rebase --upstack` overlap, but they are best used for different moments.
+
+Use `gh stack rebase --upstack` when you made a **local lower-branch change** and need upper branches to inherit it immediately:
+
+```bash
+gh stack bottom
+# edit Branch 1 files
+git add backend/database/sql_migrations/stored-procedure/R__dbo.app_FeatureFoo.sql
+git add backend/src/data/sprocs/app_FeatureFoo.py
+git commit -m "Update Report Foo data contract"
+
+gh stack rebase --upstack
+gh stack top
+```
+
+Use `gh stack sync` for **routine remote synchronization**:
+
+- after the integration branch moved;
+- after Branch 1 was merged;
+- after remote PR/stack state changed;
+- before pushing/submitting an updated stack state.
+
+`gh stack sync` is broader. It fetches, fast-forwards the trunk/integration branch when possible, cascade-rebases stack branches onto updated parents, pushes the active branches, and syncs PR state from GitHub.
+
+Typical post-merge flow after Branch 1 lands:
+
+```bash
+gh stack top
+gh stack sync
+gh stack view --json
+```
+
+Then verify that Branch 2's diff contains only Branch 2 work:
+
+```bash
+git diff --name-only <integration-branch>...HEAD
+```
+
+For report migrations, Branch 2 should no longer show Branch 1-owned data-layer files after sync. If it does, inspect before continuing:
+
+```bash
+git log --oneline --decorate --graph --max-count=20
+gh stack view --json
+```
+
+Practical rule:
+
+```text
+Local Branch 1 changed -> gh stack rebase --upstack
+Remote/integration/PR state changed -> gh stack sync
+Branch 1 merged -> gh stack sync, then verify Branch 2 diff
+```
+
+## Important caveat: file ownership is still manual
+
+`gh-stack` does **not** remember that a particular file "belongs" to Branch 1 or Branch 2. It tracks:
+
+- the ordered branch stack;
+- each branch's parent/base branch;
+- local stack metadata in `.git/gh-stack`;
+- push / submit / rebase / navigation state.
+
+Git itself determines branch contents from commits. That means files are associated with a branch only after you commit those changes on that branch.
+
+Prefer one stack branch to own a file when practical. An upper branch may change the same
+file only for a distinct, reviewable reason. Always review a branch against its immediate
+parent, not merely by its file names.
+
+## Correct misplaced changes
+
+Use Git to move content between branches. `gh-stack` manages branch order and PR bases; it
+does not move files or hunks.
+
+### Uncommitted file or hunk
+
+Save the misplaced change, move to the intended lower branch, restore and commit it there.
+Use a path-specific stash for a whole file. For mixed uncommitted changes, separate the
+hunks before committing; `git add -p` is suitable for a human interactive session.
+
+Example:
+
+```bash
+git stash push -m "move data layer" -- path/to/data-layer-file
+gh stack checkout <correct-lower-branch>
+git stash pop
+git add path/to/data-layer-file
+git commit -m "Add data layer"
+```
+
+### Whole committed change
+
+If a single commit belongs entirely in a lower branch, copy it to that branch with
+`git cherry-pick <wrong-commit>`. Then rebase the upper stack. During rebase, Git may drop
+the duplicate patch or require a conflict resolution. Verify the result before continuing.
+
+### Mixed committed change
+
+`gh stack modify` rearranges whole branches; it does not split a file or commit. For an
+unpublished commit, reconstruct the intended lower-branch change with normal Git staging,
+then rebase the upper stack. For a published commit that needs history rewriting, pause and
+agree the correction plan with the Deliverable Owner or Lead Contributor Agent before
+rewriting it.
+
+### Required after every correction
+
+```bash
+gh stack rebase --upstack
+gh stack checkout <corrected-upper-branch>
+git diff --name-only <immediate-parent-branch>...HEAD
+```
+
+Confirm the remaining diff contains only the upper branch's deliverable. Run the relevant
+tests again before pushing or submitting the stack.
+
+## Setup
+
+Install the extension from GitHub:
+
+```bash
+gh extension install github/gh-stack
+```
+
+Official reference: [GitHub Stacked PRs CLI Commands](https://github.github.com/gh-stack/reference/cli/). The page includes installation, stack management, remote operations, navigation, utilities, and exit codes.
+
+The GitHub documentation was reviewed on 2026-07-18. It describes GitHub Stacked PRs as preview functionality, so the repository must have it enabled. If it does not have access yet, use ordinary PRs with explicit base branches instead of treating the workflow as an active gh-stack lane.
+
+### CLI version check
+
+gh-stack evolves. Before running a command, inspect the installed form:
+
+```bash
+gh stack <command> --help
+```
+
+- Older extensions require `gh stack init --adopt <branches...>` for existing branches
+  and `gh stack submit --auto --draft` for draft PRs.
+- Current documentation adopts existing branches through `init` and creates draft PRs by
+  default with non-interactive `submit --auto`.
+
+Use the installed command help rather than copying an example from a different version.
+
+### Zazz skill source and maintenance
+
+For a repository using Zazz methodology, install the Zazz-adapted skill from the
+`zazz-skills` clone:
+
+```bash
+<zazz-skills-clone>/.agents/skills/gh-stack
+```
+
+Copy it into the target repository or worktree at:
+
+```bash
+.agents/skills/gh-stack
+```
+
+Do not replace it with the generic upstream `gh-stack/skills/gh-stack` skill. The upstream
+documentation and command help define CLI capabilities and version-specific flags. The Zazz
+skill defines the required lane, flat naming, agent, file-placement, and review rules.
+
+Keep the Zazz skill current as gh-stack evolves. Review upstream release and CLI changes,
+then deliberately update and validate the Zazz skill before adopting a new workflow.
+
+## Recommended report workflow
+
+Create one lane worktree from `dev`. Run this from the existing `dev/` worktree:
+
+```bash
+cd /path/to/repo-wt/dev
+git worktree add ../feature-<feature-slug>-lane -b feature-<feature-slug>-svc-1 dev
+cd ../feature-<feature-slug>-lane
+```
+
+Initialize the stack using the current Branch 1 branch, then add Branch 2:
+
+```bash
+gh stack init --base dev feature-<feature-slug>-svc-1
+# Older extensions: gh stack init --base dev --adopt feature-<feature-slug>-svc-1
+gh stack add feature-<feature-slug>-svc-2
+```
+
+Work bottom-up:
+
+```bash
+gh stack bottom
+# implement data layer, binding, tSQLt, binding tests
+git add <svc-1 paths>
+git commit -m "Add <report> data layer"
+
+gh stack top
+# implement service, document, renderers, CLI, fixtures
+git add <svc-2 paths>
+git commit -m "Add <report> rendering and CLI"
+```
+
+When Branch 1 changes after Branch 2 exists:
+
+```bash
+gh stack bottom
+# edit Branch 1 files
+git add <svc-1 paths>
+git commit -m "Update <report> data contract"
+
+gh stack rebase --upstack
+gh stack top
+```
+
+Push / submit:
+
+```bash
+gh stack push
+gh stack submit --auto
+# Older extensions may require: gh stack submit --auto --draft
+gh stack view --json
+```
+
+After Branch 1 is merged, sync the stack and verify Branch 2's remaining diff:
+
+```bash
+gh stack top
+gh stack sync
+gh stack view --json
+git diff --name-only <integration-branch>...HEAD
+```
+
+For agents, prefer non-interactive forms:
+
+- `gh stack init --base dev <branch>` (older extensions: add `--adopt`)
+- `gh stack add <branch>`
+- `gh stack sync`
+- `gh stack submit --auto`
+- `gh stack view --json`
+
+## Branch boundaries for report migrations
+
+Branch 1 owns the data contract:
+
+- `app_` stored procedure;
+- `vw2_` / `fn2_` helper if needed;
+- Python binding;
+- return-code mapping;
+- tSQLt and binding tests.
+
+Branch 2 owns the consumer side:
+
+- report service orchestration;
+- canonical document builder;
+- markdown renderer;
+- PDF renderer;
+- CLI subcommand;
+- service fixtures and report tests.
+
+The seam is the typed binding contract. If Branch 2 needs a new column or RowType, make that change on Branch 1, then rebase Branch 2 upward.
+
+## Detailed scenarios
+
+These examples assume a two-branch report stack:
+
+```text
+dev
+└── feature-next-report-svc-1   # Branch 1: data layer
+    └── feature-next-report-svc-2   # Branch 2: service/render/CLI
+```
+
+### Scenario 1: clean bottom-up implementation
+
+Use this when you know the Branch 1 work first, then build Branch 2 on top of it.
+
+```bash
+cd /path/to/repo-wt/feature-next-report-lane
+
+# Start at the bottom branch.
+gh stack bottom
+
+# Edit Branch 1 files:
+# - backend/database/sql_migrations/stored-procedure/R__dbo.app_FeatureFoo.sql
+# - backend/src/data/sprocs/app_FeatureFoo.py
+# - backend/tests/data/sprocs/test_app_FeatureFoo.py
+
+git status --short
+git add backend/database/sql_migrations/stored-procedure/R__dbo.app_FeatureFoo.sql
+git add backend/src/data/sprocs/app_FeatureFoo.py
+git add backend/tests/data/sprocs/test_app_FeatureFoo.py
+git commit -m "Add Report Foo data layer"
+
+# Move to the top branch.
+gh stack top
+
+# Edit Branch 2 files:
+# - backend/src/svc/reports/report_foo/service.py
+# - backend/src/svc/reports/report_foo/document.py
+# - backend/src/svc/reports/report_foo/markdown.py
+# - backend/scripts/generate-report.py
+
+git status --short
+git add backend/src/svc/reports/report_foo/
+git add backend/scripts/generate-report.py
+git commit -m "Add Report Foo service and CLI"
+```
+
+Result:
+
+- Branch 1 PR contains only the data layer.
+- Branch 2 PR contains only the consumer/rendering layer.
+- Branch 2 has Branch 1 in its history because it is stacked on top.
+
+### Scenario 2: mixed edited files, commit only some to the current branch
+
+Use this when you edited several files before separating which branch they belong to.
+
+Example state while on Branch 1:
+
+```bash
+git status --short
+```
+
+```text
+ M backend/database/sql_migrations/stored-procedure/R__dbo.app_FeatureFoo.sql
+ M backend/src/data/sprocs/app_FeatureFoo.py
+ M backend/src/svc/reports/report_foo/service.py
+ M backend/scripts/generate-report.py
+```
+
+Only the SQL and binding belong on Branch 1. Stage only those paths:
+
+```bash
+gh stack bottom
+git add backend/database/sql_migrations/stored-procedure/R__dbo.app_FeatureFoo.sql
+git add backend/src/data/sprocs/app_FeatureFoo.py
+git commit -m "Add Report Foo stored procedure binding"
+```
+
+The service and CLI edits remain uncommitted in the worktree. Move to Branch 2 and commit them there:
+
+```bash
+gh stack top
+git status --short
+git add backend/src/svc/reports/report_foo/service.py
+git add backend/scripts/generate-report.py
+git commit -m "Wire Report Foo service into CLI"
+```
+
+If one file contains both Branch 1 and Branch 2 edits, use patch staging:
+
+```bash
+git add -p backend/src/data/sprocs/app_FeatureFoo.py
+git commit -m "Update Report Foo binding contract"
+```
+
+Then switch branches and stage the remaining hunks later.
+
+### Scenario 3: while on Branch 2, you discover Branch 1 needs a change
+
+This is the most common stacked workflow. Do not make the data-contract change on Branch 2. Put it on Branch 1 and rebase Branch 2 upward.
+
+First, make Branch 2 clean enough to switch. Either commit the current Branch 2 work:
+
+```bash
+gh stack top
+git add backend/src/svc/reports/report_foo/
+git commit -m "Start Report Foo document builder"
+```
+
+Or stash it if it is not ready:
+
+```bash
+git stash push -m "wip report foo branch 2"
+```
+
+Then move down and change Branch 1:
+
+```bash
+gh stack bottom
+
+# Edit the SP/binding contract.
+git add backend/database/sql_migrations/stored-procedure/R__dbo.app_FeatureFoo.sql
+git add backend/src/data/sprocs/app_FeatureFoo.py
+git commit -m "Add Report Foo adjustment columns"
+```
+
+Carry that lower-branch change upward:
+
+```bash
+gh stack rebase --upstack
+gh stack top
+```
+
+If you stashed Branch 2 work, restore it after returning to the top:
+
+```bash
+git stash pop
+```
+
+Now adjust Branch 2 to the new contract and commit:
+
+```bash
+git add backend/src/svc/reports/report_foo/
+git commit -m "Consume Report Foo adjustment columns"
+```
+
+### Scenario 4: you accidentally committed Branch 1 work on Branch 2
+
+If the bad commit is the latest commit on Branch 2 and has not been pushed, move the change back into the worktree, then recommit it on the correct branch.
+
+```bash
+gh stack top
+git reset --soft HEAD~1
+```
+
+Now the changes from that commit are staged. Unstage them so you can choose what belongs where:
+
+```bash
+git restore --staged .
+```
+
+Move to Branch 1 and commit only the data-layer files:
+
+```bash
+gh stack bottom
+git add backend/database/sql_migrations/stored-procedure/R__dbo.app_FeatureFoo.sql
+git add backend/src/data/sprocs/app_FeatureFoo.py
+git commit -m "Add Report Foo data contract"
+```
+
+Rebase Branch 2 upward, then commit the remaining Branch 2 files:
+
+```bash
+gh stack rebase --upstack
+gh stack top
+git add backend/src/svc/reports/report_foo/
+git commit -m "Add Report Foo renderer"
+```
+
+If the bad commit was already pushed or is not the latest commit, slow down and inspect the history first:
+
+```bash
+git log --oneline --decorate --graph --max-count=12
+gh stack view --json
+```
+
+At that point, prefer an intentional `git rebase -i` or a follow-up corrective commit over improvising.
+
+### Scenario 5: Branch 1 merged, sync Branch 2 onto the integration branch
+
+Once the Branch 1 PR merges, Branch 2 should stop targeting Branch 1 and should reduce to only its own commits on top of the updated integration branch. `gh stack sync` is the normal command for that transition.
+
+```bash
+gh stack top
+gh stack sync
+gh stack view --json
+```
+
+Then inspect Branch 2's remaining review diff:
+
+```bash
+git diff --stat <integration-branch>...HEAD
+git diff --name-only <integration-branch>...HEAD
+```
+
+For report migrations, the remaining diff should be Branch 2 territory: service, document builder, renderers, CLI, fixtures, and tests. If SQL migrations or data sprocs still appear, pause and inspect the stack state before merge.
+
+### Scenario 6: check what each PR will contain
+
+From Branch 1, compare against `dev`:
+
+```bash
+gh stack bottom
+git diff --stat dev...HEAD
+git diff --name-only dev...HEAD
+```
+
+From Branch 2, compare against Branch 1 to see only the top PR's review diff:
+
+```bash
+gh stack top
+git diff --stat feature-next-report-svc-1...HEAD
+git diff --name-only feature-next-report-svc-1...HEAD
+```
+
+For report migrations, Branch 2 should not modify Branch 1-owned files. A quick check:
+
+```bash
+git diff --name-only feature-next-report-svc-1...HEAD -- \
+  backend/database/sql_migrations/ \
+  backend/src/data/sprocs/ \
+  backend/tests/data/sprocs/
+```
+
+That command should print nothing for a clean Branch 2.
+
+## When not to use this
+
+Use separate worktrees instead when two agents must work concurrently on different branches. A single worktree has one checked-out branch and one index. Two agents editing it at the same time will collide.
+
+For one agent implementing one report, the single-lane stack is the better default.
