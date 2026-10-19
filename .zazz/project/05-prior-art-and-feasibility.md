@@ -63,6 +63,11 @@ distributed through [codeql-cli-binaries](https://github.com/github/codeql-cli-b
 the entire CodeQL toolchain as MIT/open source on the strength of the query repository's license.
 This is a documentation/source reference; no CLI was installed or run for this review.
 
+The supplied local clone was verified clean at `bc53c78af0de4ee7578850698f12ab5638bc1b6d` on
+2026-10-19, with origin `https://github.com/github/codeql.git`. Its portable location lives in the
+[orientation](../docs/scan-agent-orientation.md#portable-workspace-and-dev_root). This records clone
+provenance; a local implementation study has not yet been performed.
+
 Start with the official [JS/TS dataflow guide](https://codeql.github.com/docs/codeql-language-guides/analyzing-data-flow-in-javascript-and-typescript/):
 local versus global flow, value-preserving versus taint steps, explicit sources/sinks, additional flow
 steps, and sanitizer guards/barriers. Study small relevant queries and their tests for the selected

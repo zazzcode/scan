@@ -25,7 +25,8 @@ Concept/architecture definition is assigned to `stage/`. See the
 It is documentation notation, not an implemented environment variable. Usual locations:
 
 - Repositories: `<DEV_ROOT>/<account>/<project>`; scan's container is `<DEV_ROOT>/zazzcode/scan`.
-- Reference clones: `<DEV_ROOT>/juice-shop` (application) and `<DEV_ROOT>/bearer` (SAST design reference).
+- Reference clones: `<DEV_ROOT>/juice-shop` (application), `<DEV_ROOT>/bearer`, and `<DEV_ROOT>/codeql`
+  (SAST design references).
 
 Resolve/verify roots each session; durable docs/configuration MUST NOT hardcode usernames or absolute
 checkout prefixes. Other documents should link here for workspace conventions.
