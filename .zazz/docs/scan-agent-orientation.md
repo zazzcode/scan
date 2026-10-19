@@ -1,68 +1,74 @@
 # Scan — agent orientation
 
-First-read orientation for agents and developers working in this repository. It summarizes the repo
-layout, the branch model, and where each kind of context lives. The operating rules are declared in
-[`AGENTS.md`](../../AGENTS.md).
+Compact session context and document routing. Read [AGENTS.md](../../AGENTS.md) for binding rules and
+when to load supporting guides. Keep this document under 400 lines; link to details rather than copy them.
 
-## What this project is
+## Table of contents
 
-`scan` is an OWASP Top 10 static analysis scanner written in Go. It builds a structural graph of a
-target repository with Tree-sitter, isolates the source-to-sink paths that carry untrusted input into
-dangerous operations, and hands those pruned paths to an LLM broker for vulnerability analysis.
+- [Current work](#current-work)
+- [Portable workspace and DEV_ROOT](#portable-workspace-and-dev_root)
+- [Branches and worktrees](#branches-and-worktrees)
+- [Documentation map](#documentation-map)
+- [Working protocol](#working-protocol)
+- [Methodology refinement](#methodology-refinement)
+- [Commands and credentials](#commands-and-credentials)
 
-It is deliberately not a general codebase-understanding tool: every stage of the pipeline exists to
-produce and narrow a security-relevant call path. See
-[`../project/architecture.md`](../project/architecture.md) for the full design.
+## Current work
 
-Initial release languages: **JavaScript (Node.js), TypeScript, Go, Python, Java**.
+Concept/architecture definition is assigned to `stage/`. See the
+[project overview](../project.md#concept-stage-repository-state) for status and the
+[architecture](../architecture.md) for Jev Assessment → Findings Review.
 
-## Where things live
+## Portable workspace and DEV_ROOT
 
-| Location | Contents |
+**`<DEV_ROOT>` means this computer's development directory**, usually `Dev/` under the user's home.
+It is documentation notation, not an implemented environment variable. Usual locations:
+
+- Repositories: `<DEV_ROOT>/<account>/<project>`; scan's container is `<DEV_ROOT>/zazzcode/scan`.
+- Reference clones: `<DEV_ROOT>/juice-shop` (application) and `<DEV_ROOT>/bearer` (SAST design reference).
+
+Resolve/verify roots each session; durable docs/configuration MUST NOT hardcode usernames or absolute
+checkout prefixes. Other documents should link here for workspace conventions.
+
+## Branches and worktrees
+
+Scan uses a shared bare Git directory with sibling worktrees. `stage` integrates work and `main` is
+release-only. Each spec has its own feature worktree and PR into `stage`, including spec authoring.
+Load [worktree setup](worktree-setup.md) for the layout, reference-clone handling, naming, creation,
+and recovery details; [AGENTS.md](../../AGENTS.md#branch-model) declares the current `stage/` exception.
+
+## Documentation map
+
+Select the document that owns the topic; do not load every row. Research/design context is preserved
+in these files independently of chat attachments.
+
+| Document | Primary content |
 |---|---|
-| `.zazz/project.md` | Project overview — the durable orientation document |
-| `.zazz/project/` | Functionality, scope, and architecture (the implementation overview) |
-| `.zazz/standards/` | Engineering standards; route through `index.yaml` |
-| `.zazz/specifications/` | Deliverable specifications (tracked in Git) |
-| `.zazz/docs/` | Methodology guides (this directory) |
-| `.zazz/ephemeral/` | Gitignored working notes, run logs, QA evidence, handoffs |
-| `.agents/skills/` | Vendored Zazz skills; load only the one matching the task |
+| [Project overview](../project.md) | Purpose, users, current state, direction |
+| [Architecture](../architecture.md) | Flow diagrams, analysis semantics, stage contracts, package boundaries |
+| [Functionality](../project/01-functionality.md) | Capabilities, detection modes, rule families, language sequence, interfaces |
+| [Scope](../project/02-project-scope.md) | Boundaries, quality hypotheses, risks |
+| [Design proposal](../project/03-jev-design-proposal.md) | Rationale, supplied concepts, graph/library choices, decision register |
+| [Jev research](../project/04-jev-validation-research.md) | Capability evidence, limitations, evaluation protocol |
+| [Prior art and feasibility](../project/05-prior-art-and-feasibility.md) | Novelty assessment, pinned Bearer study, engineering risks |
+| [Implementation plan](../project/implementation-plan.md) | Phases, ordered spec backlog, prerequisites, acceptance targets |
+| [Zazz methodology](zazz-methodology.md) | SDLC, ownership, greenlight and review lifecycle |
+| [Specifications](../specifications/README.md) | Execution contracts and index |
+| [Standards index](../standards/index.yaml) | Task-specific engineering standards routing |
 
-## Repo layout
+## Working protocol
 
-`.bare/` is the shared Git directory; `stage/` is the integration worktree. Every other branch gets
-its own sibling worktree. See [`worktree-setup.md`](worktree-setup.md) and
-[`wt-cheat-sheet.md`](wt-cheat-sheet.md).
+Load [Agent Execution Discipline](agent-execution-discipline.md) for execution, testing, verification,
+resumption, or handoff; [AGENTS.md](../../AGENTS.md) supplies repo-specific overrides. For planning,
+use the [phase-slicing guide](../project/implementation-plan.md#how-a-phase-becomes-agent-manageable-work).
 
-## Branch model
+## Methodology refinement
 
-- **`stage`** — integration branch, and the GitHub default branch. All PRs target `stage`.
-- **`main`** — release branch. Advances only by human-operated release promotion plus a version tag
-  on `main`.
-- Branch names are flat and hyphenated so branch name = worktree directory name.
+The Project Owner may assign Zazz refinements during definition. Load the
+[methodology](zazz-methodology.md) for that work; record whether a change is local or proposed upstream
+and preserve human authority. Assigned process changes do not authorize scanner implementation.
 
-## Working in this repo
+## Commands and credentials
 
-1. Read `AGENTS.md` and this file.
-2. For code work, load only the standards matched by `.zazz/standards/index.yaml`.
-3. For product context, start with `.zazz/project.md`, then the relevant document under
-   `.zazz/project/`.
-4. For a tracked deliverable, use its specification under `.zazz/specifications/` as the execution
-   contract.
-5. Work in a sibling worktree on a flat branch name; open a PR into `stage`. Never merge locally.
-
-## Repository commands
-
-```bash
-go build ./...
-go test ./...
-go vet ./...
-gofmt -l -w .
-```
-
-## Current status
-
-Bootstrap. The repository contains documentation, standards, and skills only — no Go packages yet.
-The first deliverable is the core scanner pipeline described in
-[`../project/architecture.md`](../project/architecture.md) and sequenced in
-[`../project/02-project-scope.md`](../project/02-project-scope.md).
+Commands: [AGENTS.md](../../AGENTS.md#repository-commands). Live-model setup/prerequisites:
+[Jev research](../project/04-jev-validation-research.md#what-can-happen-before-a-key-exists).

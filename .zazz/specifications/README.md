@@ -14,11 +14,18 @@ deliverable's branch and reviewed through the same PR flow as code.
 Working notes, run logs, QA findings, and handoffs do **not** live here — they go to
 `.zazz/ephemeral/` (gitignored) or a worktree-local location.
 
-## Deliverables
+## Specification index
 
-None yet. The first deliverable is the core pipeline skeleton, sequenced as step 1 in
-[`../project/02-project-scope.md`](../project/02-project-scope.md) and designed in
-[`../architecture.md`](../architecture.md).
+Every specification is authored, refined, and implemented in its own feature worktree from `stage`,
+with its own draft PR targeting `stage`. The current definition session does not create spec contracts.
 
-Draft it with the `spec-builder` skill before implementation begins, then implement it in a sibling
-worktree on a flat branch name (`deliverable-core-pipeline-skeleton`), opening a PR into `stage`.
+- [Phase 0 skeleton](phase0-skeleton/README.md) — historical foundation contract, retained for context.
+  The revised [Phase 0 plan](../project/implementation-plan.md#phase-0--foundation-audit-and-tooling-decision)
+  audits existing artifacts before further work.
+- Remaining specs are not authored yet. Their proposed slices live in the
+  [implementation plan](../project/implementation-plan.md); each needs separate human greenlight.
+
+See [repository state](../project.md#concept-stage-repository-state) for the current concept stage and
+[specification-driven delivery](../docs/zazz-methodology.md#specification-driven-delivery-cycle) for
+ownership, approval, execution, and review requirements. Earlier LLM-era phase numbering is superseded
+by the current plan.

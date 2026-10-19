@@ -14,7 +14,7 @@ agents load rules unrelated to the task, humans scan too much text, and edits to
 in the same document.
 
 The goal is contextual loading: an agent working on path pruning should load the path-tracking rules, not
-the LLM broker's prompt schema or the reporter's output format. A reviewer should be able to point to the
+the semantic adapter's question/answer schema or the reporter's output format. A reviewer should be able to point to the
 specific standard for the work under review.
 
 Line-count thresholds are a reviewability signal:
@@ -27,7 +27,7 @@ Line-count thresholds are a reviewability signal:
   that size, the file is probably mixing contexts.
 
 Splits follow work areas, not arbitrary halves. Do not create `part-1` / `part-2` files. Use names that
-describe the context: parsing, graph model, rules, tracing, bundling, broker, reporting.
+describe the context: parsing, graph model, rules, tracing, bundling, semantic adapters, reporting.
 
 ## Provenance requirement
 
@@ -61,7 +61,7 @@ frontend, no SQL Server, and no serverless deployment.
   when creating or reviewing Go packages, or any authored file that may grow too large or duplicate
   structure.
 - `testing.md`: table-driven Go tests, golden-file parsing fixtures, graph-fixture tests for path
-  tracking, a stubbed broker, no network or wall-clock dependence, and the evidence expected on a PR. Use
+  tracking, stubbed semantic adapters, no network or wall-clock dependence, and the evidence expected on a PR. Use
   when writing or reviewing any test.
 - `pr-process.md`: PR title scope labels, one logical change per PR, no transitional cruft on merge, CVE
   identifiers in titles, and the draft-first human-merge workflow. Use when opening, titling, or scoping a
@@ -98,8 +98,8 @@ exists — these describe real patterns, not aspirations.
 - `graph-model.md`: node and edge schema evolution, node identity including anonymous callables, and
   graph export compatibility.
 - `arg-binding.md`: call-site argument annotation conventions and the local binding table.
-- `llm-broker.md`: prompt shape, structured response schema, verdict semantics, retry and cost controls,
-  and model and prompt versioning.
+- `semantic-adapters.md`: Jev validation/sanitization assessments, Findings Review, evidence requirements,
+  uncertainty/routing, model/question versioning, retry and cost controls.
 - `finding-record.md`: the finding schema, fingerprint construction, previous-findings log, baseline
   format, and gating policy.
 - `cli-surface.md`: flags, output formats, exit codes, and CI usage.

@@ -9,12 +9,18 @@ Local deviations from upstream are deliberate. Known adaptations:
 - the doc model consolidates product orientation under `.zazz/project/` (see
   [zazz-methodology.md](zazz-methodology.md) § Core Model)
 - zazz-board is not used in this project
+- current concept/architecture definition and assigned methodology refinement explicitly use `stage/`;
+  each spec is authored, refined, and implemented in its own sibling feature worktree and PR into `stage`
 
 Feature documents, deliverable specifications, project/architecture docs, and ephemeral working
 notes do not live under this directory — they live under `.zazz/project/`,
 `.zazz/specifications/`, and `.zazz/ephemeral/` respectively.
 
 ## Guides
+
+Load these on demand using [AGENTS.md](../../AGENTS.md#load-context-by-task); this directory is not an
+automatic context bundle. Orientation is the session entry point, execution discipline governs active
+work, and worktree setup owns layout/operations. The cheat sheet is for Worktrunk commands only.
 
 - [scan-agent-orientation.md](scan-agent-orientation.md) — **first-read** agent orientation: repo layout, branch model, routing (repo-specific)
 - [agent-execution-discipline.md](agent-execution-discipline.md) — agent execution discipline (vendored)

@@ -1,20 +1,9 @@
 # Scan Worktree and Worktrunk Cheat Sheet
 
-Fast reference for working in:
-
-- `~/Dev/zazzcode/scan/.bare`
-- `~/Dev/zazzcode/scan/stage` (integration worktree — **stage** is the integration branch)
-- sibling feature and PR worktrees under `~/Dev/zazzcode/scan/`
-
-## Layout
-
-```text
-scan/
-├── .bare/
-├── stage/
-├── feature-taint-graph/
-└── <other-worktrees>/
-```
+Load this command reference when using Worktrunk. The
+[worktree setup guide](worktree-setup.md#required-model) owns scan's layout and operating model;
+[orientation](scan-agent-orientation.md#portable-workspace-and-dev_root) defines portable root lookup.
+Commands below run from the resolved container or named worktree, not an assumed home-directory path.
 
 ## The main idea
 
@@ -31,7 +20,7 @@ scan/
 From the repo container:
 
 ```bash
-cd ~/Dev/zazzcode/scan
+cd <repo-container>
 wt -C .bare <command>
 ```
 
@@ -90,13 +79,13 @@ wt -C .bare remove my-new-branch -D
 Update the integration worktree from GitHub:
 
 ```bash
-git -C ~/Dev/zazzcode/scan/stage pull origin stage
+git -C <repo-container>/stage pull origin stage
 ```
 
 Then create new worktrees from updated `stage`:
 
 ```bash
-wt -C ~/Dev/zazzcode/scan/.bare switch --create another-branch --base stage
+wt -C <repo-container>/.bare switch --create another-branch --base stage
 ```
 
 Use this flow before starting a new branch so the new worktree is based on the latest `origin/stage`.
@@ -129,14 +118,14 @@ wt -C .bare list
 From the repo container:
 
 ```bash
-cd ~/Dev/zazzcode/scan
+cd <repo-container>
 wt -C .bare switch --create my-feature --base stage
 ```
 
 Then work inside the new sibling directory:
 
 ```bash
-cd ~/Dev/zazzcode/scan/my-feature
+cd <repo-container>/my-feature
 ```
 
 When ready to push:
@@ -151,7 +140,7 @@ A stacked branch series is a chain where each branch's PR targets the prior bran
 `stage`. Each branch lives in its own sibling worktree. Example chain:
 
 ```text
-stage → feature-graph-core → feature-taint-graph → feature-llm-broker
+stage → feature-graph-core → feature-taint-graph → feature-findings-reviewer
 ```
 
 PR `-2` merges into `-1`, PR `-3` merges into `-2`, and so on. The topmost branch contains the
@@ -197,7 +186,7 @@ remote-tracking refs actually update (`git fetch origin` alone only updates `FET
 ```bash
 git fetch origin \
   '+refs/heads/feature-taint-graph:refs/remotes/origin/feature-taint-graph' \
-  '+refs/heads/feature-llm-broker:refs/remotes/origin/feature-llm-broker'
+  '+refs/heads/feature-findings-reviewer:refs/remotes/origin/feature-findings-reviewer'
 ```
 
 Then rebase the current branch onto the new parent:
@@ -216,10 +205,10 @@ After a rebase, push with `--force-with-lease` pinned to the verified remote SHA
 back to plain `--force` discards that safety check.
 
 ```bash
-git ls-remote origin refs/heads/feature-llm-broker
+git ls-remote origin refs/heads/feature-findings-reviewer
 # copy the SHA, then:
-git push --force-with-lease=feature-llm-broker:<expected-remote-sha> \
-  origin feature-llm-broker
+git push --force-with-lease=feature-findings-reviewer:<expected-remote-sha> \
+  origin feature-findings-reviewer
 ```
 
 ### Inspect divergence
@@ -237,9 +226,9 @@ For deliverables that split into 2–3 dependent layers, keep the entire stack i
 `gh-stack` to manage branches and PRs. Full reference: [using-gh-stack.md](using-gh-stack.md).
 
 ```bash
-cd ~/Dev/zazzcode/scan
+cd <repo-container>
 wt -C .bare switch --create feature-graph-core --base stage
-cd ~/Dev/zazzcode/scan/feature-graph-core
+cd <repo-container>/feature-graph-core
 gh stack init --base stage feature-graph-core feature-taint-graph
 ```
 
@@ -316,13 +305,13 @@ approved-commands = [
 Repo-wide local excludes:
 
 ```bash
-~/Dev/zazzcode/scan/.bare/info/exclude
+<repo-container>/.bare/info/exclude
 ```
 
 Per-worktree local excludes:
 
 ```bash
-~/Dev/zazzcode/scan/.bare/worktrees/<worktree-name>/info/exclude
+<repo-container>/.bare/worktrees/<worktree-name>/info/exclude
 ```
 
 Check why something is ignored:

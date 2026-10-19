@@ -1,111 +1,98 @@
-# 02 — Project Scope
+# 02 — Proposed project scope
 
-Boundaries, objectives, delivery sequence, and non-functional targets. Phased detail is in
-[`implementation-plan.md`](implementation-plan.md); design is in [`../architecture.md`](../architecture.md).
+**Concept stage, 2026-10-19.** Scope and quality targets remain subject to refinement. This document,
+the [architecture](../architecture.md), and the [phased plan](implementation-plan.md) are inputs to
+future specifications; none is permission to implement.
 
-## 1. Objective
+## Objective
 
-Build a fast, multi-language, OWASP Top 10 code scanner whose findings are grounded in explicit
-source-to-sink call paths or explicit known-bad patterns, so both humans and CI can act on them without
-re-deriving the reasoning — and whose deterministic tier is large enough to be useful with no model
-configured.
+Establish whether a Go + Tree-sitter + bounded dataflow + Jev scanner can produce useful, reviewable
+findings for selected OWASP-related source-code risks at acceptable cost. Prove a small JS/TS slice
+before committing to broad language or vulnerability coverage.
 
-## 2. In scope
+## Current work
 
-- Concurrent repository walking and Tree-sitter parsing.
-- A normalized, language-agnostic graph with source, sink, and guard classification, sink classes, and
-  data-type classification.
-- Call-site argument binding.
-- Deterministic pattern rules across the OWASP Top 10, with CWE mapping and severity.
-- Source-to-sink path discovery with pruning and pre-filtering.
-- Token-bounded context bundling including off-path guard definitions.
-- Path review with a three-state verdict and cited evidence.
-- Scope review for authorization, logic, and design gaps that are not dataflow properties.
-- JSON and Markdown reporting.
-- Stable finding identity and scan-to-scan tracking (new / persisting / resolved).
-- Incremental rescans: reuse unchanged parse results and previously recorded paths.
-- A Git-tracked findings baseline plus rule-level skips, so CI gates only on new findings.
-- Grammars, query sets, and resolvers for TypeScript/JavaScript, Python, Go, and Java.
+Current repository state lives in the [project overview](../project.md#concept-stage-repository-state).
+The [orientation](../docs/scan-agent-orientation.md#current-work) defines the active documentation
+session and routes to its operating rules.
 
-## 3. Out of scope
+## Proposed initial scope
 
-- **Inter-procedural dataflow analysis.** No taint propagation, no aliasing, no value tracking. This is
-  the central scope decision, not an omission.
-- **A06 — vulnerable and outdated components.** Dependency scanning is a different tool.
-- Runtime instrumentation, dynamic analysis, or test-coverage-driven tracing.
-- Automatic code remediation or patching.
-- Hosting, multi-tenancy, or a persistent service — this is a CLI tool at this stage.
-- Full runtime resolution of dynamically registered routes. An inference pass may flag these; they are
-  not guaranteed to resolve.
-- Secrets-scanning beyond hard-coded credentials found in source.
-- Graph database storage. Revisit only if the graph outgrows memory.
+- Local CLI operation over explicitly selected source trees.
+- JS/TS extraction and supported import/call resolution.
+- Named rules for a small set of input-to-sink risks and deterministic patterns.
+- Local CFG/dataflow followed by bounded resolved argument/return propagation.
+- Guard-use and branch context sufficient to distinguish validation from mere validator presence.
+- Traceable string candidates and evidence bundles; experiments with Jev validation/sanitization
+  assessment, followed by an LLM Findings Reviewer for identified issues and uncertain candidates.
+- Explicit unknown/uncertain/unexamined outcomes and coverage accounting.
+- JSON/Markdown output, stable identity, reviewable baselines, and measured CI policy.
+- Dependency-aware caching after correctness is established.
 
-## 4. Delivery sequence
+## Proposed later scope
 
-Full detail in [`implementation-plan.md`](implementation-plan.md). The shape:
+- Python, then Go and Java adapters with language-specific analysis semantics.
+- Additional frameworks, rule families, optional sensitive-data impact tags, and SARIF.
+- Explicit bounded scope checks for authorization/logic risks (the former Track C idea).
 
-1. Skeleton, fixture access, CI.
-2. Labeled corpus and model calibration — ground truth and prompt before any detection logic.
-3. Parse and structural graph (TS/JS).
-4. Resolution and edges — the highest-risk work, and what path tracking depends on.
-5. Classification.
-6. **Track A pattern rules — the first genuinely useful tool, with zero LLM calls.**
-7. Code path tracking — discovery, pruning, pre-filter, prioritization.
-8. Context bundling.
-9. Path review (Track B) — three-state verdict with cited evidence.
-10. Scope review (Track C) — authorization, logic, and design findings.
-11. Reporting, identity, findings tracking.
-12. Rescan cache.
-13. Python adapter — the test of whether the abstractions hold.
-14. Go and Java adapters.
+These require separate scope review, corpus evidence, and approved specs. There is no fixed promise
+that all target languages or tracks are in the first release.
 
-Each step is a separate deliverable with its own specification and its own PR into `stage`.
+## Exclusions and limits
 
-## 5. Non-functional targets
+- Exhaustive whole-program analysis or a general solver for arbitrary aliases, reflection, dynamic
+  dispatch, heap mutation, stored/second-order flows, or all asynchronous behavior.
+- Execution of the target, runtime instrumentation, exploit attempts, or dynamic testing.
+- Dependency vulnerability scanning and full secrets scanning.
+- Generated patches, unrestricted LLM review, model-driven graph traversal, and unsupported generated claims.
+- Hosted multi-tenant service, database-backed execution engine, or external tracking integration.
+- A claim that clean output certifies security or covers every risk in an OWASP edition.
 
-- **Throughput:** parse and graph a ~1,000-file repository in low single-digit seconds on a laptop.
-- **Parallelism:** saturate available cores for I/O and AST traversal; no global serialization point.
-- **Memory:** bounded by the largest single file plus the graph; no full-repository text retention.
-- **Determinism:** the structural graph, the path set, and **every Track A finding** must be identical
-  across runs for the same input, independent of goroutine scheduling. Track B verdicts are explicitly
-  not deterministic, which is why finding identity never depends on them.
-- **Zero-token operation:** Track A and the full deterministic pipeline must work with no API key and
-  make no network calls.
-- **Token discipline:** the LLM must never receive a whole repository, only pruned, pre-filtered path
-  bundles.
-- **Portability:** a single static binary per platform; CGO must not be a hard requirement. The
-  Tree-sitter binding decision is made by benchmark, and this target is what is at stake.
-- **Local-first:** no source code leaves the machine except the specific path bundles sent to a
-  configured endpoint.
+Some excluded constructs occur inside otherwise supported programs. Report them as limitations;
+do not silently treat them as absent dataflow or expand scope without a contract change.
 
-## 6. Risks
+## Delivery gates
 
-- **Path explosion.** Reachability between sources and sinks is combinatorially nasty; pruning and
-  pre-filtering are the core algorithmic risk and directly determine LLM cost.
-- **Pre-filter over-aggression.** A pre-filter tuned for cost will silently drop real findings. It needs
-  measurement against the corpus, and dropped paths should be reportable rather than invisible.
-- **Resolution correctness.** Barrels, path aliases, and monorepo layouts in TS/JS. If resolution is
-  wrong, every downstream finding is noise.
-- **Anonymous node identity.** Inline arrow handlers are the most common real handler shape and the
-  easiest to name unstably. Unstable naming means unstable fingerprints means scan-to-scan churn.
-- **LLM non-determinism and cost.** Mitigated by keeping identity structural, caching verdicts for
-  unchanged paths, and recording model and prompt versions per scan.
-- **`uncertain` rate.** A high rate means the bundle is missing context, not that the model is weak. It
-  is a bundle-quality metric and should be tracked as one.
-- **False positives.** Both tracks can produce them. Every finding must carry its evidence so a human
-  adjudicates in seconds.
-- **Rule catalog maintenance.** The rule set is data and will grow; without a documented catalog and
-  per-rule tests it will rot. Bearer's catalog is the maintenance reference.
-- **Grammar and runtime drift.** Five languages means five independent Tree-sitter grammar upgrade
-  paths.
-- **Track boundary.** The claim that SQL settles deterministically and NoSQL escalates is a hypothesis,
-  tested by the two TypeScript fixtures. If it does not hold, the boundary needs revisiting early.
+Delivery follows the [Zazz lifecycle](../docs/zazz-methodology.md#specification-driven-delivery-cycle).
+The [implementation plan](implementation-plan.md) supplies dependencies and future spec slices;
+phase-specific acceptance criteria must become bounded, human-greenlit contracts before execution.
 
-## 7. Open questions
+## Non-functional hypotheses
 
-- Which Tree-sitter binding: cgo or a pure-Go runtime, and does either forfeit the static-binary target?
-- Is the LLM broker provider-agnostic from day one, or OpenAI-compatible only initially?
-- Should findings be schema-versioned from the first release?
-- Where does the rescan cache live: a content-addressed directory or SQLite?
-- How much rename churn is acceptable before a "likely moved" heuristic is warranted?
-- Does the pre-filter threshold need to be configurable per repository, or is one default defensible?
+| Concern | Proposed target / required decision | Evidence before commitment |
+|---|---|---|
+| Correctness | Separate structural facts, approximations, predictions, and gaps | Labeled safe/vulnerable pairs and unsupported-construct fixtures |
+| Determinism | Stable graphs, candidates, and rule output for fixed inputs/versions | Serial/parallel and repeated-run comparisons |
+| Jev and reviewer quality | Identify validation/sanitization gaps with evidence-backed findings review | Human labels, held-out cases, diagnostic baselines, false-safe/errors, reviewer disagreement and completeness |
+| Latency | Suitable for developer/CI use; exact budgets unset | Hardware/fixture-defined cold/warm timings and per-request p50/p95 |
+| Cost | Bounded requests and run spend; exact ceiling unset | Candidate/question counts, usage, rate-limit behavior, measured billing basis |
+| Resources | Bounded workers, traversal, source retention, and payload size | Peak RSS, cancellation/backpressure, adversarial large inputs |
+| Local-only mode | Deterministic operation with zero external requests | No-key/offline end-to-end evidence |
+| Source handling | Send only enabled, necessary evidence to Jev and the configured LLM Findings Reviewer | Payload inspection, logging/redaction tests, owner decision on allowed transmission to each provider |
+| Portability | Predictable supported binaries/platforms | Binding/cgo/build matrix; static linking is a goal to assess, not a guarantee |
+| Rescans | Cached and uncached outputs agree | Dependency and model/question/rule/policy version invalidation tests |
+
+The old low-single-digit-second parse target, 250 ms Jev claims, fractional-cent claims, and full
+multi-language release scope are not established requirements. Numeric acceptance thresholds must be
+selected in the relevant future spec before evaluating its results.
+
+## Principal risks
+
+- **Semantic gap:** syntax extraction alone does not provide CFG/dataflow. Language lowering and
+  library models are substantial engineering work.
+- **Flow precision:** guards on another branch, ignored returns, reassignment, aliases, and unknown
+  calls can invalidate a superficially convincing path.
+- **Path growth:** bounded analysis can miss candidates; limits must remain visible.
+- **Classifier fitness:** typed output can still be wrong or influenced by source comments. Evaluate
+  custom validation and adversarial examples, not just obvious vulnerable snippets.
+- **Evidence quality:** missing dependencies can look like missing validation; low confidence does not
+  have a single cause.
+- **Cache overreach:** a validator judged adequate in one context is not globally safe elsewhere.
+- **Coverage inflation:** “OWASP Top 10” branding can outpace tested rules and frameworks.
+- **Release complexity:** native parsing, platform support, and multiple adapters can dominate scope.
+
+## Decision tracking
+
+The [proposal register](03-jev-design-proposal.md#open-decision-register) owns open decisions and their
+refinement gates. Update that register when scope or evidence changes rather than keeping a second
+question list here.

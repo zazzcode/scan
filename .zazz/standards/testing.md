@@ -8,7 +8,7 @@ Testing conventions for `scan`. Applies to `cmd/`, `internal/`, `testdata/`, and
   test change has no evidence.
 - Tests must be deterministic. No wall-clock dependence, no map-iteration-order dependence, no
   goroutine-scheduling dependence, no network access.
-- Unit tests never call a real LLM. The broker is stubbed with a recorded response.
+- Unit tests never call live Jev or LLM services. Semantic adapters use fixed typed responses.
 - A test that can only pass on the author's machine is a bug in the test.
 
 ## 2. Test kinds
@@ -19,7 +19,7 @@ Testing conventions for `scan`. Applies to `cmd/`, `internal/`, `testdata/`, and
 | Table-driven | rules, resolvers, bundlers | many inputs against expected outputs in one readable table |
 | Golden file | parsing and resolution | a fixture repository produces the expected normalized graph |
 | Graph fixture | path search and pruning | a hand-built graph yields the expected paths |
-| End-to-end | the whole pipeline | a fixture repo plus a stubbed broker produces the expected JSON report |
+| End-to-end | the whole pipeline | a fixture repo plus a stubbed semantic adapter produces the expected JSON report |
 
 Not every deliverable needs every kind. Every deliverable needs at least one that would fail if the
 behavior regressed.
@@ -64,13 +64,18 @@ Parallel stages are tested for equivalence, not just for absence of races:
   input
 - never assert on goroutine counts, timing, or completion order
 
-## 7. Broker stubbing
+## 7. Semantic adapter stubbing
 
-`internal/llm` is tested against a local `httptest` server, never a live endpoint:
+Future Jev Assessment (`internal/jev`) and LLM Findings Reviewer (`internal/llm`) adapters are tested
+against a local `httptest` server, never a live endpoint:
 
 - the stub returns fixed, schema-valid responses
 - test the failure paths explicitly: timeout, malformed JSON, non-200 status, and retry exhaustion
-- the structural-only degraded mode is tested with no endpoint configured at all
+- structural-only mode is tested with no endpoint configured at all
+- missing/wrong-kind answers, invalid ranges/options, partial failure, cancellation, and exhausted
+  budgets remain explicit; they never become safe results
+- live semantic evaluation is a separate opt-in experiment on versioned human-labeled cases; its
+  credentials and results are not unit-test requirements
 
 ## 8. Commands
 
@@ -88,5 +93,5 @@ gofmt -l .                       # must print nothing
 - the exact command(s) run and their result
 - for golden changes, the golden diff reviewed and explained
 - for concurrency changes, the `-race` result
-- for anything touching the broker, the stubbed-path results including the failure cases
+- for anything touching a semantic adapter, the stubbed-path results including the failure cases
 - no skipped tests left behind, and no test disabled to make the change land

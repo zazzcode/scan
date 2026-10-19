@@ -12,7 +12,7 @@ remediations.
 ## PR titles — bracketed scope labels
 
 Every PR title begins with one or more bracketed scope labels, before any descriptive text. Labels map to
-the package layout in [`../architecture.md`](../architecture.md) § 18, so a reader can tell which part of
+the package layout in [architecture package map](../architecture.md#11-proposed-package-boundaries), so a reader can tell which part of
 the tool a PR touches before opening it.
 
 | Label | Scope |
@@ -21,9 +21,11 @@ the tool a PR touches before opening it.
 | `PARSE` | `internal/parse`, `internal/lang` — Tree-sitter integration, grammars, parsing |
 | `GRAPH` | `internal/graph` — node and edge model, resolver, argument bindings |
 | `RULES` | `internal/rules`, `internal/patterns` — rule engine, pattern rules, classification |
-| `TRACE` | `internal/trace` — code path tracking, pruning, pre-filter, prioritization |
-| `SCOPES` | `internal/scopes` — Track C scope selection and bundles |
-| `LLM` | `internal/llm`, `internal/context` — broker client, prompts, bundle construction |
+| `TRACE` | `internal/trace`, `internal/flow` — supported CFG/dataflow, witnesses, pruning |
+| `SCOPES` | future bounded scope checks, if separately approved |
+| `JEV` | `internal/jev` — typed System One transport/questions/answers |
+| `LLM` | `internal/llm` — LLM Findings Reviewer, evidence checks and structured review |
+| `CONTEXT` | `internal/context`, `internal/policy` — evidence, routing, decision policy |
 | `FIND` | `internal/findings` — identity, ledger, baseline, diffing |
 | `REPORT` | `internal/report` — JSON and Markdown emitters |
 | `CI` | GitHub Actions, tooling, and format gates |
@@ -43,12 +45,12 @@ labels for the packages the PR actually changes.
 [GRAPH] Resolve barrel re-exports through index.ts
 [TRACE] Bound path search depth and report dropped candidates
 [RULES] Add NoSQL operator-injection pattern rule
-[LLM] Add three-state verdict response schema
-[FIND] Fingerprint findings from rule id and symbol chain
+[JEV] Validate typed answers and uncertainty outcomes
+[FIND] Fingerprint findings from rule identity and scoped sink site
 [CI] Add race-detector test job
 [DOC] Add path-tracking standard and register in index
 [GRAPH+TRACE] Add argument bindings and consume them in path search
-[CLI+REPORT] Add --scopes and Markdown scope findings
+[CLI+REPORT] Report incomplete analysis and candidate evidence
 ```
 
 ### Not desired ❌
@@ -141,9 +143,9 @@ title, after the scope label, in the form `[<scope>] <CVE-ID>: <human descriptio
 title is what makes PR-list grep, dashboards, and post-incident audits work — burying it in the body
 breaks all three.
 
-A CVE in a Go dependency is a dependency bump, which is out of scope for this tool (see
-[`../project/02-project-scope.md`](../project/02-project-scope.md) § 3). This convention applies to CVEs in
-our own code or in the Tree-sitter bindings we vendor.
+This applies to scan's own code, dependencies, and build tooling. Maintaining scan's dependencies is
+distinct from the excluded product capability of scanning target repositories for vulnerable dependencies
+(see [scope exclusions](../project/02-project-scope.md#exclusions-and-limits)).
 
 ### Desired ✅
 
@@ -163,7 +165,7 @@ our own code or in the Tree-sitter bindings we vendor.
 ## Draft-first, human merge
 
 - Open PRs as drafts. A draft PR is the normal working state, and CI runs on it.
-- PRs target `stage`. Never `main`.
+- Feature/deliverable PRs target `stage`; human release promotion alone targets `main`.
 - **Agents do not merge PRs.** A human reviewer approves and merges.
 - Do not merge locally into `stage`; the PR is the integration path.
 - Release promotion (`stage` → `main` plus a version tag) is human-operated.

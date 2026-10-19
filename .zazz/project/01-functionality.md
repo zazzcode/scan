@@ -1,125 +1,102 @@
-# 01 — Functionality
+# 01 — Proposed functionality
 
-What `scan` does, expressed as capabilities rather than implementation. Design context:
-[`../architecture.md`](../architecture.md).
+**Concept-stage proposal, 2026-10-19.** These are desired capabilities, not built or accepted behavior.
+Technical context: [architecture](../architecture.md). Delivery boundaries:
+[scope](02-project-scope.md) and [implementation plan](implementation-plan.md).
 
-## 1. Purpose
+## Purpose and users
 
-Given a target repository, produce a ranked, evidence-backed list of potential OWASP Top 10
-vulnerabilities, where each finding is tied to a concrete source-to-sink call path — or to a known-bad
-code pattern — and states how it was detected.
+Given a source repository, produce a ranked list of potential security issues with source evidence,
+analysis limits, and a clear account of how each result was reached. Developers inspect the evidence;
+security engineers triage it; CI applies an explicitly configured policy.
 
-## 2. Detection tracks
+## Detection modes
 
-Every finding belongs to exactly one track, and the track is recorded on the finding.
-
-| Track | Detection | Determinism | Carries |
-|---|---|---|---|
-| **A — pattern rules** | Rule matches a known-bad shape; the rule is the verdict | Deterministic; byte-stable across runs | Most of the OWASP Top 10 |
-| **B — path rules** | Deterministic discovery of a source→sink path, then model judgment of whether the data is sufficiently validated | Discovery deterministic; verdict is not | Custom validators, ORM/filter parameterization, template escaping, allow-lists |
-| **C — scope review** | The model reviews a scope — a route file, a controller, a middleware chain, an auth module — rather than a path | Discovery deterministic; findings are not | Authorization, logic, and design flaws that are not dataflow properties |
-
-Consequences: Track A findings gate CI by default. Track B findings carry a confidence and can be
-treated as advisory. The tool is useful with no model configured.
-
-## 3. Functional domains
-
-**Ingestion and structure**
-
-- **FD-1 — Repository ingestion.** Walk a target repository, filter by language and path, respect ignore
-  rules, read content concurrently.
-- **FD-2 — Multi-language parsing.** Parse each file with the language-appropriate Tree-sitter grammar.
-- **FD-3 — Structural resolution.** Extract declarations, imports, call sites, and the type hierarchy
-  into a normalized graph.
-- **FD-4 — Call-site argument binding.** Record, at each call site, which argument expressions are passed
-  and which parameter position each lands in. This is the flow evidence Track B depends on.
-
-**Classification**
-
-- **FD-5 — Source identification.** Route registrations, handler signatures, CLI entry points.
-- **FD-6 — Sink identification.** Dangerous operations, each assigned a sink class: `nosql`, `sql`,
-  `shell`, `path`, `ssrf`, `html`, `deserialization`, `log`.
-- **FD-7 — Guard identification.** Validation, sanitization, and authorization functions, as first-class
-  nodes so they can be included in a bundle even when off-path.
-- **FD-8 — Data-type classification.** PII, PHI, credentials, payment data — by name and source pattern
-  only, never by value. An impact signal, not a detection.
-
-**Detection**
-
-- **FD-9 — Pattern rules (Track A).** Known-bad shape detection across the OWASP Top 10.
-- **FD-10 — Code path tracking (Track B).** Source-to-sink reachability across files, dead-end pruning,
-  deduplication, pre-filtering, and prioritization. The spine: every other capability consumes this graph.
-- **FD-11 — Scope selection (Track C).** Select the route files, controllers, middleware chains, and auth
-  modules worth reviewing, without requiring a source→sink path.
-
-**Judgment and reporting**
-
-- **FD-12 — Context bundling.** Token-bounded bundle per unit of review — a path or a scope: ordered
-  snippets, argument bindings, sink class and mitigation idiom, data types, and off-path guard
-  definitions.
-- **FD-13 — Model judgment.** Track B: a three-state verdict (`validated`, `not_validated`, `uncertain`)
-  with mandatory cited evidence and a confidence. Track C: findings with a severity and an anchor symbol.
-- **FD-14 — Reporting.** JSON and Markdown, with OWASP category, CWE ID, severity, data classes,
-  detection track, and ordered `file:line` evidence.
-- **FD-15 — Findings tracking.** Stable fingerprint; report what is new, persisting, and resolved.
-- **FD-16 — Baseline gating.** Fail CI only on findings absent from a Git-tracked baseline; per-finding
-  suppression and rule-level skips.
-- **FD-17 — Incremental rescan.** Reuse unchanged parse results and previously recorded paths; re-judge
-  only what a change affects.
-
-## 4. Vulnerability coverage
-
-Track A targets, by category:
-
-- **A01** — path traversal from user input into filesystem APIs; open redirect; sensitive data in a
-  response.
-- **A02** — weak hashing and ciphers; disabled certificate verification; plaintext transport.
-- **A03 (SQL)** — raw SQL built by concatenation with request-derived data; `eval`; `new Function`;
-  shell execution with interpolated input; unsafe template or YAML deserialization.
-- **A03 (NoSQL)** — a request-derived object passed straight into a Mongo filter; `$where`; `$regex`
-  built from user input.
-- **A04** — missing encryption of sensitive fields; persistent cookies carrying sensitive data.
-- **A05** — permissive CORS with credentials; debug mode enabled; missing security headers; cleartext
-  secrets in a cookie or JWT.
-- **A07** — hard-coded credentials; weak password hashing; improper certificate validation.
-- **A08** — deserialization of untrusted data.
-- **A09** — sensitive data written to a log.
-- **A10** — SSRF where the outbound URL is literally request-derived.
-
-**A06 is out of scope** — vulnerable and outdated components is dependency scanning, a different tool.
-
-Track B targets the same categories where the decision is *whether a mitigation is sufficient* rather
-than *whether a dangerous shape is present* — for example, whether a Mongo filter's validation is
-adequate, or whether a custom sanitizer is sufficient for the sink it feeds.
-
-Coverage grows rule by rule. The rule set is **data** — queries plus declarative rules — not code paths
-inside the scanner, so adding a rule must not require changing Go code.
-
-## 5. Supported languages
-
-| Order | Language | Why it is in this position |
+| Mode | Proposed behavior | Evidence and limits |
 |---|---|---|
-| 1 | TypeScript / JavaScript (Node.js) | Hardest resolution case: barrels, path aliases, inline anonymous handlers, middleware by reference |
-| 2 | Python | Different axis: decorators as sources, `self`, no static types |
-| 3 | Go | Receiver methods, interface dispatch |
-| 4 | Java | Annotations, and method overloads stress the node ID scheme |
+| Track A: deterministic rules | Match explicit known-risk conditions without Jev | Rule ID, supported constructs, source spans; reproducible does not mean certainly exploitable |
+| Track B: flow plus Jev | Trace supported string dependencies to a sink; assess validation/sanitization adequacy | Witnesses, guard facts, separate validation/sanitization facets, typed assessments |
+| Findings Review | LLM reviews every identified rule/Jev issue and uncertain candidate against source evidence | Supported, disputed, or needs more evidence; separate review status and cited evidence IDs |
+| Structural-only operation | Run local analysis without credentials or external calls | Pattern findings and path candidates; semantic evaluation explicitly `not_run` |
+| Track C: future bounded scope checks | Assess explicitly enumerated authorization/logic questions | Deferred; separate evidence contract, corpus, and specs required |
 
-Each language contributes exactly three things: a grammar, source/sink/guard query sets, and a resolver.
-Adding a language must not require changes to traversal, pruning, or the LLM stage.
+Jev is the primary semantic assessor; the LLM Findings Reviewer is the planned review stage for
+identified issues. No mode claims complete OWASP Top 10 coverage. Reports preserve source evidence,
+Jev Assessments, and reviewer conclusions separately. A skipped/failed review stays explicit.
 
-## 6. Interfaces
+## Functional domains
 
-- **CLI** — `scan <path>` with flags for language selection, output format, baseline, and LLM
-  configuration. Subcommands for inspection: `--list`, `--graph`, `--classify`, `--paths`, `--scopes`,
-  `--explain <path-id>`.
-- **Machine-readable output** — a JSON findings document, stable enough for CI consumption, with a
-  versioned schema.
-- **Human-readable output** — a Markdown report grouped by severity and OWASP category, each finding
-  showing its call path and its detection track.
+| Domain | Proposed capability |
+|---|---|
+| FD-1: input selection | Deterministic manifest, language/path selection, ignore policy, skipped-file accounting |
+| FD-2: extraction | Tree-sitter CSTs and versioned query captures with exact source locations |
+| FD-3: normalization | Language adapters emit operations, symbols, blocks, values, and provenance |
+| FD-4: resolution | Resolve supported imports, call targets, handlers, parameters, returns, and framework registrations |
+| FD-5: classification | Identify sources, sinks, and candidate guards through rules/library models |
+| FD-6: local flow | Track declared assignments, expression dependencies, branch joins, and bounded loops |
+| FD-7: cross-function flow | Propagate supported argument/parameter and return dependencies through bounded summaries |
+| FD-8: deterministic rules | Detect tested patterns and rule-specific mitigation facts without inference calls |
+| FD-9: path candidates | Produce bounded source-to-sink witnesses; deduplicate and account for unexamined candidates |
+| FD-10: evidence preparation | Bundle snippets, spans, bindings, guards, sink semantics, and completeness markers |
+| FD-11: Jev Assessment | Experiment with versioned Noul/Choice questions about string validation and sanitization; validate typed responses |
+| FD-12: findings review and policy | LLM reviews identified issues and uncertain candidates; Go reconciles separate assessments, exposes disputes/incomplete review, and applies policy |
+| FD-13: reporting | Versioned JSON and readable Markdown; possible later SARIF export |
+| FD-14: finding identity | Stable identity independent of model predictions; group related source traces |
+| FD-15: comparison and baseline | New/persisting/changed assessments, reviewable suppressions, explicit incomplete-scan semantics |
+| FD-16: incremental rescan | Reuse unchanged artifacts with dependency- and version-aware invalidation |
 
-## 7. Open questions
+Optional name/pattern-based sensitive-data tags may inform prioritization later. They are heuristic
+signals and are not proof of sensitive runtime data.
 
-- Should the CLI make the "not a guarantee" caveat part of the normal output rather than a `--help` note?
-- How are false positives suppressed across runs — baseline entries, inline annotations, or both?
-- Is a Bearer-style privacy report a future output, given `data_classes` already exists?
-- Should rule documentation (the pattern each rule matches) be generated from the rules themselves?
+## Initial rule families and coverage
+
+The first feasibility slice focuses on a few JS/TS source-to-sink families. Expand only after measuring
+safe/vulnerable pairs and unsupported constructs.
+
+| Family | Candidate evidence | Mitigation distinctions to test |
+|---|---|---|
+| SQL injection | Source-derived query fragments, query API, parameter positions | Bound values versus dynamic identifiers or SQL fragments |
+| NoSQL operator injection | Untrusted values/objects entering database filters | Scalar coercion, schema enforcement, operator/object allow-lists |
+| Command injection | Shell command construction and execution mode | Shell interpolation versus argument-vector execution; executable/option control |
+| Path traversal | Untrusted path parts reaching filesystem operations | Normalization versus enforced base-directory containment |
+| SSRF | Untrusted input affecting an outbound request target | Host/scheme restrictions, redirects, unresolved runtime/network behavior |
+| Unsafe deserialization / HTML injection | Input reaching a relevant API or output context | Type- and context-specific protection |
+| Pattern-only configuration / crypto | Explicit risky API/configuration use | Precisely documented rule preconditions and counterexamples |
+
+Not every occurrence of `exec.Command`, SQL construction, a regex, or a validation API is a
+vulnerability or a mitigation. Rules declare what they establish and when the case needs more evidence.
+Missing authorization, insecure design, and deployment-dependent configuration cannot be inferred
+reliably from an arbitrary code pattern alone; broad coverage of those remains future work.
+
+OWASP mappings include an explicitly selected edition in the future catalog. CWE mappings and severity
+come from reviewed rule metadata. The old unversioned A01–A10 list is retired rather than carried
+forward as a release commitment. Dependency vulnerability scanning is excluded.
+
+## Language sequence
+
+JS/TS first, then Python, then Go and Java. The sequence and first release set remain proposed.
+Each adapter includes extraction, resolution, lowering/flow semantics, library models, and a coverage
+matrix. Recognizing a file extension is not analysis support. Additional languages may expose core IR
+changes that need a reviewed contract revision.
+
+## Interfaces and report semantics
+
+The only source-level CLI foundation currently present is `scan --list [--json] <path>`. All analysis
+interfaces are future spec work. Inspection of graph, classifications, witnesses, and explanation bundles
+is desirable, but exact flags/subcommands are not decided by this document.
+
+Security reports should include detection mode, source/sink evidence, rule/CWE/OWASP metadata,
+severity policy, assessment status, model/question versions when used, and coverage gaps. Evaluation
+states distinguish `not_run`, `completed`, and `failed`; a completed semantic assessment can be
+`uncertain`. Neither a request failure nor absent credentials produces a safe verdict.
+
+Stable candidate identity is distinct from current risk assessment. A changed assessment remains
+visible even when the fingerprint is unchanged. A missing result from an incomplete scan cannot be
+reported as resolved. CI policy and future security exit codes need their own spec.
+
+## Decisions before specs
+
+The [proposal register](03-jev-design-proposal.md#open-decision-register) tracks first-slice selection,
+semantic-policy requirements, CI behavior, and allowed source transmission. The
+[evaluation protocol](04-jev-validation-research.md#proposed-corpus-and-evaluation-protocol) defines
+how to assess the resulting capability choices.

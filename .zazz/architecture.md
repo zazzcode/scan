@@ -1,729 +1,394 @@
 # Architecture
 
-Tech stack and technical approach for `scan`.
+**Architecture direction, 2026-10-19; implementation requires greenlit specs.** This document owns
+technical responsibilities and contracts. Product purpose/state lives in [project.md](project.md),
+rationale and decisions in the [proposal](project/03-jev-design-proposal.md), and delivery order in the
+[implementation plan](project/implementation-plan.md).
 
-**Status: draft, under active design iteration.**
+## 1. Architecture premise
 
-## 1. Premise
+Tree-sitter extracts syntax. Go establishes supported control and data dependencies. **Jev is the
+primary semantic assessor for whether a candidate string is adequately validated or sanitized for
+its particular use. The LLM Findings Reviewer reviews identified issues against their evidence.**
+Go retains orchestration, reconciliation, reporting, and CI policy.
 
-**A capable LLM reasons about code better than a static analyzer, and handles the cases that break
-static analysis.**
+All scan-authored scanner and code-analysis code is Go: language adapters, graph/flow analysis,
+rules, model API clients, orchestration, reporting, and evaluation harnesses. Python and other target
+languages describe code being scanned, not implementation runtimes. Tree-sitter's native parser and
+grammars remain dependencies with explicit build requirements; this is not a pure-Go dependency claim.
+Jev and the LLM are external inference services accessed through Go adapters.
 
-| SAST breaks on | Why | Who handles it here |
+The model split aims to use Jev for fast, lower-cost decisions over candidates and reserve deeper
+LLM Findings Review for identified issues, uncertain candidates, and the protected-case audit below.
+Measure total pipeline cost and latency, including review volume, retries, and context assembly;
+Jev's per-request advantage alone does not establish end-to-end savings.
+
+Experiments measure Jev's accuracy, required context, and failure cases. Findings Review covers all
+identified issues in the full pipeline. Provider/model selection, budgets, and calibrated thresholds
+remain open.
+
+| Role | Responsibility | Output |
 |---|---|---|
-| Custom validators and sanitizers | Whether a regex or a hand-rolled check is *adequate* is semantic | LLM (Track B) |
-| Framework indirection | Dynamic routing, DI, decorators, middleware ordering defeat syntactic flow models | LLM (Track B, C) |
-| Dynamic dispatch, reflection, metaprogramming | Targets are not statically known | LLM (Track C) |
-| Authorization and logic flaws | Not dataflow properties at all | LLM (Track C) |
-| Business-logic-dependent exploitability | Requires understanding intent | LLM (Track C) |
-| Stored and second-order flows | The source is not a request parameter | Partial — surfaced as unresolved |
-| Whether a mitigation is *sufficient* | Inherently a judgment | LLM (Track B) |
+| Tree-sitter and Go | Extract code, resolve supported relationships, trace values and guards | Source-backed candidates and analysis gaps |
+| Jev Assessment | Assess string validation, sanitization, and relevance to the named sink | Typed assessments and proposed issues |
+| LLM Findings Reviewer | Independently inspect the evidence for each identified issue, then compare with the proposed assessment | Supported, disputed, or needs more evidence; evidence references |
+| Go policy/reporter | Preserve assessments, apply explicit policy, report findings and review completeness | Auditable report and configured CI result |
 
-We do not try to out-engineer SAST on its own terms. We do the deterministic work static analysis is
-genuinely good at — parsing, resolution, path tracking, pattern matching — and hand the semantic
-questions to the model.
+Terminology: a **candidate** is a string/use needing assessment; an **identified issue** is a proposed
+finding raised by Jev or deterministic rules. **Findings Review** is the stage performed by the
+**LLM Findings Reviewer**; reports retain findings together with their assessment and review status.
 
-## 2. Design principle
+A call path means potential reachability; a dataflow trace means a supported value dependency under
+declared assumptions. Neither a model judgment nor a trace proves runtime execution or exploitability.
 
-Split **deterministic structure** from **semantic judgment**.
+## 2. Pipeline
 
-1. Tree-sitter extracts structure — declarations, call sites, imports — without executing the target.
-2. The scanner normalizes that into one language-agnostic graph and classifies sources, sinks, guards,
-   and data types.
-3. Deterministic code tracks the paths through that graph and produces findings for everything decidable
-   by shape.
-4. The model handles what requires judgment, reasoning over prepared context rather than raw files.
+```mermaid
+flowchart TD
+    Repo["Target repository"] --> Parse["Tree-sitter CST and queries"]
+    Parse --> IR["Go adapters, resolution, and normalized IR"]
+    IR --> Rules["Track A: deterministic rule findings"]
+    IR --> Flow["Go CFG and bounded dataflow"]
+    Flow --> Bundle["Candidate strings, source-to-sink evidence, and gaps"]
+    Bundle --> Jev["Jev: validation and sanitization assessment"]
+    Jev --> Issues["Identified issues and uncertain cases"]
+    Jev --> Retained["Retain all assessments for coverage and audit"]
+    Retained -->|Protected-case audit sample| Review
+    Rules --> Review["Findings Review"]
+    Issues --> Review
+    Review --> Policy["Go: reconcile results and apply policy"]
+    Retained --> Policy
+    Policy --> Report["Findings, review status, coverage, JSON and Markdown"]
+```
 
-There is deliberately **no dataflow engine** — no taint propagation through parameters, returns, fields,
-or aliases, and no hand-coded source-to-sink string tracking. That class of engineering is what the
-premise replaces.
+Every identified rule or Jev issue enters Findings Review in the full pipeline. Uncertain candidates
+also enter review; a sampled set of Jev's adequately-protected candidates provides a false-negative
+audit. This sample measures missed issues in addition to reviewing identified ones. Local-only and
+Jev-only runs are useful for diagnostics/experiments, but their reports explicitly mark omitted stages.
 
-## 3. Code path tracking — the core capability
+Ingestion and parsing use bounded workers. Graph construction has explicit ownership; workers do not
+mutate shared graph state without a defined merge strategy. Independent analyses and model requests
+may use bounded pools. Stable sorting removes scheduling dependence from deterministic artifacts.
 
-Everything else depends on this. If we cannot resolve what calls what across files, there is no graph
-worth traversing, no path to hand a model, and no stable identity for scan-to-scan tracking. This is the
-Graphify approach, and it is the load-bearing part of the system.
+## 3. Parsing and language adapters
 
-### Why it is the key
+The leading parser candidate is [tree-sitter/go-tree-sitter](https://github.com/tree-sitter/go-tree-sitter)
+with separately selected grammars. The binding uses native resources that need explicit lifetime
+management. A parser spec must decide cgo/build requirements, grammar compatibility, error recovery,
+and supported platforms before promising a static binary.
 
-**It reduces what the model has to review.** The alternative — pointing a model at a repository — spends
-its entire context window locating relevant code, and gives no guarantee it found the right code. A
-tracked path hands the model exactly the code on that path, in order, with the guard and sink already
-identified. The model spends its context on reasoning instead of search, which is both cheaper and more
-accurate.
+Tree-sitter queries identify syntax such as calls, assignments, branches, route registrations, and
+candidate source/sink/validator APIs. A query match is not proof of validation or of data reaching a
+sink. A function named `sanitize` is only a candidate guard.
 
-**It provides structure for analysis.** A path is an explicit claim: this entry point reaches this
-operation, through these intermediate functions, with these guards present or absent, passing these
-arguments. The model reasons *over that structure* rather than over loose files. It can cite the path, and
-so can a human reviewing the finding. That structure is also what makes findings comparable across runs.
+Each language adapter owns grammar selection, query sets, symbol/module resolution, syntax lowering,
+and framework/library transfer models. Adding a language includes its control/dataflow semantics,
+not merely a grammar and resolver. The shared core consumes normalized operations and declared
+capabilities. A new language may expose an IR gap; revisit the contract through a spec rather than
+forcing incorrect semantics into an existing operation.
 
-**It is the only way the three tracks share anything.** Track A needs call relationships to reason about
-structural patterns. Track B is source→sink paths. Track C scopes are graph-derived neighbourhoods — a
-route file, its handlers, the middleware chain around them. One graph, three uses.
+Initial focus is JS/TS: aliases, barrel re-exports, inline handlers, middleware passed by reference,
+shadowing, and package boundaries. Python decorators, Go receiver/interface calls, and Java overloads
+are design pressure cases; unsupported behavior remains explicit until its adapter lands.
 
-### How it works
+## 4. Normalized representation and graph views
 
-1. **Extract.** Parse each file with Tree-sitter and emit declarations, imports, and call sites.
-2. **Resolve.** Turn each call-site reference into a node ID where the target is statically knowable.
-   This is the hard part, and the most language-specific — see § 6.2.
-3. **Connect.** Emit edges for calls, references, imports, and the type hierarchy — see § 7.
-4. **Classify.** Mark sources, sinks, guards, and data types — see § 11.
-5. **Annotate.** Record, at every call site, which argument expressions are passed and where they land —
-   see § 10. This is what lets the model check flow rather than guess it.
-6. **Traverse.** From each source, search forward for reachable sinks, bounded by depth.
-7. **Prune.** Drop nodes that neither descend from a source nor reach a sink; keep only the minimal
-   connecting subgraph; collapse paths differing by an uninteresting prefix.
-8. **Pre-filter.** Drop paths where no call-site argument is source-derived or non-literal. A path of
-   constants cannot carry untrusted data, and paying a model to discover that is waste.
-9. **Prioritize.** When the candidate set must be capped, order by sink severity, data-class impact, and
-   centrality. Graphify's *god nodes* — the most-connected concepts — are a useful signal: a path through
-   a hub is more likely to be reachable in practice.
+The proposed IR carries modules, callables, basic blocks, statements/operations, value definitions,
+uses, and source spans. Security roles are annotations and can overlap; a callable-only node model is
+insufficient for assignments and branch guards.
 
-Traversal runs against the in-memory graph (§ 14). It is the hot loop of the whole tool, and a database
-round trip in that loop is pure overhead.
+| View | Representative relationships | Meaning |
+|---|---|---|
+| Module and symbols | `IMPORTS`, `RE_EXPORTS`, `REFERENCES`, `CALLS` | Names and possible invocation targets |
+| Type relationships | `INHERITS`, `IMPLEMENTS` | Supported static type relationships |
+| Control flow | `NEXT`, `TRUE_BRANCH`, `FALSE_BRANCH`, `RETURN` | Possible ordering within a callable |
+| Data dependencies | `DEFINES`, `USES`, `ASSIGNS`, `ARG_TO_PARAM`, `RETURN_TO_CALL` | Supported value transfer |
+| Framework/security | route registration, source/sink/guard annotations | Rule/model facts with provenance |
 
-### Where this can go wrong
+Exact enums and serialized types belong to a future schema spec. Relations carry provenance, source
+spans, the resolver/transfer rule used, and unresolved/approximate status. Extracted syntax and inferred
+relationships are distinguishable; these labels are not statistical confidence scores.
 
-- **Resolution correctness.** Barrels, path aliases, and monorepo layouts in TS/JS. If resolution is
-  wrong, every downstream finding is noise. This is why it lands early in the plan.
-- **Candidate explosion.** In a real service, nearly every route transitively reaches nearly every
-  repository function. Steps 7–9 are doing all the work, and **the pre-filter is where real findings can
-  be silently lost.** It is the least principled component in the design and deserves deliberate
-  attention rather than tuning by feel. Dropped paths must be countable and reportable, never invisible.
-- **Anonymous node identity.** Inline arrow handlers are the most common real handler shape and the
-  easiest to name unstably. Unstable naming means unstable fingerprints means scan-to-scan churn.
+CFGs and call graphs can contain cycles. They are not assumed to be DAGs. Traversal uses bounded
+worklists/summaries and explicitly reports recursion, loop, depth, or candidate limits reached.
 
-## 4. Three detection tracks
+Identity separates semantic identity from display locations. Symbols include module/namespace,
+receiver and signature discriminators as needed; anonymous callables and multiple sink sites need
+stable disambiguation. Line numbers alone are not identities. Rename/move/collision behavior is a
+future contract to test, not an assertion that any symbol chain is globally unique.
 
-Every finding belongs to exactly one track, and the track is recorded on the finding.
+### Graph storage decision
 
-### Track A — pattern rules (deterministic end to end, no LLM)
+Use scan-owned typed Go adjacency structures as the canonical in-memory representation. Node/edge
+records carry relation kinds and provenance; forward/reverse indexes support relation-filtered
+queries. Preserve multiple relations between the same endpoints and self-edges where the IR requires
+them. Dense internal indexes may optimize access but are distinct from persistent semantic identities.
 
-A rule matches a known-bad code pattern. The rule *is* the verdict. No model call, no verdict churn,
-byte-stable across runs.
+Build with explicit ownership, then expose stable read views to analysis workers. Keep per-analysis
+worklist/visited/abstract state separate from the shared graph; traversal state may include value and
+call context, not only a node ID. Stable ordering is part of the graph contract.
 
-This track carries most of the OWASP Top 10. Using Bearer's published rule catalog as the reference for
-what is pattern-matchable:
+Gonum is not the planned storage dependency. A specific algorithm may later justify a small adapter
+over a selected graph view, without duplicating the canonical store. The
+[decision rationale](project/03-jev-design-proposal.md#graph-representation-decision) records tradeoffs,
+validation work, and conditions for reconsidering this choice.
 
-| Category | Pattern findings that need no LLM |
+## 5. Go analysis engine
+
+### Local flow first
+
+The first flow slice covers a declared JS/TS subset: source values, assignments/reassignments,
+parameters, expression dependencies, branches, returns, and bounded loop handling. A spec must define
+join/merge semantics and conservative handling for unknown operations. Fields, aliases, closures,
+exceptions, async behavior, and heap mutation are separate capability decisions, never silently
+assumed correct.
+
+### Bounded interprocedural flow second
+
+Resolved argument-to-parameter and return-to-call edges connect local analyses. Function summaries
+record input/output dependencies and mitigation facts under declared assumptions. Limits include call
+depth, recursion iterations, candidate count, and per-source work. Unknown calls and external packages
+produce an explicit gap unless a versioned library model defines their behavior.
+
+No exhaustive path enumeration is required. Summary/worklist analysis can retain representative
+witness traces with join points and approximation markers. Cycle handling and termination belong in
+acceptance tests.
+
+### Guards and mitigations
+
+A guard mitigates only the specific value/use and sink context it protects. Checking a value after a
+sink, ignoring a validator result, validating an unrelated copy, or taking an unchecked branch does
+not discharge a candidate. Parameter binding, allow-listing, HTML encoding, path containment, and
+shell execution mode are distinct rule-specific facts.
+
+A sanitizer's presence does not terminate taint tracking. Deterministic suppression requires a modeled
+transfer/mitigation rule with its preconditions established. Jev can classify a custom check's apparent
+adequacy from supplied evidence; it cannot turn an unresolved flow into a proven safe one.
+
+### Protection is specific to a value use
+
+Jev Assessment and Findings Review evaluate the tuple **value → transformations/guards → sink →
+control-flow assumptions**. If the protection is correct for that exact use and relevant paths, the
+particular vulnerability is prevented; there is no context-independent “safe string” property.
+An HTML-text encoder does not establish SQL/path safety, and valid identifier syntax does not establish
+resource authorization. See [OWASP validation guidance](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html)
+and [context-specific encoding](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html).
+
+The LLM Findings Reviewer is explicitly responsible for challenging a mismatch between protection and
+use: wrong encoding context, ignored return, validation of a different value, bypass path, later
+transformation, or missing business/framework facts. Successful code-level protection and correct model
+recognition of that protection are separate test expectations. The reviewer needs the applicable code;
+it cannot close a gap in evidence by agreeing with Jev.
+
+## 6. Detection and candidate selection
+
+**Track A — deterministic rules.** Findings arise from explicit rule conditions over extracted or
+supported analysis facts. Determinism describes reproducibility, not certainty that the code is
+exploitable. Each rule declares CWE/OWASP edition mapping, severity policy, supported frameworks,
+positive/negative examples, and evidence requirements.
+
+**Track B — path classification.** Go produces a bounded source-to-sink candidate with dataflow
+witnesses, sink semantics, guards, and gaps. Jev evaluates only the semantic questions not settled by
+those facts. Classification is an annotation on the candidate, not its identity.
+
+**Track C — deferred.** Broad controller/authorization/logic review is not carried forward as an
+open-ended Jev task. Any future scope check must enumerate its questions, candidate anchors, required
+evidence, and evaluation corpus before implementation.
+
+Pruning removes irrelevant graph regions; rule-specific filters handle established mitigation facts.
+A non-literal argument is not automatically untrusted, and constants do not by themselves prove all
+related operations safe. Unknown or truncated cases are unexamined/uncertain, with reason counts.
+Prioritization by rule severity and evidence completeness changes processing order, not proof of safety.
+
+## 7. Evidence bundle contract
+
+A bundle contains a stable candidate ID, rule/version, source and sink spans, ordered witness operations,
+call-site bindings, branch/guard facts, relevant validator definitions, library-model/version facts,
+and explicit gaps. Source snapshots/hashes bind every span to the analyzed revision.
+
+Per-file, per-snippet, per-bundle, per-run, and request-size budgets are specified before live use.
+Incomplete required evidence cannot be silently truncated into a “validated” result. Oversized or
+unresolvable candidates are reported as unexamined or uncertain. Repository comments are untrusted
+source data, not instructions for the classifier. Payload minimization and redaction policies must
+preserve the evidence needed for the question and record any resulting loss.
+
+Go constructs source references and report templates. Jev does not generate explanations or citations.
+The LLM Findings Reviewer references supplied evidence IDs; its interpretation is separate from the
+underlying source evidence.
+
+## 8. Jev Assessment and Findings Review
+
+### Jev experiment and adapter
+
+Jev receives a candidate string's origin, transformations, named field requirements, validator/helper
+bodies, relevant guard results, sink context, and known gaps. The experiment tests separate questions:
+
+- Does the shown validation enforce the named field/type/format constraint?
+- What sanitization/encoding transformation is applied, if any?
+- Is that transformation appropriate to the named sink and output context?
+
+Validation and sanitization are separate assessments; neither is universally required for every sink.
+A parameterized operation, for example, may protect a value without a string-cleaning function.
+Go establishes whether the examined/transformed value and required guard outcome reach the actual
+sink. Jev does not reconstruct missing control flow or certify a function globally safe.
+
+```mermaid
+flowchart TD
+    Value["Candidate string and its source"] --> Context["Go traces value, guard use, and sink context"]
+    Context --> Ready{"Required evidence available?"}
+    Ready -->|Yes| JevCheck["Jev assesses validation and sanitization adequacy"]
+    Ready -->|No| Unknown["Uncertain: preserve missing-evidence reason"]
+    JevCheck --> Classify{"Go interprets typed assessments"}
+    Classify -->|Potential protection gap| Issue["Proposed issue"]
+    Classify -->|Uncertain| Unknown
+    Classify -->|Adequately protected| Audit["Retain assessment and sample for audit"]
+    Issue --> Reviewer["Findings Review"]
+    Unknown --> Reviewer
+    Audit -->|Audit sample| Reviewer
+```
+
+[TypeSafe's API](https://docs.typesafe.ai/api) accepts state and typed questions at the System One
+endpoint. Its Go adapter uses `net/http` and `encoding/json`; see the
+[library choices](project/03-jev-design-proposal.md#library-choices). Noul/Choice questions are versioned
+and atomic. Independent questions may share a request; dependent questions run in separate stages.
+Item batching preserves per-candidate failures and coverage under bounded concurrency. Go validates
+answer IDs, types, ranges, and allowed options before applying calibrated policy.
+
+The provisional outcomes `adequately_protected`,
+`protection_gap`, and `uncertain` describe candidate protection under stated criteria; the facet
+assessments retain the distinction between validation and sanitization. Missing validation alone is
+not automatically an exploitable issue. Exact field names/thresholds belong in the future spec.
+An answer below a finding threshold is not by itself an adequately-protected verdict. Scores do not
+directly set severity; Go applies rule-specific mappings, evidence requirements, and calibrated policy.
+
+### LLM Findings Reviewer contract
+
+For each identified issue, the reviewer examines the same bounded source evidence, relevant helper
+bodies and framework facts, then evaluates whether the proposed issue is supported. Its first pass
+assesses the evidence without Jev's conclusion to reduce anchoring; Go then compares the independent
+result with the Jev/rule assessment. Any follow-up reconciliation call is explicit and bounded.
+
+The review checks the claimed input-to-sink connection, whether validation/sanitization protects the
+actual value/use, bypasses and contradictory evidence, and whether required context is missing.
+The reviewer cannot create graph facts or assume omitted code is safe. It returns a structured verdict
+of `supported`, `disputed`, or `needs_more_evidence`, with evidence IDs and a concise explanation.
+Jev and reviewer results remain separate. A dispute is visible; it does not silently delete a finding.
+
+```mermaid
+sequenceDiagram
+    participant G as Go orchestrator
+    participant J as Jev Assessment
+    participant L as LLM Findings Reviewer
+    participant R as Report
+    G->>J: Candidate evidence and atomic questions
+    J-->>G: Typed validation and sanitization assessments
+    G->>L: Issue evidence, without Jev conclusion
+    L-->>G: Independent assessment and evidence IDs
+    G->>G: Compare assessments and validate citations
+    opt Reconciliation needs additional review
+        G->>L: Both assessments and bounded clarification evidence
+        L-->>G: Supported, disputed, or needs more evidence
+    end
+    G->>R: Findings, separate assessments, and completeness status
+```
+
+Both adapters have explicit enablement, credentials, pinned models, deadlines, concurrency/request
+limits, retry/backoff rules, cancellation, and run budgets. No-key operation marks missing stages
+`not_run`; request failures mark them `failed`. A cap or missing credential leaves issues visibly
+unreviewed, not accepted or reviewed-safe. An unavailable reviewer does not silently substitute a
+Jev-only result for completed Findings Review. Humans retain acceptance and suppression authority.
+
+## 9. Findings, comparison, and CI
+
+The report separates candidate discovery from semantic assessment and CI eligibility:
+
+| Record | Proposed contents |
 |---|---|
-| A01 | Path traversal from user input into `path.join`/`sendFile`; open redirect from a request value into `res.redirect`; sensitive data exposed in a response |
-| A02 | Weak hashing (`md5`, `sha1`), weak ciphers (`DES`, ECB), `InsecureSkipVerify`, `rejectUnauthorized: false`, plaintext HTTP endpoints |
-| A03 (SQL) | `eval`, `new Function`, `child_process.exec` with a template literal, `dangerouslySetInnerHTML`, raw SQL built by concatenation with a request-derived value, `yaml.load` without `SafeLoader`, `pickle.loads` |
-| A03 (NoSQL) | A request-derived object passed straight into a Mongo filter (`Model.find(req.body)`, `findOne(req.query)`), `$where` present, `$regex` built from user input |
-| A04 | Missing encryption of sensitive fields; persistent cookies carrying sensitive data |
-| A05 | CORS `origin: '*'` with credentials, debug mode enabled, missing security headers, cleartext secrets in a cookie or JWT |
-| A07 | Hard-coded credentials, weak password hashing, improper certificate validation |
-| A08 | Deserialization of untrusted data |
-| A09 | Sensitive data written to a log |
-| A10 | SSRF where the outbound URL argument is literally a request-derived member access |
+| Candidate | identity, rule/version, source/sink, witness, guard facts, analysis gaps |
+| Assessment | Jev validation/sanitization facets, typed answers, model/question/bundle versions, policy outcome |
+| Findings Review | completion status, independent reviewer verdict, evidence IDs, disagreement, model/prompt version |
+| Finding | detection track, rule title, CWE/OWASP mapping, severity, evidence, template explanation |
+| Coverage | supported/skipped files, parse failures, unresolved edges, limits hit, unexamined candidates |
 
-A06 (vulnerable and outdated components) is deliberately **out of scope** — it is dependency scanning, a
-different tool. Bearer omits it for the same reason.
+A deterministic rule does not get a probability of `1.0`; rule certainty and model probability are
+separate concepts. Template explanations identify observed facts and predictions separately.
 
-Track A findings are deterministic. They gate CI by default.
+Fingerprints exclude Jev answers, probabilities, model versions, and policy thresholds. A proposed key
+uses rule identity plus a scoped sink-site identity; source traces group beneath the finding. The exact
+collision/rename/grouping scheme must be specified and tested before persistence. Candidate identity
+is separate from whether an assessment currently meets finding/report policy.
 
-The SQL and NoSQL rows are not interchangeable, and we get to test that directly. The first two acceptance
-targets are TypeScript apps — one over MongoDB, one over SQL. Same language, two sink classes, and a
-measurable hypothesis: **SQL paths should mostly settle deterministically**, because the presence of bound
-parameters is close to decisive, while **NoSQL paths should mostly escalate to Track B**, because Mongo
-has no equivalent escape hatch. If the split does not come out that way in practice, § 4 needs revisiting.
-See § 11.
+A verdict change is an assessment change, not a new structural candidate. It can still require review
+or affect policy; stable identity must not silently hide changed risk. Missing/failed/limited analysis
+cannot mark a previously observed issue resolved. Comparison requires compatible scan scope and
+analysis versions, otherwise status is unknown/unexamined.
 
-### Track B — path rules (deterministic discovery, LLM judgment)
+Git-tracked baseline entries record reason and ownership; new-finding gating and severity policy are
+reviewed separately. Proposed defaults gate selected new Track A findings and keep Track B advisory
+until calibrated and explicitly enabled for gating. Exact baseline semantics, incomplete-scan behavior,
+and exit codes belong to a future reporting spec. Existing manifest exit codes remain unchanged now.
 
-A rule finds a source→sink path via § 3. The path's *existence* is deterministic; whether the data is
-sufficiently validated is the model's judgment. Identity comes from the path, never from the verdict.
+## 10. Persistence and determinism
 
-Track B exists for the cases rules genuinely cannot decide: custom validators, regex quality, ORM and
-filter parameterization, template escaping, framework allow-lists, and whether data actually flows given
-the call-site argument bindings.
+Execution uses the [typed adjacency representation](#graph-storage-decision); ordered JSON is an
+interchange artifact. Persistence starts with a local cache. Graph databases and Redis are deferred.
 
-### Track C — scope review (insight where paths cannot reach)
+Cache Jev Assessment and Findings Review responses separately. Reviewer keys include provider/model,
+prompt/schema, exact source evidence, and any supplied prior assessments. Audit-selection or
+reconciliation-policy changes can create additional review work.
 
-Some findings are not paths at all. "This handler fetches by ID without checking ownership." "This chain
-authenticates but never authorizes." "This error path returns the full user document." Those are
-authorization, logic, and design flaws, and they are where whole-program analyzers are structurally blind,
-because they are not dataflow properties.
+Cache keys cover content, grammar/binding version, adapter/IR version, resolver configuration,
+transitive summaries/library models, rule version, complete evidence bundle, Jev model/question
+version, and request options. Raw typed responses are cached separately from policy outcomes, so
+threshold changes can be evaluated without inference. Validator summaries cannot be cached as globally
+“safe” on a function-body hash alone; value, sink, configuration, and dependency context matter.
 
-Track C hands the model a **scope** — a route file, a controller, a middleware chain, an auth module —
-derived from the same graph. No source→sink path is required and none is constructed. Scope selection is
-the Track C analogue of path pruning, and is *Open* below.
+Changed imports, callers/callees, guard definitions, models, or configuration invalidate affected
+artifacts. Cached and uncached analysis must agree. Exact storage format is deferred to its spec.
 
-This is the mode where semantic review most clearly exceeds static analysis, so it is first-class rather
-than a fallback.
+Deterministic graph/candidate/rule artifacts are stable for identical input and versions regardless of
+worker ordering. Live Jev predictions have no assumed byte-stability guarantee. Request metadata and
+operational timing are separate from deterministic artifacts.
 
-### Why the split matters
+## 11. Proposed package boundaries
 
-- **Determinism where it counts.** Track A findings are stable scan-to-scan and never appear as churn.
-  Track B's *existence* is stable; only its verdict is not.
-- **Cost.** Track A and the whole path-tracking pipeline cost zero tokens. Only Track B paths and Track C
-  scopes reach a model.
-- **Trust differentiation.** Consumers can gate hard on Track A and treat low-confidence Track B and C
-  findings as advisory. The finding says how it knows.
-- **Degraded mode is a product, not a fallback.** With no API key configured, Track A and the full
-  deterministic pipeline still work.
-- **A different error profile from SAST.** A dataflow analyzer over-reports inside the scope it models;
-  Tracks B and C reach further semantically and under-report outside what the graph and the scopes cover.
-  Complementary, not competing.
+Only `cmd/scan`, `internal/lang`, and `internal/walk` currently exist. Add packages when approved specs
+supply real consumers; this table is a responsibility map, not an instruction to scaffold placeholders.
 
-### What stays deterministic
-
-| Concern | Deterministic | Rationale |
-|---|---|---|
-| Language detection, parsing | Yes | Tree-sitter AST |
-| Module/import graph | Yes | Resolution is a lookup, not a judgment |
-| Code path tracking | Yes | Graph traversal |
-| Source, sink, guard identification | Yes | Pattern matching on known APIs |
-| Sink class | Yes | `db.raw` is a SQL sink, always |
-| Call-site argument bindings | Yes | Syntactic extraction |
-| Guard present/absent on a path | Yes | Structural fact |
-| Data-type classification (PII, PHI, credentials) | Yes | Name and source patterns, never values |
-| Pattern findings (Track A) | Yes | Rule is the verdict |
-| Finding identity / fingerprint | Yes | Never depends on a verdict |
-| Scan-to-scan diff | Yes | Set membership |
-| **Validation sufficiency** | **No — LLM** | Semantic judgment |
-| **Does the data actually flow** | **No — LLM** | Judgment given arg bindings |
-| **Exploitability in context** | **No — LLM** | Judgment |
-| **Authorization and logic gaps** | **No — LLM** | Not a dataflow property; Track C's reason to exist |
-
-Rule of thumb: **if it can be decided by matching a known shape, it is deterministic code. If it requires
-judging whether a human's mitigation is adequate, it is the model.**
-
-## 5. What the graph must carry
-
-The model can only judge what it is shown. The graph's job is to make that judgment **checkable rather
-than guessable**.
-
-1. **Call-site argument annotations.** Without these, the model is asked to infer inter-procedural flow
-   from whole function bodies — the dataflow problem, handed to the model, and it will hallucinate. See
-   § 10.
-2. **Off-path guard definitions.** The validator usually lives in another module. If the bundle holds only
-   path nodes, the model calls it unvalidated. See § 11.
-3. **Sink class and mitigation idiom.** SQL parameterization, shell escaping, HTML encoding, path
-   traversal, and SSRF allow-listing are different questions. See § 11.
-4. **Path evidence.** Ordered `file:line` spans per node, so every verdict is auditable.
-5. **Guard status on the path.** Whether a guard sits on the path is a structural fact and must never be
-   something the model has to discover.
-
-## 6. Language abstraction
-
-Four things must be settled before the first language is implemented, because retrofitting them is
-expensive. The test for each: **Python and Java must be able to fill it in without changing the core.**
-
-### 6.1 Language adapter
-
-Each language supplies exactly: a grammar, the file extensions it claims, source queries, sink queries,
-guard queries, and a resolver. Nothing else language-specific may leak into the core. If `internal/trace`
-or `internal/graph` ever needs to know the language, the boundary is wrong.
-
-### 6.2 Resolver
-
-Module resolution is the most language-specific piece and the most likely to be botched — and it is what
-makes § 3 work or fail. A resolver that assumes "an import path resolves relative to the file" works for
-JS and Python and quietly breaks for Go and Java.
-
-```go
-// Resolver turns a callee reference in a file into a graph node ID.
-// Returning ok=false is expected and normal: dynamic targets and external
-// dependencies are not resolvable, and that is recorded rather than dropped.
-type Resolver interface {
-	Resolve(fromFile string, ref CalleeRef) (nodeID string, ok bool)
-}
-```
-
-Language-specific pressure to design against now:
-
-- **JS/TS:** `tsconfig` path aliases, barrel re-exports (`index.ts`), monorepo workspaces,
-  `require`/`import` of a computed value, and the `node_modules` boundary — never traverse dependencies.
-- **Python:** `__init__.py` re-exports (the barrel analogue), relative imports, `importlib`.
-- **Go:** packages and receiver methods. **Java:** classpath, packages, overloads.
-
-### 6.3 Node identity
-
-*This is where JS/TS will punish a naive model.* Handlers are frequently inline and nameless —
-`router.get('/x', async (req, res) => {...})` — so "node = named function" misses exactly the nodes that
-matter. The scheme needs deterministic synthetic naming for anonymous callables, stable when *other* lines
-in the file change.
-
-Two stress tests from the other languages, designed against now:
-
-- **Java overloads:** two methods named `create` in one class. A `file::Class.create` ID collapses them.
-  The scheme needs an optional signature/arity discriminator.
-- **Python:** `self` methods, `@staticmethod`/`@classmethod`, and decorators that *wrap* a handler. The
-  wrapped function is still the node; the decorator is a guard annotation.
-
-### 6.4 Rule engine expressiveness
-
-The rule engine must express **Python decorators and Java annotations** even though only JS rules are
-written first. If decorators and annotations cannot be expressed as data, source detection becomes
-per-language Go code — the corner to avoid.
-
-*Open:* the rule format. Bearer's model is worth studying: declarative rule definitions for the common
-case, with an escape hatch for complex detection logic, and a published rule catalog documenting the code
-pattern per rule. Our lean is `.scm` structural queries plus a small declarative schema, with Go detectors
-only where a rule genuinely cannot express the check.
-
-## 7. Edge vocabulary
-
-`CALLS` alone is insufficient. Middleware is registered *by reference* — `app.use(authMiddleware)` — and
-that is how Go and Python register handlers too.
-
-| Kind | Meaning |
+| Package | Responsibility |
 |---|---|
-| `CALLS` | Direct invocation |
-| `REFERENCES` | Function passed as a value: middleware, handlers, callbacks |
-| `IMPORTS` / `RE_EXPORTS` | Module graph |
-| `INHERITS` / `IMPLEMENTS` / `MIXES_IN` | Type hierarchy. Borrowed from Graphify, which resolves these across ~40 languages — a handler may be inherited, and an interface implementation may be the real sink |
-| `REGISTERS_ROUTE` | Framework-specific source registration |
-| `PASSES_DATA_TO` | Reserved; not populated in v1 (that would be dataflow) |
-
-Every edge carries `Origin`: `EXTRACTED` (read from the syntax tree) or `INFERRED` (resolved by a later
-pass). This is Graphify's distinction, and it lets reporting state how confident a path is.
-
-## 8. Node model
-
-Language-agnostic, so traversal, pruning, and prompting are written once.
-
-```go
-package graph
-
-// NodeRole describes a node's security role in a call path.
-type NodeRole string
-
-const (
-	RoleSource   NodeRole = "SOURCE"   // request entry points, HTTP inputs, CLI args
-	RoleSink     NodeRole = "SINK"     // raw SQL, shell, filesystem, outbound HTTP, eval
-	RoleGuard    NodeRole = "GUARD"    // validation, sanitization, authorization
-	RoleInternal NodeRole = "INTERNAL" // ordinary function/method logic
-)
-
-// Node is a logical callable unit: a function, method, route handler, module, or
-// an anonymous callable with a deterministic synthetic name.
-type Node struct {
-	ID         string   `json:"id"`         // "path/file.ts::Class.method#2"
-	Language   string   `json:"language"`   // "typescript", "python", ...
-	Role       NodeRole `json:"role"`
-	FilePath   string   `json:"file_path"`
-	StartLine  int      `json:"start_line"`
-	EndLine    int      `json:"end_line"`
-	Params     []Param  `json:"params"`     // ordered; the target of ArgBinding.Position
-	Content    string   `json:"content"`    // source snippet
-	SinkClass  string   `json:"sink_class,omitempty"`  // "sql", "nosql", "shell", "html", "path", "ssrf"
-	Mitigation string   `json:"mitigation,omitempty"` // idiom to look for, e.g. "bound parameters"
-}
-```
-
-`Params` and `SinkClass`/`Mitigation` are what make § 10 and § 11 possible.
-
-## 9. Pipeline
-
-```text
-[ Target repository ]
-        │
-        ▼
-1. Concurrent file walker        (goroutine worker pool)
-        │
-        ▼
-2. Tree-sitter parser            (per-language grammar; one CST per file)
-        │
-        ▼
-3. Structural resolver           (declarations, imports, call sites, arg bindings)
-        │
-        ▼
-4. Classifier                    (SOURCE / SINK / GUARD roles; sink class; data types)
-        │
-        ▼
-5. Code path tracking            (discovery, pruning, pre-filter, prioritization)  ← the spine
-        │
-        ├───────────────┬────────────────────┬────────────────────┐
-        ▼               ▼                    ▼                    ▼
-6a. Track A       6b. Track B         6c. Track C
-    pattern rules     path review         scope review
-    deterministic     over tracked        over graph-derived
-    findings          paths               scopes
-    (no LLM)          (LLM judgment)      (LLM review)
-        │               │                    │
-        │               ▼                    ▼
-        │    7. Context bundler (snippets, arg bindings, off-path guards,
-        │                        sink class + mitigation, scope context)
-        │               │                    │
-        │               ▼                    ▼
-        │    8. LLM judgment (Track B: three-state verdict; Track C: findings)
-        └───────────────┴────────────────────┴────────────────────┘
-        │
-        ▼
-9. Reporter + findings log       (JSON + Markdown; diff against previous findings)
-```
-
-Stages 1–3 are parallel across files. Stage 4 is a single pass. Stage 5 is single-threaded with parallel
-per-source search. Stages 7–8 are I/O-bound and parallel across bundles.
-
-## 10. Call-site argument annotation
-
-The highest-leverage piece of the schema. At every call site, record **syntactically** which argument
-expressions are passed and which parameter position each lands in.
-
-This is extraction, not analysis: one AST walk per call site. No fixpoint, no aliasing, no propagation. It
-converts "the model guesses whether the value could flow" into "the model checks whether the argument
-arriving at the sink is the one the source supplied."
-
-```go
-// ArgBinding records one argument at a call site and where it lands in the callee.
-type ArgBinding struct {
-	Position  int    `json:"position"`    // 0-based parameter position in the callee
-	ParamName string `json:"param_name,omitempty"`
-	Expr      string `json:"expr"`        // source text of the argument expression
-	ExprKind  string `json:"expr_kind"`   // "literal", "param", "member", "call", "unknown"
-	// RootParam is set only when the expression IS literally one of the enclosing
-	// function's own parameters. This is the single flow-ish signal recorded, and
-	// it is local to the call site: we never propagate beyond it.
-	RootParam string `json:"root_param,omitempty"`
-}
-```
-
-Edge with annotations:
-
-```go
-type Edge struct {
-	SourceID string       `json:"source_id"`
-	TargetID string       `json:"target_id"`
-	Kind     string       `json:"kind"`
-	Origin   string       `json:"origin"` // "EXTRACTED" or "INFERRED"
-	Args     []ArgBinding `json:"args,omitempty"`
-}
-```
-
-**Boundary to hold:** `ExprKind` and `RootParam` describe what the expression *is*. Whether an expression
-is *untrusted* is a rule or model interpretation, not something this schema decides.
-
-*Open:* extending this with a **per-function local binding table** — `const id = req.body.id` then
-`find(id)` — so the annotation follows one level of local assignment. Still purely syntactic, and it
-closes the most common flow gap in real Express code.
-
-## 11. Classification: sources, sinks, guards, data types
-
-All four are data-driven from per-language query sets. Adding a rule must not require changing Go code.
-
-- **Sources** — route registrations and handler signatures: Express/Fastify for JS/TS, FastAPI and Flask
-  for Python, `net/http` and common routers for Go, Spring and servlet entry points for Java. Plus CLI
-  entry points.
-- **Sinks** — dangerous operations, each carrying a **sink class** (`nosql`, `sql`, `shell`, `path`,
-  `ssrf`, `html`, `deserialization`, `log`) and the **mitigation idiom** to look for, so the prompt asks
-  the right question for that sink type. For example: `nosql` looks for filter validation or type
-  coercion; `sql` looks for bound parameters; `shell` looks for the argument-array form and an allow-list;
-  `ssrf` looks for a host allow-list; `path` looks for `path.resolve` containment.
-
-  **The SQL/NoSQL asymmetry is the sharpest illustration of the track boundary.** For SQL, the presence of
-  bound parameters is close to decisive: the deterministic tier can often settle it and the model only
-  confirms. MongoDB has no equivalent escape hatch — passing a request object as a filter is safe *only
-  if* something upstream coerced or validated it, and whether a mongoose schema, a `zod` parse, or a
-  hand-rolled `typeof x === 'string'` check is sufficient is a judgment. NoSQL findings therefore land on
-  Track B far more often than SQL ones. Two TypeScript fixtures, one per database, exist to measure that.
-- **Guards** — validation, sanitization, and authorization functions. First-class nodes so they can be
-  pulled into a bundle even when off-path. Structural detection stays deterministic; only *sufficiency* is
-  the model's call.
-- **Data types** — classify by name and source pattern only, never by value: personal data, PII, PHI,
-  credentials, payment data. Borrowed from Bearer's privacy model. This is an **impact** signal, not a
-  detection: a sink handling PII ranks above one handling a public field. Pure pattern matching, so it
-  stays deterministic.
-
-*Open:* a curated **framework-facts store** — per-library notes on what actually mitigates each sink class
-(for example, that mongoose casts per schema and the native driver does not). This is a deterministic
-asset that would let the model reason from facts rather than guess at library behaviour.
-
-## 12. Context bundling
-
-One bundle per unit of review, token-bounded. For Track B the unit is a path; for Track C it is a scope.
-
-- the path summary: node IDs, roles, ordered `file:line` spans
-- the source snippet for each node on the path, in order
-- **the `ArgBinding` annotations for each edge on the path** — the flow evidence
-- **guard nodes reachable from the path, even off-path**, with their definitions
-- the sink class and the mitigation idiom to look for
-- the data types the path handles, as impact context
-- the OWASP categories the path's sink set could implicate
-- for Track C, the scope itself: the file or chain, its neighbours, and the middleware order around it
-
-Bundles are truncated by a per-node and per-path token budget. Never truncate the path itself — drop the
-whole path and report it as unexamined rather than silently passing it.
-
-## 13. LLM judgment
-
-We track paths deterministically; the model judges the prepared bundle. The model does **not** drive
-traversal in v1.
-
-- **Track B verdict is three-state:** `validated`, `not_validated`, `uncertain`, with a confidence and
-  cited evidence. Not binary — forcing binary converts uncertainty into either a false positive or a
-  silent false negative.
-- **Evidence is mandatory.** The verdict must cite the validation it accepted, or the missing check. A
-  verdict without a citation is unusable and is treated as `uncertain`.
-- **Track C returns findings, not verdicts.** A scope review reports issues ("no ownership check before
-  the fetch") with a severity and an anchor symbol, rather than judging a path.
-- **Schema-constrained output**, low temperature, one request per bundle.
-- **Provider-agnostic** over an OpenAI-compatible endpoint, so the base URL can point at a hosted provider
-  or a self-hosted model.
-- **Bounded concurrency and retry with backoff.** Fully stubbed in tests; no network in unit tests.
-- **Version recorded.** Model ID and prompt version are stored per scan, so a verdict change is
-  explainable rather than mysterious.
-
-*Open:* an opt-in deep-dive mode where the model drives traversal via a graph-query tool. More flexible,
-far more token-hungry, and unpredictable in coverage — same repo, two runs, different paths examined.
-Deferred deliberately.
-
-## 14. Persistence
-
-Four distinct problems. Conflating them is the trap.
-
-1. **Execution** — enumerate bounded source→sink paths repeatedly over the whole graph. A hot loop.
-2. **Rescans** — skip unchanged work and correctly invalidate what a change affects.
-3. **Findings tracking** — what is new, persisting, or resolved since last scan.
-4. **Interchange** — a durable, reviewable artifact.
-
-### Decision
-
-- **Execution: in-memory Go graph.** `map[string]*Node` for lookup plus adjacency slices (`[]int32`
-  indices) for forward and reverse traversal. BFS/DFS over flat slices is orders of magnitude faster than
-  a SQL or Cypher round trip, and it keeps the graph engine free of native dependencies.
-- **Interchange: JSON.** `graph.json` per run, deterministically ordered — Graphify's model.
-- **Findings log: previous findings, persisted.** Diffing against it yields new / persisting / resolved as
-  set membership. A flat file is sufficient and more reviewable than a database.
-- **Suppression: a Git-tracked baseline** (`.scan-baseline.json`) listing accepted and suppressed
-  fingerprints with a reason and an owner, plus rule-level skips (Bearer's `--skip-rule` idea). CI fails
-  only on findings absent from the baseline.
-- **Rescan cache: keyed by content hash and ruleset version.** A rule change invalidates classification
-  even though the parse tree is unchanged, so keys are split by artifact (`parse:<hash>`,
-  `classify:<hash>:<ruleset>`). *Open:* content-addressed directory or SQLite (`modernc.org/sqlite`, pure
-  Go). Performance only — correctness does not depend on it.
-
-### Rescan correctness
-
-A per-file cache is necessary but not sufficient: a change to one file can alter paths running through
-*other* files, so findings cannot be invalidated per file.
-
-1. Walk the tree; hash each file's content.
-2. Load cached nodes and edges for unchanged files; re-parse only changed and new files.
-3. Build the in-memory graph from cached plus freshly parsed subgraphs.
-4. Invalidate any recorded path with a node in a changed file, or whose endpoint files changed.
-5. Re-run path tracking only for sources whose reachable subgraph intersects a change.
-6. Re-run the model only on new or invalidated bundles. Unchanged paths keep their previous verdict.
-
-Step 6 is where rescans pay off: the model is the only expensive stage.
-
-### Finding identity
-
-Line numbers, file paths, and enumeration order are all unstable, so identity is built from durable
-content:
-
-```text
-fingerprint = sha256(rule_id || "\x00" || join(qualifiedSymbolChain, ">"))
-```
-
-- `rule_id` — the rule that produced the finding (Track A or Track B).
-- `qualifiedSymbolChain` — the qualified symbol of each node on the path, in order, for example
-  `handlers.CreateUser>service.Users.Create>db.Raw`.
-
-Deliberate consequences:
-
-- A function rename produces a new fingerprint, so the finding reads as one new plus one resolved. Surface
-  that as "likely moved" when rule, sink symbol, and path shape still match.
-- Moving a file does **not** change the fingerprint. Desired.
-- Two structurally identical paths collapse into one finding. Desired.
-- **The verdict is not part of the fingerprint.** A verdict change must never create or resolve a finding.
-
-Track C has no path, so identity falls back to
-`rule_id || "\x00" || scopeID || "\x00" || anchorSymbol`, where the anchor is the symbol the finding
-attaches to (the handler, the middleware, the function). *Open:* whether that is stable enough for gating,
-or whether Track C findings should be advisory and excluded from new-finding gating.
-
-### Finding record
-
-```
-rule_id          which rule fired
-detection        "pattern" (Track A) | "path" (Track B) | "scope" (Track C)
-owasp_category   A01..A10
-cwe_id           CWE mapping, as Bearer reports
-severity         CRITICAL | HIGH | MEDIUM | LOW
-data_classes     PII | PHI | credentials | payment | none
-confidence       1.0 for Track A; model confidence for Track B
-verdict          validated | not_validated | uncertain (Track B only)
-evidence         ordered file:line spans
-rationale        rule description, or the model's cited reasoning
-```
-
-`detection` is what lets a consumer gate hard on Track A and treat low-confidence Track B and C findings
-as advisory — and it keeps the output honest about how each finding was reached.
-
-### Gating policy
-
-CI gates on **new fingerprints**. A verdict change on unchanged code is surfaced as an informational
-status change, not as a new finding. Stating this explicitly prevents the first confusing CI failure.
-
-## 15. Determinism
-
-The structural graph, the tracked path set, and every Track A finding must be reproducible for identical
-input, independent of goroutine scheduling. This is a correctness requirement: finding identity, the
-rescan cache, and the JSON report all depend on it.
-
-- Never iterate a Go map when producing ordered output; sort keys explicitly.
-- Never let worker completion order determine slice order.
-- No wall-clock, random seed, or host-specific value in graph or findings output.
-- When parallelism is added to a stage, assert parallel output equals sequential output in a test.
-
-Track B and C verdicts are **not** deterministic — inherent to the design, and why identity never depends
-on them.
-
-## 16. Prior art
-
-### Graphify — `https://github.com/Graphify-Labs/graphify`
-
-Apache-2.0. Turns a codebase plus docs, SQL schemas, configs, and PDFs into a queryable knowledge graph.
-
-What we take:
-
-- **The core validation.** Code is parsed with tree-sitter AST and is explicitly *"deterministic, no
-  LLM"*, with graph build measured at **zero LLM credits**. It is the same split we are making, at a much
-  larger scale, and it is evidence the deterministic tier carries the load.
-- **The path-tracking model itself** — § 3 is this approach, specialised for security.
-- **`EXTRACTED` / `INFERRED` edge tagging**, so every edge says whether it was read from source or
-  resolved. Adopted directly.
-- **`INHERITS` / `MIXES_IN` edges** — a reminder that the type hierarchy matters and that we were missing
-  it.
-- **`graph.json` as the artifact** — the graph is the durable output, queryable without re-reading files.
-- **God nodes and communities** — most-connected concepts and Leiden clustering, computed without an LLM.
-  Used here for path prioritization.
-- **Rationale as first-class nodes** — `# NOTE:` / `# WHY:` comments and ADR citations become graph nodes.
-  A security analogue is attractive: an in-code annotation like `// scan: safe - parameterized` becoming a
-  node the model can see and cite.
-- **Local-first.** Nothing leaves the machine for the code pass.
-
-Where we differ: Graphify maps a codebase for comprehension. We map it to find a specific kind of path and
-to have a model judge those paths, and we carry security-specific classification (source, sink, guard,
-sink class, data types) that Graphify has no reason to model.
-
-### Bearer — `https://github.com/bearer/bearer`
-
-Open-source SAST (Go) covering the OWASP Top 10 and CWE Top 25, with dataflow analysis and a privacy
-scanner. It is the tool we are deliberately not building, which makes it the best available reference for
-*where rules beat a model*.
-
-What we take:
-
-- **The pattern-rule catalog as the Track A target.** Bearer's per-category rule list is close to a
-  specification for what must be deterministic in our tool.
-- **CWE IDs alongside OWASP categories**, plus severity tiers and per-rule documentation.
-- **Rule-level suppression** (`--skip-rule`) in addition to per-finding suppression.
-- **Data-type classification for impact** — 120+ data types across PII, PHI, and personal data,
-  identified by matching patterns in source code and never reading values.
-- **The rule-format lesson** — declarative rules for the common case with an escape hatch for complex
-  detection.
-- **A complement, not a competitor.** They model flows across files; we reach further semantically, and
-  the error profiles differ. Running both and diffing is the cheapest available check on our Track A rules.
-
-## 17. Tech stack
-
-| Concern | Choice | Rationale |
-|---|---|---|
-| Language | Go 1.27+ | Real multi-core parallelism over file I/O and AST traversal; single static binary |
-| Parsing | Tree-sitter | One uniform CST across languages; rules authored as `.scm` queries |
-| TS binding | Behind an interface | `tree-sitter/go-tree-sitter` (cgo) or a pure-Go runtime; decide by benchmark |
-| Graph engine | In-memory Go graph | Path tracking is a hot loop; a database there is pure overhead |
-| Graph artifact | JSON | Diffable, reviewable, Graphify-compatible |
-| Findings log | Flat file, diffed | Set membership; no database needed |
-| Suppression | Git-tracked baseline | Reviewable in a PR |
-| Rescan cache | Content-addressed or SQLite (*Open*) | Performance only |
-| LLM client | `net/http` + `encoding/json`, OpenAI-compatible | Tiny API surface; no SDK dependency |
-| CLI | stdlib `flag` | One command with flags |
-| Logging | `log/slog` | Structured progress for long scans |
-| Testing | stdlib `testing`, golden files, `httptest` | No test framework dependency |
-| Formatting/lint | `gofmt`, `go vet` | Stdlib; add `golangci-lint` when rules stabilize |
-| CI | GitHub Actions | build, vet, `go test -race`, `gofmt -l` gate |
-
-## 18. Package layout
-
-```text
-cmd/scan/          CLI entry point
-internal/walk/     repository traversal and file job production
-internal/parse/    Tree-sitter grammar registry and parsing worker pool
-internal/graph/    node/edge types, resolver, arg bindings, graph construction
-internal/lang/     per-language adapters (grammar, queries, resolver)
-internal/rules/    rule engine, rule catalog, classification (embedded .scm + declarative rules)
-internal/patterns/ Track A pattern rules
-internal/trace/    code path tracking: discovery, pruning, dedup, pre-filter, prioritization
-internal/scopes/   Track C scope selection and scope bundles
-internal/context/  token-bounded bundle construction
-internal/llm/      OpenAI-compatible broker client
-internal/findings/ identity, finding record, previous-findings log, baseline diffing, grouping
-internal/report/   JSON and Markdown emitters
-```
-
-`internal/` is deliberate: nothing here is a public API yet. See
-[`standards/code-structure.md`](standards/code-structure.md).
-
-## 19. Testing strategy
-
-- **Golden-file tests** for parsing and resolution: a fixture repository in, a normalized graph out.
-- **Path-tracking tests** — the highest-value tests in the project. A hand-built graph in, expected paths
-  out, including cycles, unreachable sinks, and guarded sinks.
-- **Table-driven tests** for rule matching, covering Track A and classification.
-- **Arg-binding tests** — the highest-risk extraction. A call site in, expected bindings out.
-- **Determinism tests** — two runs, byte-identical `graph.json` and Track A findings.
-- **Stubbed broker** for the model stage, including the `uncertain` and malformed-response paths.
-- **End-to-end** on a small fixture repository with a stubbed broker, asserting the JSON report and the
-  findings diff.
-- **Optional differential testing** against Bearer on a fixture app, to check Track A rules.
-
-See [`standards/testing.md`](standards/testing.md).
-
-## 20. Roadmap
-
-0. **Calibration** — hand-built vulnerable/safe pairs, hand-written bundles, measure what context makes
-   the model reason well. Produces the prompt, the response schema, and the corpus that later phases need.
-   No Go code.
-1. **Language abstraction and graph schema** — the four interfaces in § 6, node/edge types, arg bindings.
-2. **JS/TS adapter** — grammar, resolver (aliases, barrels, `node_modules` boundary), anonymous-node
-   naming.
-3. **Pipeline skeleton** — walker, parser worker pool, resolver, classifier, `graph.json` export.
-4. **Track A pattern rules** — the deterministic OWASP set from § 4. A useful tool with no LLM at all,
-   which is why it comes before the model work.
-5. **Code path tracking** — discovery, pruning, pre-filter, prioritization. Measured on a real repository.
-6. **Context bundling** — arg bindings plus off-path guards.
-7. **LLM judgment (Track B)** — three-state verdict, cited evidence, stub and degraded mode.
-8. **Track C scope review** — scope selection, scope bundles, scope findings.
-9. **Reporting and CLI** — JSON and Markdown, CWE mapping, severity, flags, CI exit codes.
-10. **Findings tracking** — identity, previous-findings log, Git-tracked baseline, CI gating.
-11. **Rescan cache** — parse cache and invalidation.
-12. **Python adapter** — decorators, `self`, relative imports. Validates the § 6 interfaces.
-13. **Go and Java adapters** — receiver methods, interface dispatch, annotations, overloads.
-14. **Rule expansion** — deeper framework coverage and broader OWASP coverage.
-
-Steps 0–4 produce a deterministic, useful scanner with no model involved. Step 12 is the real test of
-whether the abstractions hold.
-
-## 21. Open questions
-
-- **Rule format.** `.scm` plus declarative schema, and where a Go detector is justified. Bearer's model is
-  the reference.
-- **Pre-filter threshold.** What reliably drops constant-only paths without dropping real findings, and how
-  to make dropped paths countable rather than invisible.
-- **Scope selection for Track C.** Which files, controllers, and middleware chains are worth reviewing,
-  and how that scales with repository size.
-- **Track C finding identity.** Whether scope + anchor is stable enough for CI gating, or Track C findings
-  should be advisory.
-- **Node identity for anonymous callables.** Exact synthetic naming scheme, and stability under edits to
-  unrelated lines.
-- **Signature discrimination.** How much of a signature to encode in a node ID, given Java overloads.
-- **Local binding table.** Extending `ArgBinding` with per-function local assignments.
-- **Framework facts.** A curated per-library store of what actually mitigates each sink class.
-- **Finding grouping.** Collapsing the same rule + same sink across many routes into one finding with many
-  entry points.
-- **Trust hints on argument expressions.** Do rules tag expressions as request-rooted, or is that the
-  model's inference?
-- **Cache medium.** Content-addressed directory vs. SQLite.
-- **Tree-sitter binding.** cgo vs. pure Go, decided by benchmark on a large repository.
-- **Baseline granularity.** Per repository or per scan target; accepted findings, suppressed fingerprints,
-  rule-level skips, or all three.
-- **In-code annotations.** Whether `// scan: safe - <reason>` comments become guard evidence the model can
-  cite.
-- **Deep-dive mode.** Whether model-driven traversal earns its token cost as an opt-in.
-- **Findings schema versioning.** Whether it is versioned from the first release.
+| `cmd/scan` | CLI parsing and wiring |
+| `internal/lang` | Existing extension registry; future adapter registration |
+| `internal/walk` | Input manifest and selection |
+| `internal/parse` | CST/query lifecycle and parser workers |
+| `internal/ir` | Normalized analysis operations and source provenance |
+| `internal/graph` | Graph views and adjacency indexes |
+| `internal/rules`, `internal/patterns` | Classification models and deterministic findings |
+| `internal/flow` | CFG/dataflow transfers and function summaries |
+| `internal/trace` | Bounded witnesses, pruning, deduplication |
+| `internal/context` | Evidence bundle assembly and completeness |
+| `internal/jev` | Typed System One transport and validation |
+| `internal/llm` | LLM Findings Reviewer adapter; independent assessment and bounded reconciliation |
+| `internal/policy` | Jev interpretation, review reconciliation/completeness, audit selection, gating |
+| `internal/findings`, `internal/report` | Identity/baseline/comparison and report emission |
+
+Language-specific lowering and resolution sit behind adapters; their concrete directory layout is
+chosen in the parser/IR spec. Shared analysis does not depend on Tree-sitter node types or HTTP.
+The CLI uses standard-library `flag`, `encoding/json`, and normal exit-code handling; no CLI framework
+is planned. A future change needs a concrete requirement the existing surface cannot reasonably meet.
+
+## 12. Validation and unresolved decisions
+
+Golden fixtures cover extraction/resolution. Hand-built flow fixtures cover assignments, branch joins,
+cycles, guard bypass, ignored results, argument/return propagation, and unknown calls. Determinism tests
+compare serial/parallel output; cache tests compare cold/warm results and dependency invalidation.
+Local HTTP stubs cover semantic adapters, schema validation, retries, cancellation, and partial failures.
+Live evaluation is separate, opt-in, versioned, and compared with human-labeled held-out examples,
+including diagnostic Jev-only/LLM-only baselines and the planned Jev Assessment → Findings Review pipeline.
+Measure reviewer disagreement, incorrect agreement, unsupported citations, review completeness, and
+false-negative audit results against human labels; LLM agreement is not ground truth. See the
+[research/evaluation note](project/04-jev-validation-research.md).
+
+The [proposal decision register](project/03-jev-design-proposal.md#open-decision-register) owns unresolved
+choices and their refinement gates; [scope](project/02-project-scope.md) owns project-level risks and
+quality hypotheses.

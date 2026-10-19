@@ -1,6 +1,9 @@
 # Phase 0 — Skeleton, fixture access, CI
 
-Deliverable specification. Step 1 of [`../../project/implementation-plan.md`](../../project/implementation-plan.md).
+Historical foundation specification. The revised
+[implementation plan](../../project/implementation-plan.md) treats Phase 0 as an audit of existing
+bootstrap artifacts before further work. This contract is retained as historical context; it does not
+approve implementation of the concept-stage architecture or assert scanner completion.
 
 ## Contract
 

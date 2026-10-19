@@ -2,7 +2,20 @@
 
 Zazz is an operating model for the agentic software delivery lifecycle. It helps teams use agents to move faster while keeping product direction, engineering quality, review discipline, and merge authority in human hands.
 
-This document is the methodology entry point and executive overview. The detailed guidance lives in focused section docs under [`docs/methodology/`](docs/methodology/).
+This document is the methodology entry point and executive overview. Scan vendors the entry-point guide and selected workflow skills; the [section guide](#section-guide)
+routes to references available in this repository. Upstream focused section documents are not all vendored here.
+
+## Scan applicability during project definition
+
+This guide describes the shared delivery process as adapted for scan. Repository status is recorded in
+the [project overview](../project.md#concept-stage-repository-state); the documentation-only `stage/`
+exception is declared in [AGENTS.md](../../AGENTS.md#branch-model). Workspace/session guidance and
+methodology refinement live in the [orientation](scan-agent-orientation.md).
+
+The [project plan](../project/implementation-plan.md) groups future specs into phases. Those groupings
+are neither execution approval nor scheduled milestones; the greenlight and review lifecycle below
+still applies. Each scan spec is authored, refined, and implemented in its own feature worktree and
+PR into `stage`, as declared in [AGENTS.md](../../AGENTS.md#definition-and-spec-driven-delivery).
 
 ## Executive Overview
 
@@ -102,38 +115,41 @@ Every deliverable should record its Project Owner, Deliverable Owner, feature co
 when applicable, and assigned project milestone or an explicit `N/A`. The milestone is
 the time box; the deliverable is the bounded, reviewable execution unit inside it.
 
-The section docs are designed for incremental discovery. Read the entry point to choose
-the current stage, then load the focused section for that stage rather than pulling the
-entire methodology into every task.
+Use incremental discovery: read the entry point to choose the current stage, then load only its
+relevant local guide or skill. Do not assume upstream section documents exist in this checkout.
 
 ## Section Guide
 
-Each focused section includes a `Relevant Skills` table that explains which skills apply to that stage and how they improve process efficiency.
+These are available local routes for the lifecycle stages. Product/architecture documents describe
+scan's current proposals; workflow skills and standards describe how approved work is handled.
 
-| Section | Purpose |
+| Stage / local reference | Local role |
 | ------- | ------- |
-| [Project Document](docs/methodology/project.md) | Defines `project.md`, the top-level product orientation document. |
-| [Document Storage](docs/methodology/document-storage.md) | Defines where durable docs, active implementation scratch, completed specs, project plans, roadmaps, and milestones live. |
-| [Architecture](docs/methodology/architecture.md) | Defines project-level and feature-level architecture docs. |
-| [Proposals](docs/methodology/proposals.md) | Defines durable decision artifacts for uncertain product or technical direction. |
-| [Features and Project Milestones](docs/methodology/features-and-milestones.md) | Defines feature requirements documents, feature roadmap increments, project milestones, and time-boxed deliverables. |
-| [Specifications](docs/methodology/specifications.md) | Defines deliverable specifications as bounded execution contracts. |
-| [Spec-Driven Development](docs/methodology/spec-driven-development.md) | Defines the post-greenlight lifecycle for implementation, steering, contract updates, QA, PR feedback, and signoff. |
-| [Deterministic Quality Gates](docs/methodology/deterministic-quality.md) | Defines linters, formatters, type checks, accessibility checks, doc checks, CI gates, and ongoing standards conformance as deterministic controls. |
-| [Code Generation](docs/methodology/code-generation.md) | Defines agent implementation workflow, worktree discipline, and halt conditions. |
-| [Testing and Validation](docs/methodology/testing-and-validation.md) | Defines acceptance verification, test quality, QA loops, and evidence. |
-| [PR Creation](docs/methodology/pr-creation.md) | Defines draft-first PR packaging and stacked PR usage. |
-| [Self-Review](docs/methodology/self-review.md) | Defines author-side automated review before human review. |
-| [Human Review and Merge](docs/human-in-loop-pr-review-strategy.md) | Defines review tiers, human approval, merge expectations, and post-merge learning. |
+| [Project Document](../project.md) | Scan's top-level product orientation. |
+| [Document Storage](../../AGENTS.md#document-model) | Defines where durable docs, active implementation scratch, completed specs, project plans, roadmaps, and milestones live. |
+| [Architecture](../architecture.md) | Scan's proposed technical shape. |
+| [Proposals](../project/03-jev-design-proposal.md) | Current proposal, rationale, research inputs, and open decisions. |
+| [Features and Project Milestones](../project/implementation-plan.md) | Proposed phases/spec slices; milestones and owners remain to be assigned. |
+| [Specifications](../../.agents/skills/spec-builder/SKILL.md) | Defines deliverable specifications as bounded execution contracts. |
+| [Spec-Driven Development](../../.agents/skills/spec-driven/SKILL.md) | Defines the post-greenlight lifecycle for implementation, steering, contract updates, QA, PR feedback, and signoff. |
+| [Deterministic Quality Gates](../standards/testing.md) | Defines linters, formatters, type checks, accessibility checks, doc checks, CI gates, and ongoing standards conformance as deterministic controls. |
+| [Code Generation](agent-execution-discipline.md) | Defines agent implementation workflow, worktree discipline, and halt conditions. |
+| [Testing and Validation](../standards/testing.md) | Defines acceptance verification, test quality, QA loops, and evidence. |
+| [PR Creation](../../.agents/skills/pr-builder/SKILL.md) | Defines draft-first PR packaging and stacked PR usage. |
+| [Self-Review](../../.agents/skills/pr-review/SKILL.md) | Defines author-side automated review before human review. |
+| [Human Review and Merge](human-in-loop-pr-review-strategy.md) | Defines review tiers, human approval, merge expectations, and post-merge learning. |
 
 ## Core Model
 
 Zazz uses a project-first document model:
 
 - `project.md` explains the product's purpose, users, major capabilities, and durable operating assumptions.
-- `architecture/` explains intended technical shape and important system decisions.
-- `proposals/` records decisions when the path is uncertain.
-- `features/` describes long-lived capabilities and feature roadmap increments.
+- `architecture.md` or `architecture/` explains intended technical shape and important system decisions.
+  Scan uses `.zazz/architecture.md`.
+- `proposals/` or a declared project-doc location records decisions when the path is uncertain.
+  Scan currently keeps its proposal/research docs in `.zazz/project/`.
+- `features/` or a declared project-doc location describes long-lived capabilities and roadmap increments.
+  Scan currently keeps capability context and the phase plan in `.zazz/project/`.
 - `specifications/` contains deliverable specifications authored by spec-builder and executed by Contributor Agents inside the worktree. The repo decides whether this directory is tracked, ignored, mirrored, or promoted elsewhere.
 - `ephemeral/` contains active implementation scratch: run logs, QA findings, handoff notes, recovery notes, evidence, and other records that normally stay out of Git. Ephemeral means uncommitted and non-durable, not necessarily memory-only; these files may persist locally until the worktree is removed.
 - `standards/` defines how the software should be built.
@@ -173,7 +189,7 @@ GitHub Wiki, Confluence, or another system.
 
 ## Skills
 
-The shared skills under [`.agents/skills/`](.agents/skills/) implement the methodology's common workflows:
+The shared skills under [`.agents/skills/`](../../.agents/skills/) implement the methodology's common workflows:
 
 | Workflow | Skill |
 | -------- | ----- |
@@ -196,7 +212,7 @@ The shared skills under [`.agents/skills/`](.agents/skills/) implement the metho
 
 Companion utility skills such as `gh-issue`, `handoff`, `zazz-board`, `jira`, `psql`, and `sqlcmd` provide repo-specific or tool-specific support when a project uses those systems.
 
-Shared skills follow the Agent Skills format. Use [Agent Skills](docs/standards/agent-skills.md) for authoring rules,
+Shared skills follow the Agent Skills format. Use [Agent Skills](../standards/agent-skills.md) for authoring rules,
 portable front matter, metadata placement, and validation.
 
 ## Authority Gates
@@ -224,10 +240,12 @@ Supported durable storage modes include:
 
 `project.md`, architecture, feature requirements, project plans, roadmaps, project milestones, and final implemented specifications may live in the declared durable storage surface. Local specification working files live under `<DOCS_ROOT>/specifications/`; RUN_LOG files and other active execution records live in `<DOCS_ROOT>/ephemeral/` or the declared tracker/service while work is underway. After implementation lands, the final current specification may be promoted to a wiki, Confluence, Jira, Zazz Board, or another durable location if the repo policy calls for it.
 
-When an external document is the source of truth, keep a stable pointer in `AGENTS.md`, an index page, or a repo-tracked pointer file with title, responsible human, status, and link. See [Document Storage](docs/methodology/document-storage.md).
+When an external document is the source of truth, keep a stable pointer in `AGENTS.md`, an index page, or a repo-tracked pointer file with title, responsible human, status, and link. See [Document Storage](../../AGENTS.md#document-model).
 
 ## Reference Implementation
 
-This repository is the canonical source for the methodology and shared skills. Downstream repos may vendor or sync these docs and skills, but methodology changes should land here first.
+Scan vendors selected methodology guidance and skills from
+[zazz-skills](https://github.com/zazzcode/zazz-skills). Local adaptations are recorded here; candidate
+shared-methodology improvements can be proposed upstream separately.
 
 [zazz-board](https://github.com/zazzcode/zazz-board) is the reference implementation and uses the methodology.

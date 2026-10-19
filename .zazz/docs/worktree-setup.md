@@ -23,15 +23,15 @@ Supporting docs in this repo:
 
 Use a bare-repo container with sibling worktrees.
 
-Expected high-level shape:
+Scan's container layout (resolve the development root using the
+[orientation](scan-agent-orientation.md#portable-workspace-and-dev_root)):
 
 ```text
-repo-container/
-├── .bare/
-├── stage/
-├── feature-or-deliverable-branch-a/
-├── feature-or-deliverable-branch-b/
-└── docs-or-proposal-branch/
+scan/                         # container; not a development checkout
+├── .bare/                    # shared Git directory
+├── stage/                    # integration and current definition worktree
+├── feature-<spec>/           # one dedicated worktree per spec, created as needed
+└── main/                     # optional release worktree; need not exist now
 ```
 
 Required conventions:
@@ -40,16 +40,16 @@ Required conventions:
 - `.bare/` is the shared Git directory
 - each active worktree is a sibling directory under the container
 - one active deliverable or document effort maps to one worktree in the normal case
-- one branch maps to one worktree in the normal case; stacked branch lanes are the deliberate exception
+- each spec has its own branch and worktree; generic stacked-lane examples do not override this policy
 - do not use `/` in branch names
 - use flat branch names so the branch name can map directly to a sibling worktree directory
 - merges happen through PRs, not by locally merging feature branches into the integration worktree
 
-For deliverable execution, the default rule is one active deliverable equals one worktree. If multiple agents work tasks from the same deliverable, they still coordinate inside that single deliverable worktree rather than creating separate worktrees for the same deliverable.
-
-A single worktree may host a deliberate stacked branch lane when related review branches need to share one filesystem, dependency install, scratch space, and build cache. In that case, the worktree has one checked-out branch at a time, and the stack tool moves the same working directory through the ordered branch stack.
-
-If the team wants multiple versions or competing implementations, model them as separate deliverables. Each alternative gets its own worktree unless the team is explicitly stacking dependent deliverables for review sequencing.
+Every spec is authored, refined, and implemented in its own feature worktree, with its own draft PR
+into `stage`. The current definition-only `stage/` exception does not apply to specs. Implementation
+requires human spec greenlight. Multiple agents assigned to the same spec coordinate in its worktree;
+alternative implementations belong to separately scoped specs/worktrees. The generic stacked-lane
+guide does not authorize sharing a worktree across scan specs.
 
 ## Why This Pattern
 
@@ -62,7 +62,7 @@ This pattern gives the methodology three important properties:
 It also pairs well with the methodology's document model:
 
 - durable docs stay in Git
-- execution artifacts can stay local, be committed intentionally, or be mirrored/tracked in an external system such as Zazz Board
+- durable specs stay tracked; transient execution artifacts stay local under the declared document model
 - worktrees keep those transient artifacts scoped to one effort at a time
 
 ## Integration Worktree
@@ -76,6 +76,12 @@ Its role is:
 - receive changes through PR merge
 
 Do not use the integration worktree as the normal place for day-to-day feature implementation.
+
+Scan's current concept/architecture-definition documentation work is explicitly assigned to `stage/`
+by the Project Owner. Assigned methodology refinement may also happen there. This narrow exception is
+declared in [AGENTS.md](../../AGENTS.md) and the [orientation](scan-agent-orientation.md); it does not
+permit feature implementation, direct pushes, local merges, or releases. Later approved deliverables
+use sibling worktrees.
 
 ## New Setup Paths
 
@@ -133,6 +139,16 @@ git --git-dir=.bare worktree list
 cd stage && git branch -vv
 ```
 
+## Reference application checkout
+
+Juice Shop is a separate clone, not a branch or worktree of scan. Its portable lookup convention is
+recorded in the [orientation](scan-agent-orientation.md#portable-workspace-and-dev_root). Identify a
+fixture by upstream repository URL plus an agreed commit, independently of its local location.
+Future fixture configuration must allow a per-machine root override; no flag/environment contract
+is implemented now. Do not modify, install, or run the reference app merely for source inspection.
+The [acceptance-target plan](../project/implementation-plan.md#acceptance-targets) owns revision and
+challenge mapping, inclusion/exclusion, and fixture evaluation scope.
+
 ## Branch Naming Rules
 
 Because the methodology expects sibling worktree directories, branch names should also be worktree-safe directory names.
@@ -185,32 +201,14 @@ git worktree add ../proposal-role-management-options -b proposal-role-management
 
 ## Deliverables Directory Policy
 
-Within each worktree:
+Scan uses Git-tracked deliverable specs under `.zazz/specifications/`. Author the spec and its
+implementation in that spec's feature worktree and review both through its PR into `stage`.
+Do not ignore the specification directory or store contracts only in local scratch.
 
-- the repo's `AGENTS.md` should declare the docs root, commonly `docs/` or `.zazz/`
-- when the repo keeps deliverable specification files on disk, they belong under `<DOCS_ROOT>/specifications/`
-- local ignored specification files are a valid first-class methodology mode, not a workaround
-- some repos intentionally commit specification files for a Git-native audit trail
-- some repos also mirror, track, or store execution artifacts in an external system such as Zazz Board
-- worktree-local excludes are preferred over committed `.gitignore` rules when the team wants deliverable execution artifacts to stay local
-
-Typical mechanisms:
-
-- `.git/info/exclude`
-- `.bare/worktrees/<worktree-name>/info/exclude`
-- another worktree-local exclude approach in the shared bare/worktree setup
-
-Canonical example exclusion:
-
-| Path | Reason |
-| ---- | ------ |
-| `<DOCS_ROOT>/specifications/` | Local deliverable specification files should not pollute shared Git history when the repo uses ignored local specifications |
-
-Why `info/exclude` instead of `.gitignore`:
-
-- `.gitignore` is committed and affects every clone
-- `info/exclude` is local to the checkout/worktree
-- this preserves the option to keep execution artifacts local by default while still allowing explicit exceptions
+Run logs, QA evidence, recovery notes, and handoffs belong in gitignored `.zazz/ephemeral/`, as declared
+in [AGENTS.md](../../AGENTS.md#document-model). Machine-local files may use local exclude rules;
+never add secrets or transient execution records to the PR. Load
+[execution discipline](agent-execution-discipline.md#execution-records) for record/handoff procedures.
 
 ## Daily Operations
 
@@ -325,7 +323,7 @@ git --git-dir=.bare worktree prune
 
 ## Relationship to the Methodology
 
-This document is the operational companion to [../zazz-methodology.md](../zazz-methodology.md).
+This document is the operational companion to [zazz-methodology.md](zazz-methodology.md).
 
 The methodology defines:
 

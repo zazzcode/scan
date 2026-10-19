@@ -5,17 +5,9 @@ to `cmd/`, `internal/`, `.zazz/`, and `.agents/skills/`.
 
 ## 1. Package layout
 
-```text
-cmd/scan/          CLI entry point
-internal/walk/     repository traversal and file job production
-internal/parse/    Tree-sitter grammar registry and parsing worker pool
-internal/graph/    node/edge types, structural resolver, graph construction
-internal/rules/    source/sink query sets and classification (embedded .scm files)
-internal/trace/    path search, pruning, deduplication
-internal/context/  token-bounded bundle construction
-internal/llm/      OpenAI-compatible broker client
-internal/report/   JSON and Markdown emitters
-```
+The [architecture package map](../architecture.md#11-proposed-package-boundaries) owns package
+responsibilities; new boundaries are finalized in greenlit specs. The map is not an instruction to
+scaffold packages. Keep the CLI under `cmd/scan` and implementation under `internal/`.
 
 Rules:
 
@@ -24,11 +16,12 @@ Rules:
 - `cmd/` packages contain only argument handling, dependency wiring, and exit codes. If `main` needs
   branching logic longer than a line or two, that logic belongs in `internal/`.
 - A package owns one concern. If describing a package needs the word "and", split it.
-- Dependencies point inward toward `internal/graph`. `walk` and `parse` know nothing about rules,
-  tracing, or the LLM. `trace` knows nothing about Tree-sitter.
+- Shared operations and provenance live in `internal/ir`; graph indexes build on those records.
+  `walk` and `parse` know nothing about rules,
+  tracing, or semantic adapters. `trace` knows nothing about Tree-sitter.
 - Import cycles are a design error. Fix the boundary rather than hiding it behind an interface.
 - Interfaces are declared by the consumer, not the producer, and stay small — one or two methods.
-  Define an interface when there is a second real implementation (for example, a stubbed broker in
+  Define an interface when there is a second real implementation (for example, a stubbed semantic adapter in
   tests), not in anticipation of one.
 
 ## 2. File size thresholds
@@ -71,11 +64,12 @@ Parsing and graph construction dominate runtime; do not redo either.
 
 - Parse each file exactly once per run. Cache the syntax tree for the lifetime of the file's job, and
   the extracted nodes/edges after that.
-- Build the adjacency index once in stage 5 and reuse it for every source.
-- Never re-read a file to recover a snippet. Carry the snippet on the node.
+- Build relation indexes once for an analysis snapshot and reuse them across source queries.
+- Retain a shared source snapshot or bounded source store for snippet extraction; do not duplicate
+  full snippets on every graph node or re-read changed files against stale spans.
 - Treat the compiled query set per language as process-wide state, compiled at registration.
-- When a value is derived from the graph (reachability, guard status, sink category), compute it once
-  and store it on the node or path rather than recomputing per query.
+- Reuse derived facts under complete dependency/context keys. Keep context-dependent guard and flow
+  state per analysis; do not store a global safe/reachable bit on a shared node.
 
 ## 6. Determinism
 
@@ -86,7 +80,7 @@ Graph output must be reproducible for identical input, independent of goroutine 
 - no wall-clock time, random seed, or host-specific value in graph or findings output
 - when parallelism is added to a stage, assert the same output as the sequential version in a test
 
-Determinism is a correctness requirement here, not a nicety: the LLM stage and the JSON report both
+Determinism is a correctness requirement here, not a nicety: semantic evidence bundles and the JSON report both
 depend on a stable graph.
 
 ## 7. Comment and naming discipline

@@ -1,70 +1,51 @@
 # AGENTS.md — scan
 
-Primary entry point for agents and developers working in this repo. Read
-[`.zazz/docs/scan-agent-orientation.md`](.zazz/docs/scan-agent-orientation.md) for the full
-orientation; this file declares the operating rules.
+Read this file and the [agent orientation](.zazz/docs/scan-agent-orientation.md) at session start.
+Then load only the supporting context required for the task; links are not automatic includes.
 
-## Project
+## Load context by task
 
-Scan — an OWASP Top 10 static analysis scanner. It builds a language-agnostic structural graph of a
-target repository with Tree-sitter, isolates source-to-sink paths, and hands the pruned paths to an
-LLM broker for vulnerability analysis.
+| Task | Load |
+|---|---|
+| Product, scope, or architecture decisions | Orientation's [documentation map](.zazz/docs/scan-agent-orientation.md#documentation-map); select the relevant product/design doc |
+| Author or refine a spec | Assigned phase/spec in the [plan](.zazz/project/implementation-plan.md), `spec-builder`, and [spec hygiene](.zazz/standards/spec-hygiene.md) |
+| Implement, test, resume, or verify work | Active greenlit spec/run log, [execution discipline](.zazz/docs/agent-execution-discipline.md), `spec-driven`, and matched [standards](.zazz/standards/index.yaml) |
+| Create/manage a worktree | [Worktree setup](.zazz/docs/worktree-setup.md); [Worktrunk cheat sheet](.zazz/docs/wt-cheat-sheet.md) only when using Worktrunk |
+| Refine SDLC or ownership/process rules | [Zazz methodology](.zazz/docs/zazz-methodology.md) |
+| Edit documentation or standards | Matched [standards](.zazz/standards/index.yaml) and `doc-check` |
+| Prepare or review a PR | [PR process](.zazz/standards/pr-process.md) and the matching `pr-builder`/`pr-review` skill; [human-review guide](.zazz/docs/human-in-loop-pr-review-strategy.md) only for review policy |
 
-- Product docs: `.zazz/project.md` (project overview) and `.zazz/project/` (functionality, scope, architecture)
-- Stack: Go 1.27+ · Tree-sitter (multi-language parsing) · LLM broker over an OpenAI-compatible HTTP API
-- Initial release languages: JavaScript (Node.js), TypeScript, Go, Python, Java
-- Repository shape: **single Go module** (`github.com/zazzcode/scan`)
-
-## Document model
-
-- **DOCS_ROOT: `.zazz/`** (repo-relative)
-- `.zazz/project.md` — the project overview and durable orientation document (read first)
-- `.zazz/project/` — detailed product docs: functionality, scope, and `architecture.md`
-- `.zazz/specifications/` — deliverable specifications (tracked in Git)
-- `.zazz/standards/` — engineering standards; route through `.zazz/standards/index.yaml`
-- `.zazz/docs/` — methodology guides; first-read: `scan-agent-orientation.md`
-- `.zazz/ephemeral/` — gitignored working directory (run logs, QA notes, handoffs). Never commit it.
+Skills live in `.agents/skills/`; load only the matching skill. Keep this entry point small and place
+procedures in their owning guides.
 
 ## Branch model
 
-- **Integration branch: `stage`.** All PRs target `stage`. Keep the `stage/` worktree clean and
-  read-only.
-- **Release branch: `main`.** At release time a human merges `stage` → `main` and tags a version
-  (`vX.Y.Z`) on `main`. Agents never merge or tag releases.
-- **`main` receives changes only by release promotion** — never direct feature work, and no
-  hotfix-to-`main` path: expedited fixes also flow through `stage`.
-- Flat, hyphenated branch names only (`feature-taint-graph`, not `feature/taint-graph`) so branch
-  name = sibling worktree directory name.
-- Layout: `.bare/` container + sibling worktrees (`.zazz/docs/worktree-setup.md`,
-  `.zazz/docs/wt-cheat-sheet.md`).
+`stage` integrates reviewed work; `main` receives human-operated release promotion and version tags.
+All fixes flow through `stage`. Agents MUST NOT merge, tag releases, or push directly to integration.
+Current exception: assigned concept/architecture/methodology documentation may be edited in `stage/`;
+this does not permit spec work or feature implementation there. Detailed layout, naming, and operations:
+[worktree setup](.zazz/docs/worktree-setup.md).
 
-## Git identity
+## Definition and spec-driven delivery
 
-This tree lives under `/Users/michael/Dev/zazzcode`: commits are authored as **zazzcode** (via
-`includeIf`) and `gh`/git HTTPS auth uses the zazzcode profile. Verify with `git config user.name`
-before committing.
+Each spec MUST be authored, refined, and implemented in its own dedicated feature worktree from
+`stage`, with its own draft PR targeting `stage`. Implementation requires human Deliverable Owner
+greenlight. A proposed phase/backlog entry is not approval. Follow [execution discipline](.zazz/docs/agent-execution-discipline.md)
+with the scan-specific branch/spec rules above taking precedence.
 
-## Skills
+## Document model
 
-Authoritative local skill set: `.agents/skills/` (vendored from zazz-skills + local). Load only the
-skill matching the current task. Current set: `feature-doc-builder`, `spec-builder`, `spec-driven`,
-`handoff`, `standard-builder`, `worktree`, `doc-check`, `pr-builder`, `pr-review`.
+**DOCS_ROOT: `.zazz/`**. Specs are Git-tracked in `.zazz/specifications/`; execution scratch belongs in
+gitignored `.zazz/ephemeral/`, never committed. Zazz Board is not used. See the
+[documentation map](.zazz/docs/scan-agent-orientation.md#documentation-map) for durable document owners.
 
 ## Repository commands
 
-- Build: `go build ./...`
-- Test: `go test ./...`
-- Vet: `go vet ./...`
-- Format: `gofmt -l -w .`
-- No required environment or secrets for the current bootstrap.
+Run in the active worktree using its declared Go toolchain and the assigned spec's scoped checks:
 
-## Not in use
+- List inputs: `go run ./cmd/scan --list .` (add `--json` before the path for JSON).
+- Build/test/vet: `go build ./...`, `go test ./...`, `go vet ./...`.
+- Format check: `gofmt -l .`; format only changed Go files when needed.
 
-- **zazz-board** is not used in this project for now — no board mirroring or tracking; execution
-  records stay in `.zazz/ephemeral/` or worktree-local files.
-
-## Execution discipline
-
-Follow `.zazz/docs/agent-execution-discipline.md`: work in isolated worktrees, verify before
-assuming, scope edits to the branch's diff against `stage`, run checks on the task's file set, and
-stop to ask when a destructive or ambiguous situation appears.
+Before committing/pushing, verify path/branch, `git config user.name` (**zazzcode**), and the zazzcode
+Git/`gh` authentication profile. Test/evidence conventions live in [testing](.zazz/standards/testing.md).

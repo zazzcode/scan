@@ -10,7 +10,7 @@
 # Curation policy: only stack-agnostic methodology standards are vendored from
 # zazz-skills/docs/standards, and the two that described the upstream repo's own
 # stack (contextual-split, pr-process) were rewritten for scan. The scan stack
-# (Go + Tree-sitter + an OpenAI-compatible LLM broker) deliberately does NOT vendor
+# (Go + Tree-sitter + bounded flow + Jev Assessment and Findings Review) deliberately does NOT vendor
 # the upstream stack-specific baselines (Python/Flask, SQL Server sprocs, React/Next,
 # Lambda, Drizzle/Neon). Stack standards are authored for this repo with the
 # standard-builder skill and appended here as they land.
@@ -43,7 +43,7 @@ standards:
         - deciding what evidence a change must carry before it lands on stage
     purpose: >-
       Table-driven Go tests, golden-file parsing fixtures, deterministic graph fixtures for path tracking,
-      a stubbed LLM broker, no network or wall-clock dependence in unit tests, and the evidence expected on
+      stubbed semantic adapters, no network or wall-clock dependence in unit tests, and the evidence expected on
       a PR.
 
   - file: pr-process.md
@@ -128,7 +128,7 @@ standards:
 #   rule-authoring.md  .scm query conventions, rule naming, sink classes, OWASP/CWE/severity declaration
 #   graph-model.md     node/edge schema evolution, node identity, graph export compatibility
 #   arg-binding.md     call-site argument annotation conventions and the local binding table
-#   llm-broker.md      prompt shape, structured response schema, verdict semantics, retry and cost control
+#   semantic-adapters.md  Jev typed assessments, Findings Review, uncertainty, retries and budgets
 #   finding-record.md  finding schema, fingerprint, previous-findings log, baseline format, gating policy
 #   cli-surface.md     flags, output formats, exit codes, CI usage
 #   ci-workflows.md    GitHub Actions triggers, Go build/vet/test/race jobs, lint and format gates
