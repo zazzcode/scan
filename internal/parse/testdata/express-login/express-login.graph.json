@@ -1,0 +1,788 @@
+{
+  "schema_version": 1,
+  "root": "testdata/express-login",
+  "routes": [
+    {
+      "id": "route:chain.js:70:GET:/api/items/:id",
+      "method": "GET",
+      "path_pattern": "/api/items/:id",
+      "framework": "express",
+      "registration": {
+        "file": "chain.js",
+        "start_line": 6,
+        "end_line": 6,
+        "start_byte": 70,
+        "end_byte": 85
+      },
+      "handler": {
+        "name": "readItem",
+        "kind": "identifier",
+        "span": {
+          "file": "chain.js",
+          "start_line": 6,
+          "end_line": 6,
+          "start_byte": 74,
+          "end_byte": 84
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "route.get",
+            "kind": "method",
+            "span": {
+              "file": "chain.js",
+              "start_line": 6,
+              "end_line": 6,
+              "start_byte": 70,
+              "end_byte": 73
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "readItem",
+            "kind": "identifier",
+            "span": {
+              "file": "chain.js",
+              "start_line": 6,
+              "end_line": 6,
+              "start_byte": 74,
+              "end_byte": 84
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:chain.js:89:PUT:/api/items/:id",
+      "method": "PUT",
+      "path_pattern": "/api/items/:id",
+      "framework": "express",
+      "registration": {
+        "file": "chain.js",
+        "start_line": 7,
+        "end_line": 7,
+        "start_byte": 89,
+        "end_byte": 103
+      },
+      "handler": {
+        "name": "writeItem",
+        "kind": "identifier",
+        "span": {
+          "file": "chain.js",
+          "start_line": 7,
+          "end_line": 7,
+          "start_byte": 93,
+          "end_byte": 102
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "route.put",
+            "kind": "method",
+            "span": {
+              "file": "chain.js",
+              "start_line": 7,
+              "end_line": 7,
+              "start_byte": 89,
+              "end_byte": 92
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "writeItem",
+            "kind": "identifier",
+            "span": {
+              "file": "chain.js",
+              "start_line": 7,
+              "end_line": 7,
+              "start_byte": 93,
+              "end_byte": 102
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:chain.js:107:DELETE:/api/items/:id",
+      "method": "DELETE",
+      "path_pattern": "/api/items/:id",
+      "framework": "express",
+      "registration": {
+        "file": "chain.js",
+        "start_line": 8,
+        "end_line": 8,
+        "start_byte": 107,
+        "end_byte": 125
+      },
+      "handler": {
+        "name": "removeItem",
+        "kind": "identifier",
+        "span": {
+          "file": "chain.js",
+          "start_line": 8,
+          "end_line": 8,
+          "start_byte": 114,
+          "end_byte": 124
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "route.delete",
+            "kind": "method",
+            "span": {
+              "file": "chain.js",
+              "start_line": 8,
+              "end_line": 8,
+              "start_byte": 107,
+              "end_byte": 113
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "removeItem",
+            "kind": "identifier",
+            "span": {
+              "file": "chain.js",
+              "start_line": 8,
+              "end_line": 8,
+              "start_byte": 114,
+              "end_byte": 124
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:login.js:231:GET:/rest/profile",
+      "method": "GET",
+      "path_pattern": "/rest/profile",
+      "framework": "express",
+      "registration": {
+        "file": "login.js",
+        "start_line": 20,
+        "end_line": 20,
+        "start_byte": 231,
+        "end_byte": 262
+      },
+      "handler": {
+        "name": "login",
+        "kind": "identifier",
+        "span": {
+          "file": "login.js",
+          "start_line": 20,
+          "end_line": 20,
+          "start_byte": 256,
+          "end_byte": 261
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.get",
+            "kind": "method",
+            "span": {
+              "file": "login.js",
+              "start_line": 20,
+              "end_line": 20,
+              "start_byte": 231,
+              "end_byte": 238
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "login",
+            "kind": "identifier",
+            "span": {
+              "file": "login.js",
+              "start_line": 20,
+              "end_line": 20,
+              "start_byte": 256,
+              "end_byte": 261
+            }
+          }
+        },
+        {
+          "kind": "call",
+          "symbol": {
+            "name": "security.login",
+            "kind": "method",
+            "span": {
+              "file": "login.js",
+              "start_line": 8,
+              "end_line": 8,
+              "start_byte": 88,
+              "end_byte": 112
+            }
+          },
+          "caller": "login"
+        }
+      ]
+    },
+    {
+      "id": "route:login.js:264:POST:/rest/user/login",
+      "method": "POST",
+      "path_pattern": "/rest/user/login",
+      "framework": "express",
+      "registration": {
+        "file": "login.js",
+        "start_line": 22,
+        "end_line": 22,
+        "start_byte": 264,
+        "end_byte": 301
+      },
+      "handler": {
+        "name": "login",
+        "kind": "identifier",
+        "span": {
+          "file": "login.js",
+          "start_line": 22,
+          "end_line": 22,
+          "start_byte": 293,
+          "end_byte": 300
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.post",
+            "kind": "method",
+            "span": {
+              "file": "login.js",
+              "start_line": 22,
+              "end_line": 22,
+              "start_byte": 264,
+              "end_byte": 272
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "login",
+            "kind": "identifier",
+            "span": {
+              "file": "login.js",
+              "start_line": 22,
+              "end_line": 22,
+              "start_byte": 293,
+              "end_byte": 300
+            }
+          }
+        },
+        {
+          "kind": "call",
+          "symbol": {
+            "name": "security.login",
+            "kind": "method",
+            "span": {
+              "file": "login.js",
+              "start_line": 8,
+              "end_line": 8,
+              "start_byte": 88,
+              "end_byte": 112
+            }
+          },
+          "caller": "login"
+        }
+      ]
+    },
+    {
+      "id": "route:login.js:303:GET:/.well-known/security.txt",
+      "method": "GET",
+      "path_pattern": "/.well-known/security.txt",
+      "framework": "express",
+      "registration": {
+        "file": "login.js",
+        "start_line": 24,
+        "end_line": 26,
+        "start_byte": 303,
+        "end_byte": 389
+      },
+      "handler": {
+        "name": "",
+        "kind": "anonymous",
+        "span": {
+          "file": "login.js",
+          "start_line": 24,
+          "end_line": 26,
+          "start_byte": 359,
+          "end_byte": 388
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.get",
+            "kind": "method",
+            "span": {
+              "file": "login.js",
+              "start_line": 24,
+              "end_line": 24,
+              "start_byte": 303,
+              "end_byte": 310
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "",
+            "kind": "anonymous",
+            "span": {
+              "file": "login.js",
+              "start_line": 24,
+              "end_line": 26,
+              "start_byte": 359,
+              "end_byte": 388
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:login.js:303:GET:/security.txt",
+      "method": "GET",
+      "path_pattern": "/security.txt",
+      "framework": "express",
+      "registration": {
+        "file": "login.js",
+        "start_line": 24,
+        "end_line": 26,
+        "start_byte": 303,
+        "end_byte": 389
+      },
+      "handler": {
+        "name": "",
+        "kind": "anonymous",
+        "span": {
+          "file": "login.js",
+          "start_line": 24,
+          "end_line": 26,
+          "start_byte": 359,
+          "end_byte": 388
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.get",
+            "kind": "method",
+            "span": {
+              "file": "login.js",
+              "start_line": 24,
+              "end_line": 24,
+              "start_byte": 303,
+              "end_byte": 310
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "",
+            "kind": "anonymous",
+            "span": {
+              "file": "login.js",
+              "start_line": 24,
+              "end_line": 26,
+              "start_byte": 359,
+              "end_byte": 388
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:login.js:391:GET:/rest/user/change-password",
+      "method": "GET",
+      "path_pattern": "/rest/user/change-password",
+      "framework": "express",
+      "registration": {
+        "file": "login.js",
+        "start_line": 28,
+        "end_line": 28,
+        "start_byte": 391,
+        "end_byte": 466
+      },
+      "handler": {
+        "name": "changePassword",
+        "kind": "identifier",
+        "span": {
+          "file": "login.js",
+          "start_line": 28,
+          "end_line": 28,
+          "start_byte": 448,
+          "end_byte": 464
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.get",
+            "kind": "method",
+            "span": {
+              "file": "login.js",
+              "start_line": 28,
+              "end_line": 28,
+              "start_byte": 391,
+              "end_byte": 398
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "utils.asyncHandler",
+            "kind": "method",
+            "span": {
+              "file": "login.js",
+              "start_line": 28,
+              "end_line": 28,
+              "start_byte": 429,
+              "end_byte": 465
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "changePassword",
+            "kind": "identifier",
+            "span": {
+              "file": "login.js",
+              "start_line": 28,
+              "end_line": 28,
+              "start_byte": 448,
+              "end_byte": 464
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:login.js:468:USE:/ftp",
+      "method": "USE",
+      "path_pattern": "/ftp",
+      "framework": "express",
+      "registration": {
+        "file": "login.js",
+        "start_line": 30,
+        "end_line": 30,
+        "start_byte": 468,
+        "end_byte": 488
+      },
+      "handler": {
+        "name": "ftp",
+        "kind": "identifier",
+        "span": {
+          "file": "login.js",
+          "start_line": 30,
+          "end_line": 30,
+          "start_byte": 484,
+          "end_byte": 487
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.use",
+            "kind": "method",
+            "span": {
+              "file": "login.js",
+              "start_line": 30,
+              "end_line": 30,
+              "start_byte": 468,
+              "end_byte": 475
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "ftp",
+            "kind": "identifier",
+            "span": {
+              "file": "login.js",
+              "start_line": 30,
+              "end_line": 30,
+              "start_byte": 484,
+              "end_byte": 487
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:missing.js:0:GET:/health",
+      "method": "GET",
+      "path_pattern": "/health",
+      "framework": "express",
+      "registration": {
+        "file": "missing.js",
+        "start_line": 1,
+        "end_line": 1,
+        "start_byte": 0,
+        "end_byte": 26
+      },
+      "handler": {
+        "name": "health",
+        "kind": "identifier",
+        "span": {
+          "file": "missing.js",
+          "start_line": 1,
+          "end_line": 1,
+          "start_byte": 19,
+          "end_byte": 25
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.get",
+            "kind": "method",
+            "span": {
+              "file": "missing.js",
+              "start_line": 1,
+              "end_line": 1,
+              "start_byte": 0,
+              "end_byte": 7
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "health",
+            "kind": "identifier",
+            "span": {
+              "file": "missing.js",
+              "start_line": 1,
+              "end_line": 1,
+              "start_byte": 19,
+              "end_byte": 25
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:route.ts:35:GET:/ts",
+      "method": "GET",
+      "path_pattern": "/ts",
+      "framework": "express",
+      "registration": {
+        "file": "route.ts",
+        "start_line": 3,
+        "end_line": 3,
+        "start_byte": 35,
+        "end_byte": 58
+      },
+      "handler": {
+        "name": "handler",
+        "kind": "identifier",
+        "span": {
+          "file": "route.ts",
+          "start_line": 3,
+          "end_line": 3,
+          "start_byte": 50,
+          "end_byte": 57
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.get",
+            "kind": "method",
+            "span": {
+              "file": "route.ts",
+              "start_line": 3,
+              "end_line": 3,
+              "start_byte": 35,
+              "end_byte": 42
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "handler",
+            "kind": "identifier",
+            "span": {
+              "file": "route.ts",
+              "start_line": 3,
+              "end_line": 3,
+              "start_byte": 50,
+              "end_byte": 57
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:route.tsx:53:GET:/tsx",
+      "method": "GET",
+      "path_pattern": "/tsx",
+      "framework": "express",
+      "registration": {
+        "file": "route.tsx",
+        "start_line": 5,
+        "end_line": 5,
+        "start_byte": 53,
+        "end_byte": 77
+      },
+      "handler": {
+        "name": "handler",
+        "kind": "identifier",
+        "span": {
+          "file": "route.tsx",
+          "start_line": 5,
+          "end_line": 5,
+          "start_byte": 69,
+          "end_byte": 76
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.get",
+            "kind": "method",
+            "span": {
+              "file": "route.tsx",
+              "start_line": 5,
+              "end_line": 5,
+              "start_byte": 53,
+              "end_byte": 60
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "handler",
+            "kind": "identifier",
+            "span": {
+              "file": "route.tsx",
+              "start_line": 5,
+              "end_line": 5,
+              "start_byte": 69,
+              "end_byte": 76
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "gaps": [
+    {
+      "kind": "parse_error",
+      "detail": "syntax error",
+      "at": {
+        "file": "broken.js",
+        "start_line": 1,
+        "end_line": 2,
+        "start_byte": 0,
+        "end_byte": 9
+      }
+    },
+    {
+      "kind": "unresolved_handler",
+      "detail": "writeItem",
+      "at": {
+        "file": "chain.js",
+        "start_line": 7,
+        "end_line": 7,
+        "start_byte": 93,
+        "end_byte": 102
+      }
+    },
+    {
+      "kind": "unresolved_handler",
+      "detail": "removeItem",
+      "at": {
+        "file": "chain.js",
+        "start_line": 8,
+        "end_line": 8,
+        "start_byte": 114,
+        "end_byte": 124
+      }
+    },
+    {
+      "kind": "dynamic_path",
+      "detail": "path is not a string literal starting with /",
+      "at": {
+        "file": "chain.js",
+        "start_line": 10,
+        "end_line": 10,
+        "start_byte": 127,
+        "end_byte": 160
+      }
+    },
+    {
+      "kind": "dynamic_path",
+      "detail": "path is not a string literal starting with /",
+      "at": {
+        "file": "dynamic.js",
+        "start_line": 5,
+        "end_line": 5,
+        "start_byte": 47,
+        "end_byte": 73
+      }
+    },
+    {
+      "kind": "unresolved_handler",
+      "detail": "utils.asyncHandler",
+      "at": {
+        "file": "login.js",
+        "start_line": 28,
+        "end_line": 28,
+        "start_byte": 429,
+        "end_byte": 447
+      }
+    },
+    {
+      "kind": "unresolved_handler",
+      "detail": "ftp",
+      "at": {
+        "file": "login.js",
+        "start_line": 30,
+        "end_line": 30,
+        "start_byte": 484,
+        "end_byte": 487
+      }
+    },
+    {
+      "kind": "unresolved_handler",
+      "detail": "health",
+      "at": {
+        "file": "missing.js",
+        "start_line": 1,
+        "end_line": 1,
+        "start_byte": 19,
+        "end_byte": 25
+      }
+    }
+  ]
+}

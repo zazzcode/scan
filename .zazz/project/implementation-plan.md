@@ -1,7 +1,17 @@
 # Proposed phased implementation plan
 
-**Concept-stage planning, 2026-10-19.** No phase below is approved for execution. This is a decomposition
-for later spec sessions, not a specification, calendar schedule, or claim of completed functionality.
+**Concept-stage planning, 2026-10-19. First-build pointer updated 2026-10-24.** Phases 0–13 below are
+not approved for execution. This is a decomposition for later spec sessions, not a specification,
+calendar schedule, or claim of completed functionality.
+
+## First build
+
+The [route-identification spec](../specifications/tree-sitter-route-identification-mvp.md) is greenlit
+and implemented. `scan --routes` emits a JSON route index of Express-style registrations and same-file
+handler names. It is not a resolved execution trace. The OpenAI Decisions API (`gpt-6-luna` on
+`POST /v1/decisions`) remains the later assessor and is not part of this slice. Juice Shop manual
+checks use tag `v20.3.0`. Phases 0–13 stay proposed. The next spec is a Go verdict for each external
+string on a route: covered, unvalidated, unsanitized, or uncertain. That verdict is not this slice.
 Context: [architecture](../architecture.md), [scope](02-project-scope.md),
 [design proposal](03-jev-design-proposal.md), [Jev research](04-jev-validation-research.md), and
 [Zazz methodology](../docs/zazz-methodology.md).

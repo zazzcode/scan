@@ -84,6 +84,8 @@ func TestRunUsageErrors(t *testing.T) {
 		{"list without a path", []string{"--list"}},
 		{"unknown flag", []string{"--nope"}},
 		{"two paths", []string{"--list", "a", "b"}},
+		{"routes and list", []string{"--routes", "--list", "a"}},
+		{"routes without a path", []string{"--routes"}},
 	}
 
 	for _, tt := range tests {
@@ -93,6 +95,60 @@ func TestRunUsageErrors(t *testing.T) {
 				t.Errorf("exit code = %d, want %d", code, exitUsage)
 			}
 		})
+	}
+}
+
+func TestRoutesCLI(t *testing.T) {
+	root := filepath.Join("..", "..", "internal", "parse", "testdata", "express-login")
+	var stdout, stderr bytes.Buffer
+
+	if code := run([]string{"--routes", root}, &stdout, &stderr); code != exitOK {
+		t.Fatalf("exit code = %d, want %d (stderr: %s)", code, exitOK, stderr.String())
+	}
+	out := stdout.String()
+	for _, want := range []string{"POST /rest/user/login login.js:", "GET /ts route.ts:"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("output missing %q:\n%s", want, out)
+		}
+	}
+	if strings.Contains(out, "/hidden") {
+		t.Errorf("node_modules route listed:\n%s", out)
+	}
+
+	stdout.Reset()
+	stderr.Reset()
+	if code := run([]string{"--routes", "--json", root}, &stdout, &stderr); code != exitOK {
+		t.Fatalf("json exit code = %d, want %d (stderr: %s)", code, exitOK, stderr.String())
+	}
+	var got struct {
+		SchemaVersion int `json:"schema_version"`
+		Routes        []struct {
+			Method      string `json:"method"`
+			PathPattern string `json:"path_pattern"`
+			Framework   string `json:"framework"`
+		} `json:"routes"`
+	}
+	if err := json.Unmarshal(stdout.Bytes(), &got); err != nil {
+		t.Fatalf("unmarshal: %v\n%s", err, stdout.String())
+	}
+	if got.SchemaVersion != 1 {
+		t.Errorf("schema_version = %d, want 1", got.SchemaVersion)
+	}
+	found := false
+	for _, route := range got.Routes {
+		if route.Method == "POST" && route.PathPattern == "/rest/user/login" && route.Framework == "express" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("json routes = %+v, want POST /rest/user/login", got.Routes)
+	}
+
+	stdout.Reset()
+	stderr.Reset()
+	code := run([]string{"--routes", filepath.Join(t.TempDir(), "does-not-exist")}, &stdout, &stderr)
+	if code != exitError {
+		t.Errorf("missing dir exit = %d, want %d", code, exitError)
 	}
 }
 

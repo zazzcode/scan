@@ -14,6 +14,7 @@ import (
 	"sort"
 
 	"github.com/zazzcode/scan/internal/lang"
+	"github.com/zazzcode/scan/internal/parse"
 	"github.com/zazzcode/scan/internal/walk"
 )
 
@@ -36,19 +37,25 @@ func run(args []string, stdout, stderr io.Writer) int {
 
 	var (
 		list   = flags.Bool("list", false, "list the source files under the target path and exit")
+		routes = flags.Bool("routes", false, "emit the Express route execution graph and exit")
 		asJSON = flags.Bool("json", false, "emit machine-readable JSON instead of text")
 	)
 	flags.Usage = func() {
 		fmt.Fprintln(stderr, "usage: scan --list [--json] <path>")
+		fmt.Fprintln(stderr, "       scan --routes [--json] <path>")
 		flags.PrintDefaults()
 	}
 
 	if err := flags.Parse(args); err != nil {
 		return exitUsage
 	}
-	if !*list || flags.NArg() != 1 {
+	if *list == *routes || flags.NArg() != 1 {
 		flags.Usage()
 		return exitUsage
+	}
+
+	if *routes {
+		return runRoutes(flags.Arg(0), *asJSON, stdout, stderr)
 	}
 
 	result, err := walk.Walk(flags.Arg(0), walk.Options{})
@@ -68,6 +75,30 @@ func run(args []string, stdout, stderr io.Writer) int {
 	}
 
 	printManifest(stdout, result)
+	return exitOK
+}
+
+func runRoutes(root string, asJSON bool, stdout, stderr io.Writer) int {
+	scanned, err := parse.Routes(root)
+	if err != nil {
+		fmt.Fprintf(stderr, "scan: %v\n", err)
+		return exitError
+	}
+	if asJSON {
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(scanned); err != nil {
+			fmt.Fprintf(stderr, "scan: %v\n", err)
+			return exitError
+		}
+		return exitOK
+	}
+	for _, route := range scanned.Routes {
+		fmt.Fprintf(stdout, "%s %s %s:%d\n", route.Method, route.PathPattern, route.Registration.File, route.Registration.StartLine)
+	}
+	for _, gap := range scanned.Gaps {
+		fmt.Fprintf(stdout, "gap %s %s:%d %s\n", gap.Kind, gap.At.File, gap.At.StartLine, gap.Detail)
+	}
 	return exitOK
 }
 
