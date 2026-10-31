@@ -1,6 +1,6 @@
 # Proposed phased implementation plan
 
-**Concept-stage planning, 2026-10-19. First-build pointer updated 2026-10-24.** Phases 0–13 below are
+**Long-term planning, 2026-10-19; near-term route/string sequence updated 2026-10-31.** Phases 0–13 below are
 not approved for execution. This is a decomposition for later spec sessions, not a specification,
 calendar schedule, or claim of completed functionality.
 
@@ -10,11 +10,111 @@ The [route-identification spec](../specifications/tree-sitter-route-identificati
 and implemented. `scan --routes` emits a JSON route index of Express-style registrations and same-file
 handler names. It is not a resolved execution trace. The OpenAI Decisions API (`gpt-6-luna` on
 `POST /v1/decisions`) remains the later assessor and is not part of this slice. Juice Shop manual
-checks use tag `v20.3.0`. Phases 0–13 stay proposed. The next spec is a Go verdict for each external
-string on a route: covered, unvalidated, unsanitized, or uncertain. That verdict is not this slice.
+checks use tag `v20.3.0`. Phases 0–13 stay proposed. The next objective is evidence-backed assessment
+of external string uses on selected routes.
+Validation, transformation, sink-specific protection, and uncertainty are separate facets; see the
+near-term sequence below. A four-label string verdict is not an approved contract.
 Context: [architecture](../architecture.md), [scope](02-project-scope.md),
 [design proposal](03-jev-design-proposal.md), [Jev research](04-jev-validation-research.md), and
 [Zazz methodology](../docs/zazz-methodology.md).
+
+## Route-string-validation delivery sequence
+
+**2026-10-31 sequence; the bounded current contract is explicitly authorized.** The assigned branch is
+`route-string-validation`. First verification is complete for the existing syntactic route contract:
+see [evidence and limitations](06-route-validation-assessment.md#route-verification). The current route
+inventory is already present here; do not reimplement the MVP from the older backlog.
+
+The immediate objective is a small reviewable path from route to external string to sink-specific
+protection assessment. Start with Juice Shop login/search SQL cases and controlled pairs, then expand.
+GPT Decisions and Jev are alternative judge providers, with OpenAI first; [architecture](../architecture.md#current-provider-decision)
+owns that decision and [API setup](../docs/openai-decisions-setup.md) owns key instructions.
+
+| Sequence | Proposed contract | Dependency and exit evidence |
+|---|---|---|
+| R1 | Route trust and selected corpus | Reuse MVP; distinguish Express receivers from clients; pin selected files/revision, expected registrations, exclusions, safe/vulnerable/unknown labels |
+| R2 | Selected handler and input resolution | R1; resolve login/search imports, returned handler factories and wrapper; locate request sources and SQL sinks; lexical shadowing/unknown tests |
+| R3 | Local SQL-use evidence and offline report | R2; minimal normalized operations for assignments, interpolation, guards and parameter binding; witnesses, explicit gaps and coverage; separate validation/protection facets |
+| R4 | Decisions adapter and feasibility experiment | Hand-reviewed bundles from R1 can support an early independent experiment; production integration uses R3 evidence. Validate transport with HTTP stubs first; then bounded live labeled evaluation |
+| R5 | Independent review and reconciled output | R3–R4; reviewer assesses evidence independently; preserve disagreements, refusals, missing context and incomplete stages; compare against held-out human labels |
+
+Each row is a reviewable outcome to refine. The current contract implements a bounded subset
+in this assigned worktree; related design and implementation remain together. Independent future
+deliverables may use separate worktrees after accepted prerequisites.
+The user explicitly authorized implementation in this worktree on 2026-10-31. Follow the updated
+[authorization rules](../../AGENTS.md#authorization-and-delivery) and the
+[current implementation contract](../specifications/route-string-validation.md); no separate greenlight is needed.
+
+R4's early experiment uses hand-prepared evidence and cannot be presented as end-to-end scanner
+capability. API credentials are not required for R1–R3 or HTTP-stub tests. A key is not permission to
+upload source or spend without the live experiment's declared scope/budget.
+
+The first slice MUST retain unknowns and MUST NOT report missing sanitization as a vulnerability
+when sink-specific protection is established, such as SQL parameter binding. Proposed candidate
+facets are validation, transformations, sink-specific protection, and evidence completeness; exact
+fields/verdicts belong to the next spec. Desired evidence: the guarded value reaches the SQL binding.
+A real rejected inference is treating the search handler's length limit as SQL protection (see
+[assessment](06-route-validation-assessment.md#suggested-first-security-slice)).
+
+Long-term phases below remain a roadmap. R1 overlaps foundation/corpus/parser audit, R2 overlaps
+resolution, R3 overlaps local flow/evidence/minimal output, and R4–R5 overlap semantic feasibility and
+review. Future specs MUST reconcile these overlaps rather than repeating completed extraction or
+claiming all of a phase complete. Broad interprocedural flow, all OWASP families, caching, baseline CI,
+and other languages remain outside this first slice. The older S01–S34 identifiers and Jev adapter
+names are historical planning references until their individual contracts are refined.
+
+## Current two-case increment
+
+The [requirements file](../evaluation/juice-shop/validation-checks.json) declares login email/SQL
+protection and registration required-credential checks. Implemented checked mode assembles route-chain,
+relevant helper, model/generated-persistence and local branch evidence. Claim-specific required roles
+and blockers replace the blanket any-gap downgrade for checked candidates. Unchecked candidates
+remain conservative. See [design](../architecture/evidence-and-claims.md) and the current contract
+for tests and remaining limits. Source/field requirements and SQL parameterization are separate
+questions; route remediation should present complementary improvements. SARIF export and illustrative remediation templates are implemented; runtime confirmation remains
+future work. [Original comparisons](../evaluation/corpus/README.md) exercise protected and unknown
+controls. Next extend automatic claim assembly to novel targets through the
+[Phase 3/5–8 sequence](../architecture/evidence-and-claims.md#discovery-on-novel-target-repositories);
+explicit check files are evaluation/business-policy inputs, not the final discovery strategy.
+
+## Next concrete case: registration validation
+
+The user-selected next acceptance case is account registration. The
+[registration case design](07-registration-validation-case.md) records pinned Juice Shop source,
+actual conditional checks, bypass shapes, generated persistence endpoints, test-label limitations,
+and exact structural/prompt improvements. The original offline scan emitted no registration candidate; checked mode now
+assembles this candidate and the [login case](08-login-validation-case.md).
+[Two-case results](../evaluation/juice-shop/results.md) record the live integration outcome.
+
+Prioritize effective middleware chains and generated ORM create operations (Phase 3), local
+next()/return/guard control flow (Phase 5), model/helper transfers (Phase 6), claim-specific completeness
+(Phase 7), and atomic judge questions plus finding eligibility (Phase 8). Keep these as one bounded
+registration-focused increment where possible. Do not equate OWASP's repeat-password/DRY challenge
+with Empty User Registration or treat challenge flags as proof of persisted invalid accounts.
+This case refines R2–R5; only the bounded subset in the current contract is implemented.
+
+## Structural analysis and semantic judgment
+
+The objective is a target-repository framework for API routes, internal code paths, outbound service
+request strings, remote response values and subsequent use. Go establishes supported dependencies;
+GPT Decisions or Jev judges sufficient validation/protection and potential vulnerabilities from that
+evidence. This avoids hard-coding every acceptable custom validator while retaining precise source/sink
+and library semantics. See the [graph design](../architecture/repository-graph.md).
+
+| Phase | Required structural work | What stays a judge question |
+|---|---|---|
+| 2 | Parse routes, calls, assignments, returns, branches into source-backed operations and values | None; syntax is evidence |
+| 3 | Resolve handlers/imports; model request-field sources, SQL operands, outbound URL/header/body slots and response sources | Whether a shown custom constraint is adequate for the specified use |
+| 5 | Local value/control flow, reassignment, joins, guard outcomes and bypass facts | Whether those guards/transformations meet the sink's security requirements |
+| 6 | Matched argument/parameter and return flow, supported await/promise/callback continuations | Interpretation of a complete cross-function protection case |
+| 7 | Bounded evidence with helpers, witness, sink semantics, snapshots and gaps | No invented evidence or missing paths |
+| 8 | Explicit provider selection, independent calibration and failure handling, Findings Review | Typed protection/vulnerability assessment over the supplied evidence |
+
+Start with the authorized [current contract](../specifications/route-string-validation.md) spanning a
+small subset of these phases, validate on Juice Shop and controlled pairs, then grow the structural
+subset. Full phase completion is not a prerequisite to a bounded provider experiment. Outbound
+request detection does not by itself implement remote response propagation. Each new sink family or
+async pattern needs its own evidence and capability tests. General OWASP coverage remains long-term.
 
 ## Starting point and definition gate
 
@@ -38,8 +138,9 @@ the pasted library examples do not constitute approved dependency selections.
 
 ## How a phase becomes agent-manageable work
 
-Every spec is authored, refined, and implemented in its own sibling feature worktree, with its own
-PR into `stage`. The definition-only `stage/` exception does not apply to specs. See the
+Use the assigned isolated feature worktree for related specification, design, implementation and tests.
+Independent future deliverables may use separate worktrees/PRs into `stage`. Explicit user requests
+authorize implementation under [AGENTS.md](../../AGENTS.md#authorization-and-delivery). See the
 [orientation](../docs/scan-agent-orientation.md#branches-and-worktrees).
 
 - Suggested spec names below describe future contracts; they are not files created or greenlit now.
@@ -99,7 +200,7 @@ The [prior-art study](05-prior-art-and-feasibility.md) informs parser/adapter/fl
 Bearer for Go implementation patterns and CodeQL's open queries/libraries for semantic models and
 regression cases. Keep these studies scoped to the next contract. Phase 1 may compare prepared
 evidence with pinned Bearer results; treat human labels as the
-reference, not Bearer output. This study does not change the chosen Jev Assessment → Findings Review roles.
+reference, not Bearer output. This study does not change the chosen Decision Assessment → Findings Review roles.
 
 ## Dependency overview
 
@@ -113,7 +214,7 @@ reference, not Bearer output. This study does not change the chosen Jev Assessme
 | 5 | 2–3; flow fixtures from 1 | Local CFG/dataflow and mitigation-use facts |
 | 6 | 5 + resolution from 3 | Bounded cross-function flow and witnesses |
 | 7 | 6; evidence needs from 1 | Complete, minimized evidence bundles |
-| 8 | 7 + live feasibility from 1 | Jev Assessment, LLM Findings Reviewer, and reconciliation policy |
+| 8 | 7 + live feasibility from 1 | Decision Assessment, LLM Findings Reviewer, and reconciliation policy |
 | 9 | 4, 6–8 | Unified reporting, identity, baseline, CI behavior |
 | 10 | 9 | Correct incremental caches and resource/performance evidence |
 | 11 | 10 + release-scope decision | Python adapter with its declared analysis coverage |
@@ -121,24 +222,25 @@ reference, not Bearer output. This study does not change the chosen Jev Assessme
 | 13 | Separate proposal + relevant foundation | Optional narrow scope checks / coverage expansion |
 
 Phases 4 and 5 are independent after their prerequisites. Offline phases 0–7 can progress after their
-own greenlights without a Jev key. Phase 1 live feasibility and Phase 8 need credentials; absence of a
+own authorization without a judge key. Phase 1 live feasibility and Phase 8 need credentials; absence of a
 key does not justify inventing benchmark results or an automatic provider substitution.
 
 ## Ordered specification backlog
 
 **These specs are planned, not authored or greenlit.** IDs below are planning references, not files.
 Follow this recommended sequence, but start a spec only after its listed prerequisites are accepted.
-Each row gets its own feature worktree and PR into `stage`, including investigation/experiment specs.
+Rows describe independently reviewable outcomes; related rows may be delivered in the assigned
+worktree when explicitly requested by the user.
 A successor branches from `stage` after its prerequisites merge; independent rows can proceed in
-separate worktrees when authorized. Every implementation waits for its own spec greenlight.
+separate worktrees when authorized. An explicit user implementation request is sufficient authorization; record its scoped contract.
 
 | Order | Phase | Future spec | Prerequisites | Reviewable outcome |
 |---|---|---|---|---|
 | S01 | 0 | `foundation-audit` | Definition gate | Verified current behavior and gaps |
 | S02 | 0 | `foundation-adjustments` | S01; only if needed | Bounded fixes to accepted foundation/toolchain |
 | S03 | 1 | `corpus-and-juice-shop-map` | Definition gate | Pinned fixture scope and human labels |
-| S04 | 1 | `semantic-question-design` | S03 | Jev validation/sanitization questions and reviewer rubric |
-| S05 | 1 | `semantic-feasibility-eval` | S04; credentials/budgets | Measured Jev Assessment and Findings Review on prepared evidence |
+| S04 | 1 | `semantic-question-design` | S03 | judge validation/sanitization questions and reviewer rubric |
+| S05 | 1 | `semantic-feasibility-eval` | S04; credentials/budgets | Measured Decision Assessment and Findings Review on prepared evidence |
 | S06 | 2 | `parser-binding-evaluation` | S01, S03; S02 if needed | Binding/grammar/build decision |
 | S07 | 2 | `analysis-ir-contract` | S06 | Normalized operations, typed adjacency contract, identity, provenance, capability limits |
 | S08 | 2 | `jsts-cst-extraction` | S07 | Deterministic syntax extraction |
@@ -153,7 +255,7 @@ separate worktrees when authorized. Every implementation waits for its own spec 
 | S17 | 6 | `cross-function-witnesses` | S16 | Multi-file traces, recursion limits, gaps |
 | S18 | 7 | `candidate-evidence-contract` | S17, S04 | Versioned assessment/review evidence contract |
 | S19 | 7 | `bounded-bundle-builder` | S18 | Complete bounded bundles and inspector output |
-| S20 | 8 | `jev-typed-adapter` | S19, S05 | Production Jev Assessment adapter and failure states |
+| S20 | 8 | `decision-judge-adapters` | S19, S05 | Production Decision Assessment adapter and failure states |
 | S21 | 8 | `llm-findings-reviewer` | S20 | Independent Findings Review and bounded reconciliation |
 | S22 | 8 | `assessment-review-policy-and-evaluation` | S21, S12 | Integrated pipeline, human-label evaluation, audit/completeness policy |
 | S23 | 9 | `finding-identity-and-grouping` | S22 | Stable identity across detector/reviewer assessments |
@@ -169,7 +271,7 @@ separate worktrees when authorized. Every implementation waits for its own spec 
 | S33 | 12 | `java-resolution-and-lowering` | S32; Java-scope decision | Java types, annotations, overloads, lowering |
 | S34 | 12 | `java-flow-and-rules` | S33 | Java flow, rules, and assessment/review evaluation |
 
-S05's live experiment can remain pending while S06–S19 progress after their own greenlights. S12 and
+S05's live experiment can remain pending while S06–S19 progress after their own authorization. S12 and
 S13 start independent rule/flow lanes after shared prerequisites. The initial release is evaluated at
 S28; later language rows are a proposed expansion sequence, not initial-release requirements. SARIF
 and Phase 13 capabilities need separately scoped backlog entries when approved.
@@ -196,9 +298,9 @@ context-specific protection, and actual guard use separately.
 **Evidence/exit:** human-reviewed expectations, pinned reference revision and scope, held-out partition,
 hand-prepared evidence bundles, versioned questions, and a declared evaluation protocol. Live spec sets
 error/uncertainty/cost budgets before execution; report false-safe and false-alarm rates by family.
-Experiment with Jev Assessment of validation/sanitization, then Findings Review of identified issues.
-Use diagnostic deterministic/Jev-only/LLM-only baselines on the same evidence to measure contribution.
-Audit Jev-protected cases for missed issues; reviewer agreement is not a human label.
+Experiment with Decision Assessment of validation/sanitization, then Findings Review of identified issues.
+Use diagnostic deterministic/judge-only/reviewer-only baselines on the same evidence to measure contribution.
+Audit judge-protected cases for missed issues; reviewer agreement is not a human label.
 **Exclude:** production scanner implementation and API requests in the offline specs.
 **Halt/replan:** missing key for live work, contested labels, poor mitigation discrimination, or unclear
 question semantics. Preserve offline artifacts; narrow the proposal rather than forcing a model result.
@@ -283,19 +385,19 @@ context is explicit; stable bundle hashes and allowed-source/redaction behavior 
 **Exclude:** classifier transport, free-form repository uploads, and generated citations.
 **Halt/replan:** necessary evidence cannot fit or the source-transmission policy is unresolved.
 
-## Phase 8 — Jev Assessment and Findings Review
+## Phase 8 — Decision Assessment and Findings Review
 
-**Future specs:** `jev-typed-adapter`; `llm-findings-reviewer`; `assessment-review-policy-and-evaluation`.
-Choose Jev transport/model and validate typed IDs/options/ranges with bounded requests, deadlines,
+**Future specs:** `decision-judge-adapters`; `llm-findings-reviewer`; `assessment-review-policy-and-evaluation`.
+Choose the configured judge transport/model and validate typed IDs/options/ranges with bounded requests, deadlines,
 retries, cancellation, budgets, and no-key/failure states. Add the LLM Findings Reviewer as a required
 stage in the full pipeline. It independently inspects source evidence for every identified issue and
-uncertain candidate before comparison with the Jev/rule assessment. Go retains separate results,
+uncertain candidate before comparison with the judge/rule assessment. Go retains separate results,
 validates evidence IDs, and handles disagreement or missing context explicitly.
 
 **Evidence/exit:** local HTTP stubs cover both adapters and partial failures; held-out human-labeled
 evaluation measures validation/sanitization recognition, reviewer corrections and incorrect agreement,
 false-safe risk, uncertainty, citation validity, review completeness, latency, and spend. Audit a sample
-of Jev-protected candidates. Diagnostic baselines measure the roles; they do not turn the reviewer into
+of judge-protected candidates. Diagnostic baselines measure the roles; they do not turn the reviewer into
 an optional production tier. No issue is labeled reviewed unless its review completed.
 **Exclude:** autonomous graph exploration, generated fixes, and automatic safety acceptance/suppression.
 **Halt/replan:** credentials unavailable, model changes, budget exceeded, evidence missing, or the quality
@@ -304,7 +406,8 @@ bar is not met. Keep incomplete stages and unresolved cases visible; reopen scop
 ## Phase 9 — Unified reporting, identity, baseline, and CI
 
 **Future specs:** `finding-identity-and-grouping`; `report-and-scan-comparison`;
-`baseline-and-ci-policy`. Add SARIF only under a separately scoped export spec.
+`baseline-and-ci-policy`. Extend the bounded SARIF export using the
+[report design](../architecture/reporting-and-sarif.md); preserve canonical finding identity/evidence.
 Unify rule findings, flow candidates, semantic assessments, and coverage. Specify collision/move
 behavior, grouping, compatible-scan comparisons, model/policy changes, and incomplete-scan exit policy.
 Keep baseline ownership/reason review separate from model assessment.
@@ -361,6 +464,16 @@ rules, or other languages based on measured user value.
 positive/negative corpus, uncertainty routing, and evidence of benefit beyond path detection.
 **Exclude:** open-ended “review the application for security” as an unbounded model task.
 **Halt/replan:** an expected answer requires business requirements or runtime facts absent from input.
+
+## Follow-on phase — SCA ecosystem auditing
+
+After the accepted route/source-to-use milestone, add ecosystem audit adapters and dependency
+findings. This does not wait for all proposed source-language adapters. The
+[SCA design](../architecture/sca-design.md) owns SCA-1 schema/tool selection, SCA-2 bounded audit
+execution/reporting, and SCA-3 optional route-reachability correlation. Start with npm/pnpm audit for
+JS/TS targets and add pip-audit for Python inputs under its own verified adapter contract. Preserve
+resolved versions, advisory identity, dependency paths, failures and unknown reachability. Do not
+silently dismiss dependency findings because a route path was not resolved.
 
 ## Progress and decision records
 

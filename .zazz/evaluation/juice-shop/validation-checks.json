@@ -1,0 +1,20 @@
+[
+  {
+    "id": "login-email-sql",
+    "method": "POST",
+    "path": "/rest/user/login",
+    "kind": "sql_query",
+    "fields": ["email"],
+    "validation": "The request email must be a string with an acceptable email-address format before authentication. Assess email syntax separately from SQL injection protection.",
+    "protection": "Request email data must not alter executable SQL structure at the authentication query. Determine whether the email is passed as a bound data parameter or sufficiently protected for this exact SQL use. Password hashing is not evidence about the email operand."
+  },
+  {
+    "id": "registration-required-credentials",
+    "method": "POST",
+    "path": "/api/Users",
+    "kind": "account_creation",
+    "fields": ["email", "password"],
+    "validation": "Email and password must each be nonempty strings after normalization before account creation. The requirement applies even when passwordRepeat is absent. TypeScript annotations do not validate JSON at runtime.",
+    "protection": "An account must not be created with an empty or whitespace-only email/password. Inspect required-field gates, normalization order, next()/return paths, model validators, setters and hooks. A challenge observer or a password hash does not establish this constraint."
+  }
+]

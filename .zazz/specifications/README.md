@@ -4,7 +4,8 @@ Deliverable specifications — the bounded execution contracts that agent sessio
 
 - authored with the `spec-builder` skill (see `.agents/skills/spec-builder/`)
 - quality bar: `../standards/spec-hygiene.md`
-- after greenlight, the implementation lifecycle runs per `.agents/skills/spec-driven/`
+- explicit user implementation requests authorize work; use `.agents/skills/spec-driven/` for evidence
+  and review discipline, with the local authorization rules taking precedence
 
 ## Storage policy
 
@@ -16,14 +17,21 @@ Working notes, run logs, QA findings, and handoffs do **not** live here — they
 
 ## Specification index
 
-Every specification is authored, refined, and implemented in its own feature worktree from `stage`,
-with its own draft PR targeting `stage`. The current definition session does not create spec contracts.
+Use the assigned feature worktree for related contract, design, implementation and tests. Explicit
+user implementation requests authorize work under [AGENTS.md](../../AGENTS.md#authorization-and-delivery).
+Independent future deliverables may use separate feature worktrees/PRs targeting `stage`.
 
 - [Phase 0 skeleton](phase0-skeleton/README.md) — historical foundation contract, retained for context.
   The revised [Phase 0 plan](../project/implementation-plan.md#phase-0--foundation-audit-and-tooling-decision)
   audits existing artifacts before further work.
+- [Tree-sitter route identification MVP](tree-sitter-route-identification-mvp.md) — greenlit
+  2026-10-24 and implemented; syntax inventory only. Reverified on Juice Shop in the
+  [route assessment](../project/06-route-validation-assessment.md#route-verification).
+- [Route string validation](route-string-validation.md) — implementation explicitly authorized by
+  the user on 2026-10-31 in the assigned feature worktree.
+  Start from the [near-term sequence](../project/implementation-plan.md#route-string-validation-delivery-sequence).
 - Remaining specs are not authored yet. Their proposed slices live in the
-  [implementation plan](../project/implementation-plan.md); each needs separate human greenlight.
+  [implementation plan](../project/implementation-plan.md); each needs a bounded contract and user authorization.
 
 See [repository state](../project.md#concept-stage-repository-state) for the current concept stage and
 [specification-driven delivery](../docs/zazz-methodology.md#specification-driven-delivery-cycle) for

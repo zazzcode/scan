@@ -1,13 +1,50 @@
 # Architecture
 
-**Architecture direction, 2026-10-19; implementation requires greenlit specs.** This document owns
+**Architecture direction, updated 2026-10-31; implementation follows explicitly authorized contracts.** This document owns
 technical responsibilities and contracts. Product purpose/state lives in [project.md](project.md),
 rationale and decisions in the [proposal](project/03-jev-design-proposal.md), and delivery order in the
 [implementation plan](project/implementation-plan.md).
 
+## Current provider decision
+
+**2026-10-31 user direction:** use a provider-neutral **semantic judge**. OpenAI GPT Decisions
+and TypeSafe Jev are alternative providers, with room for future decision models. OpenAI is the first
+integration target; Jev remains supported by the design. These models are intended to provide faster,
+lower-cost decisions than general LLM review; actual accuracy, speed, and cost require evaluation.
+A subscription is a setup consideration, not an architecture dependency.
+
+The judge evaluates whether strings are sufficiently validated/protected for their uses, and whether
+the supplied source evidence supports a potential vulnerability. The long-term objective is selected
+OWASP Top 10 vulnerability families, each with explicit evidence requirements and evaluation cases.
+The target repository is the application being analyzed. Tree-sitter and Go construct its inbound API
+entry points, internal code paths/value flow, outbound service requests, and response continuations.
+The [repository graph design](architecture/repository-graph.md) owns those structures and boundaries.
+
+The phrase **Decision Assessment** below means this provider-neutral judge role. Provider selection
+is explicit (`openai` or `jev`); separate keys configure each adapter. No automatic provider fallback
+or second-provider source transmission is implied. Wire formats, model versions, question translation,
+calibration, and costs remain provider-specific. The independent LLM Findings Reviewer is a separate
+role; its model/transport selection remains open. See the [OpenAI setup](docs/openai-decisions-setup.md)
+and [Jev research/setup](project/04-jev-validation-research.md#what-can-happen-before-a-key-exists).
+
+The current route JSON is a syntax inventory, not the normalized security IR proposed below.
+Receiver provenance, imported handler factories, router mounts, and effective middleware ordering need
+explicit contracts before route-level security conclusions. Schema-v1 route IDs contain byte offsets;
+they MUST NOT be treated as edit-stable finding identities. See the
+[assessment](project/06-route-validation-assessment.md#architecture-and-plan-assessment).
+
+## Detailed analysis designs
+
+- [Repository graph](architecture/repository-graph.md): source/control/value and API-boundary structure.
+- [Evidence and claims](architecture/evidence-and-claims.md): route-to-use slices, relevant functions,
+  library models, precise requirements, completeness and phase acceptance cases.
+- [Reporting and SARIF](architecture/reporting-and-sarif.md): route-oriented findings, multiple
+  complementary remediations and a planned interoperable SARIF export.
+- [SCA follow-on](architecture/sca-design.md): ecosystem dependency auditing after code-path analysis.
+
 ## 1. Architecture premise
 
-Tree-sitter extracts syntax. Go establishes supported control and data dependencies. **Jev is the
+Tree-sitter extracts syntax. Go establishes supported control and data dependencies. **The configured semantic judge (GPT Decisions or Jev) is the
 primary semantic assessor for whether a candidate string is adequately validated or sanitized for
 its particular use. The LLM Findings Reviewer reviews identified issues against their evidence.**
 Go retains orchestration, reconciliation, reporting, and CI policy.
@@ -16,26 +53,26 @@ All scan-authored scanner and code-analysis code is Go: language adapters, graph
 rules, model API clients, orchestration, reporting, and evaluation harnesses. Python and other target
 languages describe code being scanned, not implementation runtimes. Tree-sitter's native parser and
 grammars remain dependencies with explicit build requirements; this is not a pure-Go dependency claim.
-Jev and the LLM are external inference services accessed through Go adapters.
+The configured judge and LLM reviewer are external inference services accessed through Go adapters.
 
-The model split aims to use Jev for fast, lower-cost decisions over candidates and reserve deeper
+The model split aims to use the decision model for fast, lower-cost decisions over candidates and reserve deeper
 LLM Findings Review for identified issues, uncertain candidates, and the protected-case audit below.
-Measure total pipeline cost and latency, including review volume, retries, and context assembly;
-Jev's per-request advantage alone does not establish end-to-end savings.
+Measure total pipeline cost and latency, including review volume, retries, and context assembly.
+A per-request advantage alone would not establish end-to-end savings.
 
-Experiments measure Jev's accuracy, required context, and failure cases. Findings Review covers all
-identified issues in the full pipeline. Provider/model selection, budgets, and calibrated thresholds
+Experiments measure the decision model's accuracy, required context, and failure cases. Findings Review covers all
+identified issues in the full pipeline. Reviewer model selection, budgets, and calibrated thresholds
 remain open.
 
 | Role | Responsibility | Output |
 |---|---|---|
 | Tree-sitter and Go | Extract code, resolve supported relationships, trace values and guards | Source-backed candidates and analysis gaps |
-| Jev Assessment | Assess string validation, sanitization, and relevance to the named sink | Typed assessments and proposed issues |
+| Decision Assessment | Assess string validation, sanitization, and relevance to the named sink | Typed assessments and proposed issues |
 | LLM Findings Reviewer | Independently inspect the evidence for each identified issue, then compare with the proposed assessment | Supported, disputed, or needs more evidence; evidence references |
 | Go policy/reporter | Preserve assessments, apply explicit policy, report findings and review completeness | Auditable report and configured CI result |
 
 Terminology: a **candidate** is a string/use needing assessment; an **identified issue** is a proposed
-finding raised by Jev or deterministic rules. **Findings Review** is the stage performed by the
+finding raised by the decision model or deterministic rules. **Findings Review** is the stage performed by the
 **LLM Findings Reviewer**; reports retain findings together with their assessment and review status.
 
 A call path means potential reachability; a dataflow trace means a supported value dependency under
@@ -50,9 +87,9 @@ flowchart TD
     IR --> Rules["Track A: deterministic rule findings"]
     IR --> Flow["Go CFG and bounded dataflow"]
     Flow --> Bundle["Candidate strings, source-to-sink evidence, and gaps"]
-    Bundle --> Jev["Jev: validation and sanitization assessment"]
-    Jev --> Issues["Identified issues and uncertain cases"]
-    Jev --> Retained["Retain all assessments for coverage and audit"]
+    Bundle --> Decision["Semantic judge: GPT Decisions or Jev"]
+    Decision --> Issues["Identified issues and uncertain cases"]
+    Decision --> Retained["Retain all assessments for coverage and audit"]
     Retained -->|Protected-case audit sample| Review
     Rules --> Review["Findings Review"]
     Issues --> Review
@@ -61,10 +98,10 @@ flowchart TD
     Policy --> Report["Findings, review status, coverage, JSON and Markdown"]
 ```
 
-Every identified rule or Jev issue enters Findings Review in the full pipeline. Uncertain candidates
-also enter review; a sampled set of Jev's adequately-protected candidates provides a false-negative
+Every identified rule or decision-model issue enters Findings Review in the full pipeline. Uncertain candidates
+also enter review; a sampled set of the decision model's adequately-protected candidates provides a false-negative
 audit. This sample measures missed issues in addition to reviewing identified ones. Local-only and
-Jev-only runs are useful for diagnostics/experiments, but their reports explicitly mark omitted stages.
+decision-model-only runs are useful for diagnostics/experiments, but their reports explicitly mark omitted stages.
 
 Ingestion and parsing use bounded workers. Graph construction has explicit ownership; workers do not
 mutate shared graph state without a defined merge strategy. Independent analyses and model requests
@@ -72,10 +109,10 @@ may use bounded pools. Stable sorting removes scheduling dependence from determi
 
 ## 3. Parsing and language adapters
 
-The leading parser candidate is [tree-sitter/go-tree-sitter](https://github.com/tree-sitter/go-tree-sitter)
-with separately selected grammars. The binding uses native resources that need explicit lifetime
-management. A parser spec must decide cgo/build requirements, grammar compatibility, error recovery,
-and supported platforms before promising a static binary.
+The route MVP uses [tree-sitter/go-tree-sitter](https://github.com/tree-sitter/go-tree-sitter)
+with pinned JS/TS grammars in `go.mod`. The binding uses native resources that need explicit lifetime
+management. The MVP requires cgo and a C compiler. Future parser/IR contracts must verify grammar compatibility,
+error recovery, and supported platforms before promising a static binary.
 
 Tree-sitter queries identify syntax such as calls, assignments, branches, route registrations, and
 candidate source/sink/validator APIs. A query match is not proof of validation or of data reaching a
@@ -92,6 +129,11 @@ shadowing, and package boundaries. Python decorators, Go receiver/interface call
 are design pressure cases; unsupported behavior remains explicit until its adapter lands.
 
 ## 4. Normalized representation and graph views
+
+The [repository graph design](architecture/repository-graph.md) owns node/edge semantics, target
+repository boundaries, outbound requests and response continuations, provenance, and traversal limits.
+The overview here summarizes the shared representation; implementation contracts select the supported
+subset without implying the complete design exists.
 
 The proposed IR carries modules, callables, basic blocks, statements/operations, value definitions,
 uses, and source spans. Security roles are annotations and can overlap; a callable-only node model is
@@ -162,12 +204,12 @@ not discharge a candidate. Parameter binding, allow-listing, HTML encoding, path
 shell execution mode are distinct rule-specific facts.
 
 A sanitizer's presence does not terminate taint tracking. Deterministic suppression requires a modeled
-transfer/mitigation rule with its preconditions established. Jev can classify a custom check's apparent
+transfer/mitigation rule with its preconditions established. The decision model can classify a custom check's apparent
 adequacy from supplied evidence; it cannot turn an unresolved flow into a proven safe one.
 
 ### Protection is specific to a value use
 
-Jev Assessment and Findings Review evaluate the tuple **value → transformations/guards → sink →
+Decision Assessment and Findings Review evaluate the tuple **value → transformations/guards → sink →
 control-flow assumptions**. If the protection is correct for that exact use and relevant paths, the
 particular vulnerability is prevented; there is no context-independent “safe string” property.
 An HTML-text encoder does not establish SQL/path safety, and valid identifier syntax does not establish
@@ -178,7 +220,7 @@ The LLM Findings Reviewer is explicitly responsible for challenging a mismatch b
 use: wrong encoding context, ignored return, validation of a different value, bypass path, later
 transformation, or missing business/framework facts. Successful code-level protection and correct model
 recognition of that protection are separate test expectations. The reviewer needs the applicable code;
-it cannot close a gap in evidence by agreeing with Jev.
+it cannot close a gap in evidence by agreeing with the decision model.
 
 ## 6. Detection and candidate selection
 
@@ -188,11 +230,11 @@ exploitable. Each rule declares CWE/OWASP edition mapping, severity policy, supp
 positive/negative examples, and evidence requirements.
 
 **Track B — path classification.** Go produces a bounded source-to-sink candidate with dataflow
-witnesses, sink semantics, guards, and gaps. Jev evaluates only the semantic questions not settled by
+witnesses, sink semantics, guards, and gaps. The decision model evaluates only the semantic questions not settled by
 those facts. Classification is an annotation on the candidate, not its identity.
 
 **Track C — deferred.** Broad controller/authorization/logic review is not carried forward as an
-open-ended Jev task. Any future scope check must enumerate its questions, candidate anchors, required
+open-ended decision-model task. Any future scope check must enumerate its questions, candidate anchors, required
 evidence, and evaluation corpus before implementation.
 
 Pruning removes irrelevant graph regions; rule-specific filters handle established mitigation facts.
@@ -212,15 +254,17 @@ unresolvable candidates are reported as unexamined or uncertain. Repository comm
 source data, not instructions for the classifier. Payload minimization and redaction policies must
 preserve the evidence needed for the question and record any resulting loss.
 
-Go constructs source references and report templates. Jev does not generate explanations or citations.
+Go constructs source references and report templates. The decision model does not generate explanations or citations.
 The LLM Findings Reviewer references supplied evidence IDs; its interpretation is separate from the
 underlying source evidence.
 
-## 8. Jev Assessment and Findings Review
+<a id="8-jev-assessment-and-findings-review"></a>
 
-### Jev experiment and adapter
+## 8. Decision Assessment and Findings Review
 
-Jev receives a candidate string's origin, transformations, named field requirements, validator/helper
+### Decision experiment and adapter
+
+The decision model receives a candidate string's origin, transformations, named field requirements, validator/helper
 bodies, relevant guard results, sink context, and known gaps. The experiment tests separate questions:
 
 - Does the shown validation enforce the named field/type/format constraint?
@@ -230,15 +274,15 @@ bodies, relevant guard results, sink context, and known gaps. The experiment tes
 Validation and sanitization are separate assessments; neither is universally required for every sink.
 A parameterized operation, for example, may protect a value without a string-cleaning function.
 Go establishes whether the examined/transformed value and required guard outcome reach the actual
-sink. Jev does not reconstruct missing control flow or certify a function globally safe.
+sink. The decision model does not reconstruct missing control flow or certify a function globally safe.
 
 ```mermaid
 flowchart TD
     Value["Candidate string and its source"] --> Context["Go traces value, guard use, and sink context"]
     Context --> Ready{"Required evidence available?"}
-    Ready -->|Yes| JevCheck["Jev assesses validation and sanitization adequacy"]
+    Ready -->|Yes| DecisionCheck["Decision assesses validation and sanitization adequacy"]
     Ready -->|No| Unknown["Uncertain: preserve missing-evidence reason"]
-    JevCheck --> Classify{"Go interprets typed assessments"}
+    DecisionCheck --> Classify{"Go interprets typed assessments"}
     Classify -->|Potential protection gap| Issue["Proposed issue"]
     Classify -->|Uncertain| Unknown
     Classify -->|Adequately protected| Audit["Retain assessment and sample for audit"]
@@ -247,12 +291,13 @@ flowchart TD
     Audit -->|Audit sample| Reviewer
 ```
 
-[TypeSafe's API](https://docs.typesafe.ai/api) accepts state and typed questions at the System One
-endpoint. Its Go adapter uses `net/http` and `encoding/json`; see the
-[library choices](project/03-jev-design-proposal.md#library-choices). Noul/Choice questions are versioned
-and atomic. Independent questions may share a request; dependent questions run in separate stages.
-Item batching preserves per-candidate failures and coverage under bounded concurrency. Go validates
-answer IDs, types, ranges, and allowed options before applying calibrated policy.
+[OpenAI Decisions](https://developers.openai.com/api/docs/guides/decisions) accepts bounded evidence
+and named `predicate`, `choice`, or `score` questions. The Go transport uses `net/http` and
+`encoding/json`; see [setup](docs/openai-decisions-setup.md). TypeSafe Noul/Choice schemas are not
+wire-compatible. Question names and versions bind answers to candidates; dependent questions run in
+separate stages. Go validates response names, types, allowed choices, numeric ranges, refusals, and
+missing/duplicate answers before applying policy. API model estimates require corpus calibration;
+provider selection does not establish security accuracy or latency/cost targets.
 
 The provisional outcomes `adequately_protected`,
 `protection_gap`, and `uncertain` describe candidate protection under stated criteria; the facet
@@ -261,28 +306,49 @@ not automatically an exploitable issue. Exact field names/thresholds belong in t
 An answer below a finding threshold is not by itself an adequately-protected verdict. Scores do not
 directly set severity; Go applies rule-specific mappings, evidence requirements, and calibrated policy.
 
+### Provider-neutral judge boundary
+
+The analysis engine supplies a versioned evidence bundle and named semantic questions. It MUST NOT
+embed a provider's wire schema in graph records. A consumer-owned adapter boundary accepts the
+bundle/questions plus cancellation and returns normalized facet assessments, typed question answers,
+evidence references, model/provider identity, usage, and completion state. Create abstractions only
+alongside their real callers; the design does not require speculative packages.
+
+| Configuration | Responsibility |
+|---|---|
+| `openai` + `OPENAI_API_KEY` | OpenAI Decisions transport and its typed question schema |
+| `jev` + `TYPESAFE_API_KEY` | TypeSafe Jev transport and its own schema/model contract |
+| Future explicit provider + provider-specific secret | Adapter with capability declaration, conformance tests and independent evaluation |
+
+Credentials alone do not select a provider. Unsupported providers, missing keys, refusals, invalid
+answers, missing evidence, and failures remain explicit. There is no silent credential/provider
+fallback. Equivalent question intent does not imply equivalent probability calibration or thresholds.
+Cache keys include provider, model, question translation/version, evidence hash, and request options.
+The report separates sufficient validation, context-specific protection, vulnerability assessment,
+and evidence completeness. A negative answer to a validation question alone is not a finding.
+
 ### LLM Findings Reviewer contract
 
 For each identified issue, the reviewer examines the same bounded source evidence, relevant helper
 bodies and framework facts, then evaluates whether the proposed issue is supported. Its first pass
-assesses the evidence without Jev's conclusion to reduce anchoring; Go then compares the independent
-result with the Jev/rule assessment. Any follow-up reconciliation call is explicit and bounded.
+assesses the evidence without the decision model's conclusion to reduce anchoring; Go then compares the independent
+result with the model/rule assessment. Any follow-up reconciliation call is explicit and bounded.
 
 The review checks the claimed input-to-sink connection, whether validation/sanitization protects the
 actual value/use, bypasses and contradictory evidence, and whether required context is missing.
 The reviewer cannot create graph facts or assume omitted code is safe. It returns a structured verdict
 of `supported`, `disputed`, or `needs_more_evidence`, with evidence IDs and a concise explanation.
-Jev and reviewer results remain separate. A dispute is visible; it does not silently delete a finding.
+Decision Assessment and reviewer results remain separate. A dispute is visible; it does not silently delete a finding.
 
 ```mermaid
 sequenceDiagram
     participant G as Go orchestrator
-    participant J as Jev Assessment
+    participant J as OpenAI Decision Assessment
     participant L as LLM Findings Reviewer
     participant R as Report
     G->>J: Candidate evidence and atomic questions
     J-->>G: Typed validation and sanitization assessments
-    G->>L: Issue evidence, without Jev conclusion
+    G->>L: Issue evidence, without assessor conclusion
     L-->>G: Independent assessment and evidence IDs
     G->>G: Compare assessments and validate citations
     opt Reconciliation needs additional review
@@ -296,7 +362,7 @@ Both adapters have explicit enablement, credentials, pinned models, deadlines, c
 limits, retry/backoff rules, cancellation, and run budgets. No-key operation marks missing stages
 `not_run`; request failures mark them `failed`. A cap or missing credential leaves issues visibly
 unreviewed, not accepted or reviewed-safe. An unavailable reviewer does not silently substitute a
-Jev-only result for completed Findings Review. Humans retain acceptance and suppression authority.
+decision-model-only result for completed Findings Review. Humans retain acceptance and suppression authority.
 
 ## 9. Findings, comparison, and CI
 
@@ -305,7 +371,7 @@ The report separates candidate discovery from semantic assessment and CI eligibi
 | Record | Proposed contents |
 |---|---|
 | Candidate | identity, rule/version, source/sink, witness, guard facts, analysis gaps |
-| Assessment | Jev validation/sanitization facets, typed answers, model/question/bundle versions, policy outcome |
+| Assessment | Decision validation/sanitization facets, typed answers, model/question/bundle versions, policy outcome |
 | Findings Review | completion status, independent reviewer verdict, evidence IDs, disagreement, model/prompt version |
 | Finding | detection track, rule title, CWE/OWASP mapping, severity, evidence, template explanation |
 | Coverage | supported/skipped files, parse failures, unresolved edges, limits hit, unexamined candidates |
@@ -313,7 +379,7 @@ The report separates candidate discovery from semantic assessment and CI eligibi
 A deterministic rule does not get a probability of `1.0`; rule certainty and model probability are
 separate concepts. Template explanations identify observed facts and predictions separately.
 
-Fingerprints exclude Jev answers, probabilities, model versions, and policy thresholds. A proposed key
+Fingerprints exclude decision-model answers, probabilities, model versions, and policy thresholds. A proposed key
 uses rule identity plus a scoped sink-site identity; source traces group beneath the finding. The exact
 collision/rename/grouping scheme must be specified and tested before persistence. Candidate identity
 is separate from whether an assessment currently meets finding/report policy.
@@ -333,12 +399,12 @@ and exit codes belong to a future reporting spec. Existing manifest exit codes r
 Execution uses the [typed adjacency representation](#graph-storage-decision); ordered JSON is an
 interchange artifact. Persistence starts with a local cache. Graph databases and Redis are deferred.
 
-Cache Jev Assessment and Findings Review responses separately. Reviewer keys include provider/model,
+Cache Decision Assessment and Findings Review responses separately. Reviewer keys include provider/model,
 prompt/schema, exact source evidence, and any supplied prior assessments. Audit-selection or
 reconciliation-policy changes can create additional review work.
 
 Cache keys cover content, grammar/binding version, adapter/IR version, resolver configuration,
-transitive summaries/library models, rule version, complete evidence bundle, Jev model/question
+transitive summaries/library models, rule version, complete evidence bundle, decision model/question
 version, and request options. Raw typed responses are cached separately from policy outcomes, so
 threshold changes can be evaluated without inference. Validator summaries cannot be cached as globally
 “safe” on a function-body hash alone; value, sink, configuration, and dependency context matter.
@@ -347,7 +413,7 @@ Changed imports, callers/callees, guard definitions, models, or configuration in
 artifacts. Cached and uncached analysis must agree. Exact storage format is deferred to its spec.
 
 Deterministic graph/candidate/rule artifacts are stable for identical input and versions regardless of
-worker ordering. Live Jev predictions have no assumed byte-stability guarantee. Request metadata and
+worker ordering. Live decision-model predictions have no assumed byte-stability guarantee. Request metadata and
 operational timing are separate from deterministic artifacts.
 
 ## 11. Proposed package boundaries
@@ -367,9 +433,9 @@ supply real consumers; this table is a responsibility map, not an instruction to
 | `internal/flow` | CFG/dataflow transfers and function summaries |
 | `internal/trace` | Bounded witnesses, pruning, deduplication |
 | `internal/context` | Evidence bundle assembly and completeness |
-| `internal/jev` | Typed System One transport and validation |
+| `internal/judge` | Consumer-owned judge contract and normalized results; provider adapters validate their own wire answers |
 | `internal/llm` | LLM Findings Reviewer adapter; independent assessment and bounded reconciliation |
-| `internal/policy` | Jev interpretation, review reconciliation/completeness, audit selection, gating |
+| `internal/policy` | Decision interpretation, review reconciliation/completeness, audit selection, gating |
 | `internal/findings`, `internal/report` | Identity/baseline/comparison and report emission |
 
 Language-specific lowering and resolution sit behind adapters; their concrete directory layout is
@@ -384,7 +450,7 @@ cycles, guard bypass, ignored results, argument/return propagation, and unknown 
 compare serial/parallel output; cache tests compare cold/warm results and dependency invalidation.
 Local HTTP stubs cover semantic adapters, schema validation, retries, cancellation, and partial failures.
 Live evaluation is separate, opt-in, versioned, and compared with human-labeled held-out examples,
-including diagnostic Jev-only/LLM-only baselines and the planned Jev Assessment → Findings Review pipeline.
+including diagnostic decision-model-only/LLM-only baselines and the planned Decision Assessment → Findings Review pipeline.
 Measure reviewer disagreement, incorrect agreement, unsupported citations, review completeness, and
 false-negative audit results against human labels; LLM agreement is not ground truth. See the
 [research/evaluation note](project/04-jev-validation-research.md).

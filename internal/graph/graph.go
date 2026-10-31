@@ -1,4 +1,4 @@
-// Package graph is the JSON execution graph produced by route extraction.
+// Package graph defines source-backed route and string-use analysis artifacts.
 //
 // The next phase reads this document to judge validation and sanitization.
 // It is syntax: route registrations and the handler chain attached to them.
@@ -26,7 +26,7 @@ type Route struct {
 	Steps        []Step `json:"steps"`
 }
 
-// Step is one hop on the route's syntactic execution chain.
+// Step is a syntactic handler or call record attached to a registration.
 type Step struct {
 	Kind   string `json:"kind"`
 	Symbol Symbol `json:"symbol"`

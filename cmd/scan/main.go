@@ -36,24 +36,50 @@ func run(args []string, stdout, stderr io.Writer) int {
 	flags.SetOutput(stderr)
 
 	var (
-		list   = flags.Bool("list", false, "list the source files under the target path and exit")
-		routes = flags.Bool("routes", false, "emit the Express route execution graph and exit")
-		asJSON = flags.Bool("json", false, "emit machine-readable JSON instead of text")
+		exportFile    = flags.String("export-sarif", "", "convert a saved canonical JSON report to SARIF without API calls")
+		list          = flags.Bool("list", false, "list the source files under the target path and exit")
+		routes        = flags.Bool("routes", false, "emit the Express route execution graph and exit")
+		stringsMode   = flags.Bool("strings", false, "emit bounded route-to-string-use evidence")
+		routeFilter   = flags.String("route", "", "optional exact route path pattern for --strings")
+		checksFile    = flags.String("checks", "", "JSON file declaring route/method/field security requirements for --strings")
+		entry         = flags.String("entry", "", "relative JS/TS registration file for --strings")
+		judgeProvider = flags.String("judge", "", "optional semantic judge: openai or jev (transmits bounded source evidence)")
+		judgeModel    = flags.String("judge-model", "", "judge model; required for jev")
+		judgeLimit    = flags.Int("judge-limit", 10, "maximum judge requests per run, no retries")
+		asSARIF       = flags.Bool("sarif", false, "emit SARIF 2.1.0 findings for --strings")
+		asJSON        = flags.Bool("json", false, "emit machine-readable JSON instead of text")
 	)
 	flags.Usage = func() {
 		fmt.Fprintln(stderr, "usage: scan --list [--json] <path>")
 		fmt.Fprintln(stderr, "       scan --routes [--json] <path>")
+		fmt.Fprintln(stderr, "       scan --strings [--json] [--entry file] [--judge openai|jev] <path>")
 		flags.PrintDefaults()
 	}
 
 	if err := flags.Parse(args); err != nil {
 		return exitUsage
 	}
-	if *list == *routes || flags.NArg() != 1 {
+	if *exportFile != "" {
+		if flags.NArg() != 0 || *list || *routes || *stringsMode || *asJSON || *asSARIF || *entry != "" || *routeFilter != "" || *checksFile != "" || *judgeProvider != "" || *judgeModel != "" {
+			flags.Usage()
+			return exitUsage
+		}
+		return runExportSARIF(*exportFile, stdout, stderr)
+	}
+	modes := 0
+	for _, enabled := range []bool{*list, *routes, *stringsMode} {
+		if enabled {
+			modes++
+		}
+	}
+	if (*asSARIF && (*asJSON || !*stringsMode)) || modes != 1 || flags.NArg() != 1 || *judgeLimit < 1 || (!*stringsMode && (*checksFile != "" || *entry != "" || *routeFilter != "" || *judgeProvider != "" || *judgeModel != "")) || (*judgeProvider == "" && *judgeModel != "") {
 		flags.Usage()
 		return exitUsage
 	}
 
+	if *stringsMode {
+		return runStrings(flags.Arg(0), *entry, *routeFilter, *checksFile, *judgeProvider, *judgeModel, *judgeLimit, *asJSON, *asSARIF, stdout, stderr)
+	}
 	if *routes {
 		return runRoutes(flags.Arg(0), *asJSON, stdout, stderr)
 	}
