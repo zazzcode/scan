@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -29,10 +30,7 @@ func TestCheckedRouteContext(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if len(report.Uses) != 1 {
-				t.Fatalf("uses=%+v", report.Uses)
-			}
-			use := report.Uses[0]
+			use := kindUse(t, report, "account_creation_candidate")
 			if len(use.Completeness.Evidence["model_constraints"]) == 0 || len(use.Completeness.Evidence["persistence_mapping"]) == 0 || len(use.ControlEdges) == 0 {
 				t.Fatalf("incomplete route/model/control context: %+v", use.Completeness)
 			}
@@ -113,11 +111,9 @@ func TestRelevantHelperBounds(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if len(report.Uses) != 1 {
-				t.Fatal("missing check")
-			}
+			use := kindUse(t, report, "account_creation_candidate")
 			limited := false
-			for _, g := range report.Uses[0].Completeness.Blockers {
+			for _, g := range use.Completeness.Blockers {
 				if g.Kind == "helper_context_limit" {
 					limited = true
 				}
@@ -215,4 +211,243 @@ func TestConciseSQLHandlerHasCompleteLocalControl(t *testing.T) {
 	if len(report.Uses) != 1 || len(report.Uses[0].Completeness.Blockers) != 0 {
 		t.Fatalf("implicit-return handler acquired a false control gap: %+v", report.Uses)
 	}
+}
+
+func TestHelperSQLDiscovery(t *testing.T) {
+	corpus := filepath.Join("..", "..", ".zazz", "evaluation", "transfer-corpus")
+	sql := graph.Check{ID: "query-structure", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"handle"}, Validation: "nonempty", Protection: "request input must not change SQL structure"}
+	t.Run("case09 same-file", func(t *testing.T) {
+		use := oneSQL(t, checkedDir(t, filepath.Join(corpus, "case09")))
+		if use.Sink.Span.File != "server.ts" || !strings.Contains(use.Sink.Text, "SELECT") {
+			t.Fatalf("sink=%+v", use.Sink)
+		}
+		assertParameter(t, use, "server.ts", "value")
+		if len(use.Completeness.Evidence["request_source"]) == 0 {
+			t.Fatal("request field did not reach the helper sink")
+		}
+	})
+	t.Run("case10 imported", func(t *testing.T) {
+		use := oneSQL(t, checkedDir(t, filepath.Join(corpus, "case10")))
+		if use.Sink.Span.File != "store.ts" || !strings.Contains(use.Sink.Text, "SELECT") {
+			t.Fatalf("sink=%+v", use.Sink)
+		}
+		assertParameter(t, use, "store.ts", "value")
+		if !evidenceKind(use.Context, "helper_call") {
+			t.Fatal("imported call site missing")
+		}
+	})
+	t.Run("case12 bound import", func(t *testing.T) {
+		use := oneSQL(t, checkedDir(t, filepath.Join(corpus, "case12")))
+		if use.Sink.Span.File != "store.ts" || !strings.Contains(use.Sink.Text, "bind") {
+			t.Fatalf("sink=%+v", use.Sink)
+		}
+		assertParameter(t, use, "store.ts", "value")
+		binding, _ := json.Marshal(use.Completeness.Evidence["sink_binding"])
+		if !strings.Contains(string(binding), "Sequelize") {
+			t.Fatalf("binding=%s", binding)
+		}
+	})
+	t.Run("returned operand", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';const api=express();function sqlFor(value){return `SELECT '${value}'`}api.post('/session',(req,res)=>database.query(sqlFor(req.body.handle)))")
+		use := oneSQL(t, mustChecked(t, root, sql))
+		if !strings.Contains(use.Sink.Text, "database.query") {
+			t.Fatalf("sink=%+v", use.Sink)
+		}
+		assertParameter(t, use, "server.ts", "value")
+		if !transferKind(use, "return_value", "SELECT") {
+			t.Fatalf("return witness missing: %+v", use.Dependencies)
+		}
+	})
+	t.Run("missing sink", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';const api=express();function lookup(value){return String(value)}api.post('/session',(req,res)=>res.send(lookup(req.body.handle)))")
+		report := mustChecked(t, root, sql)
+		use := kindUse(t, report, "sql_sink_missing")
+		if !gapKind(use.Completeness.Blockers, "sql_sink_missing") {
+			t.Fatalf("uses=%+v", report.Uses)
+		}
+	})
+	t.Run("recursion stops", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';const api=express();function loop(value){return loop(value)}api.post('/session',(req,res)=>database.query(loop(req.body.handle)))")
+		report, err := Strings(root, "server.ts")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(report.Uses) != 1 || !gapKind(report.Uses[0].Gaps, "recursive_helper") {
+			t.Fatalf("uses=%+v entries=%+v", report.Uses, report.Entries)
+		}
+	})
+	t.Run("three nested helpers", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';const api=express();function d2(v){return database.query(`SELECT '${v}'`)}function d1(v){return d2(v)}function d0(v){return d1(v)}api.post('/session',(req,res)=>d0(req.body.handle))")
+		use := oneSQL(t, mustChecked(t, root, sql))
+		assertParameter(t, use, "server.ts", "v")
+	})
+	t.Run("fourth helper is a limit", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';const api=express();function d3(v){return database.query(`SELECT '${v}'`)}function d2(v){return d3(v)}function d1(v){return d2(v)}function d0(v){return d1(v)}api.post('/session',(req,res)=>d0(req.body.handle))")
+		report := mustChecked(t, root, sql)
+		use := kindUse(t, report, "sql_sink_missing")
+		if !gapKind(use.Completeness.Blockers, "sql_sink_missing") || !gapKind(use.Completeness.Blockers, "helper_call_limit") {
+			t.Fatalf("blockers=%+v", use.Completeness.Blockers)
+		}
+	})
+}
+
+func checkedDir(t *testing.T, dir string) *graph.StringReport {
+	t.Helper()
+	raw, err := os.ReadFile(filepath.Join(dir, "checks.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var checks []graph.Check
+	if err := json.Unmarshal(raw, &checks); err != nil {
+		t.Fatal(err)
+	}
+	report, err := CheckedStrings(dir, "server.ts", checks)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return report
+}
+
+func mustChecked(t *testing.T, root string, check graph.Check) *graph.StringReport {
+	t.Helper()
+	report, err := CheckedStrings(root, "server.ts", []graph.Check{check})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return report
+}
+
+func oneSQL(t *testing.T, report *graph.StringReport) graph.StringUse {
+	t.Helper()
+	if len(report.Uses) != 1 || report.Uses[0].Kind != "sql_query_candidate" {
+		t.Fatalf("uses=%+v", report.Uses)
+	}
+	return report.Uses[0]
+}
+
+func assertParameter(t *testing.T, use graph.StringUse, file, name string) {
+	t.Helper()
+	source, param := false, false
+	for _, d := range use.Dependencies {
+		if d.Source.Kind == "request_source" && strings.HasSuffix(d.Source.Text, ".body.handle") {
+			source = true
+		}
+		for _, e := range d.Transfers {
+			if e.Kind == "parameter_binding" && e.Text == name && e.Span.File == file {
+				param = true
+			}
+		}
+	}
+	if !source || !param {
+		t.Fatalf("dependencies=%+v", use.Dependencies)
+	}
+}
+
+func transferKind(use graph.StringUse, kind, text string) bool {
+	for _, d := range use.Dependencies {
+		for _, e := range d.Transfers {
+			if e.Kind == kind && strings.Contains(e.Text, text) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func evidenceKind(items []graph.Evidence, kind string) bool {
+	for _, e := range items {
+		if e.Kind == kind {
+			return true
+		}
+	}
+	return false
+}
+
+func TestQueryShapeAndValidation(t *testing.T) {
+	sql := graph.Check{ID: "query-structure", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"handle"}, Validation: "nonempty", Protection: "request input must not change query structure"}
+	t.Run("nosql where string", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';const api=express();api.get('/rest/track-order/:id',(req,res)=>{const id=utils.trunc(req.params.id,60);db.ordersCollection.find({$where:`this.orderId === '${id}'`})})")
+		report, err := Strings(root, "server.ts")
+		if err != nil {
+			t.Fatal(err)
+		}
+		use := kindUse(t, report, "nosql_query_candidate")
+		if !strings.Contains(use.Sink.Text, "$where") || !gapKind(use.Gaps, "query_text_interpolated") {
+			t.Fatalf("nosql=%+v", use)
+		}
+	})
+	t.Run("nosql update document", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';const api=express();api.patch('/rest/products/reviews',(req,res)=>{db.reviewsCollection.update({_id:req.body.id},{$set:{message:req.body.message}},{multi:true})})")
+		report, err := Strings(root, "server.ts")
+		if err != nil {
+			t.Fatal(err)
+		}
+		use := kindUse(t, report, "nosql_query_candidate")
+		if !gapKind(use.Gaps, "query_document_unvalidated") || !gapKind(use.Gaps, "input_validation_absent") {
+			t.Fatalf("update=%+v", use.Gaps)
+		}
+	})
+	t.Run("array find is not a query", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';const api=express();api.post('/api/login',(req,res)=>{const query=`SELECT '${req.body.username}'`;console.log(query);users.find((u)=>u.username===req.body.username)})")
+		report, err := Strings(root, "server.ts")
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, use := range report.Uses {
+			if use.Kind == "sql_query_candidate" || use.Kind == "nosql_query_candidate" {
+				t.Fatalf("log or array find became a query sink: %+v", use.Sink)
+			}
+		}
+		if kindUse(t, report, "input_validation_candidate").Kind == "" {
+			t.Fatal("login inputs were not reported")
+		}
+	})
+	t.Run("bound query keeps validation separate", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';import {Sequelize} from 'sequelize';const db=new Sequelize('sqlite::memory:');const api=express();api.post('/session',(req,res)=>db.query('SELECT $handle',{bind:{handle:req.body.handle}}))")
+		report := mustChecked(t, root, sql)
+		use := kindUse(t, report, "sql_query_candidate")
+		if gapKind(use.Gaps, "query_text_interpolated") || !gapKind(use.Gaps, "input_validation_absent") {
+			t.Fatalf("bound=%+v", use.Gaps)
+		}
+		if len(use.Completeness.Blockers) != 0 {
+			t.Fatalf("validation gap blocked the bound query claim: %+v", use.Completeness.Blockers)
+		}
+	})
+	t.Run("interpolated query records both deficiencies", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';import {Sequelize} from 'sequelize';const db=new Sequelize('sqlite::memory:');const api=express();api.post('/session',(req,res)=>db.query(`SELECT '${req.body.handle}'`))")
+		use := kindUse(t, mustChecked(t, root, sql), "sql_query_candidate")
+		if !gapKind(use.Gaps, "query_text_interpolated") || !gapKind(use.Gaps, "input_validation_absent") {
+			t.Fatalf("interpolated=%+v", use.Gaps)
+		}
+	})
+}
+
+func kindUse(t *testing.T, report *graph.StringReport, kind string) graph.StringUse {
+	t.Helper()
+	for _, use := range report.Uses {
+		if use.Kind == kind {
+			return use
+		}
+	}
+	t.Fatalf("missing %s in %+v", kind, report.Uses)
+	return graph.StringUse{}
+}
+
+func gapKind(gaps []graph.Gap, kind string) bool {
+	for _, g := range gaps {
+		if g.Kind == kind {
+			return true
+		}
+	}
+	return false
 }

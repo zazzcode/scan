@@ -21,7 +21,11 @@ type flow struct {
 	context []graph.Evidence
 	gaps    []graph.Gap
 	uses    []graph.StringUse
+	returns []value
 	work    int
+	depth   int
+	helpers *helperExpansion
+	facts   *inputFacts
 }
 
 func (f *flow) gap(kind, detail string, n *sitter.Node) graph.Gap {
@@ -33,7 +37,9 @@ func (f *flow) statements(body *sitter.Node) {
 		return
 	}
 	if body.Kind() != "statement_block" {
-		f.eval(body)
+		// An expression-bodied function returns that expression. The route handler's
+		// own implicit return is recorded and then ignored by the caller.
+		f.returns = append(f.returns, f.transfer(f.eval(body), "return_value", body))
 		return
 	}
 	for i := uint(0); i < body.NamedChildCount(); i++ {
@@ -67,7 +73,14 @@ func (f *flow) statements(body *sitter.Node) {
 					}
 				}
 			}
-		case "expression_statement", "return_statement", "throw_statement":
+		case "return_statement":
+			var v value
+			if n.NamedChildCount() > 0 {
+				v = f.eval(n.NamedChild(0))
+			}
+			f.returns = append(f.returns, f.transfer(v, "return_value", n))
+			return
+		case "expression_statement", "throw_statement":
 			if n.NamedChildCount() > 0 {
 				f.eval(n.NamedChild(0))
 			}
@@ -127,7 +140,13 @@ func (f *flow) eval(n *sitter.Node) value {
 		return value{gaps: []graph.Gap{f.gap("unknown_value", "unresolved local value: "+n.Utf8Text(src), n)}}
 	case "member_expression", "subscript_expression":
 		if isRequestField(n, src, f.request) {
-			return value{deps: []graph.Dependency{{Source: f.module.evidence("request_source", n), Transfers: []graph.Evidence{}}}}
+			sourceNode := n
+			if field := requestFieldNode(n, src, f.request); field != nil {
+				sourceNode = field
+			}
+			source := f.module.evidence("request_source", sourceNode)
+			f.rememberInput(source)
+			return value{deps: []graph.Dependency{{Source: source, Transfers: []graph.Evidence{}}}}
 		}
 		v := f.children(n)
 		return f.transfer(v, "property_read", n)
@@ -146,6 +165,7 @@ func (f *flow) eval(n *sitter.Node) value {
 	case "call_expression":
 		return f.call(n)
 	case "arrow_function", "function_expression", "function":
+		f.enterQueryCallback(n)
 		return value{gaps: []graph.Gap{f.gap("unsupported_callback", "callback/closure body not traversed", n)}}
 	case "number", "string", "true", "false", "null", "undefined", "property_identifier", "type_identifier", "comment", "string_fragment", "escape_sequence":
 		return value{}
@@ -249,10 +269,7 @@ func (f *flow) call(n *sitter.Node) value {
 			values = append(values, f.eval(args.NamedChild(i)))
 		}
 	}
-	kind := ""
-	if strings.HasSuffix(name, ".query") {
-		kind = "sql_query_candidate"
-	}
+	kind := queryKind(name, args, f.module.src, values)
 	if name == "fetch" || name == "axios" || strings.HasPrefix(name, "axios.") {
 		kind = "outbound_http_candidate"
 	}
@@ -263,6 +280,7 @@ func (f *flow) call(n *sitter.Node) value {
 		}
 		if len(v.deps) > 0 || len(v.gaps) > 0 || kind == "outbound_http_candidate" {
 			gaps := append(append([]graph.Gap{}, f.gaps...), v.gaps...)
+			gaps = append(gaps, f.structureGaps(kind, args, values, n)...)
 			gaps = append(gaps, f.gap("sink_binding_unverified", "candidate API shape; library binding/argument roles require review", n))
 			if kind == "outbound_http_candidate" {
 				gaps = append(gaps, f.gap("external_response_unresolved", "remote response and asynchronous continuation are not modeled", n))
@@ -272,6 +290,14 @@ func (f *flow) call(n *sitter.Node) value {
 		}
 		// Response values are new external sources, never aliases of request arguments.
 		return value{gaps: []graph.Gap{f.gap("unknown_call_result", "sink/transport return value is not modeled", n)}}
+	}
+	ret, entered, precise := f.enterHelper(n, name, values)
+	if entered && precise {
+		return ret
+	}
+	// A helper that contains the sink is not a validator of its arguments.
+	if !entered {
+		f.noteInputTouch(values)
 	}
 	v := value{}
 	for _, a := range values {
@@ -286,8 +312,11 @@ func (f *flow) call(n *sitter.Node) value {
 	}
 	if len(v.deps) > 0 {
 		v.gaps = append(v.gaps, f.gap("unknown_transfer", "call may transform or discard its arguments: "+name, n))
-		if hm, helper := f.set.resolve(f.module, name); hm != nil && helper != nil && !shadowed(n, name, f.module.src) {
-			f.context = append(f.context, hm.evidence("helper_definition", helper))
+		// enterHelper already recorded the definition when the body was analyzed.
+		if !entered {
+			if hm, helper := f.set.resolve(f.module, name); hm != nil && helper != nil && !shadowed(n, name, f.module.src) {
+				f.context = append(f.context, hm.evidence("helper_definition", helper))
+			}
 		}
 	}
 	if len(v.deps) == 0 {

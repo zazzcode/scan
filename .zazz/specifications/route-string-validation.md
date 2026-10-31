@@ -18,8 +18,9 @@ future adapters in the design without claiming unimplemented transports exist.
 - Tree-sitter identifies syntax; no regex security verdicts. A separate evidence schema preserves
   route, source, operation and candidate-use relationships and source hashes.
 - The first slice supports local named ESM imports, direct/factory handlers and local expression
-  dependencies. Unsupported branches, closures, wrappers, heap/cross-function transfers and external
-  response continuations are explicit gaps, not completed analysis claims.
+  dependencies. Supported same-file functions and relative-imported named exports are entered at call
+  sites, with identifier parameter bindings and direct return witnesses. Closures, wrappers, rest or
+  destructured parameters, recursion, heap writes and external response continuations stay explicit gaps.
 - SQL `.query` shapes are candidate sink models, not proven library identity or confirmed vulnerabilities.
   Outbound calls record request argument evidence; opaque response behavior stays unknown.
 - `--strings [--json] [--entry <relative-file>] [--route <path-pattern>] <target-root>` runs offline by default. Optional
@@ -42,6 +43,9 @@ future adapters in the design without claiming unimplemented transports exist.
 - Stubbed judge tests reject missing/duplicate/refused/invalid answers and non-success responses.
 - CLI tests cover new mode, incompatible flags, bad entry paths and missing target roots.
 - Manual Juice Shop verification records login/search candidates and remaining limitations.
+- Same-file and relative-imported helper calls discover SQL candidates when an argument reaches a
+  `.query` sink or a returned query operand. Case09 and case10 produce those candidates. Case12
+  reaches Sequelize binding evidence. A declared SQL check with no candidate records `sql_sink_missing`.
 
 ## Design and operating references
 
@@ -99,8 +103,92 @@ model-generated code, independent review and SCA remain planned work.
   [comparison results](../evaluation/corpus/README.md).
 - Keep automatic novel-repository discovery as the next bounded Phase 3/5–8 extension in the
   [evidence design](../architecture/evidence-and-claims.md#discovery-on-novel-target-repositories).
+- Run a pinned Bearer CLI/rules comparison on original controls, added helper/mutation/outbound
+  controls and matching source scopes of both sample repositories. Preserve incomplete runs and
+  source-inspect disagreements; do not treat absent findings as safety or challenge labels as runtime truth.
+- Maintain the complete pinned Juice Shop challenge registry and per-finding review status. Evaluate
+  the product goal of equal-or-better detection with fewer false positives; current development
+  evidence does not establish held-out quality or whole-graph analysis.
+
+## Helper SQL sink discovery
+
+A call to a same-file function or a relative-imported named export is analyzed with the callee body.
+Positional identifier parameters receive the evaluated argument, including its existing dependency
+witnesses, as `parameter_binding` evidence spanned in the callee module. A direct `return` is
+`return_value` evidence. That return replaces the conservative argument may-dependency only when the
+body has at least one modeled return and the callee did not record unsupported control flow, binding,
+recursion, work limit, or helper-call limit. Otherwise the call result keeps the prior may-dependency
+and any sinks already found inside the body remain.
+
+Expansion allows three nested helper levels and 24 call expansions per handler. A further call records
+`helper_call_limit` and is not treated as a resolved body. A recursive re-entry records
+`recursive_helper` and stops. This slice does not complete cross-function analysis: closures, rest
+and destructured parameters, defaults that are actually used, property calls, and mutation of caller
+locals are unresolved.
+
+Checked `sql_query` requirements still select routes. When the route resolves and no
+`sql_query_candidate` was discovered, the report includes one `sql_sink_missing` use. That use is
+incomplete discovery, not a protected assessment and not evidence that the route has no query.
+
+## Query structure and input validation
+
+Every supported request field read (`req.body`, `req.query`, `req.params`, `req.headers`,
+`req.cookies`, and the next property) is a validation subject. A field that reaches a query sink
+with no earlier call carries `input_validation_absent`. A field that reaches some other call first
+carries `input_validation_unresolved`: the call is not treated as a validator. Fields that never
+reach a query sink are separate `input_validation_candidate` uses. These are best-practice gaps for
+agent fixes. They are not a judgment that a present custom validator is weak, and unresolved
+middleware can still validate a field the handler does not.
+
+Query, update, and insert structure is a separate fact:
+
+- Sequelize `.query`, and `Op.like` templates, record `query_text_interpolated` when the text is built
+  from a value. A bound parameter in a later argument does not get that gap.
+- Mongo collection calls (`Collection.find`, `update`, `insert`, and the listed siblings) record
+  `query_text_interpolated` for `$where` strings and `query_document_unvalidated` when a request
+  value enters the document. `users.find(callback)` is not a query sink.
+- A logged SQL string is not a query sink.
+
+Nested functions are entered only when their text contains `$where`, `Op.like`, or `.query(`.
+That is how the chat tool's query strings are reached. Other callbacks stay unknown.
 
 ## Implementation And Review Change Log
+
+### 2026-10-31 — Helper-call SQL sink discovery
+
+**Source:** resume instruction after the pinned Bearer comparison. Case09/10 produced no scan uses
+and case12 disappeared before binding could be assessed.
+**Changed sections:** implementation boundary, acceptance evidence, helper SQL sink discovery.
+**Rationale:** a judge cannot recover a sink the structural slice never found. Argument, parameter
+and return witnesses have to be source-backed before another model call.
+**Summary:** enter supported same-file and relative-imported helpers, record parameter and direct
+return evidence, and emit `sql_sink_missing` when a declared SQL check has no candidate.
+**Verification impact:** parse tests cover case09/10/12, returned operands, missing sinks, recursion
+and the fourth-level limit. `go test ./...`, vet and build passed. No new live model calls.
+
+### 2026-10-31 — Query structure and input validation
+
+**Source:** branch exit is every lacking input validation result and every string-built SQL or NoSQL
+query, update, or insert on the documented Juice Shop and vulnerable-app sinks.
+**Changed sections:** query structure and input validation.
+**Rationale:** a route can validate a field and still concatenate it into a query, or bind a query
+and still leave the field unvalidated. Those are separate findings.
+**Summary:** record absent and unresolved validation, interpolated SQL and `$where` text, and
+unvalidated values in collection documents. Do not treat `console.log` of SQL or `Array.find` as a
+query sink.
+**Verification impact:** shape tests, Juice Shop route comparison, vulnerable-app comparison, and
+`go test ./...`. No new live model calls.
+
+### 2026-10-31 — Pinned comparator evaluation and false-positive objective
+
+**Source:** continuation request and user steering for lower false positives, Juice Shop expected
+findings and the second TypeScript sample.
+**Changed sections:** reporting/comparison increment; product objective and evidence-design references.
+**Rationale:** measure custom protection recognition and actual coverage rather than raw finding totals.
+**Summary:** pinned CLI/rules runner, thirteen controls, both samples, capability inventory and complete
+challenge/per-finding review index; no scanner implementation change or new live model calls.
+**Verification impact:** offline runner failure regressions, source/hash inventory checks, matched
+snapshot scans and existing Go tests/vet. Independent human review and broad parity remain pending.
 
 ### 2026-10-31 — Route-focused reporting and original comparison controls
 

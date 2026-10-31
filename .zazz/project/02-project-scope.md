@@ -12,8 +12,11 @@ OpenAI is the first integration target; Jev-specific research does not establish
 
 Establish whether a Go + Tree-sitter + bounded dataflow + semantic judge scanner can produce useful, reviewable
 findings for selected OWASP-related source-code risks at acceptable cost. The long-term product
-objective is **equal-or-better SAST detection and code analysis than Bearer, with equivalent coverage
-of its capabilities across CLI and Pro**. The [project objectives](../project.md#long-term-objectives)
+objective is **equal-or-better SAST detection and code analysis than Bearer with fewer false positives,
+with equivalent coverage
+of its capabilities across CLI and Pro**. For each route, report where protection is sufficient,
+where it is lacking, and the poor code-practice findings an agent can fix with the dataflow fixes.
+The [project objectives](../project.md#long-term-objectives)
 own this ambition and its measurement criteria. Prove a small JS/TS slice first, then expand through
 an explicit capability-parity inventory and measured contracts; current capability is not broad parity.
 
@@ -75,7 +78,7 @@ phase-specific acceptance criteria must become bounded, human-greenlit contracts
 |---|---|---|
 | Correctness | Separate structural facts, approximations, predictions, and gaps | Labeled safe/vulnerable pairs and unsupported-construct fixtures |
 | Determinism | Stable graphs, candidates, and rule output for fixed inputs/versions | Serial/parallel and repeated-run comparisons |
-| Judge and reviewer quality | Identify validation/sanitization gaps with evidence-backed findings review | Human labels, held-out cases, diagnostic baselines, false-safe/errors, reviewer disagreement and completeness |
+| Judge and reviewer quality | Equal-or-better detection than Bearer with lower false positives, using graph-grounded assessment of actual protection. Per route, report sufficient protection, lacking protection, and poor code-practice findings as separate results | Independent labels, matched held-out cases, recall/precision and false-positive denominators, false-safe/errors, abstentions, reviewer disagreement and completeness |
 | Latency | Suitable for developer/CI use; exact budgets unset | Hardware/fixture-defined cold/warm timings and per-request p50/p95 |
 | Cost | Bounded requests and run spend; exact ceiling unset | Candidate/question counts, usage, rate-limit behavior, measured billing basis |
 | Resources | Bounded workers, traversal, source retention, and payload size | Peak RSS, cancellation/backpressure, adversarial large inputs |

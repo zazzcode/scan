@@ -27,7 +27,8 @@ The historical definition-only `stage/` exception is not this assignment.
 - **Next objective:** extend automatic claim-scoped evidence assembly to novel targets, then independently
   evaluate findings; selected route/check bundles already connect inputs, helpers, guards and uses.
 - **Long-term objective:** equal-or-better SAST detection/code analysis than Bearer and equivalent
-  capabilities across CLI/Pro; see [objectives](../project.md#long-term-objectives). This is an ambition,
+  capabilities across CLI/Pro with fewer false positives. For each route, report sufficient protection,
+  lacking protection, and poor code-practice findings; see [objectives](../project.md#long-term-objectives). This is an ambition,
   not current parity. Start with the local CLI comparison and build a versioned capability inventory.
 - **Model direction:** GPT Decisions or Jev provides the semantic judge, with future adapters allowed.
   OpenAI is first. The independent LLM Findings Reviewer remains a separate role; provider schemas,
@@ -48,7 +49,12 @@ The historical definition-only `stage/` exception is not this assignment.
 **Local session handoff:** when resuming this checkout, read
 [route-string-validation handoff](../ephemeral/route-string-validation-handoff.md) first. It is an
 ignored local execution artifact; durable design/contracts/results remain indexed below.
-The next experiment is the [Bearer comparison](../evaluation/bearer-comparison.md), not yet run.
+The initial [Bearer comparison](../evaluation/bearer-results.md) is complete: both samples and
+thirteen controls, no new model calls. Supported same-file and relative-imported helper calls now
+discover SQL sinks through argument, parameter and direct-return evidence. The next slice is
+non-mutating guards versus reassignment, then a fresh capped Luna run on the changed bundles.
+The [Juice Shop index](../evaluation/juice-shop/README.md) includes all 116 documented challenges and
+a 671-finding review ledger; three findings are source-inspected false positives, 664 remain pending.
 
 The [near-term plan](../project/implementation-plan.md#route-string-validation-delivery-sequence)
 owns proposed delivery order. The [architecture](../architecture.md#current-provider-decision) owns
@@ -114,7 +120,7 @@ in these files independently of chat attachments.
 | [Registration validation case](../project/07-registration-validation-case.md) | Next field-constraint case: middleware/guard bypass, generated persistence, evidence and judge questions |
 | [Login SQL/validation case](../project/08-login-validation-case.md) | Separate email constraints and query semantics; phase regression expectations |
 | [Two-case results](../evaluation/juice-shop/results.md) | Known-target Luna outcomes, usage, offline checks and remaining limits |
-| [Bearer comparison plan](../evaluation/bearer-comparison.md) | Next-session local CLI setup, fair comparison and disagreement evaluation |
+| [Bearer comparison plan](../evaluation/bearer-comparison.md) | Repeat/extension protocol; links to pinned results and capability inventory |
 | [Original comparison controls](../evaluation/corpus/README.md) | Label-isolated corpus, Luna outcomes, provenance correction and limitations |
 | [OpenAI Decisions setup](openai-decisions-setup.md) | Project key, local environment, Go transport, access smoke check |
 | [Zazz methodology](zazz-methodology.md) | SDLC, ownership, greenlight and review lifecycle |

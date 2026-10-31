@@ -77,6 +77,28 @@ controls. Next extend automatic claim assembly to novel targets through the
 [Phase 3/5–8 sequence](../architecture/evidence-and-claims.md#discovery-on-novel-target-repositories);
 explicit check files are evaluation/business-policy inputs, not the final discovery strategy.
 
+## Future capability branches
+
+This branch's exit is input validation plus string-built SQL and NoSQL query, update, and insert
+findings. The comparison is [query and validation results](../evaluation/query-validation-comparison.md).
+Each row below is a later worktree and its own coding session. Do not implement that row on this branch.
+
+| Future branch | First acceptance target |
+|---|---|
+| `logger-leak` | Request or secret values written to logs; constant startup messages stay negatives |
+| `hardcoded-secrets` | Private material in source; public verification keys stay negatives |
+| `command-injection` | `exec` of request input on the vulnerable TypeScript app `/api/ping` |
+| `path-traversal` | `fs.readFile` of a request path on `/api/files` |
+| `xss-response` | Request data written into HTML on `/api/search` |
+| `code-injection` | `eval` of a request expression on `/api/calculate` |
+| `xxe` | XML parse of a request body on `/api/parse-xml` |
+| `open-redirect` | `res.redirect` of a request URL |
+| `weak-randomness` | `Math.random` used as a token |
+| `cookie-session-headers` | `httpOnly`, `secure`, session secret, and missing baseline headers |
+| `ssrf-destination` | Judge the existing `axios.default.get` candidate; Bearer missed this call |
+| `prototype-pollution` | `_.merge` of request objects; Bearer did not flag it |
+| `language-and-delivery` | Other languages, baselines, CI, and SCA, in the later phases |
+
 ## Next concrete case: registration validation
 
 The user-selected next acceptance case is account registration. The

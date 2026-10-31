@@ -1,0 +1,32 @@
+[
+  {
+    "case": "case08",
+    "expected_property": "protected",
+    "rationale": "Enforced imported ASCII allow-list restricts this exact quoted SQL value."
+  },
+  {
+    "case": "case09",
+    "expected_property": "vulnerable",
+    "rationale": "Same-file helper interpolates route input into SQL."
+  },
+  {
+    "case": "case10",
+    "expected_property": "vulnerable",
+    "rationale": "Imported helper interpolates route input into SQL."
+  },
+  {
+    "case": "case11",
+    "expected_property": "vulnerable",
+    "rationale": "Validated local is replaced by unvalidated alternate input before SQL."
+  },
+  {
+    "case": "case12",
+    "expected_property": "protected",
+    "rationale": "Imported helper binds request input; domain validation is separate."
+  },
+  {
+    "case": "case13",
+    "expected_property": "vulnerable",
+    "rationale": "Request-controlled URL reaches Axios without a destination restriction."
+  }
+]

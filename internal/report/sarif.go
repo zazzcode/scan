@@ -117,6 +117,10 @@ func ruleIdentity(use graph.StringUse) (string, string) {
 	switch kind {
 	case "sql_query", "sql_query_candidate":
 		return "scan/sql-input-protection", "CWE-89"
+	case "nosql_query", "nosql_query_candidate":
+		return "scan/nosql-input-protection", "CWE-943"
+	case "input_validation", "input_validation_candidate":
+		return "scan/input-validation", "CWE-20"
 	case "account_creation", "account_creation_candidate":
 		return "scan/required-field-validation", "CWE-20"
 	default:

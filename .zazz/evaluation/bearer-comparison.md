@@ -1,9 +1,12 @@
-# Bearer comparison experiment — next session
+# Bearer comparison experiment
 
-**Planned, not run; 2026-10-31 user request.** Compare scan's AI-assisted route/evidence judgments
+**Initial pinned CLI experiment completed, 2026-10-31.** See [results](bearer-results.md), the
+[capability inventory](bearer-capabilities.md) and [complete Juice Shop challenge/review index](juice-shop/README.md).
+The procedure below remains the repeat/extension protocol. Compare scan's AI-assisted route/evidence judgments
 with the local traditional SAST CLI on the same pinned source. Bearer is a comparator, not ground truth.
 The [long-term objective](../project.md#long-term-objectives) is equal-or-better SAST detection and
-capability parity across CLI and Pro. Local CLI comparisons begin that evaluation; they cannot alone
+capability parity across CLI and Pro, with fewer false positives at equal-or-better detection.
+Local CLI comparisons begin that evaluation; they cannot alone
 establish parity with capabilities unavailable in the tested edition.
 
 ## Local setup evidence
@@ -11,8 +14,9 @@ establish parity with capabilities unavailable in the tested edition.
 Reference checkout: `<DEV_ROOT>/bearer`, commit `e3753de6347988bed15bdba80b9ff731bf028c80`,
 clean when inspected. Read its README, `docs/contributing/code.md`, `go.mod` and
 `.goreleaser/common.yaml` before setup. Local docs declare Go 1.26+, `go mod download`, and
-`go run ./cmd/bearer/bearer.go [COMMAND]`; release build configuration uses CGO. No Bearer build,
-initialization, generation, dependency download or scan was performed in this session.
+`go run ./cmd/bearer/bearer.go [COMMAND]`; release build configuration uses CGO. The initial experiment
+built the pinned source with readonly modules, downloaded a separate pinned rules snapshot and scanned
+both sample repositories plus thirteen controls. No generation or tidy ran; see results for exact scope.
 
 The pinned README describes data-flow/sensitive-data analysis and Pro advanced cross-file analysis,
 listing Java/Python/C#/Go for the latter. It does not establish an exhaustive TypeScript CLI boundary.

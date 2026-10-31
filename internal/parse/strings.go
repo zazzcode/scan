@@ -47,8 +47,8 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 	out := &graph.StringReport{SchemaVersion: 1, Root: root, Entries: []graph.Entry{}, Uses: []graph.StringUse{}, Gaps: []graph.Gap{}, Files: []graph.Evidence{}, Limitations: []string{
 		"ESM named relative imports and direct returned handler factories only; no re-exports or CommonJS resolution",
 		"ESM Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
-		"Local expression dependencies only; branches, wrappers, unknown calls and asynchronous response continuations remain uncertain",
-		"SQL and HTTP call shapes are candidate use models, not verified library bindings or confirmed vulnerabilities",
+		"Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
+		"SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities",
 	}}
 	for _, file := range selected {
 		m, err := set.load(file)
@@ -88,10 +88,11 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 				if body != nil {
 					evidence := hm.evidence("handler", body)
 					e.Handler = &evidence
-					f := flow{module: hm, set: set, route: r, request: req, env: map[string]value{}, context: []graph.Evidence{m.evidence("registration", call), evidence}, gaps: append([]graph.Gap{}, e.Gaps...)}
+					f := flow{module: hm, set: set, route: r, request: req, env: map[string]value{}, context: []graph.Evidence{m.evidence("registration", call), evidence}, gaps: append([]graph.Gap{}, e.Gaps...), helpers: &helperExpansion{budget: 24, stack: map[string]bool{}}, facts: newInputFacts()}
 					// Effective middleware is not modeled; an offline candidate cannot be called safe.
 					f.gaps = append(f.gaps, graph.Gap{Kind: "middleware_unresolved", Detail: "effective middleware/guard chain is not modeled", At: r.Registration})
 					f.statements(body)
+					f.finishValidation()
 					out.Uses = append(out.Uses, f.uses...)
 					e.Gaps = append(e.Gaps, f.gaps[len(e.Gaps):]...)
 				}

@@ -1,0 +1,13 @@
+[
+  {
+    "id": "query-structure",
+    "method": "POST",
+    "path": "/session",
+    "kind": "sql_query",
+    "fields": [
+      "handle"
+    ],
+    "validation": "The input used in the query must be a nonempty string.",
+    "protection": "Request input must not alter executable SQL structure. Assess actual enforced guards, mutations and parameter binding."
+  }
+]

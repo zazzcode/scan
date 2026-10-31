@@ -206,6 +206,28 @@
           }
         },
         {
+          "kind": "query_text_interpolated",
+          "detail": "request-controlled value is built into executable query text",
+          "at": {
+            "file": "handler.ts",
+            "start_line": 5,
+            "end_line": 5,
+            "start_byte": 172,
+            "end_byte": 193
+          }
+        },
+        {
+          "kind": "input_validation_absent",
+          "detail": "req.body.email reaches a sensitive use with no validator call on its path",
+          "at": {
+            "file": "handler.ts",
+            "start_line": 5,
+            "end_line": 5,
+            "start_byte": 172,
+            "end_byte": 193
+          }
+        },
+        {
           "kind": "sink_binding_unverified",
           "detail": "candidate API shape; library binding/argument roles require review",
           "at": {
@@ -252,7 +274,7 @@
   "limitations": [
     "ESM named relative imports and direct returned handler factories only; no re-exports or CommonJS resolution",
     "ESM Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
-    "Local expression dependencies only; branches, wrappers, unknown calls and asynchronous response continuations remain uncertain",
-    "SQL and HTTP call shapes are candidate use models, not verified library bindings or confirmed vulnerabilities"
+    "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
+    "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities"
   ]
 }

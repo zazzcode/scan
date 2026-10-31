@@ -1,0 +1,58 @@
+[
+  {
+    "rule": "javascript_lang_logger_leak",
+    "file": "lib/startup/validateConfig.ts",
+    "line": 45,
+    "disposition": "source_inspected_false_positive",
+    "reason": "Message contains a constant public documentation URL passed through colors.yellow; no sensitive or request-dependent data is logged.",
+    "evidence": ["lib/startup/validateConfig.ts:45", "lib/logger.ts:7"]
+  },
+  {
+    "rule": "javascript_lang_logger_leak",
+    "file": "lib/startup/validateConfig.ts",
+    "line": 47,
+    "disposition": "source_inspected_false_positive",
+    "reason": "Logged value is colors.red applied to a constant configuration-error message; no sensitive data source exists in the expression.",
+    "evidence": ["lib/startup/validateConfig.ts:46", "lib/startup/validateConfig.ts:47", "lib/logger.ts:7"]
+  },
+  {
+    "rule": "javascript_lang_hardcoded_secret",
+    "file": "lib/insecurity.ts",
+    "line": 52,
+    "disposition": "source_inspected_false_positive",
+    "reason": "JWT verification receives publicKey, read from jwt.pub (with a public-key placeholder fallback). Public verification material is not a secret. The separate hardcoded private signing key is a real concern and is not dismissed.",
+    "evidence": ["lib/insecurity.ts:20", "lib/insecurity.ts:52"]
+  },
+  {
+    "rule": "javascript_lang_sql_injection",
+    "file": "routes/login.ts",
+    "line": 34,
+    "disposition": "source_supported_potential",
+    "reason": "Email request operand directly interpolates into SQL text. Model/plain options do not bind it; hashing the password is independent.",
+    "evidence": ["routes/login.ts:32", "routes/login.ts:34", "server.ts:624"]
+  },
+  {
+    "rule": "javascript_lang_sql_injection",
+    "file": "routes/search.ts",
+    "line": 23,
+    "disposition": "source_supported_potential",
+    "reason": "Request search criteria enters query text after a length restriction, which does not exclude SQL syntax.",
+    "evidence": ["routes/search.ts:15", "routes/search.ts:23"]
+  },
+  {
+    "rule": "javascript_express_server_side_request_forgery",
+    "file": "routes/profileImageUrlUpload.ts",
+    "line": 24,
+    "disposition": "source_supported_potential",
+    "reason": "Profile image URL from the request is passed to the HTTP client; local destination restrictions are absent at this use. Runtime reachability/egress are untested.",
+    "evidence": ["routes/profileImageUrlUpload.ts:19", "routes/profileImageUrlUpload.ts:24"]
+  },
+  {
+    "rule": "javascript_lang_http_url_using_user_input",
+    "file": "routes/profileImageUrlUpload.ts",
+    "line": 24,
+    "disposition": "source_supported_potential",
+    "reason": "Same source/sink as the SSRF rule; retain both raw rules but count one destination concern when grouping.",
+    "evidence": ["routes/profileImageUrlUpload.ts:19", "routes/profileImageUrlUpload.ts:24"]
+  }
+]

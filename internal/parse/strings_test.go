@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/zazzcode/scan/internal/graph"
 )
 
 func TestStringFlowGolden(t *testing.T) {
@@ -89,11 +91,19 @@ func TestLocalDependencies(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if len(report.Uses) != tt.uses {
-				t.Fatalf("uses=%d want %d; entries=%+v", len(report.Uses), tt.uses, report.Entries)
+			sinks := 0
+			var u graph.StringUse
+			for _, use := range report.Uses {
+				if use.Kind == "input_validation_candidate" {
+					continue
+				}
+				sinks++
+				u = use
+			}
+			if sinks != tt.uses {
+				t.Fatalf("uses=%d want %d; entries=%+v", sinks, tt.uses, report.Entries)
 			}
 			if tt.uses > 0 {
-				u := report.Uses[0]
 				if u.Assessment.Status != "not_run" {
 					t.Fatal("offline assessment was not not_run")
 				}

@@ -18,10 +18,12 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 			continue
 		}
 		if check.Kind == "sql_query" {
+			matched := 0
 			for _, old := range report.Uses {
 				if old.Kind != "sql_query_candidate" || !checkRoute(report, old.RouteID, check) {
 					continue
 				}
+				matched++
 				use := old
 				use.ID += "/" + check.ID
 				use.Check = &check
@@ -65,8 +67,9 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 						} else {
 							use.Completeness.Blockers = append(use.Completeness.Blockers, g)
 						}
-					case "middleware_unresolved":
-						// Replaced by explicit applicable middleware evidence and its own blockers.
+					case "middleware_unresolved", "query_text_interpolated", "query_document_unvalidated", "input_validation_absent", "input_validation_unresolved":
+						// Query shape and missing validation stay visible. They do not
+						// convert a clear insufficient protection answer into an abstention.
 						use.Completeness.Coverage = append(use.Completeness.Coverage, g)
 
 					case "unknown_value":
@@ -95,13 +98,52 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 				use.Completeness.Blockers = append(use.Completeness.Blockers, s.contextLimits...)
 				selected = append(selected, use)
 			}
+			if matched == 0 {
+				selected = append(selected, missingSQLSink(report, check, context, chainGaps))
+			}
 		} else if check.Kind == "account_creation" {
 			use := s.registrationCheck(report, check, context, chainGaps)
 			use.Completeness.Blockers = append(use.Completeness.Blockers, s.contextLimits...)
 			selected = append(selected, use)
 		}
 	}
+	for _, old := range report.Uses {
+		if old.Kind == "input_validation_candidate" {
+			selected = append(selected, old)
+		}
+	}
 	report.Uses = selected
+}
+
+// missingSQLSink keeps a declared SQL check visible when discovery found no query.
+// An empty use list would be indistinguishable from a protected route.
+func missingSQLSink(report *graph.StringReport, c graph.Check, context []graph.Evidence, chainGaps []graph.Gap) graph.StringUse {
+	var route graph.Route
+	blockers := append([]graph.Gap{}, chainGaps...)
+	for _, e := range report.Entries {
+		if e.Route.Method != c.Method || e.Route.PathPattern != c.Path {
+			continue
+		}
+		route = e.Route
+		for _, g := range e.Gaps {
+			switch g.Kind {
+			case "helper_call_limit", "recursive_helper", "work_limit":
+				blockers = append(blockers, g)
+			}
+		}
+	}
+	gap := graph.Gap{Kind: "sql_sink_missing", Detail: c.ID + ": declared SQL check produced no candidate sink", At: route.Registration}
+	blockers = append(blockers, gap)
+	return graph.StringUse{
+		ID:           fmt.Sprintf("check:%s:%s:missing-sink", route.ID, c.ID),
+		RouteID:      route.ID,
+		Kind:         "sql_sink_missing",
+		Check:        &c,
+		Context:      context,
+		Gaps:         []graph.Gap{gap},
+		Assessment:   graph.Assessment{Status: "not_run"},
+		Completeness: &graph.Completeness{Required: []string{"request_source", "sql_query_candidate", "route_handler", "sink_binding"}, Evidence: evidenceRoles(context), Blockers: blockers, Coverage: []graph.Gap{}, Scope: "declared SQL check produced no candidate sink in the supported handler and helper slice"},
+	}
 }
 
 func checkRoute(report *graph.StringReport, id string, c graph.Check) bool {

@@ -1,0 +1,18 @@
+{
+  "target_revision": "f189f521266f42c6bd05884468292000cee852ed",
+  "challenge_count": 116,
+  "bearer_report_sha256": "54f7aa4d72808fa88d352a678b0979894f4c61ebeee1dbcaf0331ce897e8dd04",
+  "bearer_findings": 671,
+  "dispositions": {
+    "pending_source_review": 664,
+    "source_inspected_false_positive": 3,
+    "source_supported_potential": 4
+  },
+  "scope_counts": {
+    "application_or_support": 329,
+    "test": 278,
+    "training_snippet": 64
+  },
+  "challenge_source_sha256": "a37357f5d4daa0981f87fa3af9817de140d87777732bb1bbbd0fbf8b5bf7d218",
+  "review_state": "agent source inspection; independent human review and runtime tests pending"
+}

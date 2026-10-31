@@ -13,7 +13,7 @@ explicit policy over findings and analysis limits. A clean run is not a security
 ## Long-term objectives
 
 **Objective update, 2026-10-31:** build a source-code security scanner that is **as good as or better
-than Bearer at SAST detection and code analysis**, with the long-term goal of supporting all equivalent
+than Bearer at SAST detection and code analysis, with fewer false positives**, with the long-term goal of supporting all equivalent
 analysis and developer-workflow capabilities. This includes capabilities available across Bearer CLI
 and Pro; the free CLI is the first local comparison baseline, not the ceiling for scan's ambition.
 
@@ -22,20 +22,39 @@ families; source-to-sink taint and control/dataflow analysis; interprocedural an
 sensitive-data classification and security/privacy impact; finding evidence and remediation guidance;
 and reporting, configuration, incremental/baseline and CI workflows. Verify each comparator capability
 and edition rather than assuming a marketing description establishes behavior. The detailed inventory
-and phased delivery contracts remain to be developed.
+is recorded in the [versioned capability inventory](evaluation/bearer-capabilities.md); phased
+delivery contracts remain to be developed for unsupported capabilities.
 
 Measure equal-or-better detection on matched, pinned source scopes and independently labeled,
-held-out vulnerable/protected/unknown cases. Compare recall, precision, false safe claims, abstentions,
+held-out vulnerable/protected/unknown cases. Require lower false-positive rates at equal-or-better
+vulnerability recall on comparable scope; fewer findings alone is not success. Select numeric
+thresholds and denominators before held-out evaluation. Compare recall, precision, false safe claims, abstentions,
 coverage and evidence quality; record latency, resource use and model cost alongside accuracy. More
 findings alone do not establish superiority. Demonstrated parity applies only to the capabilities and
 corpus actually evaluated; broad parity has not been achieved by the current implementation.
 
-The intended advantage is graph-grounded semantic assessment of custom validation and sink protection,
-with route-oriented explanations and complementary remediation. Test that advantage against traditional
+The intended advantage is a decision model that considers the relevant paths in a repository-wide
+code graph, including actual custom-validator bodies, enforced guards, value changes, bypasses and
+sink semantics, so valid protection is recognized and false positives are reduced. This is a quality
+hypothesis to test, not an established benefit. Build the repository graph structurally and supply
+complete claim-relevant slices within model limits; the current implementation supplies only bounded
+slices and does not analyze the entire code graph. Missing paths or unknown effects must remain
+explicit, rather than become protected claims. Provide route-oriented explanations and complementary
+remediation. Test that advantage against traditional
 SAST rather than assume that using AI improves detection. The
-[Bearer comparison plan](evaluation/bearer-comparison.md) starts this evaluation; the
+[pinned CLI comparison](evaluation/bearer-results.md) starts this evaluation; the
 [phased plan](project/implementation-plan.md) owns delivery order. SCA remains a complementary objective
 after the source-code analysis foundation.
+
+**Route report, 2026-10-31.** For each route, identify and report both where protection is sufficient
+and where it is lacking. A sufficient result names the claim, the value, and the sink slot it covers.
+It stays in the report so silence is not read as safety and an agent does not redo a protection that
+already holds. A lacking result names the value that can still affect that use. Also report poor
+code-practice findings on the route: hard-coded secrets, insecure cookie and session defaults,
+missing baseline headers, weak randomness, and similar deterministic issues. Agentic coding can fix
+those alongside dataflow fixes, so a route review that drops them is incomplete. Keep practice
+findings distinct from a claim that request input can change a sink. A practice finding is not
+exploitability, and a protected dataflow claim does not make the route's configuration sound.
 
 ## Product direction
 

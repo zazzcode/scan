@@ -15,6 +15,15 @@ improvements with source evidence. The long-term direction is selected OWASP Top
 
 ## Evidence selection
 
+The [product quality goal](../project.md#long-term-objectives) is Bearer-level-or-better effectiveness
+with fewer false positives, plus a per-route report of sufficient protection, lacking protection, and
+poor code-practice findings. Repository-wide structural analysis should make all relevant protection
+and bypass paths available for semantic assessment. Actual guard/helper semantics and sink binding
+can prevent a suspicious call shape from becoming a false finding. That benefit remains an
+evaluation hypothesis; missing graph edges or incomplete slices can still cause false findings or
+false protected claims. The current implementation does not supply or analyze an entire repository
+graph. Measure both false positives and missed vulnerabilities/abstentions before claiming improvement.
+
 Supply a bounded source-backed graph slice **and** the actual code of its relevant functions. A graph
 alone omits custom-validator semantics; the entire repository forces the judge to rediscover paths
 and buries evidence. Go selects and substantiates supported relationships. GPT Decisions or Jev
@@ -69,6 +78,21 @@ Deliver this next in the existing phases rather than adding target-specific vuln
    requirements and their provenance; unknown business intent is not a demonstrated violation.
 5. Phases 1/8/9: evaluate unseen vulnerable/protected/unknown repositories, independently review
    findings, and retain evidence/coverage in route-oriented JSON and SARIF.
+
+Request fields are validation subjects even when a query is bound. A missing validator call is
+`input_validation_absent`. A call that merely receives the field is `input_validation_unresolved`.
+String-built SQL, `Op.like` templates, and NoSQL `$where` strings are `query_text_interpolated`.
+A request value inside a collection query, update, or insert document is
+`query_document_unvalidated`. A logged SQL string and `Array.find` are not query sinks. These facts
+are candidates for agent fixes. They do not prove exploitability, and they do not turn a bound
+query into a structure defect.
+
+The bounded scanner now enters supported same-file functions and relative-imported named exports
+while discovering SQL candidates. Positional identifier parameters and direct returns are
+source-backed witnesses, limited to three nested calls and 24 expansions per handler. A declared SQL
+check that finds no candidate records `sql_sink_missing` rather than an empty use list. Closures,
+rest and destructured parameters, recursion, mutation and asynchronous continuations remain
+unresolved. This is not repository-wide graph analysis.
 
 Structural source/sink models remain necessary even when the judge recognizes arbitrary custom
 validators. They establish what a value controls and what protection the operation requires; they do

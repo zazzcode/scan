@@ -27,6 +27,18 @@ func guidance(use graph.StringUse) Guidance {
 			g.ExampleStatus = "illustrative_template; not a verified application patch"
 		}
 		return g
+	case "nosql_query", "nosql_query_candidate":
+		return Guidance{Title: "Keep request data out of NoSQL query structure", Actions: []string{
+			"Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document.",
+			"Do not concatenate or interpolate request values into $where strings.",
+			"Treat a length limit or partial character filter as unresolved until it is shown to dominate the sink.",
+		}, ExampleStatus: "not_generated; driver-specific adaptation and tests required"}
+	case "input_validation", "input_validation_candidate":
+		return Guidance{Title: "Validate and sanitize each request input", Actions: []string{
+			"Enforce type, presence, length, and format on the server for every request field the route reads.",
+			"Sanitize for the destination only after validation, and do not treat that sanitizer as proof the query structure is safe.",
+			"Preserve an explicit result when a call receives the field but its effect is unknown.",
+		}, ExampleStatus: "not_generated; field policy is route-specific"}
 	case "account_creation", "account_creation_candidate":
 		return Guidance{Title: "Enforce required fields before account creation", Actions: []string{
 			"Validate required fields independently of optional confirmation fields and before the persistence operation.",
