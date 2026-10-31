@@ -29,7 +29,11 @@ type flow struct {
 }
 
 func (f *flow) gap(kind, detail string, n *sitter.Node) graph.Gap {
-	return graph.Gap{Kind: kind, Detail: detail, At: spanOf(f.module.file, n)}
+	g := graph.Gap{Kind: kind, Detail: detail}
+	if n != nil {
+		g.At = spanOf(f.module.file, n)
+	}
+	return g
 }
 
 func (f *flow) statements(body *sitter.Node) {
@@ -94,6 +98,7 @@ func (f *flow) statements(body *sitter.Node) {
 			// Explore branch bodies as possible paths, preserving the explicit gap.
 			f.context = append(f.context, f.module.evidence("control_statement", n))
 			if condition := n.ChildByFieldName("condition"); condition != nil {
+				f.noteWeakCondition(condition)
 				f.eval(condition)
 			}
 			saved := copyValues(f.env)
@@ -297,7 +302,7 @@ func (f *flow) call(n *sitter.Node) value {
 	}
 	// A helper that contains the sink is not a validator of its arguments.
 	if !entered {
-		f.noteInputTouch(values)
+		f.noteInputTouch(values, name)
 	}
 	v := value{}
 	for _, a := range values {

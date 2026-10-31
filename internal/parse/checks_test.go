@@ -430,6 +430,42 @@ func TestQueryShapeAndValidation(t *testing.T) {
 			t.Fatalf("interpolated=%+v", use.Gaps)
 		}
 	})
+	t.Run("string check does not protect an interpolated query", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';const api=express();function guard(req,res,next){if(typeof req.body.handle!=='string')return res.status(400).end();next()}api.use(guard);api.post('/session',(req,res)=>db.query(`SELECT '${req.body.handle}'`))")
+		report, err := Strings(root, "server.ts")
+		if err != nil {
+			t.Fatal(err)
+		}
+		use := kindUse(t, report, "sql_query_candidate")
+		if !gapKind(use.Gaps, "query_text_interpolated") || !gapKind(use.Gaps, "validation_insufficient_for_sink") || gapKind(use.Gaps, "input_validation_absent") {
+			t.Fatalf("string middleware=%+v", use.Gaps)
+		}
+	})
+	t.Run("free text must be bound at the sink", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';const api=express();api.post('/session',(req,res)=>db.reviewsCollection.update({_id:1},{$set:{message:req.body.comment}}))")
+		report, err := Strings(root, "server.ts")
+		if err != nil {
+			t.Fatal(err)
+		}
+		use := kindUse(t, report, "nosql_query_candidate")
+		if !gapKind(use.Gaps, "query_document_unvalidated") || !gapKind(use.Gaps, "sink_must_bind_free_text") {
+			t.Fatalf("comment=%+v", use.Gaps)
+		}
+	})
+	t.Run("bound free text does not demand an allow-list", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "server.ts", "import express from 'express';import {Sequelize} from 'sequelize';const db=new Sequelize('sqlite::memory:');const api=express();api.post('/session',(req,res)=>db.query('SELECT $comment',{bind:{comment:req.body.comment}}))")
+		report, err := Strings(root, "server.ts")
+		if err != nil {
+			t.Fatal(err)
+		}
+		use := kindUse(t, report, "sql_query_candidate")
+		if gapKind(use.Gaps, "query_text_interpolated") || gapKind(use.Gaps, "sink_must_bind_free_text") || !gapKind(use.Gaps, "validation_free_text_bound") {
+			t.Fatalf("bound comment=%+v", use.Gaps)
+		}
+	})
 }
 
 func kindUse(t *testing.T, report *graph.StringReport, kind string) graph.StringUse {

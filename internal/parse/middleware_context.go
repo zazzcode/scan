@@ -94,6 +94,112 @@ func (s *moduleSet) middlewareContext(m *sourceModule, route graph.Route) ([]gra
 	return out, gaps
 }
 
+// noteMiddlewareFields records request fields read by applicable app.use middleware
+// and by middleware arguments on this route registration. A read is not proof
+// that the middleware rejects a bad value.
+func (s *moduleSet) noteMiddlewareFields(f *flow, registration *sourceModule, call *sitter.Node) {
+	if f == nil || f.facts == nil || registration == nil {
+		return
+	}
+	if call != nil {
+		args := call.ChildByFieldName("arguments")
+		if args != nil && args.NamedChildCount() > 2 {
+			for i := uint(1); i+1 < args.NamedChildCount(); i++ {
+				s.markMiddlewareArg(f, registration, args.NamedChild(i))
+			}
+		}
+	}
+	evidence, _ := s.middlewareContext(registration, f.route)
+	for _, item := range evidence {
+		if item.Kind != "middleware_handler" {
+			continue
+		}
+		module := s.modules[item.Span.File]
+		if module == nil {
+			continue
+		}
+		body := nodeAt(module.tree.RootNode(), item.Span.StartByte, item.Span.EndByte)
+		if body == nil || body.Parent() == nil {
+			continue
+		}
+		markMiddlewareFields(f, module, body, requestParamName(body.Parent(), module.src))
+	}
+}
+
+func (s *moduleSet) markMiddlewareArg(f *flow, m *sourceModule, arg *sitter.Node) {
+	target, body, req, _ := s.handler(m, arg)
+	if body == nil || target == nil || req == "" {
+		return
+	}
+	markMiddlewareFields(f, target, body, req)
+}
+
+func markMiddlewareFields(f *flow, m *sourceModule, body *sitter.Node, req string) {
+	if f.facts == nil || body == nil || req == "" {
+		return
+	}
+	var walk func(*sitter.Node)
+	walk = func(n *sitter.Node) {
+		if n == nil {
+			return
+		}
+		if n.Kind() == "if_statement" {
+			if condition := n.ChildByFieldName("condition"); condition != nil && weakPredicate(condition.Utf8Text(m.src)) {
+				markWeakFields(f, m, condition, req)
+			}
+		}
+		if isRequestField(n, m.src, req) {
+			node := n
+			if field := requestFieldNode(n, m.src, req); field != nil {
+				node = field
+			}
+			f.facts.middleware[node.Utf8Text(m.src)] = true
+		}
+		for i := uint(0); i < n.NamedChildCount(); i++ {
+			walk(n.NamedChild(i))
+		}
+	}
+	walk(body)
+}
+
+func markWeakFields(f *flow, m *sourceModule, condition *sitter.Node, req string) {
+	if f.facts == nil || condition == nil {
+		return
+	}
+	var walk func(*sitter.Node)
+	walk = func(n *sitter.Node) {
+		if n == nil {
+			return
+		}
+		if isRequestField(n, m.src, req) {
+			node := n
+			if field := requestFieldNode(n, m.src, req); field != nil {
+				node = field
+			}
+			f.facts.weak[node.Utf8Text(m.src)] = true
+		}
+		for i := uint(0); i < n.NamedChildCount(); i++ {
+			walk(n.NamedChild(i))
+		}
+	}
+	walk(condition)
+}
+
+func requestParamName(fn *sitter.Node, src []byte) string {
+	params := fn.ChildByFieldName("parameters")
+	if params == nil || params.NamedChildCount() == 0 {
+		return ""
+	}
+	p := params.NamedChild(0)
+	if p.Kind() == "required_parameter" || p.Kind() == "optional_parameter" {
+		p = p.ChildByFieldName("pattern")
+	}
+	if p != nil && p.Kind() == "identifier" {
+		return p.Utf8Text(src)
+	}
+	return ""
+}
+
 func transportMiddleware(m *sourceModule, n *sitter.Node) bool {
 	if n.Kind() == "call_expression" {
 		n = n.ChildByFieldName("function")

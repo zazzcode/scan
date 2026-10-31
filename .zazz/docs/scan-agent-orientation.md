@@ -104,7 +104,7 @@ in these files independently of chat attachments.
 
 | Document | Primary content |
 |---|---|
-| [Project overview](../project.md) | Purpose, users, current state, direction |
+| [Project overview](../project.md) | Purpose, [tenets](../project.md#tenets), current state, direction |
 | [Architecture](../architecture.md) | Flow diagrams, judge/provider contracts, analysis semantics, package boundaries |
 | [Repository graph design](../architecture/repository-graph.md) | Target-repository nodes/edges, inbound/outbound API boundaries, response flow, identity and provenance |
 | [Evidence and claims](../architecture/evidence-and-claims.md) | Source-backed route slices, relevant functions, checked requirements and finding eligibility |

@@ -10,6 +10,23 @@ to the detailed documents and defines their responsibilities.
 to give developers reviewable source evidence, security engineers useful triage context, and CI an
 explicit policy over findings and analysis limits. A clean run is not a security certification.
 
+## Tenets
+
+1. **Report more than proven exploits.** Surface confirmed vulnerabilities and weak or poor practice
+   on the same route. A missing check, a type-only check, an insecure default, and a string built
+   into a query are all findings. A practice finding is not, by itself, proof of exploitability.
+2. **Agents can harden code cheaply.** Do not drop a finding because a human would postpone it.
+   An agent can apply the tightest validation the business field allows, and can fix sink
+   construction, in the same pass. Silence is not a savings.
+3. **Defensive validation, and a correct sink.** Restrict each input as far as the business
+   requirement allows. A string or length check is not injection protection. A comment or other
+   free-text field may contain any character, so an allow-list is the wrong fix. That value has to
+   be bound in the query, update, or insert.
+4. **Say what is already sufficient.** A protected claim names the field, the check, and the sink
+   slot. It stays in the report so an agent does not redo it and so silence is not read as safety.
+5. **Unknown stays unknown.** A custom validator or middleware read whose effect is not shown does
+   not become a pass, and a missing graph edge does not become a vulnerability.
+
 ## Long-term objectives
 
 **Objective update, 2026-10-31:** build a source-code security scanner that is **as good as or better
@@ -45,6 +62,10 @@ SAST rather than assume that using AI improves detection. The
 [pinned CLI comparison](evaluation/bearer-results.md) starts this evaluation; the
 [phased plan](project/implementation-plan.md) owns delivery order. SCA remains a complementary objective
 after the source-code analysis foundation.
+
+**Languages, 2026-10-31.** The scanner's committed languages are JavaScript, TypeScript, Python,
+and Go. JavaScript and TypeScript are the current implementation. Python, then Go, are later
+adapters. A file extension is not analysis support.
 
 **Route report, 2026-10-31.** For each route, identify and report both where protection is sufficient
 and where it is lacking. A sufficient result names the claim, the value, and the sink slot it covers.

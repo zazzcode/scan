@@ -79,7 +79,11 @@ Deliver this next in the existing phases rather than adding target-specific vuln
 5. Phases 1/8/9: evaluate unseen vulnerable/protected/unknown repositories, independently review
    findings, and retain evidence/coverage in route-oriented JSON and SARIF.
 
-Request fields are validation subjects even when a query is bound. A missing validator call is
+The defensive rule is the tightest validation the business field allows, plus sink construction
+that does not let the value change a query, update, or insert. A string or length check is not
+injection protection. A comment or other free-text field may contain any character, so an allow-list
+is the wrong fix and the statement must bind the value. Applicable middleware is part of the
+validation path. A missing validator call is
 `input_validation_absent`. A call that merely receives the field is `input_validation_unresolved`.
 String-built SQL, `Op.like` templates, and NoSQL `$where` strings are `query_text_interpolated`.
 A request value inside a collection query, update, or insert document is

@@ -218,7 +218,7 @@
         },
         {
           "kind": "input_validation_absent",
-          "detail": "req.body.email reaches a sensitive use with no validator call on its path",
+          "detail": "req.body.email reaches a sensitive use with no validator call in the handler or applicable middleware",
           "at": {
             "file": "handler.ts",
             "start_line": 5,
@@ -276,5 +276,15 @@
     "ESM Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
     "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
     "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities"
+  ],
+  "practice": [
+    {
+      "id": "javascript",
+      "version": "1",
+      "languages": [
+        "javascript",
+        "typescript"
+      ]
+    }
   ]
 }

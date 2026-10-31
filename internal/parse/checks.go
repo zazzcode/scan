@@ -67,7 +67,7 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 						} else {
 							use.Completeness.Blockers = append(use.Completeness.Blockers, g)
 						}
-					case "middleware_unresolved", "query_text_interpolated", "query_document_unvalidated", "input_validation_absent", "input_validation_unresolved":
+					case "middleware_unresolved", "query_text_interpolated", "query_document_unvalidated", "input_validation_absent", "input_validation_unresolved", "input_validation_middleware", "validation_insufficient_for_sink", "validation_type_only", "sink_must_bind_free_text", "validation_free_text_bound":
 						// Query shape and missing validation stay visible. They do not
 						// convert a clear insufficient protection answer into an abstention.
 						use.Completeness.Coverage = append(use.Completeness.Coverage, g)

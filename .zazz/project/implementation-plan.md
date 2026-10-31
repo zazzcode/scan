@@ -465,11 +465,13 @@ matrix and bundle quality are reviewed; re-evaluate model questions on Python ex
 **Exclude:** automatic parity with all JS/TS constructs or a promise of zero core changes.
 **Halt/replan:** the adapter would silently reinterpret core operations or claim unsupported dispatch.
 
-## Phase 12 — Go and Java adapters
+## Phase 12 — Go adapter
 
-**Future specs:** `go-resolution-and-lowering`; `go-flow-and-rules`;
-`java-resolution-and-lowering`; `java-flow-and-rules`. Each language is a separate decision and sequence.
-Go stresses receivers/interfaces; Java stresses overloads, annotations, class/type boundaries.
+**Sequence update, 2026-10-31.** The committed languages are JavaScript, TypeScript, Python, and Go.
+This phase is Go. Java is not in that sequence.
+
+**Future specs:** `go-resolution-and-lowering`; `go-flow-and-rules`.
+Go stresses receivers and interfaces.
 
 **Evidence/exit:** language-specific resolution/flow fixtures, signature identity tests, explicit
 unknowns, rules and semantic-question evaluation. Release support is declared per proven capability.

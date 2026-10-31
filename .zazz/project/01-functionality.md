@@ -78,10 +78,11 @@ forward as a release commitment. Dependency vulnerability scanning is excluded.
 
 ## Language sequence
 
-JS/TS first, then Python, then Go and Java. The sequence and first release set remain proposed.
-Each adapter includes extraction, resolution, lowering/flow semantics, library models, and a coverage
-matrix. Recognizing a file extension is not analysis support. Additional languages may expose core IR
-changes that need a reviewed contract revision.
+The committed language sequence is JavaScript, TypeScript, Python, and Go. JavaScript and
+TypeScript are the current analysis target. Python is the next adapter, then Go. Each adapter
+includes extraction, resolution, lowering/flow semantics, library models, and a coverage matrix.
+Recognizing a file extension is not analysis support. A new language may expose core IR changes
+that need a contract revision before that adapter claims the same query and validation findings.
 
 ## Interfaces and report semantics
 

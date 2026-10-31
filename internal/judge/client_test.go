@@ -26,7 +26,7 @@ func TestProviders(t *testing.T) {
 				if provider == "jev" {
 					field = "state"
 				}
-				if len(body[field]) == 0 || len(body["questions"]) == 0 {
+				if len(body[field]) == 0 || len(body["questions"]) == 0 || !strings.Contains(string(body[field]), "id: javascript") || !strings.Contains(string(body["questions"]), "practice standard") {
 					t.Error("wrong provider request shape")
 				}
 				if provider == "openai" {
@@ -42,7 +42,7 @@ func TestProviders(t *testing.T) {
 			}
 			client.endpoint = server.URL
 			client.http = server.Client()
-			use := graph.StringUse{Gaps: []graph.Gap{{Kind: "unresolved_flow"}}}
+			use := graph.StringUse{Sink: graph.Evidence{Span: graph.Span{File: "server.ts"}}, Gaps: []graph.Gap{{Kind: "unresolved_flow"}}}
 			got := client.Assess(context.Background(), use)
 			if got.Status != "completed" || got.Answers["protection"] != "sufficient" || got.Protection != "uncertain" || got.Provider != provider || got.Usage["input_tokens"] != 12 {
 				t.Fatalf("assessment=%+v", got)

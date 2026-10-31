@@ -72,7 +72,9 @@ and incomplete assessments to review/note, and not_applicable to notApplicable/n
 only to the declared claim. Validation and use-protection answers remain separate in messages and
 properties: safe SQL parameterization can coexist with missing domain validation.
 
-Rule help and per-result recommendations include complementary actions and **illustrative, unverified
+Rule help and per-result recommendations include the project tenet that findings cover confirmed
+vulnerabilities and weak or poor practice, because an agent can harden both cheaply, plus
+complementary actions and **illustrative, unverified
 code templates** where the supported library model permits them. They are not patches and do not
 appear in SARIF fixes. The Decisions choice API supplies typed assessments; it does not generate code.
 A future optional Responses generation stage could produce tailored examples using separately capped

@@ -132,13 +132,21 @@ incomplete discovery, not a protected assessment and not evidence that the route
 
 ## Query structure and input validation
 
+Defensive posture: restrict each field as far as the business requirement allows, and construct
+the sink so the value cannot change query, update, or insert structure. A type or length check is
+not that construction. A field the business must accept as free text, such as a comment, message,
+description, review, or feedback, may contain any character. An allow-list would reject valid
+input. For those fields the injection control is a bound query, update, or insert.
+
 Every supported request field read (`req.body`, `req.query`, `req.params`, `req.headers`,
-`req.cookies`, and the next property) is a validation subject. A field that reaches a query sink
-with no earlier call carries `input_validation_absent`. A field that reaches some other call first
-carries `input_validation_unresolved`: the call is not treated as a validator. Fields that never
-reach a query sink are separate `input_validation_candidate` uses. These are best-practice gaps for
-agent fixes. They are not a judgment that a present custom validator is weak, and unresolved
-middleware can still validate a field the handler does not.
+`req.cookies`, and the next property) is a validation subject. Applicable `app.use` middleware and
+middleware arguments on the route registration are included. A field with no check in either place
+carries `input_validation_absent`. A type or length check while the value is still built into query
+structure carries `validation_insufficient_for_sink`. The same weak check on a bound sink carries
+`validation_type_only`. A free-text field built into a statement carries `sink_must_bind_free_text`.
+A free-text field that is already bound carries `validation_free_text_bound`. A custom call or a
+middleware read whose predicate is not a recognized type or length check stays unresolved. Fields
+that never reach a query sink are separate `input_validation_candidate` uses.
 
 Query, update, and insert structure is a separate fact:
 
@@ -151,6 +159,11 @@ Query, update, and insert structure is a separate fact:
 
 Nested functions are entered only when their text contains `$where`, `Op.like`, or `.query(`.
 That is how the chat tool's query strings are reached. Other callbacks stay unknown.
+
+The language practice pack lives in `internal/rules/` and is embedded in the binary. It is a scan
+rule set, not an SDLC document. A decision request sends the pack for the sink file's language.
+JavaScript and TypeScript share one pack. Python and Go packs are loaded when those files are
+assessed. Offline reports name the pack id and version and do not copy the full text onto every use.
 
 ## Implementation And Review Change Log
 

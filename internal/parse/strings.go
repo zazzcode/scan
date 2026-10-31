@@ -9,6 +9,7 @@ import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	"github.com/zazzcode/scan/internal/graph"
 	"github.com/zazzcode/scan/internal/lang"
+	"github.com/zazzcode/scan/internal/rules"
 	"github.com/zazzcode/scan/internal/walk"
 )
 
@@ -91,6 +92,7 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 					f := flow{module: hm, set: set, route: r, request: req, env: map[string]value{}, context: []graph.Evidence{m.evidence("registration", call), evidence}, gaps: append([]graph.Gap{}, e.Gaps...), helpers: &helperExpansion{budget: 24, stack: map[string]bool{}}, facts: newInputFacts()}
 					// Effective middleware is not modeled; an offline candidate cannot be called safe.
 					f.gaps = append(f.gaps, graph.Gap{Kind: "middleware_unresolved", Detail: "effective middleware/guard chain is not modeled", At: r.Registration})
+					set.noteMiddlewareFields(&f, m, call)
 					f.statements(body)
 					f.finishValidation()
 					out.Uses = append(out.Uses, f.uses...)
@@ -111,6 +113,9 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 	for _, k := range keys {
 		m := set.modules[k]
 		out.Files = append(out.Files, m.evidence("file", m.tree.RootNode()))
+	}
+	for _, item := range rules.ForPaths(keys) {
+		out.Practice = append(out.Practice, graph.PracticeRef{ID: item.ID, Version: item.Version, Languages: item.Languages})
 	}
 	return out, nil
 }

@@ -53,14 +53,23 @@ type Entry struct {
 
 // StringReport is the bounded analysis artifact, separate from route-v1 JSON.
 type StringReport struct {
-	SelectedRoute string      `json:"selected_route,omitempty"`
-	SchemaVersion int         `json:"schema_version"`
-	Root          string      `json:"root"`
-	Entries       []Entry     `json:"entries"`
-	Uses          []StringUse `json:"uses"`
-	Gaps          []Gap       `json:"gaps"`
-	Files         []Evidence  `json:"files"`
-	Limitations   []string    `json:"limitations"`
+	SelectedRoute string        `json:"selected_route,omitempty"`
+	SchemaVersion int           `json:"schema_version"`
+	Root          string        `json:"root"`
+	Entries       []Entry       `json:"entries"`
+	Uses          []StringUse   `json:"uses"`
+	Gaps          []Gap         `json:"gaps"`
+	Files         []Evidence    `json:"files"`
+	Limitations   []string      `json:"limitations"`
+	Practice      []PracticeRef `json:"practice,omitempty"`
+}
+
+// PracticeRef names the embedded language rule applied to this report.
+// The full text is sent with a decision request, not copied into every use.
+type PracticeRef struct {
+	ID        string   `json:"id"`
+	Version   string   `json:"version"`
+	Languages []string `json:"languages"`
 }
 
 // Check declares a security requirement independently of the expected test answer.
