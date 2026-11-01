@@ -55,7 +55,7 @@ func TestFindingTypesPreserveScopeAndPlannedCoverage(t *testing.T) {
 
 func TestRowPillsAggregateTypesWithoutUpgradingStatus(t *testing.T) {
 	items := []htmlItem{
-		{Finding: graph.Finding{TypeIDs: []string{"sql-injection", "input-validation"}, Status: "observed_pattern"}},
+		{Finding: graph.Finding{TypeIDs: []string{"sql-injection", "input-validation"}, Status: "poor_practice"}},
 		{Finding: graph.Finding{TypeIDs: []string{"sql-injection", "input-validation"}, Status: "needs_evidence"}},
 		{Finding: graph.Finding{TypeIDs: []string{"nosql-injection"}, Status: "protected_for_claim"}},
 	}
@@ -64,7 +64,7 @@ func TestRowPillsAggregateTypesWithoutUpgradingStatus(t *testing.T) {
 		t.Fatalf("pills=%+v", pills)
 	}
 	for _, p := range pills {
-		if p.ID == "sql-injection" && (p.Count != 2 || p.Observed != 1 || p.Review != 1 || p.Status != "mixed status") {
+		if p.ID == "sql-injection" && (p.Count != 2 || p.PoorPractice != 1 || p.Review != 1 || p.Status != "mixed status") {
 			t.Fatalf("SQL pill=%+v", p)
 		}
 		if p.ID == "nosql-injection" && (p.Count != 1 || p.Status != "protected") {
@@ -80,7 +80,7 @@ func TestHTMLTypePanelsAndDistinctLocations(t *testing.T) {
 		t.Fatal(err)
 	}
 	html := b.String()
-	for _, want := range []string{`<span>Route location</span>`, `server.ts:3`, `Finding location · </span>handler.ts:11`, `class="type-pill observed"`, `popovertarget="glossary-sql-injection"`, `id="glossary-sql-injection" class="glossary-panel" popover="auto"`, `popovertargetaction="hide"`, `aria-labelledby="glossary-heading-sql-injection"`, `SQL Injection <span class="pill-status">· observed`, `Input Validation <span class="pill-status">· observed`, `Coverage: planned`, `id="finding-glossary"`} {
+	for _, want := range []string{`<span>Route location</span>`, `server.ts:3`, `Finding location · </span>handler.ts:11`, `class="type-pill poor-practice"`, `popovertarget="glossary-sql-injection"`, `id="glossary-sql-injection" class="glossary-panel" popover="auto"`, `popovertargetaction="hide"`, `aria-labelledby="glossary-heading-sql-injection"`, `SQL Injection <span class="pill-status">· poor practice`, `Input Validation <span class="pill-status">· poor practice`, `Coverage: planned`, `id="finding-glossary"`} {
 		if !strings.Contains(html, want) {
 			t.Fatalf("missing %s", want)
 		}

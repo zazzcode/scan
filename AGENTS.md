@@ -4,7 +4,10 @@
 
 Agents MUST read this file and the [agent orientation](.zazz/docs/scan-agent-orientation.md)
 at session start, then load only the context required for the task. Links are not automatic includes.
-The [README](README.md) owns the project introduction, user setup, CLI usage, and contributor setup.
+The [README](README.md) introduces the project; root [user documentation](docs/README.md) owns
+philosophy, user setup, CLI usage, result interpretation, and contributor guides.
+Product analysis rules and guidelines belong in root [docs/analysis](docs/analysis/README.md), not
+`.zazz/`. Agents MUST load the matching analysis guide when changing scanner evidence or judgment.
 Current assignments, progress, evaluation results, and session restrictions belong in the project
 docs or local handoff, not this file. Agents MUST verify the actual worktree path, branch, and changes
 before editing and MUST preserve unrelated user changes.
@@ -13,7 +16,7 @@ before editing and MUST preserve unrelated user changes.
 
 | Task | Load |
 |---|---|
-| Run scan or configure a decision provider | [README](README.md), then [decision API setup](.zazz/docs/openai-decisions-setup.md) when needed |
+| Run scan or configure a decision provider | [README](README.md), then [decision-model user guide](docs/decision-models.md) when needed |
 | Product, scope, or architecture decisions | Orientation's [documentation map](.zazz/docs/scan-agent-orientation.md#documentation-map); select the document that owns the topic |
 | Graph structure or outbound service paths | [Repository graph design](.zazz/architecture/repository-graph.md), then relevant architecture sections |
 | Author or refine a spec | Relevant [plan](.zazz/project/implementation-plan.md) and contract, `spec-builder`, and [spec hygiene](.zazz/standards/spec-hygiene.md) |
@@ -52,7 +55,7 @@ and the zazzcode Git/`gh` authentication profile. Feature/deliverable PRs MUST s
 
 ## Document model
 
-**DOCS_ROOT: `.zazz/`**. Specs are Git-tracked in `.zazz/specifications/`; execution scratch belongs in
+**Internal DOCS_ROOT: `.zazz/`**. User-facing documentation belongs in root `docs/`. Specs are Git-tracked in `.zazz/specifications/`; execution scratch belongs in
 gitignored `.zazz/ephemeral/` and MUST NOT be committed. Zazz Board is not used. See the
 [documentation map](.zazz/docs/scan-agent-orientation.md#documentation-map) for durable document owners.
 
@@ -68,6 +71,6 @@ exhaust a balance. Alternative adapters MAY be tested with local HTTP stubs.
 ## Verification
 
 Agents MUST run the assigned contract's scoped checks using the worktree's declared Go toolchain.
-The [README contributor guide](README.md#contributing) owns build, test, vet, and format commands;
+The [contributor guide](docs/contributing.md) owns build, test, vet, and format commands;
 [evidence conventions](.zazz/standards/testing.md) define the required validation record.
 Agents MUST format only changed Go files and keep documentation changes within the requested scope.

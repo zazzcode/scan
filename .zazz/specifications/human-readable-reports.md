@@ -10,11 +10,22 @@ JSON. Implement in the assigned `logger-leak` worktree before logger-leak detect
 
 - Add optional `findings` and report-presentation version fields to schema-v1 evidence JSON. Preserve
   raw entries, uses, gaps, and assessments. Human findings reference the originating use and route IDs.
-- Findings name observed behavior in plain English. A query-shape match alone is an analysis item,
-  not a confirmed injection. Separate input-validation evidence from query protection and distinguish
-  observations, incomplete analysis, supported potential findings, and scoped protection.
+- Root `docs/` owns the public philosophy and user/contributor guides, indexed by `docs/README.md`.
+  The repo README remains a standalone introduction and quick-start. `.zazz/` retains engineering
+  design, planning, contracts, evaluation evidence, and SDLC processes; internal docs link to user
+  guidance instead of serving as its only home.
+- Findings name established vulnerabilities or poor practice worth remediation/refactoring, without
+  requiring proof of exploitation for a practice violation. Review means uncertainty about whether
+  a problem or sufficient protection exists. Version 3 labels deterministic SQL and NoSQL executable
+  string construction `poor_practice`. Missing modeled document constraints or validator calls alone
+  remain Review. A model's `supported_potential` alone remains Review; it does not prove a vulnerability.
+  Independent practice findings remain actionable even if model assessment fails, is inconclusive,
+  or supports a separate protected injection claim. Preserve raw evidence and model answers.
 - Preserve the existing detector and judge eligibility; do not promote findings based on display text.
 - SARIF remains the standard interchange output and preserves human context in namespaced properties.
+- Use soft red/orange/blue/green for definitive scanner vulnerability/poor practice/Review/Protected,
+  with labels as well as color; None reported category cells use light grey. Reserve red until
+  scanner evidence supports a definitive verdict. Do not use a manual-confirmation override.
 - The HTML contains only scan results; tool comparisons stay in evaluation documents.
 - Use NoSQL consistently; comparator cells say “NoSQL: no finding reported.”
 - Provide `--export-html <saved-json>` using Go `html/template`, embedded CSS, and native details/summary
@@ -26,6 +37,8 @@ JSON. Implement in the assigned `logger-leak` worktree before logger-leak detect
   are marked planned and never assigned by existing detectors. Rename Registration to Route location;
   expanded records explicitly label Finding location. Native HTML popovers show one glossary panel
   per type with descriptions, interpretation, remediation, and a close button, without JavaScript.
+- Sort HTML rows alphabetically by route path, then HTTP method; preserve ties and place unresolved
+  entries last. Status/counts do not change route order.
 - Rows group by source entry, showing source type, method/path signature, location, counts, and analysis
   state. Expand for human findings, source excerpts, input/transfer/sink evidence, assessment state,
   limitations, and remediation. Retain entries without findings and unmatched uses without inventing routes.
@@ -41,8 +54,9 @@ JSON. Implement in the assigned `logger-leak` worktree before logger-leak detect
 
 ## Acceptance and verification
 
-- Tests distinguish interpolated text, query documents, unresolved calls, validation observations,
-  protected claims, and failed/not-run assessments without inventing confirmed vulnerabilities.
+- Tests distinguish actionable construction practice from unknown ORM/document/validator behavior,
+  and prove incomplete/failed/protected model outcomes do not hide an independent practice finding.
+  HTML, JSON, and SARIF agree on record classification while retaining raw assessments.
 - HTML escapes hostile source/path text, preserves provenance and remediation, groups by route ID,
   retains zero-finding rows and orphan uses, and has no scripts or network resources.
 - Verify taxonomy references, deduplicated row pills, independent status labels, registry coverage,
@@ -70,3 +84,11 @@ fabricate security judgments to complete the presentation. Human UX feedback gui
 User UI feedback requests row-end type pills, plain descriptions in a separate panel, and clearer
 location labeling. Add shared presentation taxonomy and native HTML popovers; no new detectors or
 upgraded vulnerability verdicts. Verify mappings, row aggregation, locations, and regenerated reports.
+
+### 2026-11-01 — Remediation-first findings and public documentation
+
+User steering clarifies that established poor practice requires remediation even without a demonstrated
+exploit. Version 3 uses Poor practice findings versus Review for unestablished problems, keeps the
+Findings/Review/Protected headers, and renames the type column Categories. Root `docs/` becomes the
+user-guide and philosophy home with a linked index; internal designs and project planning stay in
+`.zazz/`. Verification covers classification consistency and documentation migration/link integrity.

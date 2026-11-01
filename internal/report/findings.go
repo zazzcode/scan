@@ -9,7 +9,7 @@ import (
 // Enrich adds deterministic display records while preserving raw evidence and assessments.
 // Rebuilding from uses also lets older saved reports use the current presentation rules.
 func Enrich(r *graph.StringReport) {
-	r.PresentationVersion = 2
+	r.PresentationVersion = 3
 	r.FindingTypes = append([]graph.FindingType(nil), findingTypes...)
 	r.Findings = make([]graph.Finding, 0, len(r.Uses))
 	for _, u := range r.Uses {
@@ -22,7 +22,7 @@ func describe(u graph.StringUse) graph.Finding {
 		RecordType: "analysis", Status: "needs_review", Title: "Sensitive operation needs review",
 		Summary:    "Scan recorded a possible sensitive operation. Its security behavior has not been established.",
 		Validation: "Not established from the supplied evidence.", Protection: "Not established from the supplied evidence.",
-		Uncertainty: "This is bounded static analysis, not an execution trace or a confirmed exploit. Missing library behavior, control flow, and middleware effects remain unresolved.", Recommendations: guidance(u)}
+		Uncertainty: "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.", Recommendations: guidance(u)}
 	validationDetails := []string{}
 	seenValidation := map[string]bool{}
 	for _, g := range u.Gaps {
@@ -51,9 +51,9 @@ func describe(u graph.StringUse) graph.Finding {
 		f.Summary = "Scan identified a database-call pattern. Verify the driver and how it separates query structure from values."
 		if hasGap(u, "query_text_interpolated") {
 			f.RecordType = "finding"
-			f.Status = "observed_pattern"
+			f.Status = "poor_practice"
 			f.Title = "A value is built into SQL query text"
-			f.Summary = "The analyzed code builds database query text from a value rather than showing a separate bound parameter. This construction needs review independently of input validation."
+			f.Summary = "Refactor the string-built query to keep values separate from SQL structure using the verified driver API. This construction is a poor-practice finding even when an exploitable injection has not been demonstrated. Field validation is a separate concern."
 			if strings.Contains(u.Sink.Text, "Op.like") {
 				f.RecordType = "analysis"
 				f.Status = "needs_review"
@@ -65,22 +65,22 @@ func describe(u graph.StringUse) graph.Finding {
 		f.Title = "NoSQL database operation needs review"
 		if hasGap(u, "query_text_interpolated") {
 			f.RecordType = "finding"
-			f.Status = "observed_pattern"
+			f.Status = "poor_practice"
 			f.Title = "A value is built into a NoSQL $where expression"
-			f.Summary = "The code constructs a $where expression using concatenation or interpolation. Review the value's origin and every applicable transformation; this observation alone does not establish an exploitable injection."
+			f.Summary = "Replace the concatenated or interpolated $where expression with an appropriate data-only query. This executable-string construction is a poor-practice finding even when conversions or filters may prevent exploitation. Review value types and preserve the intended query behavior."
 		} else if hasGap(u, "query_document_unvalidated") {
-			f.RecordType = "finding"
-			f.Status = "observed_pattern"
-			f.Title = "Request data enters a NoSQL document without a modeled type constraint"
+			f.RecordType = "analysis"
+			f.Status = "needs_review"
+			f.Title = "NoSQL document type constraints need review"
 			f.Summary = "A request value reaches a query, update, or insert document. Scan has not established the scalar type or permitted keys/operators for that slot. A structured document is not automatically unsafe; verify the driver and field constraints."
 		}
 	case "input_validation_candidate":
 		f.Title = "Request-field validation needs review"
 		f.Summary = "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection."
 		if hasGap(u, "input_validation_absent") {
-			f.RecordType = "finding"
-			f.Status = "observed_pattern"
-			f.Title = "No validator call identified for a request field in the analyzed code"
+			f.RecordType = "analysis"
+			f.Status = "needs_review"
+			f.Title = "Request-field validation evidence is incomplete"
 		}
 	case "account_creation_candidate":
 		f.Title = "Account-creation requirements need review"
@@ -100,22 +100,46 @@ func describe(u graph.StringUse) graph.Finding {
 	}
 	if a.Status == "completed" {
 		if answer := a.Answers["validation"]; answer != "" {
-			f.Validation += " Model validation answer: " + answer + "."
+			f.Validation += " Model validation answer: " + displayLabel(answer) + "."
 		}
-		f.Protection = "Assessed use protection: " + a.Protection + ". " + a.Reason
+		f.Protection = "Assessed injection/use protection: " + displayLabel(a.Protection) + ". " + a.Reason
 		switch a.FindingStatus {
+		case "confirmed_vulnerability":
+			if u.Completeness != nil && u.Completeness.ClaimKind == "injection" && len(a.BlockingGaps) == 0 && (a.Answers["injection_protection"] == "vulnerable" || a.Answers["injection_protection"] == "insufficient") {
+				f.RecordType = "finding"
+				f.Status = "confirmed_vulnerability"
+				f.Title = "SQL injection supported by source analysis"
+				if u.Kind == "nosql_query_candidate" {
+					f.Title = "NoSQL injection supported by source analysis"
+				}
+				f.Summary = "The supplied source and injection-specific assessment establish that request input can affect query syntax or selector structure in the stated analysis scope. Remediate the injection using the verified database API; the underlying construction-practice concern is included in this one finding."
+			}
+			if u.Completeness != nil && len(u.Completeness.Evidence["conditional_value"]) > 0 {
+				f.Uncertainty += " Conditional value paths are present. This static vulnerability judgment is scoped to an unsafe supported path under its configuration/branch precondition, not every runtime configuration; inspect the conditional-expression evidence."
+			}
 		case "supported_potential":
-			f.RecordType = "finding"
-			f.Status = "supported_potential"
+			if f.Status != "poor_practice" {
+				f.RecordType = "analysis"
+				f.Status = "supported_potential"
+			}
 		case "protected_for_claim":
-			f.RecordType = "protection"
-			f.Status = "protected_for_claim"
+			if f.Status != "poor_practice" {
+				f.RecordType = "protection"
+				f.Status = "protected_for_claim"
+			}
 		case "not_applicable":
-			f.RecordType = "analysis"
-			f.Status = "not_applicable"
+			if f.Status != "poor_practice" {
+				f.RecordType = "analysis"
+				f.Status = "not_applicable"
+			}
 		case "needs_evidence":
-			f.Status = "needs_evidence"
+			if f.Status != "poor_practice" {
+				f.Status = "needs_evidence"
+			}
 		}
+	}
+	if f.Status == "poor_practice" {
+		f.Uncertainty += " Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task."
 	}
 	return f
 }

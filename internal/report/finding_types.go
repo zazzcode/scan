@@ -6,11 +6,11 @@ import "github.com/zazzcode/scan/internal/graph"
 var findingTypes = []graph.FindingType{
 	{ID: "sql-injection", Label: "SQL Injection", Coverage: "bounded analysis",
 		Description:    "Input changes executable SQL structure instead of remaining a data value, potentially changing what the database reads or writes.",
-		Interpretation: "An SQL Injection pill identifies the risk family being reviewed. String-built SQL is an observed construction; a library-managed search value may remain unresolved. The finding status and evidence determine the actual claim. The pill alone does not confirm injection.",
+		Interpretation: "An SQL Injection pill identifies the risk family being reviewed. String-built executable SQL is poor practice to remediate even without a proven exploit; a library-managed search value may remain unresolved. The finding status and evidence determine the actual claim. The pill alone does not confirm injection.",
 		Remediation:    "Use the verified driver's parameter-binding API for values. Review dynamic identifiers separately. Keep business-field validation independent of query-structure protection."},
 	{ID: "nosql-injection", Label: "NoSQL Injection", Coverage: "bounded analysis",
 		Description:    "Untrusted input changes a NoSQL query's operators, selector structure, or executable expression rather than remaining an allowed data value.",
-		Interpretation: "A $where string construction or unmodeled document constraint is a review observation, not proof of injection. Inspect actual value types, keys, transformations, library behavior, and the named assessment status.",
+		Interpretation: "Executable $where string construction is poor practice to refactor even without a proven exploit. An unmodeled document constraint alone is Review, not an established defect. Inspect actual value types, keys, transformations, library behavior, and the named status.",
 		Remediation:    "Prefer data-only query APIs, constrain scalar slots and permitted keys/operators, and avoid building executable $where strings from input."},
 	{ID: "input-validation", Label: "Input Validation", Coverage: "bounded analysis",
 		Description:    "Server-side checks enforce the business requirements for a field, such as required presence, runtime type, permitted format, range, or length.",

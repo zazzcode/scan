@@ -2,10 +2,23 @@
 
 ## Purpose and ownership
 
+Public philosophy and report instructions live in root [user documentation](../../docs/README.md),
+including [philosophy](../../docs/philosophy.md) and [interpretation](../../docs/interpreting-results.md).
+This document owns renderer design, not the sole copy of user-facing semantics.
+
+
 HTML is scan's core human-facing report for CLI runs. The canonical JSON is the richer agent-readable
 artifact; SARIF remains the standard interchange output. See [reporting and SARIF](reporting-and-sarif.md)
 for shared statuses and evidence ownership. HTML contains scan's own results only. Comparisons to
 other tools belong in evaluation documents, never in the product report.
+
+## Inconclusive judgments
+
+The human-facing label for raw `unknown`, `uncertain`, and `needs_evidence` values is
+**Inconclusive**. It describes an unresolved judgment within Review, independently of an established
+poor-practice finding on the same operation. Assessment execution remains separate: `not_run` is
+Not assessed, and `failed` is Assessment failed. The renderer MUST preserve raw JSON/provider values
+and source excerpts; display terminology does not change the protocol or assessment outcome.
 
 ## Data path
 
@@ -42,10 +55,10 @@ Saved input is capped at 64 MiB by the shared JSON export reader.
 
 Show one expandable entry per inventoried source, grouped by route ID rather than path alone. Columns:
 source type, method/path signature, **Route location**, finding count, analysis-review count,
-protected-claim count, and row-end finding-type pills. Route location is the source declaration,
+protected-claim count, and row-end finding-type pills in **Categories**. Route location is the source declaration,
 not a finding location. An unresolved entry displays “Not resolved”; operation locations remain
-in the expanded records labeled **Finding location**. Findings appear first, then unresolved analysis and zero-finding entries;
-within these groups, sort by signature with stable input order for ties. Distinct HTTP methods sharing a path remain separate. Today the source type is
+in the expanded records labeled **Finding location**. Sort all route rows lexicographically by route path, then HTTP method, regardless of findings or
+review counts. Keep stable input order for ties and place unresolved entries last. Distinct HTTP methods sharing a path remain separate. Today the source type is
 HTTP route; a use without a matching entry appears under an explicit unresolved entry, never an invented
 route. Other entry types require future detector contracts rather than labels inferred by the viewer.
 
@@ -54,7 +67,7 @@ with column styling, not an ARIA interactive grid. Keyboard activation, visible 
 expand/collapse behavior work without JavaScript. Narrow layouts stack the columns and label counts.
 The expanded row contains:
 
-- Named observed issues, incomplete analysis items, and scoped protection with distinct status labels.
+- Established practice findings, incomplete analysis items, and scoped protection with distinct status labels.
 - Plain-English behavior and separate input-validation / use-protection explanations.
 - Source locations, operation excerpt, resolved inputs and transfer evidence, and additional context.
 - Raw assessment state/provider/model, declared checks, gaps, blockers, and scope limitations.
@@ -66,16 +79,29 @@ vulnerabilities; shared helper observations can appear under several routes. No 
 confirmation is invented for offline observations. The review and runtime-confirmation stages remain
 unimplemented; opening an HTML report does not perform either stage.
 
+## Remediation-first presentation classification
+
+Version 3 implements the [public philosophy](../../docs/philosophy.md): Findings include established
+poor practice to remediate/refactor, even without exploit confirmation. String-built SQL and executable
+NoSQL `$where` construction receive **Poor practice · remediate**. Incomplete validator/document type
+evidence stays Review. Potential model answers alone also stay Review. A deterministic practice
+finding survives inconclusive/failed assessment and a model's protected result for a separate claim.
+Raw assessments remain visible; no new exploit confirmation is invented.
+
+The shared `describe` classification drives row totals, category pill states, JSON, and SARIF. Findings
+show Remediation and Fix scope headings; Review records show investigation and unresolved questions.
+Categories overlap and do not define independent counts. Atomic multi-claim counting remains planned.
+
 ## Finding-type pills and glossary
 
-Presentation version 2 adds `type_ids` to each human-readable finding and a report-level
+Presentation version 2 introduced `type_ids` to each human-readable finding and a report-level
 `finding_types` registry. The canonical definitions live in
 [`internal/report/finding_types.go`](../../internal/report/finding_types.go); [finding-type design](finding-types.md)
 owns their interpretation. JSON carries definitions and references; SARIF retains definitions in
 `scan.findingTypes` and references in `scan.finding`. Existing saved schema-v1 input is reinterpreted
 from raw uses at export time with the current presentation, without upgrading raw assessment state.
 
-Deduplicate type pills per row. Each pill shows the family, record count, and observed/review/potential/
+Deduplicate type pills per row. Each pill shows the family, record count, and poor-practice/review/
 protected/mixed status. A family label such as SQL Injection identifies what is being reviewed, not a
 confirmed vulnerability. Planned types are documented in the glossary but never attached by existing
 detectors. Counts are per use and type; one record can belong to both SQL Injection and Input Validation.
@@ -88,6 +114,16 @@ registry is also available in an inline expandable glossary for reference, print
 without popover support. Popover panels themselves are hidden when printing.
 
 The native behavior follows [MDN's declarative popover guide](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API/Using).
+
+## Soft status palette
+
+Use soft red for scanner-supported definitive vulnerability judgments, orange for established poor
+practice, blue for Review, and green for Protected. Light-grey category cells say None reported. Row backgrounds remain unchanged.
+Keep explicit status labels and readable contrast. The red CSS treatment is reserved for
+`confirmed_vulnerability`, emitted only from the evidence-gated injection judgment described in
+[query judgment design](query-judgment.md). User statements and practice answers must not become
+scanner confirmation through a presentation override. Palette styling is not detection logic.
+The verdict is a bounded static judgment; independent review/runtime confirmation remain separate.
 
 ## Standalone behavior and source safety
 

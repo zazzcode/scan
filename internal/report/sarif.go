@@ -40,7 +40,7 @@ func SARIF(report *graph.StringReport) map[string]any {
 			}
 			rules = append(rules, map[string]any{"id": id, "shortDescription": map[string]string{"text": g.Title}, "help": map[string]string{"text": g.Title + ". " + strings.Join(g.Actions, " "), "markdown": markdown}, "properties": map[string]any{"tags": tags}})
 		}
-		kind, level := resultKind(use.Assessment)
+		kind, level := resultKind(report.Findings[i])
 		route := routeName(report, use)
 		finding := report.Findings[i]
 		message := fmt.Sprintf("%s: %s [%s]. %s %s", route, finding.Title, finding.Status, finding.Summary, finding.Protection)
@@ -126,18 +126,20 @@ func ruleIdentity(use graph.StringUse) (string, string) {
 		return "scan/unresolved-string-use", ""
 	}
 }
-func resultKind(a graph.Assessment) (string, string) {
-	switch a.FindingStatus {
-	case "supported_potential":
-		return "fail", "warning"
-	case "protected_for_claim":
-		return "pass", "none"
-	case "not_applicable":
+func resultKind(f graph.Finding) (string, string) {
+	if f.Status == "not_applicable" {
 		return "notApplicable", "none"
+	}
+	switch f.RecordType {
+	case "finding":
+		return "fail", "warning"
+	case "protection":
+		return "pass", "none"
 	default:
 		return "review", "note"
 	}
 }
+
 func routeName(report *graph.StringReport, use graph.StringUse) string {
 	if use.Check != nil {
 		return use.Check.Method + " " + use.Check.Path

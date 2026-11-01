@@ -77,6 +77,22 @@ controls. Next extend automatic claim assembly to novel targets through the
 [Phase 3/5–8 sequence](../architecture/evidence-and-claims.md#discovery-on-novel-target-repositories);
 explicit check files are evaluation/business-policy inputs, not the final discovery strategy.
 
+## Reducing Review through stronger analysis
+
+The [analysis-certainty improvement plan](analysis-certainty-improvements.md) proposes atomic claims,
+claim-specific blockers, verified library/API models, callback/source provenance, enforcing guards and
+middleware, relevant helper summaries, and evidence-ready semantic assessment. It maps the HTML
+uncertainty text to concrete missing facts and gives acceptance targets and evaluation measures.
+
+Keep the AppSec headers **Findings**, **Review**, and **Protected**, with overlapping **Categories**.
+Count distinct supported issues independently of operation records; a type pill is not an additional
+finding. Preserve Review for unresolved requirements or evidence. Extend the existing checked-mode
+completeness machinery instead of promoting every observed pattern to a true-positive finding.
+
+These are follow-on analysis increments to scope deliberately. They do not authorize a broad engine
+rewrite during logger-leak work, paid evaluations, or target execution. Reduce Review by resolving
+its questions correctly, measuring false findings and false protection alongside coverage.
+
 ## Human report UI and packaged demonstration
 
 The current [human-report contract](../specifications/human-readable-reports.md) adds clearer JSON

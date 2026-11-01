@@ -16,6 +16,13 @@ Automatic reference/line matches are navigation aids, not correctness decisions.
 [Summary counts](inventory-summary.json) and [explicit review decisions](review-decisions.json) are
 versioned separately from the ignored raw reports.
 
+## External exercise report
+
+[Corisco pentest summary](coriscope-pentest-summary.md) summarizes all eleven categories in the
+user-selected 2024 report, preserves attributed scores/CWE IDs, and maps comparison candidates to
+our pinned inventory. Its claims are external evaluation evidence, not automatic scanner verdicts.
+SQL/NoSQL judgment against known-positive, protected, and unknown cases takes priority over logger-leak.
+
 ## Initial source review
 
 | Rule and location | Source-inspected disposition | Reason |
@@ -173,3 +180,6 @@ references live in JSONL. No unreviewed row asserts a scanner miss or a protecte
 | xxeFileDisclosureChallenge | XXE Data Access | XXE | [registry](https://github.com/juice-shop/juice-shop/blob/f189f521266f42c6bd05884468292000cee852ed/data/static/challenges.yml#L1264) |
 | yamlBombChallenge | Memory Bomb | Insecure Deserialization | [registry](https://github.com/juice-shop/juice-shop/blob/f189f521266f42c6bd05884468292000cee852ed/data/static/challenges.yml#L1297) |
 | zeroStarsChallenge | Zero Stars | Improper Input Validation | [registry](https://github.com/juice-shop/juice-shop/blob/f189f521266f42c6bd05884468292000cee852ed/data/static/challenges.yml#L1309) |
+
+Latest scanner work: [SQL/NoSQL judgment calibration](query-judgment-calibration.md), including
+conditional false-positive correction and remaining acceptance checks. Earlier tables are historical.

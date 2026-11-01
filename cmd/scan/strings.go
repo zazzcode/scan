@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 
 	"github.com/zazzcode/scan/internal/graph"
 	"github.com/zazzcode/scan/internal/judge"
@@ -65,8 +66,13 @@ func runStrings(root, entry, routeFilter, checksFile, provider, model string, li
 	}
 	failed := false
 	if client != nil {
-		for i := range report.Uses {
-			if i >= limit {
+		order := make([]int, len(report.Uses))
+		for i := range order {
+			order[i] = i
+		}
+		sort.SliceStable(order, func(a, b int) bool { return queryUse(report.Uses[order[a]]) && !queryUse(report.Uses[order[b]]) })
+		for requestIndex, i := range order {
+			if requestIndex >= limit {
 				report.Uses[i].Assessment.Status = "not_run"
 				report.Uses[i].Assessment.Reason = "judge request limit reached"
 				failed = true
@@ -121,4 +127,8 @@ func runStrings(root, entry, routeFilter, checksFile, provider, model string, li
 		return exitError
 	}
 	return exitOK
+}
+
+func queryUse(use graph.StringUse) bool {
+	return use.Kind == "sql_query_candidate" || use.Kind == "nosql_query_candidate"
 }

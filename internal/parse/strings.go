@@ -104,6 +104,8 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 	}
 	if len(checks) > 0 {
 		set.buildChecks(out, checks)
+	} else {
+		set.automaticQueries(out)
 	}
 	keys := make([]string, 0, len(set.modules))
 	for k := range set.modules {

@@ -275,6 +275,12 @@ func (f *flow) call(n *sitter.Node) value {
 		}
 	}
 	kind := queryKind(name, args, f.module.src, values)
+	if kind == "" && collectionWrite(name) && requestDeps(values) && f.set != nil {
+		probe := graph.StringUse{Sink: f.module.evidence("nosql_query_candidate", n)}
+		if len(f.set.collectionBinding(probe)) > 0 {
+			kind = "nosql_query_candidate"
+		}
+	}
 	if name == "fetch" || name == "axios" || strings.HasPrefix(name, "axios.") {
 		kind = "outbound_http_candidate"
 	}

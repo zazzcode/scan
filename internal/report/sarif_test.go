@@ -9,7 +9,7 @@ import (
 )
 
 func TestSARIFStatusAndRouteEvidence(t *testing.T) {
-	for _, tt := range []struct{ status, kind, level string }{{"supported_potential", "fail", "warning"}, {"protected_for_claim", "pass", "none"}, {"needs_evidence", "review", "note"}} {
+	for _, tt := range []struct{ status, kind, level string }{{"supported_potential", "review", "note"}, {"protected_for_claim", "pass", "none"}, {"needs_evidence", "review", "note"}} {
 		t.Run(tt.status, func(t *testing.T) {
 			e := graph.Evidence{Kind: "request_source", Text: "req.body.email", Span: graph.Span{File: "routes/session handler.ts", StartLine: 4, EndLine: 4, StartByte: 10, EndByte: 24}, SHA256: "snapshot"}
 			use := graph.StringUse{ID: "use", RouteID: "r", Check: &graph.Check{ID: "email-sql", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"email"}}, Sink: e, Dependencies: []graph.Dependency{{Source: e, Transfers: []graph.Evidence{}}}, Context: []graph.Evidence{e, e}, Assessment: graph.Assessment{Status: "completed", FindingStatus: tt.status, Protection: "insufficient"}, Completeness: &graph.Completeness{Evidence: map[string][]graph.Evidence{"sink_binding": {e}}}}

@@ -5,8 +5,8 @@ import (
 )
 
 type htmlTypePill struct {
-	ID, Label, Status, Tone                       string
-	Count, Observed, Review, Potential, Protected int
+	ID, Label, Status, Tone                                      string
+	Count, PoorPractice, Review, Potential, Protected, Confirmed int
 }
 
 func rowTypePills(items []htmlItem) []htmlTypePill {
@@ -25,8 +25,14 @@ func rowTypePills(items []htmlItem) []htmlTypePill {
 			switch item.Finding.Status {
 			case "protected_for_claim":
 				p.Protected++
-			case "observed_pattern":
-				p.Observed++
+			case "confirmed_vulnerability":
+				if id == "sql-injection" || id == "nosql-injection" {
+					p.Confirmed++
+				} else {
+					p.Review++
+				}
+			case "poor_practice":
+				p.PoorPractice++
 			case "supported_potential":
 				p.Potential++
 			default:
@@ -37,12 +43,15 @@ func rowTypePills(items []htmlItem) []htmlTypePill {
 	for i := range pills {
 		p := &pills[i]
 		switch {
+		case p.Confirmed == p.Count:
+			p.Status = "vulnerability"
+			p.Tone = "confirmed-vulnerability"
 		case p.Potential == p.Count:
-			p.Status = "potential issue"
-			p.Tone = "observed"
-		case p.Observed == p.Count:
-			p.Status = "observed"
-			p.Tone = "observed"
+			p.Status = "review"
+			p.Tone = "review"
+		case p.PoorPractice == p.Count:
+			p.Status = "poor practice"
+			p.Tone = "poor-practice"
 		case p.Protected == p.Count:
 			p.Status = "protected"
 			p.Tone = "protected"

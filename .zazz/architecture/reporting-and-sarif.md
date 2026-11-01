@@ -56,17 +56,26 @@ one result record per use. A record includes `id`, `use_id`, `route_id`, `record
 [glossary](finding-types.md); risk families remain separate from assessment status. Evidence stays in the referenced use; it is not replaced by generated prose.
 `internal/report/findings.go` owns interpretation; `guidance.go` owns reviewable remediation.
 
-`record_type` is `finding` for an observed construction/check issue or supported potential issue,
-`analysis` for unresolved sensitive behavior, and `protection` for an assessed protected claim.
-Observation status does not establish exploitability. The existing judge's finding status remains
-separate and unchanged; failed/not-run assessments never become completed verdicts through export.
+The public semantics live in [philosophy](../../docs/philosophy.md) and
+[result interpretation](../../docs/interpreting-results.md). Presentation version 3 uses `record_type`
+`finding` for evidence-gated static vulnerabilities and established poor practice, `analysis` for unresolved behavior/potential model claims,
+and `protection` for an assessed protected claim. The Findings column is not limited to demonstrated
+exploits: an established practice violation is a remediation/refactoring task. `poor_practice`
+replaces the former broad `observed_pattern` presentation status for string-built executable queries.
+
+Unmodeled NoSQL document constraints and absent modeled validator calls alone remain Review. An
+advisory `supported_potential` model answer is retained as Review unless independent deterministic
+practice evidence already establishes a finding. Existing practice findings remain actionable when
+assessment is omitted, fails, is inconclusive, or supports protection for a separate injection claim.
+Raw assessment statuses and answers are never rewritten. A query-shape/library ambiguity such as
+ORM search values remains Review rather than being relabeled as a practice defect.
 
 Descriptions explain behavior and uncertainty in ordinary language. Internal names such as
 `query_text_interpolated` remain available as evidence identifiers, not the primary explanation.
 For example, an interpolated ORM `Op.like` value requires library review rather than an automatic
 SQL-injection finding. NoSQL document values require slot, type, key/operator and API review. NoSQL
 is one word. “No validator identified” applies only to the analyzed slice; unknown validation remains
-unknown. Shared uses count per route and must not be described as unique confirmed vulnerabilities.
+Inconclusive in the human view; raw values remain compatible. Shared uses count per route and must not be described as unique confirmed vulnerabilities.
 
 ## SARIF mapping
 
@@ -103,8 +112,9 @@ The exporter does not recompute or upgrade saved assessments. It rebuilds determ
 presentation from saved raw uses, including for older schema-v1 reports. `scan.finding` preserves the
 human-readable finding alongside `scan.assessment`, source evidence, gaps, and recommendations.
 
-Results map supported_potential to fail/warning, protected_for_claim to pass/none, needs_evidence
-and incomplete assessments to review/note, and not_applicable to notApplicable/none. A pass applies
+SARIF maps presentation Findings (including poor practice) to fail/warning, Protected to pass/none,
+Review to review/note, and not_applicable to notApplicable/none. This uses the shared presentation
+classification rather than raw model status; `scan.assessment` retains the original status. A pass applies
 only to the declared claim. Validation and use-protection answers remain separate in messages and
 properties: safe SQL parameterization can coexist with missing domain validation.
 
@@ -127,3 +137,6 @@ registration value paths or unverified fixes. No GitHub/IDE ingestion test has b
 Phase 9 still owns the stable normalized finding contract, identity/baselines, CI policy and consumer
 integration. This bounded adapter does not complete that phase. Neither JSON nor SARIF changes
 finding eligibility, runtime-confirmation state or independent-review policy.
+
+The [query judgment design](query-judgment.md) owns automatic injection evidence and policy gates.
+Public [analysis rules](../../docs/analysis/README.md) describe SQL/NoSQL and validation semantics.

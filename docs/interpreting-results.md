@@ -1,0 +1,106 @@
+# Interpreting scan results
+
+[Documentation index](README.md) · [Philosophy](philosophy.md) · [Categories](glossary.md)
+
+## Findings, Review, and Protected
+
+| Column | What it establishes | What an agent should do |
+|---|---|---|
+| **Findings** | A named problem exists: a vulnerability or poor practice supported by the rule's evidence | Remediate or refactor it and verify the correction |
+| **Review** | A problem or sufficient protection has not been established | Resolve the evidence or policy question; decide whether a change is needed |
+| **Protected** | Adequate protection for the named claim is supported by the assessment/evidence | Preserve it and check other claims separately |
+
+Poor practice is actionable. It does not need a demonstrated exploit to justify a correct refactor.
+Review is uncertainty about the problem or protection, not an instruction to postpone an established
+problem until someone proves exploitation.
+
+**Inconclusive** means the available evidence does not support a definitive judgment for that
+question. It is a result within Review, not a safe verdict. The human view uses this label for raw
+`unknown`, `uncertain`, and `needs_evidence` values. JSON preserves those machine values for
+compatibility and audit; `not_run` remains **Not assessed** and `failed` remains **Assessment failed**.
+
+## Status colors
+
+The HTML uses soft fills with readable text and explicit labels:
+
+- **Soft red:** a definitive vulnerability judgment supported by scanner analysis.
+- **Soft orange:** established poor practice to remediate or refactor.
+- **Soft blue:** Review; the problem or adequate protection remains unresolved.
+- **Soft green:** protection supported for the named claim.
+- **Light grey:** None reported; no category records for the source entry.
+
+Red is reserved for a definitive scanner verdict. The bounded query classifier can emit a
+source-supported static vulnerability when its injection-specific assessment and evidence gates
+pass. This is not runtime exploit confirmation or a claim of general detection accuracy.
+A user-confirmed example is an acceptance target for improving analysis, not an automatic red override.
+An advisory model answer alone is also insufficient to promote a record. Labels remain visible so
+color is never the only way to understand status.
+
+## Current presentation statuses
+
+| JSON status | Display | Placement |
+|---|---|---|
+| `confirmed_vulnerability` | Confirmed vulnerability · static analysis | Findings; requires injection-specific judgment and claim evidence |
+| `poor_practice` | Poor practice · remediate | Findings; current rules recognize string-built SQL and executable NoSQL `$where` construction |
+| `needs_review` | Analysis needs review | Review; e.g. unmodeled document types, unclear validators, unknown APIs |
+| `needs_evidence` | Inconclusive | Review unless a separate deterministic poor-practice conclusion already holds |
+| `supported_potential` | Potential vulnerability · review | Review; preserve the model's answer without presenting it as an established vulnerability |
+| `protected_for_claim` | Protection supported for this claim | Protected, scoped to the named claim |
+| `not_applicable` | Not applicable to this claim | Review/reference record; not a general safety pass |
+
+The renderer preserves the evidence-gated scanner judgment; an advisory practice answer alone
+does not establish a vulnerability. See the [analysis rules](analysis/database-injection.md).
+Its deterministic poor-practice findings remain actionable if assessment was omitted, failed, or
+cannot decide exploitability. A model-supported protected injection claim also does not automatically
+remove a separately established string-construction practice finding: the two address different
+properties. Raw model answers and statuses stay in the evidence record.
+
+## Counts and categories
+
+Categories identify related risk families and may overlap. One query-construction record can carry
+SQL Injection and Input Validation labels without proving two independent defects. A category name
+is not a vulnerability verdict. Select a pill for a definition and its coverage.
+
+Current output groups one presentation record per raw use. Findings/Review/Protected count those
+records by classification; category counts count associated records and must not be added together.
+One record may contain multiple field or protection concerns. Distinct claim-level counting is a
+planned improvement: independent established problems should ultimately count separately, with
+shared operation/evidence links. Shared helper records can also repeat for multiple routes.
+
+## Locations and evidence
+
+**Route location** points to the route declaration. **Finding location** inside the expanded row
+points to the recorded operation; it can be in another file. Inspect the operation excerpt, inputs,
+transfers, relevant context, guards, and gaps before applying a change. No resolved request dependency
+means external control is unknown, unless there is positive evidence of a constant or trusted source.
+
+A field's business validation and its destination protection are separate questions. SQL binding,
+NoSQL operator/type constraints, numeric conversion, escaping, and arbitrary string filters have
+different effects. An ORM search value containing interpolation is not automatically executable SQL.
+Missing modeled validation alone does not establish that every runtime path lacks validation.
+
+## Remediation workflow
+
+- For Findings, identify the named practice/weakness and its source evidence. Apply the smallest
+  correct remediation, including complementary improvements when each is independently established.
+- For Review, resolve the specific unknown first. Examples include confirming the actual driver,
+  reading a validator body, checking middleware order, and defining the field's business policy.
+- Preserve existing supported protection. Test intended normal input, malformed input, and the
+  operation-specific safety property after making a change.
+
+Report examples are illustrative, not applied or verified patches. JSON includes `entries`, `uses`,
+`gaps`, `files`, `limitations`, presentation `findings`, `finding_types`, and `presentation_version`.
+Human records reference `use_id` and `route_id`; raw assessments preserve provider/model, answers,
+completion status, blockers, and scope. HTML and SARIF are offline views of that evidence.
+
+## Completion and compatibility
+
+`not_run`, `failed`, and `completed` describe semantic-assessment execution, independently of whether
+static analysis establishes poor practice. Exit 0 means the requested operation completed. Exit 1
+indicates execution/requested-assessment failure; a retained report may still contain useful findings.
+Exit 2 means invalid CLI usage. There is currently no finding-severity CI gate.
+
+Presentation version 3 introduces this distinction. Older schema-v1 evidence remains exportable:
+regenerating HTML/SARIF rebuilds the current interpretation from raw uses. Legacy `observed_pattern`
+is not a new verdict. Saved source evidence and model assessments are preserved; previously generated
+views remain snapshots until regenerated. Independent review and runtime confirmation are separate.

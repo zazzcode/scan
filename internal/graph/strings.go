@@ -17,6 +17,7 @@ type Dependency struct {
 
 // StringUse is a candidate use needing context-specific assessment.
 type StringUse struct {
+	APIModel     *APIModel     `json:"api_model,omitempty"`
 	ControlEdges []ControlEdge `json:"control_edges,omitempty"`
 	Check        *Check        `json:"check,omitempty"`
 	Completeness *Completeness `json:"completeness,omitempty"`
@@ -88,11 +89,14 @@ type Check struct {
 
 // Completeness separates claim blockers from unrelated coverage limitations.
 type Completeness struct {
-	Required []string              `json:"required"`
-	Evidence map[string][]Evidence `json:"evidence"`
-	Blockers []Gap                 `json:"blockers"`
-	Coverage []Gap                 `json:"coverage"`
-	Scope    string                `json:"scope"`
+	ModelFacts []string              `json:"model_facts,omitempty"`
+	Resolved   []Gap                 `json:"resolved_gaps,omitempty"`
+	ClaimKind  string                `json:"claim_kind,omitempty"`
+	Required   []string              `json:"required"`
+	Evidence   map[string][]Evidence `json:"evidence"`
+	Blockers   []Gap                 `json:"blockers"`
+	Coverage   []Gap                 `json:"coverage"`
+	Scope      string                `json:"scope"`
 }
 
 // ControlEdge records a source-backed local successor, including both guard outcomes.
@@ -100,4 +104,12 @@ type ControlEdge struct {
 	From Evidence `json:"from"`
 	To   Evidence `json:"to"`
 	Kind string   `json:"kind"`
+}
+
+// APIModel describes a versioned library contract separately from source evidence.
+type APIModel struct {
+	ID        string `json:"id"`
+	Library   string `json:"library"`
+	Semantics string `json:"semantics"`
+	Reference string `json:"reference"`
 }

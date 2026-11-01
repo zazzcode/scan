@@ -51,7 +51,9 @@ exception is not this assignment.
   [AGENTS.md](../../AGENTS.md#authorization-and-delivery); no separate greenlight is required.
 
 **Local session handoff:** when resuming this checkout, read
-[route-string-validation handoff](../ephemeral/route-string-validation-handoff.md) first. It is an
+[SQL/NoSQL judgment handoff](../ephemeral/sql-nosql-judgment-handoff.md) first. It records current
+calibration failures and the logger-leak gate. The earlier
+[route-string-validation handoff](../ephemeral/route-string-validation-handoff.md) is historical context. This is an
 ignored local execution artifact; durable design/contracts/results remain indexed below.
 The initial [Bearer comparison](../evaluation/bearer-results.md) is complete: both samples and
 thirteen controls, no new model calls. Supported same-file and relative-imported helper calls now
@@ -101,6 +103,20 @@ load whole design documents only when the task crosses their boundaries. A link 
 | Implement or resume | Current authorized spec, its local run log, [execution discipline](agent-execution-discipline.md), `spec-driven` | Select relevant standards from the standards index; explicit user implementation requests are sufficient authorization under AGENTS.md |
 | Reassess scope or long-term architecture | Project overview, architecture, scope, then proposal | Load functionality for capability details; prior-art/research docs for evidence behind a disputed choice |
 
+## Product documentation versus SDLC documentation
+
+Root `docs/` owns public philosophy, user/contributor setup, CLI operation, result interpretation,
+and [scan analysis rules and guidelines](../../docs/analysis/README.md). These are product documents
+used by people running scans and agents refining detection. They MUST NOT be placed under `.zazz/`.
+Load the [database injection](../../docs/analysis/database-injection.md),
+[input validation](../../docs/analysis/input-validation.md), and
+[calibration](../../docs/analysis/calibration.md) guides when changing those analyses.
+
+`.zazz/` owns SDLC/process standards, project plans, implementation contracts, internal architecture,
+and evaluation history. `.zazz/ephemeral/` is ignored execution scratch and session handoff only.
+Public rules describe the implemented analysis; current Markdown files are not dynamically loaded
+by the binary. Changes MUST keep those rules, Go evidence/judgment code, and tests aligned.
+
 ## Documentation map
 
 Select the document that owns the topic; do not load every row. Research/design context is preserved
@@ -108,9 +124,11 @@ in these files independently of chat attachments.
 
 | Document | Primary content |
 |---|---|
-| [Project overview](../project.md) | Purpose, [tenets](../project.md#tenets), current state, direction |
+| [User documentation](../../docs/README.md) | Product introduction, agent-first philosophy, setup, use, result interpretation and contributor guides |
+| [Project overview](../project.md) | Purpose, [public philosophy](../../docs/philosophy.md), current state, direction |
 | [Architecture](../architecture.md) | Flow diagrams, judge/provider contracts, analysis semantics, package boundaries |
 | [Repository graph design](../architecture/repository-graph.md) | Target-repository nodes/edges, inbound/outbound API boundaries, response flow, identity and provenance |
+| [SQL/NoSQL judgment design](../architecture/query-judgment.md) | Automatic query claims, model contracts, conditional output facts and policy gates |
 | [Evidence and claims](../architecture/evidence-and-claims.md) | Source-backed route slices, relevant functions, checked requirements and finding eligibility |
 | [Reporting and SARIF](../architecture/reporting-and-sarif.md) | Route-oriented output, remediation options, internal model and implemented bounded SARIF export |
 | [Standalone HTML](../architecture/html-reporting.md) | Core human-facing CLI report, native disclosure rows and JSON/SARIF relationship |
@@ -127,7 +145,8 @@ in these files independently of chat attachments.
 | [Two-case results](../evaluation/juice-shop/results.md) | Known-target Luna outcomes, usage, offline checks and remaining limits |
 | [Bearer comparison plan](../evaluation/bearer-comparison.md) | Repeat/extension protocol; links to pinned results and capability inventory |
 | [Original comparison controls](../evaluation/corpus/README.md) | Label-isolated corpus, Luna outcomes, provenance correction and limitations |
-| [OpenAI Decisions setup](openai-decisions-setup.md) | Project key, local environment, Go transport, access smoke check |
+| [Decision-model user guide](../../docs/decision-models.md) | Provider credentials, environment loading, capped scanner assessment |
+| [Integration evidence](openai-decisions-setup.md) | Historical provider setup, transport and access smoke-check evidence |
 | [Zazz methodology](zazz-methodology.md) | SDLC, ownership, greenlight and review lifecycle |
 | [Specifications](../specifications/README.md) | Execution contracts and index |
 | [Standards index](../standards/index.yaml) | Task-specific engineering standards routing |

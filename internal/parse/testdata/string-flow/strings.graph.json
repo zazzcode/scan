@@ -86,6 +86,239 @@
   ],
   "uses": [
     {
+      "control_edges": [
+        {
+          "from": {
+            "kind": "statement",
+            "text": "const query = `SELECT * FROM users WHERE email = '${email}'`",
+            "span": {
+              "file": "handler.ts",
+              "start_line": 4,
+              "end_line": 4,
+              "start_byte": 107,
+              "end_byte": 167
+            },
+            "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+          },
+          "to": {
+            "kind": "statement",
+            "text": "database.query(query)",
+            "span": {
+              "file": "handler.ts",
+              "start_line": 5,
+              "end_line": 5,
+              "start_byte": 172,
+              "end_byte": 193
+            },
+            "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+          },
+          "kind": "NEXT"
+        },
+        {
+          "from": {
+            "kind": "statement",
+            "text": "const email = req.body.email",
+            "span": {
+              "file": "handler.ts",
+              "start_line": 3,
+              "end_line": 3,
+              "start_byte": 74,
+              "end_byte": 102
+            },
+            "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+          },
+          "to": {
+            "kind": "statement",
+            "text": "const query = `SELECT * FROM users WHERE email = '${email}'`",
+            "span": {
+              "file": "handler.ts",
+              "start_line": 4,
+              "end_line": 4,
+              "start_byte": 107,
+              "end_byte": 167
+            },
+            "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+          },
+          "kind": "NEXT"
+        }
+      ],
+      "check": {
+        "id": "automatic-query",
+        "method": "POST",
+        "path": "/login",
+        "kind": "sql_query",
+        "fields": [
+          "email"
+        ],
+        "validation": "Assess only field requirements established by the supplied code; missing business constraints remain uncertain.",
+        "protection": "Untrusted input must remain data and must not change executable query syntax or selector operators. Evaluate actual transformations and enforcing guards separately from construction practice."
+      },
+      "completeness": {
+        "model_facts": [
+          "Scope is direct Express registrations with syntactically matched earlier middleware and same-route handlers. Matching source bodies or explicit transport/authentication adapter contracts are supplied; unsupported/dynamic chains remain blockers.",
+          "Known express.json/body-parser parsing adapters parse request values and may admit nested JSON objects. They do not enforce an id/email/name field schema or remove query operators from nested fields. A parser call alone is not a validator.",
+          "For this supported registration scope, the discovery-stage generic middleware_unresolved warning is superseded by the supplied route/middleware context. Judge guard effects from those bodies and actual input transformations; do not invent additional undisclosed middleware."
+        ],
+        "resolved_gaps": [
+          {
+            "kind": "middleware_unresolved",
+            "detail": "effective middleware/guard chain is not modeled",
+            "at": {
+              "file": "server.ts",
+              "start_line": 4,
+              "end_line": 4,
+              "start_byte": 102,
+              "end_byte": 136
+            }
+          }
+        ],
+        "claim_kind": "injection",
+        "required": [
+          "request_source",
+          "sql_query_candidate",
+          "route_handler",
+          "sink_binding",
+          "control_flow"
+        ],
+        "evidence": {
+          "control_flow": [
+            {
+              "kind": "handler",
+              "text": "{\n    const email = req.body.email\n    const query = `SELECT * FROM users WHERE email = '${email}'`\n    database.query(query)\n  }",
+              "span": {
+                "file": "handler.ts",
+                "start_line": 2,
+                "end_line": 6,
+                "start_byte": 68,
+                "end_byte": 197
+              },
+              "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+            }
+          ],
+          "handler": [
+            {
+              "kind": "handler",
+              "text": "{\n    const email = req.body.email\n    const query = `SELECT * FROM users WHERE email = '${email}'`\n    database.query(query)\n  }",
+              "span": {
+                "file": "handler.ts",
+                "start_line": 2,
+                "end_line": 6,
+                "start_byte": 68,
+                "end_byte": 197
+              },
+              "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+            }
+          ],
+          "registration": [
+            {
+              "kind": "registration",
+              "text": "app.post('/login', authenticate())",
+              "span": {
+                "file": "server.ts",
+                "start_line": 4,
+                "end_line": 4,
+                "start_byte": 102,
+                "end_byte": 136
+              },
+              "sha256": "7fc7eba69407c02911fec45c7110a35c520babcdea6f788890b08e9c991fec5d"
+            }
+          ],
+          "request_source": [
+            {
+              "kind": "request_source",
+              "text": "req.body.email",
+              "span": {
+                "file": "handler.ts",
+                "start_line": 3,
+                "end_line": 3,
+                "start_byte": 88,
+                "end_byte": 102
+              },
+              "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+            }
+          ],
+          "route_handler": [
+            {
+              "kind": "route_handler",
+              "text": "{\n    const email = req.body.email\n    const query = `SELECT * FROM users WHERE email = '${email}'`\n    database.query(query)\n  }",
+              "span": {
+                "file": "handler.ts",
+                "start_line": 2,
+                "end_line": 6,
+                "start_byte": 68,
+                "end_byte": 197
+              },
+              "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+            }
+          ],
+          "route_registration": [
+            {
+              "kind": "route_registration",
+              "text": "app.post('/login', authenticate())",
+              "span": {
+                "file": "server.ts",
+                "start_line": 4,
+                "end_line": 4,
+                "start_byte": 102,
+                "end_byte": 136
+              },
+              "sha256": "7fc7eba69407c02911fec45c7110a35c520babcdea6f788890b08e9c991fec5d"
+            }
+          ],
+          "sql_query_candidate": [
+            {
+              "kind": "sql_query_candidate",
+              "text": "database.query(query)",
+              "span": {
+                "file": "handler.ts",
+                "start_line": 5,
+                "end_line": 5,
+                "start_byte": 172,
+                "end_byte": 193
+              },
+              "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+            }
+          ]
+        },
+        "blockers": [
+          {
+            "kind": "sink_binding_unverified",
+            "detail": "candidate API shape; library binding/argument roles require review",
+            "at": {
+              "file": "handler.ts",
+              "start_line": 5,
+              "end_line": 5,
+              "start_byte": 172,
+              "end_byte": 193
+            }
+          }
+        ],
+        "coverage": [
+          {
+            "kind": "query_text_interpolated",
+            "detail": "request-controlled value is built into executable query text",
+            "at": {
+              "file": "handler.ts",
+              "start_line": 5,
+              "end_line": 5,
+              "start_byte": 172,
+              "end_byte": 193
+            }
+          },
+          {
+            "kind": "input_validation_absent",
+            "detail": "req.body.email reaches a sensitive use with no validator call in the handler or applicable middleware",
+            "at": {
+              "file": "handler.ts",
+              "start_line": 5,
+              "end_line": 5,
+              "start_byte": 172,
+              "end_byte": 193
+            }
+          }
+        ],
+        "scope": "injection claim over the supplied route, relevant request values, verified operation contract and guard/transfer context"
+      },
       "id": "use:route:server.ts:102:POST:/login:handler.ts:172",
       "route_id": "route:server.ts:102:POST:/login",
       "kind": "sql_query_candidate",
@@ -168,6 +401,30 @@
         }
       ],
       "context": [
+        {
+          "kind": "route_registration",
+          "text": "app.post('/login', authenticate())",
+          "span": {
+            "file": "server.ts",
+            "start_line": 4,
+            "end_line": 4,
+            "start_byte": 102,
+            "end_byte": 136
+          },
+          "sha256": "7fc7eba69407c02911fec45c7110a35c520babcdea6f788890b08e9c991fec5d"
+        },
+        {
+          "kind": "route_handler",
+          "text": "{\n    const email = req.body.email\n    const query = `SELECT * FROM users WHERE email = '${email}'`\n    database.query(query)\n  }",
+          "span": {
+            "file": "handler.ts",
+            "start_line": 2,
+            "end_line": 6,
+            "start_byte": 68,
+            "end_byte": 197
+          },
+          "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+        },
         {
           "kind": "registration",
           "text": "app.post('/login', authenticate())",

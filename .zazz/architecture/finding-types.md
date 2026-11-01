@@ -2,6 +2,10 @@
 
 ## Purpose
 
+The public philosophy and result meanings live in [root user documentation](../../docs/README.md),
+with [category guidance](../../docs/glossary.md) and [remediation philosophy](../../docs/philosophy.md).
+This document owns the internal taxonomy contract.
+
 Use one project vocabulary across canonical JSON, standalone HTML, and SARIF. A type describes the
 risk family under review; the result status describes what the evidence establishes. Type labels
 must not independently promote an observation or unresolved analysis item to a vulnerability.
@@ -10,7 +14,7 @@ This taxonomy is scan's terminology contract, not a claim that every listed dete
 The authoritative definition registry is
 [`internal/report/finding_types.go`](../../internal/report/finding_types.go). Each definition has a
 stable `id`, display `label`, plain-English `description`, `interpretation`, `remediation` approach,
-and `coverage`. Human findings reference it through `type_ids`. Presentation version 2 embeds the
+and `coverage`. Human findings reference it through `type_ids`. Presentation version 2 introduced the
 registry as `finding_types`; schema-v1 raw evidence remains unchanged and compatible.
 
 ## Initial vocabulary
@@ -44,7 +48,7 @@ names. SQL and NoSQL uses can also carry Input Validation when field/check evide
 A record may therefore reference several types. Keep all raw use IDs, route IDs, gaps, assessments,
 and completeness evidence intact; this is presentation classification, not another detector.
 
-Rows show each type once, counting associated records. Pill labels preserve observed, potential,
+Rows show each type once, counting associated records. Pill labels preserve poor-practice,
 review, protected, or mixed state. Mixed-state aggregation must not conceal protected or unresolved
 records by assigning the entire family the most severe state. Type counts overlap across families
 and must not be summed into a unique-finding count.

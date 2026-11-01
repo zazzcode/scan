@@ -154,11 +154,31 @@
         "protection": "separate data from SQL structure"
       },
       "completeness": {
+        "model_facts": [
+          "Scope is direct Express registrations with syntactically matched earlier middleware and same-route handlers. Matching source bodies or explicit transport/authentication adapter contracts are supplied; unsupported/dynamic chains remain blockers.",
+          "Known express.json/body-parser parsing adapters parse request values and may admit nested JSON objects. They do not enforce an id/email/name field schema or remove query operators from nested fields. A parser call alone is not a validator.",
+          "For this supported registration scope, the discovery-stage generic middleware_unresolved warning is superseded by the supplied route/middleware context. Judge guard effects from those bodies and actual input transformations; do not invent additional undisclosed middleware."
+        ],
+        "resolved_gaps": [
+          {
+            "kind": "middleware_unresolved",
+            "detail": "effective middleware/guard chain is not modeled",
+            "at": {
+              "file": "server.ts",
+              "start_line": 4,
+              "end_line": 4,
+              "start_byte": 102,
+              "end_byte": 136
+            }
+          }
+        ],
+        "claim_kind": "injection",
         "required": [
           "request_source",
           "sql_query_candidate",
           "route_handler",
-          "sink_binding"
+          "sink_binding",
+          "control_flow"
         ],
         "evidence": {
           "control_flow": [
@@ -275,17 +295,6 @@
         ],
         "coverage": [
           {
-            "kind": "middleware_unresolved",
-            "detail": "effective middleware/guard chain is not modeled",
-            "at": {
-              "file": "server.ts",
-              "start_line": 4,
-              "end_line": 4,
-              "start_byte": 102,
-              "end_byte": 136
-            }
-          },
-          {
             "kind": "query_text_interpolated",
             "detail": "request-controlled value is built into executable query text",
             "at": {
@@ -308,7 +317,7 @@
             }
           }
         ],
-        "scope": "declared check over the supplied route and local source-to-SQL evidence"
+        "scope": "injection claim over the supplied route, relevant request values, verified operation contract and guard/transfer context"
       },
       "id": "use:route:server.ts:102:POST:/login:handler.ts:172/login-input",
       "route_id": "route:server.ts:102:POST:/login",

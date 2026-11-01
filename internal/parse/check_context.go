@@ -101,7 +101,13 @@ func (s *moduleSet) chainEvidence(report *graph.StringReport, check graph.Check)
 			continue
 		}
 		for i := uint(1); i < args.NamedChildCount(); i++ {
-			hm, body, req, more := s.handler(m, args.NamedChild(i))
+			arg := args.NamedChild(i)
+			if adapter := s.authenticationAdapter(m, arg); len(adapter) > 0 {
+				context = append(context, adapter...)
+				continue
+			}
+			context = append(context, s.wrapperContext(m, arg)...)
+			hm, body, req, more := s.handler(m, arg)
 			gaps = append(gaps, more...)
 			if body == nil {
 				continue
