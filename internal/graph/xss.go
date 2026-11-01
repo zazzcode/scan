@@ -23,6 +23,8 @@ type XSSFacts struct {
 	OriginResolved   bool     `json:"origin_resolved"`
 	ResponsePath     string   `json:"response_path,omitempty"`
 	ResponseMethod   string   `json:"response_method,omitempty"`
+	// ResponseField is the JSON path a browser output reads from that response.
+	ResponseField string `json:"response_field,omitempty"`
 	// Paths is present only when sibling source paths differ in protection, so a
 	// protected or unknown path is never read as covering an unsafe one.
 	Paths []XSSPath `json:"paths,omitempty"`

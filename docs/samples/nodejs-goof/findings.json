@@ -279,12 +279,12 @@
       "use_id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:108",
       "route_id": "route:app.js:1652:POST:/account_details",
       "record_type": "analysis",
-      "status": "needs_evidence",
+      "status": "needs_review",
       "title": "Escaped fields observed; request-controlled rendering options need review",
       "summary": "The template escapes these field expressions, but the handler also forwards request-derived data as the complete rendering options object. That can affect template selection or engine options. Field escaping alone does not establish protection for this rendering flow.",
       "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
-      "use_protection": "Decision XSS exposure: Inconclusive. Scanner policy: The XSS claim has missing or unresolved source-backed evidence.",
-      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
+      "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
         "title": "Protect the specific browser rendering context",
         "actions": [
@@ -873,9 +873,9 @@
       "route_id": "route:routes/users.js:654:POST:/:mount:app.js:2105:/users",
       "record_type": "analysis",
       "status": "needs_review",
-      "title": "Request-field validation evidence is incomplete",
+      "title": "Request-field validation needs review",
       "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.address is read and no handler or applicable middleware validator handles it",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body.address before the sink, and that call is not a proven validator",
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
@@ -898,9 +898,9 @@
       "route_id": "route:routes/users.js:654:POST:/:mount:app.js:2105:/users",
       "record_type": "analysis",
       "status": "needs_review",
-      "title": "Request-field validation evidence is incomplete",
+      "title": "Request-field validation needs review",
       "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.name is read and no handler or applicable middleware validator handles it",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body.name before the sink, and that call is not a proven validator",
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
@@ -923,9 +923,9 @@
       "route_id": "route:routes/users.js:654:POST:/:mount:app.js:2105:/users",
       "record_type": "analysis",
       "status": "needs_review",
-      "title": "Request-field validation evidence is incomplete",
+      "title": "Request-field validation needs review",
       "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.role is read and no handler or applicable middleware validator handles it",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body.role before the sink, and that call is not a proven validator",
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
@@ -7343,6 +7343,42 @@
                 "end_byte": 2685
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
           ]
         },
@@ -7380,6 +7416,72 @@
               "end_line": 125,
               "start_byte": 2712,
               "end_byte": 3493
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3242
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3266
             }
           },
           {
@@ -7435,6 +7537,234 @@
                 "end_line": 104,
                 "start_byte": 2667,
                 "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
@@ -7563,6 +7893,72 @@
           }
         },
         {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3242
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3266
+          }
+        },
+        {
           "kind": "render_options_unresolved",
           "detail": "Request-controlled whole-object render locals can also supply template-engine options.",
           "at": {
@@ -7575,180 +7971,8 @@
         }
       ],
       "assessment": {
-        "answer_details": {
-          "encoding_adequacy": {
-            "choice": "unknown",
-            "confidence": 0.45,
-            "probabilities": [
-              {
-                "value": "adequate",
-                "probability": 0.27
-              },
-              {
-                "value": "inadequate",
-                "probability": 0.11
-              },
-              {
-                "value": "not_present",
-                "probability": 0.03
-              },
-              {
-                "value": "unknown",
-                "probability": 0.59
-              }
-            ]
-          },
-          "output_context": {
-            "choice": "html_text",
-            "confidence": 0.52,
-            "probabilities": [
-              {
-                "value": "html_text",
-                "probability": 0.57
-              },
-              {
-                "value": "html_attribute",
-                "probability": 0.01
-              },
-              {
-                "value": "url",
-                "probability": 0
-              },
-              {
-                "value": "script",
-                "probability": 0
-              },
-              {
-                "value": "style",
-                "probability": 0
-              },
-              {
-                "value": "unquoted_attribute",
-                "probability": 0
-              },
-              {
-                "value": "active_attribute",
-                "probability": 0
-              },
-              {
-                "value": "html_tag",
-                "probability": 0
-              },
-              {
-                "value": "template_code",
-                "probability": 0
-              },
-              {
-                "value": "unknown",
-                "probability": 0.42
-              }
-            ]
-          },
-          "sanitizer_effectiveness": {
-            "choice": "unknown",
-            "confidence": 0.6,
-            "probabilities": [
-              {
-                "value": "effective",
-                "probability": 0.04
-              },
-              {
-                "value": "ineffective",
-                "probability": 0.09
-              },
-              {
-                "value": "absent",
-                "probability": 0.17
-              },
-              {
-                "value": "unknown",
-                "probability": 0.7
-              }
-            ]
-          },
-          "xss_all_paths_protected": {
-            "choice": "unknown",
-            "confidence": 0.96,
-            "probabilities": [
-              {
-                "value": "yes",
-                "probability": 0.01
-              },
-              {
-                "value": "no",
-                "probability": 0.02
-              },
-              {
-                "value": "unknown",
-                "probability": 0.97
-              }
-            ]
-          },
-          "xss_exposure": {
-            "choice": "unknown",
-            "confidence": 0.99,
-            "probabilities": [
-              {
-                "value": "vulnerable",
-                "probability": 0
-              },
-              {
-                "value": "protected",
-                "probability": 0.01
-              },
-              {
-                "value": "unknown",
-                "probability": 0.99
-              },
-              {
-                "value": "not_applicable",
-                "probability": 0
-              }
-            ]
-          }
-        },
-        "finding_status": "needs_evidence",
-        "blocking_gaps": [
-          {
-            "kind": "render_protection_unresolved",
-            "detail": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
-            "at": {
-              "file": "views/account.hbs",
-              "start_line": 6,
-              "end_line": 6,
-              "start_byte": 108,
-              "end_byte": 121
-            }
-          },
-          {
-            "kind": "xss_context_unresolved",
-            "detail": "Answers must agree with the established rendering context and protection facts.",
-            "at": {
-              "file": "",
-              "start_line": 0,
-              "end_line": 0,
-              "start_byte": 0,
-              "end_byte": 0
-            }
-          }
-        ],
-        "answers": {
-          "encoding_adequacy": "unknown",
-          "output_context": "html_text",
-          "sanitizer_effectiveness": "unknown",
-          "xss_all_paths_protected": "unknown",
-          "xss_exposure": "unknown"
-        },
-        "usage": {
-          "input_tokens": 4288,
-          "output_tokens": 0
-        },
-        "status": "completed",
-        "provider": "openai",
-        "model": "gpt-6-luna",
-        "question_version": "xss-use-v1",
-        "protection": "uncertain",
-        "reason": "The XSS claim has missing or unresolved source-backed evidence."
+        "status": "not_run",
+        "reason": "The saved decision was made for earlier evidence; changed evidence does not inherit it, and a fresh judgment requires separate authorization."
       }
     },
     {
@@ -7820,6 +8044,42 @@
                 "end_byte": 2685
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
           ]
         },
@@ -7857,6 +8117,72 @@
               "end_line": 125,
               "start_byte": 2712,
               "end_byte": 3493
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3242
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3266
             }
           },
           {
@@ -7912,6 +8238,234 @@
                 "end_line": 104,
                 "start_byte": 2667,
                 "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
@@ -8037,6 +8591,72 @@
             "end_line": 125,
             "start_byte": 2712,
             "end_byte": 3493
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3242
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3266
           }
         },
         {
@@ -8124,6 +8744,42 @@
                 "end_byte": 2685
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
           ]
         },
@@ -8161,6 +8817,72 @@
               "end_line": 125,
               "start_byte": 2712,
               "end_byte": 3493
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3242
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3266
             }
           },
           {
@@ -8216,6 +8938,234 @@
                 "end_line": 104,
                 "start_byte": 2667,
                 "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
@@ -8341,6 +9291,72 @@
             "end_line": 125,
             "start_byte": 2712,
             "end_byte": 3493
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3242
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3266
           }
         },
         {
@@ -8428,6 +9444,42 @@
                 "end_byte": 2685
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
           ]
         },
@@ -8465,6 +9517,72 @@
               "end_line": 125,
               "start_byte": 2712,
               "end_byte": 3493
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3242
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3266
             }
           },
           {
@@ -8520,6 +9638,234 @@
                 "end_line": 104,
                 "start_byte": 2667,
                 "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
@@ -8645,6 +9991,72 @@
             "end_line": 125,
             "start_byte": 2712,
             "end_byte": 3493
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3242
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3266
           }
         },
         {
@@ -8732,6 +10144,42 @@
                 "end_byte": 2685
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
           ]
         },
@@ -8769,6 +10217,72 @@
               "end_line": 125,
               "start_byte": 2712,
               "end_byte": 3493
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3242
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3266
             }
           },
           {
@@ -8824,6 +10338,234 @@
                 "end_line": 104,
                 "start_byte": 2667,
                 "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
@@ -8949,6 +10691,72 @@
             "end_line": 125,
             "start_byte": 2712,
             "end_byte": 3493
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3242
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3266
           }
         },
         {
@@ -9036,6 +10844,42 @@
                 "end_byte": 2685
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "request_source",
+              "text": "req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2677,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
           ]
         },
@@ -9073,6 +10917,72 @@
               "end_line": 125,
               "start_byte": 2712,
               "end_byte": 3493
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3184
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 116,
+              "end_line": 116,
+              "start_byte": 3175,
+              "end_byte": 3209
+            }
+          },
+          {
+            "kind": "unknown_value",
+            "detail": "unresolved local value: validator",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3242
+            }
+          },
+          {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: validator.rtrim",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 117,
+              "end_line": 117,
+              "start_byte": 3233,
+              "end_byte": 3266
             }
           },
           {
@@ -9128,6 +11038,234 @@
                 "end_line": 104,
                 "start_byte": 2667,
                 "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.firstname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3191,
+                "end_byte": 3208
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3175,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.firstname = validator.rtrim(profile.firstname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 116,
+                "end_line": 116,
+                "start_byte": 3155,
+                "end_byte": 3209
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "property_read",
+              "text": "profile.lastname",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3249,
+                "end_byte": 3265
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3233,
+                "end_byte": 3266
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "profile.lastname = validator.rtrim(profile.lastname)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 3214,
+                "end_byte": 3266
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             }
@@ -9253,6 +11391,72 @@
             "end_line": 125,
             "start_byte": 2712,
             "end_byte": 3493
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3184
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 116,
+            "end_line": 116,
+            "start_byte": 3175,
+            "end_byte": 3209
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3242
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: validator.rtrim",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 117,
+            "end_line": 117,
+            "start_byte": 3233,
+            "end_byte": 3266
           }
         },
         {
@@ -19831,8 +22035,8 @@
           }
         },
         {
-          "kind": "input_validation_absent",
-          "detail": "req.body.address is read and no handler or applicable middleware validator handles it",
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body.address before the sink, and that call is not a proven validator",
           "at": {
             "file": "routes/users.js",
             "start_line": 33,
@@ -19976,8 +22180,8 @@
           }
         },
         {
-          "kind": "input_validation_absent",
-          "detail": "req.body.name is read and no handler or applicable middleware validator handles it",
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body.name before the sink, and that call is not a proven validator",
           "at": {
             "file": "routes/users.js",
             "start_line": 32,
@@ -20121,8 +22325,8 @@
           }
         },
         {
-          "kind": "input_validation_absent",
-          "detail": "req.body.role is read and no handler or applicable middleware validator handles it",
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body.role before the sink, and that call is not a proven validator",
           "at": {
             "file": "routes/users.js",
             "start_line": 34,

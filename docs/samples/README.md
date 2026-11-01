@@ -18,7 +18,8 @@ filter. Server/API routes and browser/client-side sources have separate sections
 baseline flows are vulnerable, protected or unresolved, independently of detector output. Goof's
 [Bearer baseline](nodejs-goof/bearer/20261101-goof-baseline-02/SUMMARY.md) and
 [five-case Decisions evaluation](nodejs-goof/decisions/20261101-five-case-01/README.md) are saved
-separately from the canonical zazzles results.
+separately from the canonical zazzles results. Semgrep CE comparison runs follow the
+[Semgrep CE cheat sheet](../semgrep-ce-cheat-sheet.md) and stay under `_test-findings`.
 
 Reports start with the grouped Findings → Review → Protected sort, highest counts first, then route
 path A–Z; blank rows appear last. Click that grouped header or Route signature to change the order.
@@ -41,7 +42,7 @@ python3 docs/samples/refresh.py --scan ./bin/scan
 ```
 
 This updates presentation only, offline. To publish improved analysis, run a fresh target scan into
-your normal external findings directory, replace the corresponding sample `findings.json` with that
+your external findings directory (`<DEV_ROOT>/zazzcode/zazzles/_test-findings/`), replace the corresponding sample `findings.json` with that
 run's canonical JSON, update its README's target revision/date/assessment coverage, then run the
 refresh command. The script normalizes the public root label and exports matching HTML/SARIF.
 

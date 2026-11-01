@@ -82,6 +82,7 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 		return nil, err
 	}
 	set.linkStoredXSS(out)
+	set.linkCrossTierXSS(out)
 	assembleXSSClaims(out)
 	if len(checks) > 0 {
 		set.buildChecks(out, checks)

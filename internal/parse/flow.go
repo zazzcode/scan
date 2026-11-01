@@ -13,14 +13,16 @@ type value struct {
 	urlParams          bool
 	trustedContext     string
 	apiPath, apiMethod string
-	model              string
-	read               *graph.Evidence
-	fields             map[string]value
-	templateFile       string
-	outputHTML         bool
-	outputContext      string
-	deps               []graph.Dependency
-	gaps               []graph.Gap
+	// responseField is the JSON path read from an API response ("data[].id"); "*" when ambiguous.
+	responseField string
+	model         string
+	read          *graph.Evidence
+	fields        map[string]value
+	templateFile  string
+	outputHTML    bool
+	outputContext string
+	deps          []graph.Dependency
+	gaps          []graph.Gap
 }
 type flow struct {
 	client       *clientContext
@@ -212,13 +214,7 @@ func (f *flow) branches(n *sitter.Node) {
 		for _, e := range exits {
 			branch := e.env[key]
 			if e.branch != nil {
-				branch.deps = append([]graph.Dependency{}, branch.deps...)
-				for i, d := range branch.deps {
-					if count[dependencyKey(d)] < len(exits) {
-						d.Transfers = append(append([]graph.Evidence{}, d.Transfers...), *e.branch)
-						branch.deps[i] = d
-					}
-				}
+				branch = tagBranch(branch, *e.branch, func(d graph.Dependency) bool { return count[dependencyKey(d)] < len(exits) }, 0)
 			}
 			v = combine(v, branch)
 		}
@@ -286,7 +282,20 @@ func (f *flow) eval(n *sitter.Node) value {
 		if v, ok := f.storedProperty(n); ok {
 			return v
 		}
-		v := f.children(n)
+		obj := n.ChildByFieldName("object")
+		base := f.eval(obj)
+		v := base
+		segment := "[]"
+		if n.Kind() == "member_expression" {
+			if prop := n.ChildByFieldName("property"); prop != nil {
+				segment = prop.Utf8Text(src)
+			}
+		} else {
+			v = combine(v, f.eval(n.ChildByFieldName("index")))
+		}
+		if base.apiPath != "" && base.responseField != "*" {
+			v.responseField = joinField(base.responseField, segment)
+		}
 		return f.transfer(v, "property_read", n)
 	case "assignment_expression":
 		left := n.ChildByFieldName("left")
@@ -302,7 +311,7 @@ func (f *flow) eval(n *sitter.Node) value {
 			if left.Utf8Text(src) == f.response {
 				f.response = ""
 			}
-		} else {
+		} else if !f.assignLocalField(left, v) {
 			f.assignStoredField(left, v)
 			v.gaps = append(v.gaps, f.gap("unsupported_write", "heap/property assignment is not modeled", n))
 		}
@@ -459,7 +468,9 @@ func combine(a, b value) value {
 		a.trustedContext = b.trustedContext
 	}
 	if a.apiPath == "" {
-		a.apiPath, a.apiMethod = b.apiPath, b.apiMethod
+		a.apiPath, a.apiMethod, a.responseField = b.apiPath, b.apiMethod, b.responseField
+	} else if b.apiPath != "" && (b.apiPath != a.apiPath || b.responseField != a.responseField) {
+		a.responseField = "*"
 	}
 	if a.outputContext == "" {
 		a.outputContext = b.outputContext
@@ -520,6 +531,9 @@ func (f *flow) call(n *sitter.Node) value {
 			arg := args.NamedChild(i)
 			if isFunction(arg) && modelCall {
 				f.modelCallback(arg, modelValue, name)
+				values = append(values, value{})
+			} else if isFunction(arg) && f.client == nil && continuationCall(fn, f.module.src) {
+				f.enterContinuation(arg)
 				values = append(values, value{})
 			} else {
 				values = append(values, f.eval(arg))
@@ -615,6 +629,26 @@ func (f *flow) call(n *sitter.Node) value {
 	return f.transfer(v, "call_argument_dependency", n)
 }
 
+// tagBranch appends a branch condition to the selected dependencies of a value
+// and of its nested fields, so a field read later keeps the same precondition.
+func tagBranch(v value, branch graph.Evidence, selected func(graph.Dependency) bool, depth int) value {
+	v.deps = append([]graph.Dependency{}, v.deps...)
+	for i, d := range v.deps {
+		if selected(d) {
+			d.Transfers = append(append([]graph.Evidence{}, d.Transfers...), branch)
+			v.deps[i] = d
+		}
+	}
+	if len(v.fields) > 0 && depth < 8 {
+		fields := map[string]value{}
+		for k, field := range v.fields {
+			fields[k] = tagBranch(field, branch, selected, depth+1)
+		}
+		v.fields = fields
+	}
+	return v
+}
+
 func dependencyKey(d graph.Dependency) string {
 	var b strings.Builder
 	key := func(e graph.Evidence) {
@@ -634,4 +668,127 @@ func copyValues(in map[string]value) map[string]value {
 		out[k] = v
 	}
 	return out
+}
+
+func joinField(base, segment string) string {
+	switch {
+	case base == "":
+		return segment
+	case segment == "[]":
+		return base + "[]"
+	}
+	return base + "." + segment
+}
+
+// assignLocalField records a write such as result.data[0] = v into the fields of
+// a local object value. Model instances keep their storage semantics instead.
+func (f *flow) assignLocalField(left *sitter.Node, v value) bool {
+	var path []string
+	n := left
+	for n != nil && (n.Kind() == "member_expression" || n.Kind() == "subscript_expression") {
+		segment := "[]"
+		if n.Kind() == "member_expression" {
+			prop := n.ChildByFieldName("property")
+			if prop == nil {
+				return false
+			}
+			segment = prop.Utf8Text(f.module.src)
+		}
+		path = append([]string{segment}, path...)
+		n = n.ChildByFieldName("object")
+	}
+	if n == nil || n.Kind() != "identifier" || len(path) == 0 {
+		return false
+	}
+	name := n.Utf8Text(f.module.src)
+	base, ok := f.env[name]
+	if !ok || base.model != "" || base.domNode || f.client != nil {
+		return false
+	}
+	f.env[name] = withField(base, path, v)
+	return true
+}
+
+func withField(base value, path []string, v value) value {
+	fields := map[string]value{}
+	for k, old := range base.fields {
+		fields[k] = old
+	}
+	child := v
+	if len(path) > 1 {
+		child = withField(fields[path[0]], path[1:], v)
+	}
+	fields[path[0]] = child
+	out := combine(base, v)
+	out.fields = fields
+	return out
+}
+
+// fieldValue resolves a JSON path (as produced by joinField) in a value's fields.
+func fieldValue(v value, path string) (value, bool) {
+	if path == "" {
+		return v, true
+	}
+	for _, segment := range strings.Split(strings.ReplaceAll(path, "[]", ".[]"), ".") {
+		if segment == "" {
+			continue
+		}
+		next, ok := v.fields[segment]
+		if !ok {
+			return value{}, false
+		}
+		v = next
+	}
+	return v, true
+}
+
+func continuationCall(fn *sitter.Node, src []byte) bool {
+	if fn.Kind() != "member_expression" {
+		return false
+	}
+	prop := fn.ChildByFieldName("property")
+	if prop == nil {
+		return false
+	}
+	switch prop.Utf8Text(src) {
+	case "then", "catch", "finally":
+		return true
+	}
+	return false
+}
+
+// enterContinuation follows a promise continuation with the handler's request,
+// response and closure bindings. Its parameters are external results, not request
+// data; scheduling and rejection ordering remain unmodeled.
+func (f *flow) enterContinuation(fn *sitter.Node) {
+	if f.depth >= 3 {
+		f.gaps = append(f.gaps, f.gap("unsupported_callback", "promise continuation depth limit reached", fn))
+		return
+	}
+	child := *f
+	child.env = copyValues(f.env)
+	child.context = append(append([]graph.Evidence{}, f.context...), f.module.evidence("async_continuation", fn))
+	child.gaps = append(append([]graph.Gap{}, f.gaps...), f.gap("async_continuation", "promise continuation traversed; scheduling and rejection paths are not modeled", fn))
+	child.uses, child.returns = nil, nil
+	child.depth = f.depth + 1
+	if params, ok := functionParameters(fn, f.module.src); ok {
+		for _, p := range params {
+			child.env[p.name] = value{gaps: []graph.Gap{{Kind: "async_result_unresolved", Detail: "continuation argument is an external result: " + p.name, At: spanOf(f.module.file, p.node)}}}
+			if p.name == child.request {
+				child.request = ""
+			}
+			if p.name == child.response {
+				child.response = ""
+			}
+		}
+	}
+	child.statements(fn.ChildByFieldName("body"))
+	f.uses = append(f.uses, child.uses...)
+	for _, g := range child.gaps[len(f.gaps)+1:] {
+		switch g.Kind {
+		case "work_limit", "helper_call_limit", "recursive_helper":
+			f.gaps = append(f.gaps, g)
+		}
+	}
+	f.work = child.work
 }

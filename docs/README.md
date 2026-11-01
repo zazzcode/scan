@@ -22,6 +22,7 @@ and intended behavior visible so an agent can apply and verify an appropriate ch
 | [Category glossary](glossary.md) | SQL/NoSQL, validation, outbound requests, and planned categories |
 | [Decision-model setup](decision-models.md) | Optional provider keys, model selection, capped assessment, and failures |
 | [CI/CD artifacts](ci.md) | Saving and consuming reports in build pipelines |
+| [Semgrep CE cheat sheet](semgrep-ce-cheat-sheet.md) | Running Semgrep Community Edition locally as a comparison scanner |
 | [Contributing](contributing.md) | Development checks, feature branches, review, and documentation ownership |
 
 ## First steps

@@ -1,6 +1,6 @@
-# zazzles
+# Zazzles
 
-`zazzles` is a Go static application security scanner (SAST) and dependency-audit CLI under active
+Zazzles is a Go static application security scanner (SAST) and dependency-audit CLI under active
 development. It aims to help developers and coding agents understand how request inputs reach
 security-sensitive operations,
 what validation and protection already hold, and where code needs hardening. Reports should give
@@ -13,33 +13,46 @@ unknown rather than becoming a safety claim or a vulnerability by assumption.
 
 ## Explore sample findings
 
-See the expandable report UI and source evidence from two intentionally vulnerable applications:
+See the expandable report UI and source evidence from three intentionally vulnerable applications:
 
 | Application | What the current sample shows | Output |
 |---|---|---|
-| **OWASP Juice Shop** | 152 route entries; 3 static injection findings, a credential written to access logs, and 3 query-construction findings | [View in browser](https://zazzcode.github.io/zazzles/juice-shop/findings.html) · [HTML file](docs/samples/juice-shop/findings.html) · [JSON](docs/samples/juice-shop/findings.json) · [SARIF](docs/samples/juice-shop/findings.sarif) |
-| **Vulnerable TypeScript app** | 19 route entries; a password logged in SQL text (Review) and other evidence and incomplete-analysis records | [View in browser](https://zazzcode.github.io/zazzles/vulnerable-typescript-app/findings.html) · [HTML file](docs/samples/vulnerable-typescript-app/findings.html) · [JSON](docs/samples/vulnerable-typescript-app/findings.json) · [SARIF](docs/samples/vulnerable-typescript-app/findings.sarif) |
+| **OWASP Juice Shop** | 152 route entries and 9 browser entries; DOM search and cross-tier track-order XSS, SQL/NoSQL query-construction findings, and a credential written to access logs | [View in browser](https://zazzcode.github.io/zazzles/juice-shop/findings.html) · [HTML file](docs/samples/juice-shop/findings.html) · [JSON](docs/samples/juice-shop/findings.json) · [SARIF](docs/samples/juice-shop/findings.sarif) |
+| **Node.js Goof** | 19 route entries; reflected login XSS, stored Markdown XSS with separate create/update write paths, and two escaped outputs marked Protected | [HTML file](docs/samples/nodejs-goof/findings.html) · [JSON](docs/samples/nodejs-goof/findings.json) · [SARIF](docs/samples/nodejs-goof/findings.sarif) |
+| **Vulnerable TypeScript app** | 19 route entries; a reflected-XSS search response, plus Review records for a password logged in SQL text and other incomplete analysis | [View in browser](https://zazzcode.github.io/zazzles/vulnerable-typescript-app/findings.html) · [HTML file](docs/samples/vulnerable-typescript-app/findings.html) · [JSON](docs/samples/vulnerable-typescript-app/findings.json) · [SARIF](docs/samples/vulnerable-typescript-app/findings.sarif) |
 
 **View in browser** opens the hosted copy published by GitHub Pages ([all samples](https://zazzcode.github.io/zazzles/)). GitHub's
 file view shows HTML source rather than running it, so you can also download an HTML file and open
 it locally. Findings appear first; expand rows for evidence and remediation, or click a category pill for its
 glossary. No setup or model calls are needed. These [evolving samples](docs/samples/README.md) include
-coverage limits and refresh instructions; they will be updated as zazzles improves.
+coverage limits and refresh instructions; they will be updated as Zazzles improves.
 
 ## Goals and current scope
 
 The goal is to report vulnerabilities, weak security practices, and sufficient protection by route,
-with useful explanations and remediation guidance. Longer term, zazzles aims to match or exceed Bearer's
+with useful explanations and remediation guidance. Longer term, Zazzles aims to match or exceed Bearer's
 SAST and developer-workflow capabilities with fewer false positives, measured at comparable detection
-coverage on independently labeled cases. That is a project objective; broad parity is not established.
+coverage on independently labeled cases. Bearer and Semgrep Community Edition serve as local comparison
+tools. That is a project objective; broad parity is not established.
 
-Today, zazzles analyzes local JavaScript and TypeScript source. It inventories Express-style route
-registrations, follows a bounded subset of handlers and request-value dependencies into candidate SQL
-and outbound HTTP uses, and exports source evidence as JSON, standalone HTML, or SARIF. Optional OpenAI Decisions or Jev
-judging assesses validation and protection from that evidence.
+Today, Zazzles analyzes local JavaScript and TypeScript source. It inventories Express-style routes
+(including CommonJS exports and static router mounts) and browser entries, follows a bounded subset of
+handlers, helpers, branches and promise continuations, and exports source evidence as JSON, standalone
+HTML, or SARIF. Supported capabilities:
 
-Full control-flow and interprocedural analysis, independent findings review, Python and Go analysis,
-and dependency vulnerability scanning remain planned. Recognizing a file extension in the file list
+| Area | Current support |
+|---|---|
+| **Cross-site scripting (XSS)** | Reflected server output (Express `send`/`write`/`end`, EJS, Handlebars, Pug); template construction before compilation; stored XSS through Mongoose/Sequelize model fields, with each write path kept separate; DOM sinks, jQuery, React, Vue and Angular templates, including trust bypasses; cross-tier links from a browser output to the server route and JSON response field that produce it. Protection is context-specific (HTML text, attribute, URL, script, style) and must hold on every modeled path. |
+| **Injection** | String-built SQL, NoSQL selectors and `$where` construction, Sequelize raw queries |
+| **Input validation** | Request fields reaching sinks without modeled validation, kept separate from sink protection |
+| **Logging** | Request data and credentials reaching verified loggers |
+| **Outbound requests** | Request-influenced `fetch`/`axios` destinations |
+| **Judgment (optional)** | Versioned OpenAI Decisions or Jev questions; answers never replace missing source evidence |
+
+See the [XSS analysis guide](docs/analysis/xss.md) for the exact contracts and limits.
+
+Full control-flow and whole-program interprocedural analysis, independent findings review, Python and Go
+analysis, and dependency vulnerability scanning remain planned. Recognizing a file extension in the file list
 does not establish analysis support. A clean scan does not certify that an application is secure.
 
 ## Agent-first philosophy
@@ -73,7 +86,7 @@ go build -o bin/scan ./cmd/scan
 ```
 
 For a new local setup, copy [.env.sample](.env.sample) to `.env`; merge settings if `.env` already
-exists so you preserve your keys. zazzles does not auto-load `.env`. Offline scanning needs no API key.
+exists so you preserve your keys. Zazzles does not auto-load `.env`. Offline scanning needs no API key.
 See the [setup guide](docs/getting-started.md) for full instructions.
 
 ### Optional decision-model setup
@@ -85,7 +98,7 @@ evidence and need an explicit request cap; a key is not a reason to run paid ass
 ## Run
 
 ```bash
-export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-finding"
+export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-findings"
 ./bin/scan --strings --entry server.ts /path/to/juice-shop
 ./bin/scan --strings --entry src/server.ts /path/to/vulnerable-typescript-app
 ```
@@ -129,7 +142,7 @@ implemented.
 
 ## Contributing
 
-Developing zazzles: use the [contributor guide](docs/contributing.md), [AGENTS.md](AGENTS.md), and
+Developing Zazzles: use the [contributor guide](docs/contributing.md), [AGENTS.md](AGENTS.md), and
 [developer agent orientation](.zazz/docs/zazzles-agent-orientation.md) for workspace conventions, branches,
 commands, and the internal documentation map. Run relevant scoped checks;
 CI verifies formatting, vet, build, and race tests. Work stays on feature branches, draft PRs target
@@ -139,5 +152,7 @@ Internal engineering material lives under `.zazz/`: [architecture](.zazz/archite
 [implementation plan](.zazz/project/implementation-plan.md), [contracts](.zazz/specifications/README.md),
 and the [engineering documentation map](.zazz/docs/zazzles-agent-orientation.md#documentation-map).
 
-Analysis contributors: read the [zazzles analysis rules and guidelines](docs/analysis/README.md) for
-SQL/NoSQL judgment, input-validation policy, and calibration controls.
+Analysis contributors: read the [Zazzles analysis rules and guidelines](docs/analysis/README.md) for
+SQL/NoSQL and XSS judgment, input-validation policy, and calibration controls. Comparison runs use the
+[Bearer runbook](docs/samples/nodejs-goof/bearer-runbook.md) and the
+[Semgrep CE cheat sheet](docs/semgrep-ce-cheat-sheet.md).

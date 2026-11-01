@@ -147,6 +147,7 @@ in these files independently of chat attachments.
 | [Login SQL/validation case](../project/08-login-validation-case.md) | Separate email constraints and query semantics; phase regression expectations |
 | [Two-case results](../evaluation/juice-shop/results.md) | Known-target Luna outcomes, usage, offline checks and remaining limits |
 | [Bearer comparison plan](../evaluation/bearer-comparison.md) | Repeat/extension protocol; links to pinned results and capability inventory |
+| [Semgrep CE cheat sheet](../../docs/semgrep-ce-cheat-sheet.md) | Second local comparison scanner: privacy flags, rule snapshots, output layout, CE limits |
 | [Original comparison controls](../evaluation/corpus/README.md) | Label-isolated corpus, Luna outcomes, provenance correction and limitations |
 | [Decision-model user guide](../../docs/decision-models.md) | Provider credentials, environment loading, capped scanner assessment |
 | [Integration evidence](openai-decisions-setup.md) | Historical provider setup, transport and access smoke-check evidence |

@@ -29,6 +29,7 @@ type sourceModule struct {
 
 type moduleSet struct {
 	storageWrites  map[string][]storageWrite
+	producers      []jsonProducer
 	modelEvidence  map[string][]graph.Evidence
 	mountedOrigins map[string]bool
 	textSources    map[string]graph.Evidence

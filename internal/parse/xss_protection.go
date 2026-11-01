@@ -97,6 +97,12 @@ func (f *flow) dependencyProtection(dependency graph.Dependency, context string)
 		}
 		call := nodeAt(m.tree.RootNode(), transfer.Span.StartByte, transfer.Span.EndByte)
 		mode := verifiedOutputProtection(m, call)
+		if mode == "" {
+			mode = regexReplaceMode(m, call)
+		}
+		if mode == "neutral" {
+			continue
+		}
 		if mode == "markdown" && f.set.packageVersion("marked") == "0.3.5" {
 			mode = "ineffective"
 		}
@@ -115,6 +121,13 @@ func (f *flow) dependencyProtection(dependency graph.Dependency, context string)
 		case "sanitize":
 			protection = "unknown"
 			if context == "html_text" {
+				protection = "sanitized"
+			}
+		case "allowlist":
+			// The output holds only allow-listed characters, none HTML/URL significant.
+			protection = "unknown"
+			switch context {
+			case "html_text", "html_attribute", "unquoted_attribute", "url":
 				protection = "sanitized"
 			}
 		case "ineffective":
@@ -222,3 +235,48 @@ func (f *flow) handlebarsSafeString(dependency graph.Dependency) bool {
 	}
 	return false
 }
+
+// regexReplaceMode classifies x.replace(/re/g, literal). "allowlist": a global
+// negated class whose kept characters are only word characters, digits, underscores or
+// hyphens, removing everything else. "neutral": the pattern can match only line
+// breaks/tabs and the replacement adds nothing HTML-significant, so markup is
+// preserved unchanged. Anything else is not modeled ("").
+func regexReplaceMode(m *sourceModule, call *sitter.Node) string {
+	if call == nil || call.Kind() != "call_expression" {
+		return ""
+	}
+	fn, args := call.ChildByFieldName("function"), call.ChildByFieldName("arguments")
+	if fn == nil || fn.Kind() != "member_expression" || args == nil || args.NamedChildCount() != 2 {
+		return ""
+	}
+	if prop := fn.ChildByFieldName("property"); prop == nil || (prop.Utf8Text(m.src) != "replace" && prop.Utf8Text(m.src) != "replaceAll") {
+		return ""
+	}
+	re, repl := args.NamedChild(0), args.NamedChild(1)
+	replacement, ok := stringLiteral(repl, m.src)
+	if re.Kind() != "regex" || !ok || strings.ContainsAny(replacement, htmlSignificant) {
+		return ""
+	}
+	pattern, flags := "", ""
+	if p := re.ChildByFieldName("pattern"); p != nil {
+		pattern = p.Utf8Text(m.src)
+	}
+	if fl := re.ChildByFieldName("flags"); fl != nil {
+		flags = fl.Utf8Text(m.src)
+	}
+	if !strings.Contains(flags, "g") {
+		return ""
+	}
+	if allowlistPattern.MatchString(pattern) && replacement == "" {
+		return "allowlist"
+	}
+	if lineBreakPattern.MatchString(pattern) {
+		return "neutral"
+	}
+	return ""
+}
+
+var (
+	allowlistPattern = regexp.MustCompile(`^\[\^(?:\\w|\\d|a-z|A-Z|0-9|_|-)+\][+*]?$`)
+	lineBreakPattern = regexp.MustCompile(`^(?:[()|+*?]|\?:|\\[rntfv]|\[(?:\\[rntfv])+\])+$`)
+)

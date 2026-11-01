@@ -121,7 +121,7 @@ func (s *moduleSet) angularOutputs(f *flow) {
 		u.XSS.Protection, u.XSS.ProtectionReason, u.XSS.Paths = f.angularPathProtection(v, context)
 		if v.apiPath != "" {
 			u.XSS.Type, u.XSS.OriginResolved = "cross_tier", false
-			u.XSS.ResponsePath, u.XSS.ResponseMethod = v.apiPath, v.apiMethod
+			u.XSS.ResponsePath, u.XSS.ResponseMethod, u.XSS.ResponseField = v.apiPath, v.apiMethod, v.responseField
 		}
 		for _, d := range v.deps {
 			for _, e := range d.Transfers {

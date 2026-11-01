@@ -255,7 +255,7 @@ func (f *flow) clientRecord(node *sitter.Node, v value, context string, escaped 
 	u := &f.uses[len(f.uses)-1]
 	if u.ClientID != "" && v.apiPath != "" {
 		u.XSS.Type, u.XSS.OriginResolved = "cross_tier", false
-		u.XSS.ResponsePath, u.XSS.ResponseMethod = v.apiPath, v.apiMethod
+		u.XSS.ResponsePath, u.XSS.ResponseMethod, u.XSS.ResponseField = v.apiPath, v.apiMethod, v.responseField
 	}
 }
 

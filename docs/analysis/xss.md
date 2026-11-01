@@ -35,7 +35,9 @@ encoding, safe CSS or protection in an unquoted attribute.
 Verified imports for `entities`/`he` HTML encoders, `escape-html`, `sanitize-html` and DOMPurify
 sanitization supply bounded protection contracts for appropriate contexts. Plain `dompurify` is trusted only in
 browser code (without a window it returns its input); a verified Handlebars `SafeString` disables
-`{{…}}` escaping. Unknown functions,
+`{{…}}` escaping. A global negated allow-list `replace` (for example `[^\w-]+` to `''`) is
+sanitization in text, attribute and URL contexts; removing only line breaks is neutral; other
+replacements are unknown. Unknown functions,
 same-name fake libraries, shadowed imports and custom sanitizer options are not trusted. Every
 modeled path must be protected; protection on one branch does not protect a raw sibling branch.
 
@@ -59,7 +61,10 @@ Browser entries have their own identity, component/source location and sink cont
 bounded patterns include location/URL parameters, message/input events, verified DOM nodes and HTML,
 text, URL and string-code sinks, imported jQuery, React JSX, Vue single-file script/template output,
 and Angular injected sources/trust APIs with template bindings. An unlinked trust bypass is Review.
-API response origins and collection/component/dialog aliases are not fully linked by this first pass.
+A browser output that reads an API response field is linked to its origin only when exactly one server
+route matches the request method and path pattern and its JSON response provides that field from request
+data, including writes inside promise continuations. Stored or token origins behind a producer, and
+collection/component/dialog aliases, are not yet linked; those records stay Review.
 
 Default Angular protection requires a demonstrated plain-value path, not merely absence of a known
 bypass. Unknown trusted-wrapper transformations remain Review. Whole-object request render locals

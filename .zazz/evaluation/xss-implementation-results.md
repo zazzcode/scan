@@ -9,7 +9,7 @@ The [handoff](../ephemeral/xss-analysis-handoff.md) is the entry point for that 
 | Target | Server entries | Client entries | Use records | Findings | Review | Protected |
 |---|---:|---:|---:|---:|---:|---:|
 | [Goof](../../docs/samples/nodejs-goof/findings.html) | 19 | 0 | 33 | 2 | 29 | 2 |
-| [Juice Shop](../../docs/samples/juice-shop/findings.html) | 152 | 9 | 206 | 7 | 199 | 0 |
+| [Juice Shop](../../docs/samples/juice-shop/findings.html) | 152 | 9 | 208 | 8 | 200 | 0 |
 | [Vulnerable TypeScript app](../../docs/samples/vulnerable-typescript-app/findings.html) | 19 | 0 | 20 | 1 | 19 | 0 |
 
 These are use-level results, not confirmed-vulnerability totals. Categories overlap. Goof's login
@@ -93,6 +93,37 @@ facts such as `indexOf` results still carry content dependencies, which adds unk
 cross-tier producer/model/JWT/dialog links (handoff priority 3) are not yet linked, so the Juice Shop
 product-description dialog sink remains unestablished; EJS custom `escape` options are not modeled;
 duplicate outbound-HTTP IDs remain.
+
+## Hardening 10: cross-tier response-field links
+
+Saved as `20261101-xss-hardening-10` and promoted. Offline, no model calls.
+
+- Server promise continuations (`.then`/`.catch`/`.finally`) are followed with the handler's request,
+  response and closure bindings; their parameters are external results, not request data.
+- Writes such as `result.data[0] = {orderId: id}` update local object fields. Branch conditions are also
+  attached to nested fields.
+- Each server JSON response is kept with its fields. A browser read of an API response records its
+  JSON path (`data[].orderId`). The linker joins a cross-tier browser record to its origin only when
+  exactly one route matches the method and path pattern and that field carries request-derived data.
+  Unmatched, ambiguous, constant or merged fields stay Review with `response_producer_unresolved` or
+  `response_field_unresolved`.
+- Regex `replace` is classified: a global negated allow-list (`[^\w-]+` to `''`) is sanitization in
+  HTML text, attribute, unquoted-attribute and URL contexts; removing only line breaks or tabs is neutral;
+  anything else, including partial escaping, stays unknown.
+
+Juice Shop `JS-XSS-02` (track order) is now a finding, linked to `GET /rest/track-order/:id`. Its three paths
+match the answer key: the disabled branch's allow-list is sanitized, the enabled branch's truncation is
+raw when the ID is short, and the `substr` path is unknown. Each carries the `result.data[0] === undefined`
+precondition. `JS-XSS-N04` (CAPTCHA) stays Review: there is no request-derived producer field. The
+application-configuration and feedback outputs stay Review: no matching producer, or a merged field.
+
+Goof: modeling `profile.firstname = validator.rtrim(...)` as a local field write changed the
+render-options request (4 paths instead of 1), so that saved answer, like the stored one, is no longer
+applied. Three of five saved decisions still replay. No use lost a source; the only status change is
+`JS-XSS-02`. Juice Shop gains two JSON data records from newly followed continuations.
+
+Still open: stored and JWT origins behind API producers (`JS-XSS-03`/`04`/`06`); component input,
+gallery `args` and dialog data aliases (`JS-XSS-05`/`06`); `switch` traversal; branch feasibility.
 
 ## Decisions and source references
 
