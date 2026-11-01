@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 var requestContainers = map[string]bool{"body": true, "query": true, "params": true, "headers": true, "cookies": true}

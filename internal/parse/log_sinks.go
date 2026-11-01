@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 var consoleMethods = map[string]bool{"log": true, "info": true, "warn": true, "error": true, "debug": true, "trace": true}

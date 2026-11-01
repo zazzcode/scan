@@ -27,7 +27,7 @@ Scan's container layout (resolve the development root using the
 [orientation](scan-agent-orientation.md#portable-workspace-and-dev_root)):
 
 ```text
-scan/                         # container; not a development checkout
+zazzles/                         # container; not a development checkout
 ├── .bare/                    # shared Git directory
 ├── stage/                    # integration and current definition worktree
 ├── feature-<spec>/           # one dedicated worktree per spec, created as needed
@@ -169,13 +169,13 @@ cd ../<worktree> && GOMODCACHE="$(cd .. && pwd)/.tools/gomod" go mod download
 Agent environment for each VM command (the container is mounted at `$HOME/mnt/<container>`):
 
 ```bash
-T=$HOME/mnt/scan/.tools
-export GOROOT=$T/go PATH=$T/go/bin:$PATH GOMODCACHE=$T/gomod GOCACHE=$HOME/.cache/scan-go \
+T=$HOME/mnt/zazzles/.tools
+export GOROOT=$T/go PATH=$T/go/bin:$PATH GOMODCACHE=$T/gomod GOCACHE=$HOME/.cache/zazzles-go \
   GOTOOLCHAIN=local GOPROXY=off GOFLAGS='-mod=readonly -buildvcs=false' CGO_ENABLED=1
 ```
 
 The worktree's `.git` file names a macOS path the VM cannot see; set
-`GIT_DIR=$HOME/mnt/scan/.bare/worktrees/<worktree>` and `GIT_WORK_TREE=<worktree path>` for Git.
+`GIT_DIR=$HOME/mnt/zazzles/.bare/worktrees/<worktree>` and `GIT_WORK_TREE=<worktree path>` for Git.
 VM results are Linux results, matching CI; a macOS run before a PR remains worthwhile.
 
 ## Branch Naming Rules

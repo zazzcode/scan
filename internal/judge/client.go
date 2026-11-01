@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zazzcode/scan/internal/graph"
-	"github.com/zazzcode/scan/internal/lang"
-	"github.com/zazzcode/scan/internal/rules"
+	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/lang"
+	"github.com/zazzcode/zazzles/internal/rules"
 )
 
 const questionVersion = "string-use-v8"

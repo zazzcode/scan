@@ -13,9 +13,9 @@ import (
 	"os"
 	"sort"
 
-	"github.com/zazzcode/scan/internal/lang"
-	"github.com/zazzcode/scan/internal/parse"
-	"github.com/zazzcode/scan/internal/walk"
+	"github.com/zazzcode/zazzles/internal/lang"
+	"github.com/zazzcode/zazzles/internal/parse"
+	"github.com/zazzcode/zazzles/internal/walk"
 )
 
 // Exit codes. CI depends on these, so they are part of the CLI contract.

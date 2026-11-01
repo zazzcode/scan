@@ -72,7 +72,7 @@ repository capability state.
 **`<DEV_ROOT>` means this computer's development directory**, usually `Dev/` under the user's home.
 It is documentation notation, not an implemented environment variable. Usual locations:
 
-- Repositories: `<DEV_ROOT>/<account>/<project>`; scan's container is `<DEV_ROOT>/zazzcode/scan`.
+- Repositories: `<DEV_ROOT>/<account>/<project>`; scan's container is `<DEV_ROOT>/zazzcode/zazzles`.
 - Reference clones: `<DEV_ROOT>/juice-shop` (application), `<DEV_ROOT>/bearer`, and `<DEV_ROOT>/codeql`
   (SAST design references).
 

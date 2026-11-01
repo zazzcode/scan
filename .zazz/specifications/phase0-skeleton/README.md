@@ -12,7 +12,7 @@ toolchain, the fixture layout, and the repository shape before any analysis exis
 
 ## In scope
 
-- `go.mod` for `github.com/zazzcode/scan`.
+- `go.mod` for `github.com/zazzcode/zazzles`.
 - `internal/lang`: the extension-to-language registry. The only place that knows about file extensions.
 - `internal/walk`: deterministic repository traversal selecting supported source files, skipping
   dependency and build directories, and reporting what it skipped.

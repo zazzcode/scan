@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/scan/internal/graph"
-	"github.com/zazzcode/scan/internal/lang"
-	"github.com/zazzcode/scan/internal/rules"
-	"github.com/zazzcode/scan/internal/walk"
+	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/lang"
+	"github.com/zazzcode/zazzles/internal/rules"
+	"github.com/zazzcode/zazzles/internal/walk"
 )
 
 // Strings resolves selected route handlers and extracts bounded string-use evidence.

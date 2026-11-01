@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 var update = flag.Bool("update", false, "rewrite golden files")

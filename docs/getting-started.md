@@ -38,7 +38,7 @@ cp .env.sample .env  # New setups only; do not overwrite an existing .env.
 Set the output root in `.env`, adjusting the path for your checkout layout:
 
 ```bash
-SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/scan/_test-finding"
+SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-finding"
 ```
 
 Load your own trusted `.env` in bash or zsh before running scan:

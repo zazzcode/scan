@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 const SchemaURI = "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json"
@@ -104,7 +104,7 @@ func SARIF(report *graph.StringReport) map[string]any {
 	for _, e := range report.Files {
 		artifacts = append(artifacts, map[string]any{"location": map[string]string{"uri": relativeURI(e.Span.File)}, "hashes": map[string]string{"sha-256": e.SHA256}})
 	}
-	run := map[string]any{"tool": map[string]any{"driver": map[string]any{"name": "scan", "informationUri": "https://github.com/zazzcode/scan", "rules": rules}}, "results": results, "artifacts": artifacts, "invocations": []any{invocation}, "properties": map[string]any{"scan.findingTypes": report.FindingTypes, "scan.limitations": report.Limitations, "scan.selectedRoute": report.SelectedRoute, "scan.identityPolicy": "snapshot-local use IDs; edit-stable baseline identity is not implemented"}}
+	run := map[string]any{"tool": map[string]any{"driver": map[string]any{"name": "scan", "informationUri": "https://github.com/zazzcode/zazzles", "rules": rules}}, "results": results, "artifacts": artifacts, "invocations": []any{invocation}, "properties": map[string]any{"scan.findingTypes": report.FindingTypes, "scan.limitations": report.Limitations, "scan.selectedRoute": report.SelectedRoute, "scan.identityPolicy": "snapshot-local use IDs; edit-stable baseline identity is not implemented"}}
 	return map[string]any{"$schema": SchemaURI, "version": "2.1.0", "runs": []any{run}}
 }
 

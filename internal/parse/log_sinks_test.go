@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 func logUses(report *graph.StringReport) []graph.StringUse {

@@ -17,7 +17,7 @@ Commands below run from the resolved container or named worktree, not an assumed
 
 ## Where to run Worktrunk
 
-From the repo container:  `~/Dev/zazzcode/scan`
+From the repo container:  `~/Dev/zazzcode/zazzles`
 
 ```bash
 cd <repo-container>
@@ -292,7 +292,7 @@ approve and remember. Non-interactively (agent shells/CI), `wt hook approvals ad
 prompt; either run it in a real TTY or edit `~/.config/worktrunk/approvals.toml` directly:
 
 ```toml
-[projects."github.com/zazzcode/scan"]
+[projects."github.com/zazzcode/zazzles"]
 approved-commands = [
     "/opt/homebrew/bin/wt step copy-ignored",
     "git -C {{ worktree_path }} config --worktree core.bare false",

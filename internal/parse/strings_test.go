@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 func TestStringFlowGolden(t *testing.T) {

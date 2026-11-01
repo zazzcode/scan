@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 // wireBundle sends each source span once. Edges and role references point into

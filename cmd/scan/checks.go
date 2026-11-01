@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 func loadChecks(path string) ([]graph.Check, error) {

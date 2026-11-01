@@ -111116,7 +111116,7 @@
       ],
       "tool": {
         "driver": {
-          "informationUri": "https://github.com/zazzcode/scan",
+          "informationUri": "https://github.com/zazzcode/zazzles",
           "name": "scan",
           "rules": [
             {

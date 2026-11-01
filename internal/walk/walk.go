@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/zazzcode/scan/internal/lang"
+	"github.com/zazzcode/zazzles/internal/lang"
 )
 
 // File is one source file selected for processing.

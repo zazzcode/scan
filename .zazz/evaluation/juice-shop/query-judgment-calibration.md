@@ -5,7 +5,7 @@
 Pinned Juice Shop target: v20.3.0, `f189f521266f42c6bd05884468292000cee852ed`.
 These source-only experiments use OpenAI Decisions gpt-6-luna. No target execution or exploitation
 was performed. Expected challenge answers and control labels were excluded from model bundles.
-Reports are saved outside the checkout under `<DEV_ROOT>/zazzcode/scan/_test-finding/`.
+Reports are saved outside the checkout under `<DEV_ROOT>/zazzcode/zazzles/_test-finding/`.
 
 Seven bounded batches made 28 completed requests: 235,102 input tokens and zero reported output
 tokens. No provider errors or automatic retries/fallback. Local manifests retain exact source report

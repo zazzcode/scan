@@ -6,7 +6,7 @@ import (
 	"unicode"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 // Field-key lexicons produce hints for judgment, never an established data class.

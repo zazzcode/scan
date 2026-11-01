@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/scan/internal/lang"
+	"github.com/zazzcode/zazzles/internal/lang"
 )
 
 func TestPracticePack(t *testing.T) {

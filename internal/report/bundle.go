@@ -9,7 +9,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 // WriteBundle creates a fresh private run folder under base, never replacing an earlier run.

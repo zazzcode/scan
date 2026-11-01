@@ -1,6 +1,6 @@
 package judge
 
-import "github.com/zazzcode/scan/internal/graph"
+import "github.com/zazzcode/zazzles/internal/graph"
 
 // applyPolicy uses claim-scoped completeness when supplied. Legacy candidates
 // remain conservative until their dependency and binding evidence is assembled.

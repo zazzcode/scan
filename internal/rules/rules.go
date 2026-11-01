@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/zazzcode/scan/internal/lang"
+	"github.com/zazzcode/zazzles/internal/lang"
 )
 
 //go:embed javascript.md python.md go.md
