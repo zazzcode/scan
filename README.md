@@ -57,6 +57,38 @@ Full control-flow and whole-program interprocedural analysis, independent findin
 analysis, and dependency vulnerability scanning remain planned. Recognizing a file extension in the file list
 does not establish analysis support. A clean scan does not certify that an application is secure.
 
+## Roadmap: vulnerability types
+
+Each type is delivered as its own bounded increment with source-reviewed answer keys, paired
+protected/unknown controls, and fresh sample reports. The order follows the
+[implementation plan](.zazz/project/implementation-plan.md#future-capability-branches); the project
+owner decides final sequencing.
+
+| Vulnerability type | Status | First acceptance target |
+|---|---|---|
+| Input validation | Delivered | Request fields reaching sinks without modeled validation |
+| SQL injection (string-built queries) | Delivered | Juice Shop login/search query construction |
+| NoSQL injection (selectors, `$where`) | Delivered | Juice Shop and Goof Mongo/Mongoose queries |
+| Sensitive-data logging | Delivered | Credentials and request data reaching verified loggers and access logs |
+| Outbound request destinations | Review records | Request-influenced `fetch`/`axios` targets; SSRF judgment is planned below |
+| Cross-site scripting (XSS) | In progress | Reflected, stored, template, DOM and cross-tier cases across all three samples; Juice Shop stored/JWT/dialog origins remain |
+| Hard-coded secrets | Planned | Private material in source; public verification keys stay negatives |
+| Command injection | Planned | `exec` of request input (TypeScript app `/api/ping`) |
+| Path traversal | Planned | `fs.readFile` of a request path (`/api/files`) |
+| Code injection | Planned | `eval` of a request expression (`/api/calculate`) |
+| XML external entities (XXE) | Planned | XML parse of a request body (`/api/parse-xml`) |
+| Open redirect | Planned | `res.redirect` of a request URL |
+| Weak randomness | Planned | `Math.random` used as a token |
+| Cookie, session and security headers | Planned | `httpOnly`, `secure`, session secret, missing baseline headers |
+| Server-side request forgery (SSRF) | Planned | Judge existing outbound destination candidates |
+| Prototype pollution | Planned | `_.merge` of request objects |
+
+Language and delivery work follows separately: a Python adapter after XSS (reusing the same
+language-neutral source, context and protection facts), then Go and other languages, dependency
+vulnerability scanning (SCA), finding baselines and CI gating. The
+[Semgrep CE and Bearer comparisons](.zazz/evaluation/semgrep-results.md) track each type against
+other scanners on the same labeled cases.
+
 ## Agent-first philosophy
 
 Our goal is to help agents fix code correctly. Report established vulnerabilities **and poor
