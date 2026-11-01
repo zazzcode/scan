@@ -1,5 +1,5 @@
 id: javascript
-version: 3
+version: 4
 languages: javascript, typescript
 
 # JavaScript and TypeScript practice
@@ -41,3 +41,20 @@ permitted keys, and driver behavior. A numeric conversion or character filter mu
 actual path, not dismissed by name. No validator identified in a bounded slice does not establish that
 all paths lack validation. Use NoSQL as one word. Report uncertainty explicitly rather than presenting
 an internal “candidate” label as the human explanation.
+
+## Cross-site scripting
+
+Judge one source-to-rendering flow in its actual browser context. Raw HTML construction is poor
+practice when untrusted data reaches it without appropriate encoding or effective sanitization.
+HTML entity encoding protects HTML text and quoted non-active attributes; it does not establish
+safe JavaScript, URL schemes, event-handler content, unquoted attributes or template source code.
+Use escaped templates and text APIs for plain content. Rich HTML requires a verified maintained
+sanitizer before every sink. Imported library identity, actual version, options and ordering matter;
+a sanitizer name or an obsolete sanitize option alone does not establish protection.
+
+Stored claims require matching write/read storage identity and field evidence. API JSON alone is
+not an HTML rendering sink. Browser sources and DOM/framework sinks require their own entry and
+binding evidence; Angular's default sanitization is distinct from an explicit trust bypass.
+Use xss-use-v1 questions for output context, encoding adequacy, sanitizer effectiveness, all-path
+protection and exposure. Missing/contradictory evidence stays Review. A red static XSS result requires
+complete evidence and consistent XSS-specific answers; a database-injection judgment is insufficient.

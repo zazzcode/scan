@@ -1,0 +1,3978 @@
+{
+  "finding_types": [
+    {
+      "id": "sql-injection",
+      "label": "SQL Injection",
+      "description": "Input changes executable SQL structure instead of remaining a data value, potentially changing what the database reads or writes.",
+      "interpretation": "An SQL Injection pill identifies the risk family being reviewed. String-built executable SQL is poor practice to remediate even without a proven exploit; a library-managed search value may remain unresolved. The finding status and evidence determine the actual claim. The pill alone does not confirm injection.",
+      "remediation": "Use the verified driver's parameter-binding API for values. Review dynamic identifiers separately. Keep business-field validation independent of query-structure protection.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "nosql-injection",
+      "label": "NoSQL Injection",
+      "description": "Untrusted input changes a NoSQL query's operators, selector structure, or executable expression rather than remaining an allowed data value.",
+      "interpretation": "Executable $where string construction is poor practice to refactor even without a proven exploit. An unmodeled document constraint alone is Review, not an established defect. Inspect actual value types, keys, transformations, library behavior, and the named status.",
+      "remediation": "Prefer data-only query APIs, constrain scalar slots and permitted keys/operators, and avoid building executable $where strings from input.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "input-validation",
+      "label": "Input Validation",
+      "description": "Server-side checks enforce the business requirements for a field, such as required presence, runtime type, permitted format, range, or length.",
+      "interpretation": "Poor input validation means an applicable requirement is not adequately enforced. This neutral family label also covers unresolved checks and supported protection: no validator identified in an analyzed slice is not proof that every execution path lacks validation. Free-text punctuation is not itself a defect.",
+      "remediation": "Define field-specific requirements and enforce them before use on all applicable paths. Verify guard behavior and middleware. Apply destination-specific protection separately.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "account-creation-validation",
+      "label": "Account Creation Validation",
+      "description": "Required account fields and enforcing guards must be checked before an account is persisted.",
+      "interpretation": "Review field requirements, conditional bypasses, and generated persistence behavior. A modeled create operation alone does not prove a registration bypass.",
+      "remediation": "Enforce required fields before persistence, terminate rejected paths, add appropriate database constraints, and test the persisted result.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "outbound-request-safety",
+      "label": "Outbound Request Safety",
+      "description": "Input used in an outbound request may affect its destination, headers, or other request values. Unrestricted destination control can lead to server-side request forgery (SSRF).",
+      "interpretation": "The current scanner records bounded outbound-use evidence. A pill does not establish SSRF, destination reachability, or complete response-flow analysis.",
+      "remediation": "Verify allowed destinations and protocols, redirect handling, network boundaries, and sensitive request values for the specific HTTP client.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "reflected-xss",
+      "label": "Reflected XSS",
+      "description": "Request-controlled content is reflected into a browser response in a context that allows it to execute as script.",
+      "interpretation": "Request input reaches an HTML response or template output. Raw output is a construction finding; unknown context or sanitizers remain Review. Escaping protects only its modeled output context. Runtime exploitation is not implied.",
+      "remediation": "Use context-appropriate output encoding and safe template or DOM APIs. Input validation alone does not replace correct output handling.",
+      "coverage": "bounded server response and template analysis"
+    },
+    {
+      "id": "sensitive-data-logging",
+      "label": "Sensitive Data Logging",
+      "description": "Logs expose credentials, tokens, personal information, or other sensitive values to readers or storage that should not receive them.",
+      "interpretation": "Covers verified console and winston calls in analyzed route handlers that receive request values with credential or personal-data evidence. A field name is a hint for review, not proof; Authorization and Cookie headers are credentials by HTTP semantics. Morgan request logging that records URLs is checked against credentials read from the query string. Constant messages are not leaks. Non-request secrets and logger redaction configuration are not yet analyzed.",
+      "remediation": "Avoid logging secrets; minimize sensitive fields and apply verified redaction before emission. Review log access and retention.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "sensitive-operation-review",
+      "label": "Sensitive Operation Review",
+      "description": "A possible sensitive use was recorded but does not yet map to a more specific supported risk family.",
+      "interpretation": "This is an analysis category. Inspect the evidence and missing operation semantics before making a security claim.",
+      "remediation": "Resolve the source, operation, API behavior, and required protection before selecting a fix.",
+      "coverage": "bounded analysis"
+    }
+  ],
+  "presentation_version": 3,
+  "findings": [
+    {
+      "type_ids": [
+        "sensitive-data-logging"
+      ],
+      "id": "finding:use:route:src/server.ts:2186:POST:/api/login:src/server.ts:2467",
+      "use_id": "use:route:src/server.ts:2186:POST:/api/login:src/server.ts:2467",
+      "route_id": "route:src/server.ts:2186:POST:/api/login",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Possible sensitive data in a log entry",
+      "summary": "A verified logging call receives a request value whose field name or container suggests credentials or personal data, or that passes through an unresolved transformation. Confirm what the value contains and whether redaction applies before changing behavior. A field name is a hint, not proof.",
+      "input_validation": "Field validation is reported separately; it does not change what this log line contains.",
+      "use_protection": "Logging evidence: request body field password has a credential field-name hint and its content is written to the log.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Keep credential and personal-data content out of logs",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.",
+          "Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.",
+          "If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
+          "Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+        ],
+        "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' && password.length > 0 });",
+        "example_status": "illustrative_template; not a verified application patch"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:2186:POST:/api/login:req.body:2277",
+      "use_id": "input:route:src/server.ts:2186:POST:/api/login:req.body:2277",
+      "route_id": "route:src/server.ts:2186:POST:/api/login",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation evidence is incomplete",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body is read and no handler or applicable middleware validator handles it",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:2983:GET:/api/ping:req.query.host:3062",
+      "use_id": "input:route:src/server.ts:2983:GET:/api/ping:req.query.host:3062",
+      "route_id": "route:src/server.ts:2983:GET:/api/ping",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.host before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:3417:GET:/api/files:req.query.filename:3501",
+      "use_id": "input:route:src/server.ts:3417:GET:/api/files:req.query.filename:3501",
+      "route_id": "route:src/server.ts:3417:GET:/api/files",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.filename before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "reflected-xss"
+      ],
+      "id": "finding:xss:route:src/server.ts:3915:GET:/api/search:src/server.ts:4084",
+      "use_id": "xss:route:src/server.ts:3915:GET:/api/search:src/server.ts:4084",
+      "route_id": "route:src/server.ts:3915:GET:/api/search",
+      "record_type": "finding",
+      "status": "poor_practice",
+      "title": "Untrusted data reaches raw HTML output",
+      "summary": "A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Output context: html_text. Untrusted data reaches raw HTML output without modeled context-appropriate encoding or sanitization.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:3915:GET:/api/search:req.query.query:3997",
+      "use_id": "input:route:src/server.ts:3915:GET:/api/search:req.query.query:3997",
+      "route_id": "route:src/server.ts:3915:GET:/api/search",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation evidence is incomplete",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.query is read and no handler or applicable middleware validator handles it",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "outbound-request-safety",
+        "input-validation"
+      ],
+      "id": "finding:use:route:src/server.ts:4203:GET:/api/proxy:src/server.ts:4415",
+      "use_id": "use:route:src/server.ts:4203:GET:/api/proxy:src/server.ts:4415",
+      "route_id": "route:src/server.ts:4203:GET:/api/proxy",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Outbound request needs destination review",
+      "summary": "Scan recorded a possible outbound HTTP use. Verify the destination, request-value handling, and applicable restrictions; this is not a confirmed SSRF finding.",
+      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.url reaches a sensitive use with no validator call in the handler or applicable middleware",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Review protection for the named use",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Resolve the source-to-use relationship and applicable guards.",
+          "Apply the destination/API-specific protection and the route's declared field requirements.",
+          "Add vulnerable, protected and inconclusive regression cases."
+        ],
+        "example_status": "no code example for an unverified library model"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:4614:POST:/api/calculate:req.body:4701",
+      "use_id": "input:route:src/server.ts:4614:POST:/api/calculate:req.body:4701",
+      "route_id": "route:src/server.ts:4614:POST:/api/calculate",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:4964:DELETE:/api/admin/users/:id:req.params.id:5055",
+      "use_id": "input:route:src/server.ts:4964:DELETE:/api/admin/users/:id:req.params.id:5055",
+      "route_id": "route:src/server.ts:4964:DELETE:/api/admin/users/:id",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation evidence is incomplete",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:5459:GET:/api/users/:id:req.params.id:5541",
+      "use_id": "input:route:src/server.ts:5459:GET:/api/users/:id:req.params.id:5541",
+      "route_id": "route:src/server.ts:5459:GET:/api/users/:id",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation evidence is incomplete",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:5878:POST:/api/parse-xml:req.body:5958",
+      "use_id": "input:route:src/server.ts:5878:POST:/api/parse-xml:req.body:5958",
+      "route_id": "route:src/server.ts:5878:POST:/api/parse-xml",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:6272:POST:/api/parse-yaml:req.body:6361",
+      "use_id": "input:route:src/server.ts:6272:POST:/api/parse-yaml:req.body:6361",
+      "route_id": "route:src/server.ts:6272:POST:/api/parse-yaml",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:7357:POST:/api/validate-email:req.body:7444",
+      "use_id": "input:route:src/server.ts:7357:POST:/api/validate-email:req.body:7444",
+      "route_id": "route:src/server.ts:7357:POST:/api/validate-email",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:7985:GET:/redirect:req.query.url:8063",
+      "use_id": "input:route:src/server.ts:7985:GET:/redirect:req.query.url:8063",
+      "route_id": "route:src/server.ts:7985:GET:/redirect",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation evidence is incomplete",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.url is read and no handler or applicable middleware validator handles it",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:src/server.ts:8210:POST:/api/merge:req.body:8297",
+      "use_id": "input:route:src/server.ts:8210:POST:/api/merge:req.body:8297",
+      "route_id": "route:src/server.ts:8210:POST:/api/merge",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    }
+  ],
+  "schema_version": 1,
+  "root": "vulnerable-typescript-app",
+  "entries": [
+    {
+      "route": {
+        "id": "route:src/server.ts:2186:POST:/api/login",
+        "method": "POST",
+        "path_pattern": "/api/login",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 69,
+          "end_line": 84,
+          "start_byte": 2186,
+          "end_byte": 2935
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 69,
+            "end_line": 84,
+            "start_byte": 2209,
+            "end_byte": 2934
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 69,
+                "end_line": 69,
+                "start_byte": 2186,
+                "end_byte": 2194
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 69,
+                "end_line": 84,
+                "start_byte": 2209,
+                "end_byte": 2934
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "console.log",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 74,
+                "end_line": 74,
+                "start_byte": 2467,
+                "end_byte": 2495
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const { username, password } = req.body;\n\n  // Vulnerable: Direct string concatenation simulating SQL injection\n  const query: string = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;\n  console.log('Query:', query); // This would be vulnerable in real SQL\n\n  const user = users.find((u: User) => u.username === username);\n  if (user) {\n    // VULNERABILITY: Weak JWT signing with predictable secret (CWE-327)\n    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });\n    res.json({ success: true, token, user });\n  } else {\n    res.status(401).json({ success: false, message: 'Invalid credentials' });\n  }\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 69,
+          "end_line": 84,
+          "start_byte": 2242,
+          "end_byte": 2934
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 69,
+            "end_line": 84,
+            "start_byte": 2186,
+            "end_byte": 2935
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 77,
+            "end_line": 83,
+            "start_byte": 2605,
+            "end_byte": 2932
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:2983:GET:/api/ping",
+        "method": "GET",
+        "path_pattern": "/api/ping",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 87,
+          "end_line": 97,
+          "start_byte": 2983,
+          "end_byte": 3372
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 87,
+            "end_line": 97,
+            "start_byte": 3004,
+            "end_byte": 3371
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 87,
+                "end_line": 87,
+                "start_byte": 2983,
+                "end_byte": 2990
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 87,
+                "end_line": 97,
+                "start_byte": 3004,
+                "end_byte": 3371
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "exec",
+              "kind": "identifier",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 90,
+                "end_line": 96,
+                "start_byte": 3143,
+                "end_byte": 3368
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const host: string = req.query.host as string;\n  // Vulnerable: User input directly in exec command\n  exec(`ping -c 3 ${host}`, (error: any, stdout: string, stderr: string) => {\n    if (error) {\n      res.json({ error: error.message, stdout, stderr });\n    } else {\n      res.json({ success: true, output: stdout });\n    }\n  });\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 87,
+          "end_line": 97,
+          "start_byte": 3037,
+          "end_byte": 3371
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 87,
+            "end_line": 97,
+            "start_byte": 2983,
+            "end_byte": 3372
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:3417:GET:/api/files",
+        "method": "GET",
+        "path_pattern": "/api/files",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 100,
+          "end_line": 111,
+          "start_byte": 3417,
+          "end_byte": 3858
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 100,
+            "end_line": 111,
+            "start_byte": 3439,
+            "end_byte": 3857
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 100,
+                "end_line": 100,
+                "start_byte": 3417,
+                "end_byte": 3424
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 100,
+                "end_line": 111,
+                "start_byte": 3439,
+                "end_byte": 3857
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "fs.readFile",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 104,
+                "end_line": 110,
+                "start_byte": 3652,
+                "end_byte": 3854
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const filename: string = req.query.filename as string;\n  // Vulnerable: No sanitization of file path\n  const filePath: string = path.join(__dirname, '../uploads', filename);\n  fs.readFile(filePath, 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {\n    if (err) {\n      res.status(404).json({ error: 'File not found' });\n    } else {\n      res.send(data);\n    }\n  });\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 100,
+          "end_line": 111,
+          "start_byte": 3472,
+          "end_byte": 3857
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 100,
+            "end_line": 111,
+            "start_byte": 3417,
+            "end_byte": 3858
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:3915:GET:/api/search",
+        "method": "GET",
+        "path_pattern": "/api/search",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 114,
+          "end_line": 118,
+          "start_byte": 3915,
+          "end_byte": 4137
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 114,
+            "end_line": 118,
+            "start_byte": 3938,
+            "end_byte": 4136
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 114,
+                "end_line": 114,
+                "start_byte": 3915,
+                "end_byte": 3922
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 114,
+                "end_line": 118,
+                "start_byte": 3938,
+                "end_byte": 4136
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "res.send",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 4084,
+                "end_byte": 4133
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const query: string = req.query.query as string;\n  // Vulnerable: Reflects user input without sanitization\n  res.send(`<h1>Search Results for: ${query}</h1>`);\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 114,
+          "end_line": 118,
+          "start_byte": 3971,
+          "end_byte": 4136
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 114,
+            "end_line": 118,
+            "start_byte": 3915,
+            "end_byte": 4137
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:4203:GET:/api/proxy",
+        "method": "GET",
+        "path_pattern": "/api/proxy",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 121,
+          "end_line": 130,
+          "start_byte": 4203,
+          "end_byte": 4551
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 121,
+            "end_line": 130,
+            "start_byte": 4225,
+            "end_byte": 4550
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 121,
+                "end_line": 121,
+                "start_byte": 4203,
+                "end_byte": 4210
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 121,
+                "end_line": 130,
+                "start_byte": 4225,
+                "end_byte": 4550
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const url: string = req.query.url as string;\n  // Vulnerable: No URL validation, allows internal network access\n  try {\n    const response = await axios.default.get(url);\n    res.json(response.data);\n  } catch (error: any) {\n    res.status(500).json({ error: error.message });\n  }\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 121,
+          "end_line": 130,
+          "start_byte": 4264,
+          "end_byte": 4550
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 121,
+            "end_line": 130,
+            "start_byte": 4203,
+            "end_byte": 4551
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: try_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 124,
+            "end_line": 129,
+            "start_byte": 4382,
+            "end_byte": 4548
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:4614:POST:/api/calculate",
+        "method": "POST",
+        "path_pattern": "/api/calculate",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 133,
+          "end_line": 142,
+          "start_byte": 4614,
+          "end_byte": 4910
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 133,
+            "end_line": 142,
+            "start_byte": 4641,
+            "end_byte": 4909
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 133,
+                "end_line": 133,
+                "start_byte": 4614,
+                "end_byte": 4622
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 133,
+                "end_line": 142,
+                "start_byte": 4641,
+                "end_byte": 4909
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const { expression } = req.body;\n  try {\n    // Vulnerable: Direct eval of user input\n    const result = eval(expression);\n    res.json({ result });\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 133,
+          "end_line": 142,
+          "start_byte": 4674,
+          "end_byte": 4909
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 133,
+            "end_line": 142,
+            "start_byte": 4614,
+            "end_byte": 4910
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: try_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 135,
+            "end_line": 141,
+            "start_byte": 4713,
+            "end_byte": 4907
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:4964:DELETE:/api/admin/users/:id",
+        "method": "DELETE",
+        "path_pattern": "/api/admin/users/:id",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 145,
+          "end_line": 155,
+          "start_byte": 4964,
+          "end_byte": 5388
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 145,
+            "end_line": 155,
+            "start_byte": 4999,
+            "end_byte": 5387
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.delete",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 145,
+                "end_line": 145,
+                "start_byte": 4964,
+                "end_byte": 4974
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 145,
+                "end_line": 155,
+                "start_byte": 4999,
+                "end_byte": 5387
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const id: string = req.params.id as string;\n  // Vulnerable: No authentication or authorization check!\n  const index = users.findIndex((u: User) => u.id === parseInt(id));\n  if (index !== -1) {\n    users.splice(index, 1);\n    res.json({ success: true, message: 'User deleted' });\n  } else {\n    res.status(404).json({ error: 'User not found' });\n  }\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 145,
+          "end_line": 155,
+          "start_byte": 5032,
+          "end_byte": 5387
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 145,
+            "end_line": 155,
+            "start_byte": 4964,
+            "end_byte": 5388
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 149,
+            "end_line": 154,
+            "start_byte": 5210,
+            "end_byte": 5385
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:5459:GET:/api/users/:id",
+        "method": "GET",
+        "path_pattern": "/api/users/:id",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 158,
+          "end_line": 167,
+          "start_byte": 5459,
+          "end_byte": 5811
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 158,
+            "end_line": 167,
+            "start_byte": 5485,
+            "end_byte": 5810
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 158,
+                "end_line": 158,
+                "start_byte": 5459,
+                "end_byte": 5466
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 158,
+                "end_line": 167,
+                "start_byte": 5485,
+                "end_byte": 5810
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const id: string = req.params.id as string;\n  // Vulnerable: No authorization check - any user can view any user's data\n  const user = users.find((u: User) => u.id === parseInt(id));\n  if (user) {\n    res.json(user);\n  } else {\n    res.status(404).json({ error: 'User not found' });\n  }\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 158,
+          "end_line": 167,
+          "start_byte": 5518,
+          "end_byte": 5810
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 158,
+            "end_line": 167,
+            "start_byte": 5459,
+            "end_byte": 5811
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 162,
+            "end_line": 166,
+            "start_byte": 5707,
+            "end_byte": 5808
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:5878:POST:/api/parse-xml",
+        "method": "POST",
+        "path_pattern": "/api/parse-xml",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 170,
+          "end_line": 180,
+          "start_byte": 5878,
+          "end_byte": 6220
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 170,
+            "end_line": 180,
+            "start_byte": 5905,
+            "end_byte": 6219
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 170,
+                "end_line": 170,
+                "start_byte": 5878,
+                "end_byte": 5886
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 170,
+                "end_line": 180,
+                "start_byte": 5905,
+                "end_byte": 6219
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "xml2js.parseString",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 173,
+                "end_line": 179,
+                "start_byte": 6021,
+                "end_byte": 6216
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const { xml } = req.body;\n  // Vulnerable: XML parser without XXE protection\n  xml2js.parseString(xml, { strict: false }, (err: Error | null, result: any) => {\n    if (err) {\n      res.status(400).json({ error: err.message });\n    } else {\n      res.json(result);\n    }\n  });\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 170,
+          "end_line": 180,
+          "start_byte": 5938,
+          "end_byte": 6219
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 170,
+            "end_line": 180,
+            "start_byte": 5878,
+            "end_byte": 6220
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:6272:POST:/api/parse-yaml",
+        "method": "POST",
+        "path_pattern": "/api/parse-yaml",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 183,
+          "end_line": 192,
+          "start_byte": 6272,
+          "end_byte": 6590
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 183,
+            "end_line": 192,
+            "start_byte": 6300,
+            "end_byte": 6589
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 183,
+                "end_line": 183,
+                "start_byte": 6272,
+                "end_byte": 6280
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 183,
+                "end_line": 192,
+                "start_byte": 6300,
+                "end_byte": 6589
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const { yamlContent } = req.body;\n  try {\n    // Vulnerable: YAML parsing can execute arbitrary code\n    const parsed = yaml.safeLoad(yamlContent);\n    res.json(parsed);\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 183,
+          "end_line": 192,
+          "start_byte": 6333,
+          "end_byte": 6589
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 183,
+            "end_line": 192,
+            "start_byte": 6272,
+            "end_byte": 6590
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: try_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 185,
+            "end_line": 191,
+            "start_byte": 6373,
+            "end_byte": 6587
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:6637:POST:/api/register",
+        "method": "POST",
+        "path_pattern": "/api/register",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 195,
+          "end_line": 203,
+          "start_byte": 6637,
+          "end_byte": 6946
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 195,
+            "end_line": 203,
+            "start_byte": 6663,
+            "end_byte": 6945
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 195,
+                "end_line": 195,
+                "start_byte": 6637,
+                "end_byte": 6645
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 195,
+                "end_line": 203,
+                "start_byte": 6663,
+                "end_byte": 6945
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "users.push",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 201,
+                "end_line": 201,
+                "start_byte": 6877,
+                "end_byte": 6896
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "res.json",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 202,
+                "end_line": 202,
+                "start_byte": 6900,
+                "end_byte": 6942
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  // Vulnerable: Directly assigning all properties from user input\n  const newUser: User = {\n    id: users.length + 1,\n    ...req.body, // Attacker could set role: 'admin'\n  };\n  users.push(newUser);\n  res.json({ success: true, user: newUser });\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 195,
+          "end_line": 203,
+          "start_byte": 6696,
+          "end_byte": 6945
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 195,
+            "end_line": 203,
+            "start_byte": 6637,
+            "end_byte": 6946
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:7001:GET:/api/debug",
+        "method": "GET",
+        "path_pattern": "/api/debug",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 206,
+          "end_line": 217,
+          "start_byte": 7001,
+          "end_byte": 7293
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 206,
+            "end_line": 217,
+            "start_byte": 7023,
+            "end_byte": 7292
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 206,
+                "end_line": 206,
+                "start_byte": 7001,
+                "end_byte": 7008
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 206,
+                "end_line": 217,
+                "start_byte": 7023,
+                "end_byte": 7292
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "res.json",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 208,
+                "end_line": 216,
+                "start_byte": 7117,
+                "end_byte": 7289
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  // Vulnerable: Exposes sensitive environment variables\n  res.json({\n    environment: process.env,\n    secret: JWT_SECRET,\n    adminPassword: ADMIN_PASSWORD,\n    users: users,\n    config: {\n      dbPassword: DB_PASSWORD\n    }\n  });\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 206,
+          "end_line": 217,
+          "start_byte": 7056,
+          "end_byte": 7292
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 206,
+            "end_line": 217,
+            "start_byte": 7001,
+            "end_byte": 7293
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:7357:POST:/api/validate-email",
+        "method": "POST",
+        "path_pattern": "/api/validate-email",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 220,
+          "end_line": 226,
+          "start_byte": 7357,
+          "end_byte": 7679
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 220,
+            "end_line": 226,
+            "start_byte": 7389,
+            "end_byte": 7678
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 220,
+                "end_line": 220,
+                "start_byte": 7357,
+                "end_byte": 7365
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 220,
+                "end_line": 226,
+                "start_byte": 7389,
+                "end_byte": 7678
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "res.json",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 225,
+                "end_line": 225,
+                "start_byte": 7647,
+                "end_byte": 7675
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const { email } = req.body;\n  // Vulnerable: Complex regex that can cause ReDoS\n  const emailRegex = /^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$/;\n  const isValid: boolean = emailRegex.test(email);\n  res.json({ valid: isValid });\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 220,
+          "end_line": 226,
+          "start_byte": 7422,
+          "end_byte": 7678
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 220,
+            "end_line": 226,
+            "start_byte": 7357,
+            "end_byte": 7679
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:7730:GET:/api/token",
+        "method": "GET",
+        "path_pattern": "/api/token",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 229,
+          "end_line": 233,
+          "start_byte": 7730,
+          "end_byte": 7940
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 229,
+            "end_line": 233,
+            "start_byte": 7752,
+            "end_byte": 7939
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 229,
+                "end_line": 229,
+                "start_byte": 7730,
+                "end_byte": 7737
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 229,
+                "end_line": 233,
+                "start_byte": 7752,
+                "end_byte": 7939
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "res.json",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 232,
+                "end_line": 232,
+                "start_byte": 7917,
+                "end_byte": 7936
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  // Vulnerable: Math.random() is not cryptographically secure\n  const token: string = Math.random().toString(36).substring(7);\n  res.json({ token });\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 229,
+          "end_line": 233,
+          "start_byte": 7785,
+          "end_byte": 7939
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 229,
+            "end_line": 233,
+            "start_byte": 7730,
+            "end_byte": 7940
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:7985:GET:/redirect",
+        "method": "GET",
+        "path_pattern": "/redirect",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 236,
+          "end_line": 240,
+          "start_byte": 7985,
+          "end_byte": 8158
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 236,
+            "end_line": 240,
+            "start_byte": 8006,
+            "end_byte": 8157
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 236,
+                "end_line": 236,
+                "start_byte": 7985,
+                "end_byte": 7992
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 236,
+                "end_line": 240,
+                "start_byte": 8006,
+                "end_byte": 8157
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "res.redirect",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 239,
+                "end_line": 239,
+                "start_byte": 8137,
+                "end_byte": 8154
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const url: string = req.query.url as string;\n  // Vulnerable: No validation of redirect URL\n  res.redirect(url);\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 236,
+          "end_line": 240,
+          "start_byte": 8039,
+          "end_byte": 8157
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 236,
+            "end_line": 240,
+            "start_byte": 7985,
+            "end_byte": 8158
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:8210:POST:/api/merge",
+        "method": "POST",
+        "path_pattern": "/api/merge",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 243,
+          "end_line": 248,
+          "start_byte": 8210,
+          "end_byte": 8447
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 243,
+            "end_line": 248,
+            "start_byte": 8233,
+            "end_byte": 8446
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 243,
+                "end_line": 243,
+                "start_byte": 8210,
+                "end_byte": 8218
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 243,
+                "end_line": 248,
+                "start_byte": 8233,
+                "end_byte": 8446
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "res.json",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 247,
+                "end_line": 247,
+                "start_byte": 8415,
+                "end_byte": 8443
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  const { target, source } = req.body;\n  // Vulnerable: Using lodash merge without proper sanitization\n  const merged = _.merge(target, source);\n  res.json({ result: merged });\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 243,
+          "end_line": 248,
+          "start_byte": 8266,
+          "end_byte": 8446
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 243,
+            "end_line": 248,
+            "start_byte": 8210,
+            "end_byte": 8447
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:8524:GET:/api/error-test",
+        "method": "GET",
+        "path_pattern": "/api/error-test",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 251,
+          "end_line": 258,
+          "start_byte": 8524,
+          "end_byte": 8858
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 251,
+            "end_line": 258,
+            "start_byte": 8551,
+            "end_byte": 8857
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 251,
+                "end_line": 251,
+                "start_byte": 8524,
+                "end_byte": 8531
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 251,
+                "end_line": 258,
+                "start_byte": 8551,
+                "end_byte": 8857
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  try {\n    throw new Error('Database connection failed: mysql://admin:password@localhost:3306/mydb');\n  } catch (error: any) {\n    // Vulnerable: Exposes sensitive information in error message\n    res.status(500).json({ error: error.message, stack: error.stack });\n  }\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 251,
+          "end_line": 258,
+          "start_byte": 8584,
+          "end_byte": 8857
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 251,
+            "end_line": 258,
+            "start_byte": 8524,
+            "end_byte": 8858
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: try_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 252,
+            "end_line": 257,
+            "start_byte": 8588,
+            "end_byte": 8855
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:8886:GET:/health",
+        "method": "GET",
+        "path_pattern": "/health",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 261,
+          "end_line": 263,
+          "start_byte": 8886,
+          "end_byte": 9002
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 261,
+            "end_line": 263,
+            "start_byte": 8905,
+            "end_byte": 9001
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 261,
+                "end_line": 261,
+                "start_byte": 8886,
+                "end_byte": 8893
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 261,
+                "end_line": 263,
+                "start_byte": 8905,
+                "end_byte": 9001
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "res.json",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 262,
+                "end_line": 262,
+                "start_byte": 8942,
+                "end_byte": 8998
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  res.json({ status: 'running', vulnerabilities: 'many' });\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 261,
+          "end_line": 263,
+          "start_byte": 8938,
+          "end_byte": 9001
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 261,
+            "end_line": 263,
+            "start_byte": 8886,
+            "end_byte": 9002
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:src/server.ts:9022:GET:/",
+        "method": "GET",
+        "path_pattern": "/",
+        "framework": "express",
+        "registration": {
+          "file": "src/server.ts",
+          "start_line": 266,
+          "end_line": 295,
+          "start_byte": 9022,
+          "end_byte": 10354
+        },
+        "handler": {
+          "name": "",
+          "kind": "anonymous",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 266,
+            "end_line": 295,
+            "start_byte": 9035,
+            "end_byte": 10353
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 266,
+                "end_line": 266,
+                "start_byte": 9022,
+                "end_byte": 9029
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "",
+              "kind": "anonymous",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 266,
+                "end_line": 295,
+                "start_byte": 9035,
+                "end_byte": 10353
+              }
+            }
+          },
+          {
+            "kind": "call",
+            "symbol": {
+              "name": "res.send",
+              "kind": "method",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 267,
+                "end_line": 294,
+                "start_byte": 9072,
+                "end_byte": 10350
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  res.send(`\n    <html>\n      <head><title>Vulnerable TypeScript App</title></head>\n      <body>\n        <h1>Intentionally Vulnerable TypeScript Application</h1>\n        <p>This application contains numerous security vulnerabilities for testing purposes.</p>\n        <h2>Available Endpoints:</h2>\n        <ul>\n          <li>POST /api/login - SQL Injection</li>\n          <li>GET /api/ping?host=example.com - Command Injection</li>\n          <li>GET /api/files?filename=test.txt - Path Traversal</li>\n          <li>GET /api/search?query=test - XSS</li>\n          <li>GET /api/proxy?url=http://example.com - SSRF</li>\n          <li>POST /api/calculate - RCE via eval</li>\n          <li>DELETE /api/admin/users/1 - Missing Authentication</li>\n          <li>GET /api/users/1 - IDOR</li>\n          <li>POST /api/parse-xml - XXE Injection</li>\n          <li>POST /api/parse-yaml - YAML Deserialization</li>\n          <li>POST /api/register - Mass Assignment</li>\n          <li>GET /api/debug - Sensitive Data Exposure</li>\n          <li>POST /api/validate-email - ReDoS</li>\n          <li>GET /api/token - Insecure Randomness</li>\n          <li>GET /redirect?url= - Open Redirect</li>\n          <li>POST /api/merge - Prototype Pollution</li>\n        </ul>\n      </body>\n    </html>\n  `);\n}",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 266,
+          "end_line": 295,
+          "start_byte": 9068,
+          "end_byte": 10353
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 266,
+            "end_line": 295,
+            "start_byte": 9022,
+            "end_byte": 10354
+          }
+        }
+      ]
+    }
+  ],
+  "uses": [
+    {
+      "id": "use:route:src/server.ts:2186:POST:/api/login:src/server.ts:2467",
+      "route_id": "route:src/server.ts:2186:POST:/api/login",
+      "kind": "log_sink_candidate",
+      "sink": {
+        "kind": "log_sink_candidate",
+        "text": "console.log('Query:', query)",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 74,
+          "end_line": 74,
+          "start_byte": 2467,
+          "end_byte": 2495
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 70,
+              "end_line": 70,
+              "start_byte": 2277,
+              "end_byte": 2285
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": [
+            {
+              "kind": "field_projection",
+              "text": "username",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 70,
+                "end_line": 70,
+                "start_byte": 2254,
+                "end_byte": 2262
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "expression",
+              "text": "${username}",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 73,
+                "end_line": 73,
+                "start_byte": 2421,
+                "end_byte": 2432
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "expression",
+              "text": "`SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 73,
+                "end_line": 73,
+                "start_byte": 2382,
+                "end_byte": 2463
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "assignment",
+              "text": "query: string = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 73,
+                "end_line": 73,
+                "start_byte": 2366,
+                "end_byte": 2463
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 70,
+              "end_line": 70,
+              "start_byte": 2277,
+              "end_byte": 2285
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": [
+            {
+              "kind": "field_projection",
+              "text": "password",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 70,
+                "end_line": 70,
+                "start_byte": 2264,
+                "end_byte": 2272
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "expression",
+              "text": "${password}",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 73,
+                "end_line": 73,
+                "start_byte": 2450,
+                "end_byte": 2461
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "expression",
+              "text": "`SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 73,
+                "end_line": 73,
+                "start_byte": 2382,
+                "end_byte": 2463
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "assignment",
+              "text": "query: string = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 73,
+                "end_line": 73,
+                "start_byte": 2366,
+                "end_byte": 2463
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/api/login', (req: Request, res: Response) => {\n  const { username, password } = req.body;\n\n  // Vulnerable: Direct string concatenation simulating SQL injection\n  const query: string = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;\n  console.log('Query:', query); // This would be vulnerable in real SQL\n\n  const user = users.find((u: User) => u.username === username);\n  if (user) {\n    // VULNERABILITY: Weak JWT signing with predictable secret (CWE-327)\n    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });\n    res.json({ success: true, token, user });\n  } else {\n    res.status(401).json({ success: false, message: 'Invalid credentials' });\n  }\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 69,
+            "end_line": 84,
+            "start_byte": 2186,
+            "end_byte": 2935
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const { username, password } = req.body;\n\n  // Vulnerable: Direct string concatenation simulating SQL injection\n  const query: string = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;\n  console.log('Query:', query); // This would be vulnerable in real SQL\n\n  const user = users.find((u: User) => u.username === username);\n  if (user) {\n    // VULNERABILITY: Weak JWT signing with predictable secret (CWE-327)\n    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });\n    res.json({ success: true, token, user });\n  } else {\n    res.status(401).json({ success: false, message: 'Invalid credentials' });\n  }\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 69,
+            "end_line": 84,
+            "start_byte": 2242,
+            "end_byte": 2934
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "logger_binding",
+          "text": "global console.log",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 74,
+            "end_line": 74,
+            "start_byte": 2467,
+            "end_byte": 2478
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 69,
+            "end_line": 84,
+            "start_byte": 2186,
+            "end_byte": 2935
+          }
+        },
+        {
+          "kind": "log_sensitive_field_hint",
+          "detail": "request body field password has a credential field-name hint and its content is written to the log",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 74,
+            "end_line": 74,
+            "start_byte": 2467,
+            "end_byte": 2495
+          }
+        },
+        {
+          "kind": "log_destination_unresolved",
+          "detail": "logger transports, levels, formats and redaction configuration are not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 74,
+            "end_line": 74,
+            "start_byte": 2467,
+            "end_byte": 2495
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:2186:POST:/api/login:req.body:2277",
+      "route_id": "route:src/server.ts:2186:POST:/api/login",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.body",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 70,
+          "end_line": 70,
+          "start_byte": 2277,
+          "end_byte": 2285
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 70,
+              "end_line": 70,
+              "start_byte": 2277,
+              "end_byte": 2285
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/api/login', (req: Request, res: Response) => {\n  const { username, password } = req.body;\n\n  // Vulnerable: Direct string concatenation simulating SQL injection\n  const query: string = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;\n  console.log('Query:', query); // This would be vulnerable in real SQL\n\n  const user = users.find((u: User) => u.username === username);\n  if (user) {\n    // VULNERABILITY: Weak JWT signing with predictable secret (CWE-327)\n    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });\n    res.json({ success: true, token, user });\n  } else {\n    res.status(401).json({ success: false, message: 'Invalid credentials' });\n  }\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 69,
+            "end_line": 84,
+            "start_byte": 2186,
+            "end_byte": 2935
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const { username, password } = req.body;\n\n  // Vulnerable: Direct string concatenation simulating SQL injection\n  const query: string = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;\n  console.log('Query:', query); // This would be vulnerable in real SQL\n\n  const user = users.find((u: User) => u.username === username);\n  if (user) {\n    // VULNERABILITY: Weak JWT signing with predictable secret (CWE-327)\n    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });\n    res.json({ success: true, token, user });\n  } else {\n    res.status(401).json({ success: false, message: 'Invalid credentials' });\n  }\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 69,
+            "end_line": 84,
+            "start_byte": 2242,
+            "end_byte": 2934
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (user) {\n    // VULNERABILITY: Weak JWT signing with predictable secret (CWE-327)\n    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });\n    res.json({ success: true, token, user });\n  } else {\n    res.status(401).json({ success: false, message: 'Invalid credentials' });\n  }",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 77,
+            "end_line": 83,
+            "start_byte": 2605,
+            "end_byte": 2932
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 69,
+            "end_line": 84,
+            "start_byte": 2186,
+            "end_byte": 2935
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 77,
+            "end_line": 83,
+            "start_byte": 2605,
+            "end_byte": 2932
+          }
+        },
+        {
+          "kind": "input_validation_absent",
+          "detail": "req.body is read and no handler or applicable middleware validator handles it",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 70,
+            "end_line": 70,
+            "start_byte": 2277,
+            "end_byte": 2285
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:2983:GET:/api/ping:req.query.host:3062",
+      "route_id": "route:src/server.ts:2983:GET:/api/ping",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.query.host",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 88,
+          "end_line": 88,
+          "start_byte": 3062,
+          "end_byte": 3076
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query.host",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 88,
+              "end_line": 88,
+              "start_byte": 3062,
+              "end_byte": 3076
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/api/ping', (req: Request, res: Response) => {\n  const host: string = req.query.host as string;\n  // Vulnerable: User input directly in exec command\n  exec(`ping -c 3 ${host}`, (error: any, stdout: string, stderr: string) => {\n    if (error) {\n      res.json({ error: error.message, stdout, stderr });\n    } else {\n      res.json({ success: true, output: stdout });\n    }\n  });\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 87,
+            "end_line": 97,
+            "start_byte": 2983,
+            "end_byte": 3372
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const host: string = req.query.host as string;\n  // Vulnerable: User input directly in exec command\n  exec(`ping -c 3 ${host}`, (error: any, stdout: string, stderr: string) => {\n    if (error) {\n      res.json({ error: error.message, stdout, stderr });\n    } else {\n      res.json({ success: true, output: stdout });\n    }\n  });\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 87,
+            "end_line": 97,
+            "start_byte": 3037,
+            "end_byte": 3371
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 87,
+            "end_line": 97,
+            "start_byte": 2983,
+            "end_byte": 3372
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.query.host before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 88,
+            "end_line": 88,
+            "start_byte": 3062,
+            "end_byte": 3076
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:3417:GET:/api/files:req.query.filename:3501",
+      "route_id": "route:src/server.ts:3417:GET:/api/files",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.query.filename",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 101,
+          "end_line": 101,
+          "start_byte": 3501,
+          "end_byte": 3519
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query.filename",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 101,
+              "end_line": 101,
+              "start_byte": 3501,
+              "end_byte": 3519
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/api/files', (req: Request, res: Response) => {\n  const filename: string = req.query.filename as string;\n  // Vulnerable: No sanitization of file path\n  const filePath: string = path.join(__dirname, '../uploads', filename);\n  fs.readFile(filePath, 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {\n    if (err) {\n      res.status(404).json({ error: 'File not found' });\n    } else {\n      res.send(data);\n    }\n  });\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 100,
+            "end_line": 111,
+            "start_byte": 3417,
+            "end_byte": 3858
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const filename: string = req.query.filename as string;\n  // Vulnerable: No sanitization of file path\n  const filePath: string = path.join(__dirname, '../uploads', filename);\n  fs.readFile(filePath, 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {\n    if (err) {\n      res.status(404).json({ error: 'File not found' });\n    } else {\n      res.send(data);\n    }\n  });\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 100,
+            "end_line": 111,
+            "start_byte": 3472,
+            "end_byte": 3857
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 100,
+            "end_line": 111,
+            "start_byte": 3417,
+            "end_byte": 3858
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.query.filename before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 101,
+            "end_line": 101,
+            "start_byte": 3501,
+            "end_byte": 3519
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "xss": {
+        "type": "reflected",
+        "entry_kind": "server",
+        "output_context": "html_text",
+        "content_type": "text/html",
+        "protection": "raw",
+        "protection_reason": "Untrusted data reaches raw HTML output without modeled context-appropriate encoding or sanitization.",
+        "origin_resolved": true
+      },
+      "api_model": {
+        "id": "html-output-v1",
+        "library": "express",
+        "semantics": "Request values reach an HTML rendering operation in the recorded output context.",
+        "reference": "https://expressjs.com/en/api.html#res.send"
+      },
+      "id": "xss:route:src/server.ts:3915:GET:/api/search:src/server.ts:4084",
+      "route_id": "route:src/server.ts:3915:GET:/api/search",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "html_response",
+        "text": "res.send(`<h1>Search Results for: ${query}</h1>`)",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 117,
+          "end_line": 117,
+          "start_byte": 4084,
+          "end_byte": 4133
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query.query",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 115,
+              "end_line": 115,
+              "start_byte": 3997,
+              "end_byte": 4012
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": [
+            {
+              "kind": "expression",
+              "text": "req.query.query as string",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 115,
+                "end_line": 115,
+                "start_byte": 3997,
+                "end_byte": 4022
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "assignment",
+              "text": "query: string = req.query.query as string",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 115,
+                "end_line": 115,
+                "start_byte": 3981,
+                "end_byte": 4022
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "expression",
+              "text": "${query}",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 4118,
+                "end_byte": 4126
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "expression",
+              "text": "`<h1>Search Results for: ${query}</h1>`",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 4093,
+                "end_byte": 4132
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/api/search', (req: Request, res: Response) => {\n  const query: string = req.query.query as string;\n  // Vulnerable: Reflects user input without sanitization\n  res.send(`<h1>Search Results for: ${query}</h1>`);\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 114,
+            "end_line": 118,
+            "start_byte": 3915,
+            "end_byte": 4137
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const query: string = req.query.query as string;\n  // Vulnerable: Reflects user input without sanitization\n  res.send(`<h1>Search Results for: ${query}</h1>`);\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 114,
+            "end_line": 118,
+            "start_byte": 3971,
+            "end_byte": 4136
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 114,
+            "end_line": 118,
+            "start_byte": 3915,
+            "end_byte": 4137
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:3915:GET:/api/search:req.query.query:3997",
+      "route_id": "route:src/server.ts:3915:GET:/api/search",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.query.query",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 115,
+          "end_line": 115,
+          "start_byte": 3997,
+          "end_byte": 4012
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query.query",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 115,
+              "end_line": 115,
+              "start_byte": 3997,
+              "end_byte": 4012
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/api/search', (req: Request, res: Response) => {\n  const query: string = req.query.query as string;\n  // Vulnerable: Reflects user input without sanitization\n  res.send(`<h1>Search Results for: ${query}</h1>`);\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 114,
+            "end_line": 118,
+            "start_byte": 3915,
+            "end_byte": 4137
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const query: string = req.query.query as string;\n  // Vulnerable: Reflects user input without sanitization\n  res.send(`<h1>Search Results for: ${query}</h1>`);\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 114,
+            "end_line": 118,
+            "start_byte": 3971,
+            "end_byte": 4136
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 114,
+            "end_line": 118,
+            "start_byte": 3915,
+            "end_byte": 4137
+          }
+        },
+        {
+          "kind": "input_validation_absent",
+          "detail": "req.query.query is read and no handler or applicable middleware validator handles it",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 115,
+            "end_line": 115,
+            "start_byte": 3997,
+            "end_byte": 4012
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "use:route:src/server.ts:4203:GET:/api/proxy:src/server.ts:4415",
+      "route_id": "route:src/server.ts:4203:GET:/api/proxy",
+      "kind": "outbound_http_candidate",
+      "sink": {
+        "kind": "outbound_http_candidate",
+        "text": "axios.default.get(url)",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 125,
+          "end_line": 125,
+          "start_byte": 4415,
+          "end_byte": 4437
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query.url",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 122,
+              "end_line": 122,
+              "start_byte": 4288,
+              "end_byte": 4301
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": [
+            {
+              "kind": "expression",
+              "text": "req.query.url as string",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 122,
+                "end_line": 122,
+                "start_byte": 4288,
+                "end_byte": 4311
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "assignment",
+              "text": "url: string = req.query.url as string",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 122,
+                "end_line": 122,
+                "start_byte": 4274,
+                "end_byte": 4311
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/api/proxy', async (req: Request, res: Response) => {\n  const url: string = req.query.url as string;\n  // Vulnerable: No URL validation, allows internal network access\n  try {\n    const response = await axios.default.get(url);\n    res.json(response.data);\n  } catch (error: any) {\n    res.status(500).json({ error: error.message });\n  }\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 121,
+            "end_line": 130,
+            "start_byte": 4203,
+            "end_byte": 4551
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const url: string = req.query.url as string;\n  // Vulnerable: No URL validation, allows internal network access\n  try {\n    const response = await axios.default.get(url);\n    res.json(response.data);\n  } catch (error: any) {\n    res.status(500).json({ error: error.message });\n  }\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 121,
+            "end_line": 130,
+            "start_byte": 4264,
+            "end_byte": 4550
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "control_statement",
+          "text": "try {\n    const response = await axios.default.get(url);\n    res.json(response.data);\n  } catch (error: any) {\n    res.status(500).json({ error: error.message });\n  }",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 124,
+            "end_line": 129,
+            "start_byte": 4382,
+            "end_byte": 4548
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 121,
+            "end_line": 130,
+            "start_byte": 4203,
+            "end_byte": 4551
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: try_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 124,
+            "end_line": 129,
+            "start_byte": 4382,
+            "end_byte": 4548
+          }
+        },
+        {
+          "kind": "input_validation_absent",
+          "detail": "req.query.url reaches a sensitive use with no validator call in the handler or applicable middleware",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 125,
+            "end_line": 125,
+            "start_byte": 4415,
+            "end_byte": 4437
+          }
+        },
+        {
+          "kind": "sink_binding_unverified",
+          "detail": "candidate API shape; library binding/argument roles require review",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 125,
+            "end_line": 125,
+            "start_byte": 4415,
+            "end_byte": 4437
+          }
+        },
+        {
+          "kind": "external_response_unresolved",
+          "detail": "remote response and asynchronous continuation are not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 125,
+            "end_line": 125,
+            "start_byte": 4415,
+            "end_byte": 4437
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:4614:POST:/api/calculate:req.body:4701",
+      "route_id": "route:src/server.ts:4614:POST:/api/calculate",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.body",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 134,
+          "end_line": 134,
+          "start_byte": 4701,
+          "end_byte": 4709
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 134,
+              "end_line": 134,
+              "start_byte": 4701,
+              "end_byte": 4709
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/api/calculate', (req: Request, res: Response) => {\n  const { expression } = req.body;\n  try {\n    // Vulnerable: Direct eval of user input\n    const result = eval(expression);\n    res.json({ result });\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 133,
+            "end_line": 142,
+            "start_byte": 4614,
+            "end_byte": 4910
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const { expression } = req.body;\n  try {\n    // Vulnerable: Direct eval of user input\n    const result = eval(expression);\n    res.json({ result });\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 133,
+            "end_line": 142,
+            "start_byte": 4674,
+            "end_byte": 4909
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "control_statement",
+          "text": "try {\n    // Vulnerable: Direct eval of user input\n    const result = eval(expression);\n    res.json({ result });\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 135,
+            "end_line": 141,
+            "start_byte": 4713,
+            "end_byte": 4907
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 133,
+            "end_line": 142,
+            "start_byte": 4614,
+            "end_byte": 4910
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: try_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 135,
+            "end_line": 141,
+            "start_byte": 4713,
+            "end_byte": 4907
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 134,
+            "end_line": 134,
+            "start_byte": 4701,
+            "end_byte": 4709
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:4964:DELETE:/api/admin/users/:id:req.params.id:5055",
+      "route_id": "route:src/server.ts:4964:DELETE:/api/admin/users/:id",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.params.id",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 146,
+          "end_line": 146,
+          "start_byte": 5055,
+          "end_byte": 5068
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.params.id",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 146,
+              "end_line": 146,
+              "start_byte": 5055,
+              "end_byte": 5068
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.delete('/api/admin/users/:id', (req: Request, res: Response) => {\n  const id: string = req.params.id as string;\n  // Vulnerable: No authentication or authorization check!\n  const index = users.findIndex((u: User) => u.id === parseInt(id));\n  if (index !== -1) {\n    users.splice(index, 1);\n    res.json({ success: true, message: 'User deleted' });\n  } else {\n    res.status(404).json({ error: 'User not found' });\n  }\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 145,
+            "end_line": 155,
+            "start_byte": 4964,
+            "end_byte": 5388
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const id: string = req.params.id as string;\n  // Vulnerable: No authentication or authorization check!\n  const index = users.findIndex((u: User) => u.id === parseInt(id));\n  if (index !== -1) {\n    users.splice(index, 1);\n    res.json({ success: true, message: 'User deleted' });\n  } else {\n    res.status(404).json({ error: 'User not found' });\n  }\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 145,
+            "end_line": 155,
+            "start_byte": 5032,
+            "end_byte": 5387
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (index !== -1) {\n    users.splice(index, 1);\n    res.json({ success: true, message: 'User deleted' });\n  } else {\n    res.status(404).json({ error: 'User not found' });\n  }",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 149,
+            "end_line": 154,
+            "start_byte": 5210,
+            "end_byte": 5385
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 145,
+            "end_line": 155,
+            "start_byte": 4964,
+            "end_byte": 5388
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 149,
+            "end_line": 154,
+            "start_byte": 5210,
+            "end_byte": 5385
+          }
+        },
+        {
+          "kind": "input_validation_absent",
+          "detail": "req.params.id is read and no handler or applicable middleware validator handles it",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 146,
+            "end_line": 146,
+            "start_byte": 5055,
+            "end_byte": 5068
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:5459:GET:/api/users/:id:req.params.id:5541",
+      "route_id": "route:src/server.ts:5459:GET:/api/users/:id",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.params.id",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 159,
+          "end_line": 159,
+          "start_byte": 5541,
+          "end_byte": 5554
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.params.id",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 159,
+              "end_line": 159,
+              "start_byte": 5541,
+              "end_byte": 5554
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/api/users/:id', (req: Request, res: Response) => {\n  const id: string = req.params.id as string;\n  // Vulnerable: No authorization check - any user can view any user's data\n  const user = users.find((u: User) => u.id === parseInt(id));\n  if (user) {\n    res.json(user);\n  } else {\n    res.status(404).json({ error: 'User not found' });\n  }\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 158,
+            "end_line": 167,
+            "start_byte": 5459,
+            "end_byte": 5811
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const id: string = req.params.id as string;\n  // Vulnerable: No authorization check - any user can view any user's data\n  const user = users.find((u: User) => u.id === parseInt(id));\n  if (user) {\n    res.json(user);\n  } else {\n    res.status(404).json({ error: 'User not found' });\n  }\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 158,
+            "end_line": 167,
+            "start_byte": 5518,
+            "end_byte": 5810
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (user) {\n    res.json(user);\n  } else {\n    res.status(404).json({ error: 'User not found' });\n  }",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 162,
+            "end_line": 166,
+            "start_byte": 5707,
+            "end_byte": 5808
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 158,
+            "end_line": 167,
+            "start_byte": 5459,
+            "end_byte": 5811
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 162,
+            "end_line": 166,
+            "start_byte": 5707,
+            "end_byte": 5808
+          }
+        },
+        {
+          "kind": "input_validation_absent",
+          "detail": "req.params.id is read and no handler or applicable middleware validator handles it",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 159,
+            "end_line": 159,
+            "start_byte": 5541,
+            "end_byte": 5554
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:5878:POST:/api/parse-xml:req.body:5958",
+      "route_id": "route:src/server.ts:5878:POST:/api/parse-xml",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.body",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 171,
+          "end_line": 171,
+          "start_byte": 5958,
+          "end_byte": 5966
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 171,
+              "end_line": 171,
+              "start_byte": 5958,
+              "end_byte": 5966
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/api/parse-xml', (req: Request, res: Response) => {\n  const { xml } = req.body;\n  // Vulnerable: XML parser without XXE protection\n  xml2js.parseString(xml, { strict: false }, (err: Error | null, result: any) => {\n    if (err) {\n      res.status(400).json({ error: err.message });\n    } else {\n      res.json(result);\n    }\n  });\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 170,
+            "end_line": 180,
+            "start_byte": 5878,
+            "end_byte": 6220
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const { xml } = req.body;\n  // Vulnerable: XML parser without XXE protection\n  xml2js.parseString(xml, { strict: false }, (err: Error | null, result: any) => {\n    if (err) {\n      res.status(400).json({ error: err.message });\n    } else {\n      res.json(result);\n    }\n  });\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 170,
+            "end_line": 180,
+            "start_byte": 5938,
+            "end_byte": 6219
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 170,
+            "end_line": 180,
+            "start_byte": 5878,
+            "end_byte": 6220
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 171,
+            "end_line": 171,
+            "start_byte": 5958,
+            "end_byte": 5966
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:6272:POST:/api/parse-yaml:req.body:6361",
+      "route_id": "route:src/server.ts:6272:POST:/api/parse-yaml",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.body",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 184,
+          "end_line": 184,
+          "start_byte": 6361,
+          "end_byte": 6369
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 184,
+              "end_line": 184,
+              "start_byte": 6361,
+              "end_byte": 6369
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/api/parse-yaml', (req: Request, res: Response) => {\n  const { yamlContent } = req.body;\n  try {\n    // Vulnerable: YAML parsing can execute arbitrary code\n    const parsed = yaml.safeLoad(yamlContent);\n    res.json(parsed);\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 183,
+            "end_line": 192,
+            "start_byte": 6272,
+            "end_byte": 6590
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const { yamlContent } = req.body;\n  try {\n    // Vulnerable: YAML parsing can execute arbitrary code\n    const parsed = yaml.safeLoad(yamlContent);\n    res.json(parsed);\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 183,
+            "end_line": 192,
+            "start_byte": 6333,
+            "end_byte": 6589
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "control_statement",
+          "text": "try {\n    // Vulnerable: YAML parsing can execute arbitrary code\n    const parsed = yaml.safeLoad(yamlContent);\n    res.json(parsed);\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 185,
+            "end_line": 191,
+            "start_byte": 6373,
+            "end_byte": 6587
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 183,
+            "end_line": 192,
+            "start_byte": 6272,
+            "end_byte": 6590
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: try_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 185,
+            "end_line": 191,
+            "start_byte": 6373,
+            "end_byte": 6587
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 184,
+            "end_line": 184,
+            "start_byte": 6361,
+            "end_byte": 6369
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:7357:POST:/api/validate-email:req.body:7444",
+      "route_id": "route:src/server.ts:7357:POST:/api/validate-email",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.body",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 221,
+          "end_line": 221,
+          "start_byte": 7444,
+          "end_byte": 7452
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 221,
+              "end_line": 221,
+              "start_byte": 7444,
+              "end_byte": 7452
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/api/validate-email', (req: Request, res: Response) => {\n  const { email } = req.body;\n  // Vulnerable: Complex regex that can cause ReDoS\n  const emailRegex = /^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$/;\n  const isValid: boolean = emailRegex.test(email);\n  res.json({ valid: isValid });\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 220,
+            "end_line": 226,
+            "start_byte": 7357,
+            "end_byte": 7679
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const { email } = req.body;\n  // Vulnerable: Complex regex that can cause ReDoS\n  const emailRegex = /^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$/;\n  const isValid: boolean = emailRegex.test(email);\n  res.json({ valid: isValid });\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 220,
+            "end_line": 226,
+            "start_byte": 7422,
+            "end_byte": 7678
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 220,
+            "end_line": 226,
+            "start_byte": 7357,
+            "end_byte": 7679
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 221,
+            "end_line": 221,
+            "start_byte": 7444,
+            "end_byte": 7452
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:7985:GET:/redirect:req.query.url:8063",
+      "route_id": "route:src/server.ts:7985:GET:/redirect",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.query.url",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 237,
+          "end_line": 237,
+          "start_byte": 8063,
+          "end_byte": 8076
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query.url",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 237,
+              "end_line": 237,
+              "start_byte": 8063,
+              "end_byte": 8076
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/redirect', (req: Request, res: Response) => {\n  const url: string = req.query.url as string;\n  // Vulnerable: No validation of redirect URL\n  res.redirect(url);\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 236,
+            "end_line": 240,
+            "start_byte": 7985,
+            "end_byte": 8158
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const url: string = req.query.url as string;\n  // Vulnerable: No validation of redirect URL\n  res.redirect(url);\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 236,
+            "end_line": 240,
+            "start_byte": 8039,
+            "end_byte": 8157
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 236,
+            "end_line": 240,
+            "start_byte": 7985,
+            "end_byte": 8158
+          }
+        },
+        {
+          "kind": "input_validation_absent",
+          "detail": "req.query.url is read and no handler or applicable middleware validator handles it",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 237,
+            "end_line": 237,
+            "start_byte": 8063,
+            "end_byte": 8076
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:src/server.ts:8210:POST:/api/merge:req.body:8297",
+      "route_id": "route:src/server.ts:8210:POST:/api/merge",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.body",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 244,
+          "end_line": 244,
+          "start_byte": 8297,
+          "end_byte": 8305
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 244,
+              "end_line": 244,
+              "start_byte": 8297,
+              "end_byte": 8305
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/api/merge', (req: Request, res: Response) => {\n  const { target, source } = req.body;\n  // Vulnerable: Using lodash merge without proper sanitization\n  const merged = _.merge(target, source);\n  res.json({ result: merged });\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 243,
+            "end_line": 248,
+            "start_byte": 8210,
+            "end_byte": 8447
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const { target, source } = req.body;\n  // Vulnerable: Using lodash merge without proper sanitization\n  const merged = _.merge(target, source);\n  res.json({ result: merged });\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 243,
+            "end_line": 248,
+            "start_byte": 8266,
+            "end_byte": 8446
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 243,
+            "end_line": 248,
+            "start_byte": 8210,
+            "end_byte": 8447
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 244,
+            "end_line": 244,
+            "start_byte": 8297,
+            "end_byte": 8305
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    }
+  ],
+  "gaps": [],
+  "files": [
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "src/server.ts",
+        "start_line": 1,
+        "end_line": 315,
+        "start_byte": 0,
+        "end_byte": 10901
+      },
+      "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+    }
+  ],
+  "limitations": [
+    "ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain",
+    "Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
+    "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
+    "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities"
+  ],
+  "practice": [
+    {
+      "id": "javascript",
+      "version": "3",
+      "languages": [
+        "javascript",
+        "typescript"
+      ]
+    }
+  ]
+}

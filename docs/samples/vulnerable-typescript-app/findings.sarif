@@ -49,7 +49,19 @@
             {
               "level": "note",
               "message": {
+                "text": "GET /api/search: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
                 "text": "GET /api/proxy: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "POST /api/calculate: semantic assessment not_run"
               }
             },
             {
@@ -85,7 +97,13 @@
             {
               "level": "note",
               "message": {
-                "text": "POST /api/register: semantic assessment not_run"
+                "text": "POST /api/parse-yaml: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "POST /api/validate-email: semantic assessment not_run"
               }
             },
             {
@@ -105,12 +123,34 @@
               "message": {
                 "text": "POST /api/merge: semantic assessment not_run"
               }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "POST /api/merge: semantic assessment not_run"
+              }
             }
           ]
         }
       ],
       "properties": {
         "scan.findingTypes": [
+          {
+            "id": "dom-xss",
+            "label": "Client-side XSS",
+            "description": "Browser or API data reaches a DOM or framework rendering operation in an active output context.",
+            "interpretation": "Client entries identify browser sources and verified sinks. Raw flows are construction findings; unknown origin, trust-to-template linkage or API response mapping remains Review. Framework defaults can protect a specific output.",
+            "remediation": "Prefer text APIs and default framework escaping/sanitization. Sanitize rich HTML before rendering, remove unnecessary trust bypasses and verify API origins.",
+            "coverage": "bounded browser DOM and Angular/React/Vue analysis"
+          },
+          {
+            "id": "rendering-flow-review",
+            "label": "Rendering Flow Review",
+            "description": "Data returned by an API needs its browser consumer linked before a rendering claim can be assessed.",
+            "interpretation": "JSON output alone is not an XSS sink or a vulnerability. This record is incomplete flow context for further analysis.",
+            "remediation": "Locate the browser consumer, establish its output context and protections, and assess that rendering flow before changing API data handling.",
+            "coverage": "bounded API response evidence"
+          },
           {
             "id": "sql-injection",
             "label": "SQL Injection",
@@ -155,9 +195,17 @@
             "id": "reflected-xss",
             "label": "Reflected XSS",
             "description": "Request-controlled content is reflected into a browser response in a context that allows it to execute as script.",
-            "interpretation": "XSS means cross-site scripting. This glossary entry is vocabulary for a planned detector; the current reporting increment does not detect or assign Reflected XSS findings.",
+            "interpretation": "Request input reaches an HTML response or template output. Raw output is a construction finding; unknown context or sanitizers remain Review. Escaping protects only its modeled output context. Runtime exploitation is not implied.",
             "remediation": "Use context-appropriate output encoding and safe template or DOM APIs. Input validation alone does not replace correct output handling.",
-            "coverage": "planned"
+            "coverage": "bounded server response and template analysis"
+          },
+          {
+            "id": "stored-xss",
+            "label": "Stored XSS",
+            "description": "Untrusted data is persisted and later rendered in an active browser context.",
+            "interpretation": "A matching model and field link source writes to rendering reads. Unresolved write origins remain Review; a verified raw path is a construction finding. A dependency version alone does not establish a reachable XSS flow.",
+            "remediation": "Preserve the intended stored data; apply context-appropriate escaping or maintained sanitization at every rendering sink, and review existing stored content.",
+            "coverage": "bounded model-field write/read and server template analysis"
           },
           {
             "id": "sensitive-data-logging",
@@ -178,8 +226,8 @@
         ],
         "scan.identityPolicy": "snapshot-local use IDs; edit-stable baseline identity is not implemented",
         "scan.limitations": [
-          "ESM named relative imports and direct returned handler factories only; no re-exports or CommonJS resolution",
-          "ESM Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
+          "ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain",
+          "Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
           "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
           "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities"
         ],
@@ -1285,6 +1333,320 @@
                       "properties": {
                         "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
                       }
+                    },
+                    {
+                      "executionOrder": 2,
+                      "location": {
+                        "message": {
+                          "text": "expression"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 115,
+                            "startLine": 115
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 3,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 115,
+                            "startLine": 115
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "expression"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 117,
+                            "startLine": 117
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 5,
+                      "location": {
+                        "message": {
+                          "text": "expression"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 117,
+                            "startLine": 117
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 6,
+                      "location": {
+                        "message": {
+                          "text": "html_response"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 117,
+                            "startLine": 117
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "fail",
+          "level": "warning",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /api/search",
+                  "kind": "function",
+                  "name": "GET /api/search"
+                }
+              ],
+              "message": {
+                "text": "Protect the specific browser rendering context"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 117,
+                  "startLine": 117
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /api/search: Untrusted data reaches raw HTML output [poor_practice]. A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate. Output context: html_text. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.blockingGaps": [],
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 114,
+                  "end_line": 118,
+                  "start_byte": 3915,
+                  "end_byte": 4137
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "reflected-xss"
+              ],
+              "id": "finding:xss:route:src/server.ts:3915:GET:/api/search:src/server.ts:4084",
+              "use_id": "xss:route:src/server.ts:3915:GET:/api/search:src/server.ts:4084",
+              "route_id": "route:src/server.ts:3915:GET:/api/search",
+              "record_type": "finding",
+              "status": "poor_practice",
+              "title": "Untrusted data reaches raw HTML output",
+              "summary": "A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate.",
+              "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+              "use_protection": "Output context: html_text. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
+              "recommendations": {
+                "title": "Protect the specific browser rendering context",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                ],
+                "example_status": ""
+              }
+            },
+            "scan.kind": "xss_candidate",
+            "scan.recommendations": {
+              "title": "Protect the specific browser rendering context",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+              ],
+              "example_status": ""
+            },
+            "scan.requiredEvidence": [
+              "render_source",
+              "render_binding",
+              "render_context"
+            ],
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /api/search",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.scope": "Bounded source-to-rendering flow; output context and protections are scoped to this sink.",
+            "scan.useId": "xss:route:src/server.ts:3915:GET:/api/search:src/server.ts:4084"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 118,
+                  "startLine": 114
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 118,
+                  "startLine": 114
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "render_binding"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 16,
+                  "startLine": 16
+                }
+              }
+            },
+            {
+              "id": 3,
+              "message": {
+                "text": "render_binding"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 4,
+                  "startLine": 4
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/xss-output-protection",
+          "ruleIndex": 2
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 118,
+                            "startLine": 114
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 115,
+                            "startLine": 115
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
                     }
                   ]
                 }
@@ -1317,7 +1679,7 @@
             }
           ],
           "message": {
-            "text": "GET /api/search: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+            "text": "GET /api/search: Request-field validation evidence is incomplete [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
           },
           "properties": {
             "scan.assessment": {
@@ -1336,8 +1698,8 @@
                 }
               },
               {
-                "kind": "input_validation_unresolved",
-                "detail": "a call receives req.query.query before the sink, and that call is not a proven validator",
+                "kind": "input_validation_absent",
+                "detail": "req.query.query is read and no handler or applicable middleware validator handles it",
                 "at": {
                   "file": "src/server.ts",
                   "start_line": 115,
@@ -1356,9 +1718,9 @@
               "route_id": "route:src/server.ts:3915:GET:/api/search",
               "record_type": "analysis",
               "status": "needs_review",
-              "title": "Request-field validation needs review",
+              "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.query before the sink, and that call is not a proven validator",
+              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.query is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -1716,7 +2078,279 @@
             }
           ],
           "ruleId": "scan/unresolved-string-use",
-          "ruleIndex": 2
+          "ruleIndex": 3
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 142,
+                            "startLine": 133
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 134,
+                            "startLine": 134
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 2,
+                      "location": {
+                        "message": {
+                          "text": "field_projection"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 134,
+                            "startLine": 134
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 3,
+                      "location": {
+                        "message": {
+                          "text": "call_argument_dependency"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 137,
+                            "startLine": 137
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 137,
+                            "startLine": 137
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 5,
+                      "location": {
+                        "message": {
+                          "text": "rendering_data"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 138,
+                            "startLine": 138
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "POST /api/calculate",
+                  "kind": "function",
+                  "name": "POST /api/calculate"
+                }
+              ],
+              "message": {
+                "text": "Protect the specific browser rendering context"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 138,
+                  "startLine": 138
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "POST /api/calculate: API data needs a rendering link before XSS assessment [needs_review]. Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim. No HTML sink has been established for this data edge."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "unknown_transfer",
+                "detail": "call may transform or discard its arguments: eval",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 137,
+                  "end_line": 137,
+                  "start_byte": 4783,
+                  "end_byte": 4799
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "rendering-flow-review"
+              ],
+              "id": "finding:render-data:route:src/server.ts:4614:POST:/api/calculate:src/server.ts:4805",
+              "use_id": "render-data:route:src/server.ts:4614:POST:/api/calculate:src/server.ts:4805",
+              "route_id": "route:src/server.ts:4614:POST:/api/calculate",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "API data needs a rendering link before XSS assessment",
+              "summary": "Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim.",
+              "input_validation": "Not established from the supplied evidence.",
+              "use_protection": "No HTML sink has been established for this data edge.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Protect the specific browser rendering context",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                ],
+                "example_status": ""
+              }
+            },
+            "scan.kind": "xss_data_candidate",
+            "scan.recommendations": {
+              "title": "Protect the specific browser rendering context",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+              ],
+              "example_status": ""
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "POST /api/calculate",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "render-data:route:src/server.ts:4614:POST:/api/calculate:src/server.ts:4805"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 142,
+                  "startLine": 133
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 142,
+                  "startLine": 133
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "control_statement"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 141,
+                  "startLine": 135
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/rendering-flow-review",
+          "ruleIndex": 4
         },
         {
           "codeFlows": [
@@ -2588,6 +3222,289 @@
                       "properties": {
                         "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
                       }
+                    },
+                    {
+                      "executionOrder": 2,
+                      "location": {
+                        "message": {
+                          "text": "field_projection"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 184,
+                            "startLine": 184
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 3,
+                      "location": {
+                        "message": {
+                          "text": "call_argument_dependency"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 187,
+                            "startLine": 187
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 187,
+                            "startLine": 187
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 5,
+                      "location": {
+                        "message": {
+                          "text": "rendering_data"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 188,
+                            "startLine": 188
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "POST /api/parse-yaml",
+                  "kind": "function",
+                  "name": "POST /api/parse-yaml"
+                }
+              ],
+              "message": {
+                "text": "Protect the specific browser rendering context"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 188,
+                  "startLine": 188
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "POST /api/parse-yaml: API data needs a rendering link before XSS assessment [needs_review]. Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim. No HTML sink has been established for this data edge."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "unknown_value",
+                "detail": "unresolved local value: yaml",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 187,
+                  "end_line": 187,
+                  "start_byte": 6457,
+                  "end_byte": 6461
+                }
+              },
+              {
+                "kind": "unknown_transfer",
+                "detail": "call may transform or discard its arguments: yaml.safeLoad",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 187,
+                  "end_line": 187,
+                  "start_byte": 6457,
+                  "end_byte": 6483
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "rendering-flow-review"
+              ],
+              "id": "finding:render-data:route:src/server.ts:6272:POST:/api/parse-yaml:src/server.ts:6489",
+              "use_id": "render-data:route:src/server.ts:6272:POST:/api/parse-yaml:src/server.ts:6489",
+              "route_id": "route:src/server.ts:6272:POST:/api/parse-yaml",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "API data needs a rendering link before XSS assessment",
+              "summary": "Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim.",
+              "input_validation": "Not established from the supplied evidence.",
+              "use_protection": "No HTML sink has been established for this data edge.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Protect the specific browser rendering context",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                ],
+                "example_status": ""
+              }
+            },
+            "scan.kind": "xss_data_candidate",
+            "scan.recommendations": {
+              "title": "Protect the specific browser rendering context",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+              ],
+              "example_status": ""
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "POST /api/parse-yaml",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "render-data:route:src/server.ts:6272:POST:/api/parse-yaml:src/server.ts:6489"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 192,
+                  "startLine": 183
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 192,
+                  "startLine": 183
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "control_statement"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 191,
+                  "startLine": 185
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/rendering-flow-review",
+          "ruleIndex": 4
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 192,
+                            "startLine": 183
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 184,
+                            "startLine": 184
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
                     }
                   ]
                 }
@@ -2772,8 +3689,8 @@
                             "uri": "src/server.ts"
                           },
                           "region": {
-                            "endLine": 203,
-                            "startLine": 195
+                            "endLine": 226,
+                            "startLine": 220
                           }
                         }
                       },
@@ -2792,8 +3709,108 @@
                             "uri": "src/server.ts"
                           },
                           "region": {
-                            "endLine": 199,
-                            "startLine": 199
+                            "endLine": 221,
+                            "startLine": 221
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 2,
+                      "location": {
+                        "message": {
+                          "text": "field_projection"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 221,
+                            "startLine": 221
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 3,
+                      "location": {
+                        "message": {
+                          "text": "call_argument_dependency"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 224,
+                            "startLine": 224
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 224,
+                            "startLine": 224
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 5,
+                      "location": {
+                        "message": {
+                          "text": "expression"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 225,
+                            "startLine": 225
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 6,
+                      "location": {
+                        "message": {
+                          "text": "rendering_data"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 225,
+                            "startLine": 225
                           }
                         }
                       },
@@ -2812,27 +3829,27 @@
             {
               "logicalLocations": [
                 {
-                  "fullyQualifiedName": "POST /api/register",
+                  "fullyQualifiedName": "POST /api/validate-email",
                   "kind": "function",
-                  "name": "POST /api/register"
+                  "name": "POST /api/validate-email"
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Protect the specific browser rendering context"
               },
               "physicalLocation": {
                 "artifactLocation": {
                   "uri": "src/server.ts"
                 },
                 "region": {
-                  "endLine": 199,
-                  "startLine": 199
+                  "endLine": 225,
+                  "startLine": 225
                 }
               }
             }
           ],
           "message": {
-            "text": "POST /api/register: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+            "text": "POST /api/validate-email: API data needs a rendering link before XSS assessment [needs_review]. Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim. No HTML sink has been established for this data edge."
           },
           "properties": {
             "scan.assessment": {
@@ -2840,68 +3857,59 @@
             },
             "scan.coverageGaps": [
               {
-                "kind": "middleware_unresolved",
-                "detail": "effective middleware/guard chain is not modeled",
+                "kind": "unknown_transfer",
+                "detail": "call may transform or discard its arguments: emailRegex.test",
                 "at": {
                   "file": "src/server.ts",
-                  "start_line": 195,
-                  "end_line": 203,
-                  "start_byte": 6637,
-                  "end_byte": 6946
-                }
-              },
-              {
-                "kind": "input_validation_unresolved",
-                "detail": "a call receives req.body before the sink, and that call is not a proven validator",
-                "at": {
-                  "file": "src/server.ts",
-                  "start_line": 199,
-                  "end_line": 199,
-                  "start_byte": 6824,
-                  "end_byte": 6832
+                  "start_line": 224,
+                  "end_line": 224,
+                  "start_byte": 7621,
+                  "end_byte": 7643
                 }
               }
             ],
             "scan.finding": {
               "type_ids": [
-                "input-validation"
+                "rendering-flow-review"
               ],
-              "id": "finding:input:route:src/server.ts:6637:POST:/api/register:req.body:6824",
-              "use_id": "input:route:src/server.ts:6637:POST:/api/register:req.body:6824",
-              "route_id": "route:src/server.ts:6637:POST:/api/register",
+              "id": "finding:render-data:route:src/server.ts:7357:POST:/api/validate-email:src/server.ts:7647",
+              "use_id": "render-data:route:src/server.ts:7357:POST:/api/validate-email:src/server.ts:7647",
+              "route_id": "route:src/server.ts:7357:POST:/api/validate-email",
               "record_type": "analysis",
               "status": "needs_review",
-              "title": "Request-field validation needs review",
-              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
-              "use_protection": "Not established from the supplied evidence.",
+              "title": "API data needs a rendering link before XSS assessment",
+              "summary": "Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim.",
+              "input_validation": "Not established from the supplied evidence.",
+              "use_protection": "No HTML sink has been established for this data edge.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Protect the specific browser rendering context",
                 "actions": [
                   "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": ""
               }
             },
-            "scan.kind": "input_validation_candidate",
+            "scan.kind": "xss_data_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Protect the specific browser rendering context",
               "actions": [
                 "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": ""
             },
             "scan.reviewStatus": "not_run",
-            "scan.route": "POST /api/register",
+            "scan.route": "POST /api/validate-email",
             "scan.runtimeConfirmation": "not_run",
-            "scan.useId": "input:route:src/server.ts:6637:POST:/api/register:req.body:6824"
+            "scan.useId": "render-data:route:src/server.ts:7357:POST:/api/validate-email:src/server.ts:7647"
           },
           "relatedLocations": [
             {
@@ -2914,8 +3922,8 @@
                   "uri": "src/server.ts"
                 },
                 "region": {
-                  "endLine": 203,
-                  "startLine": 195
+                  "endLine": 226,
+                  "startLine": 220
                 }
               }
             },
@@ -2929,14 +3937,14 @@
                   "uri": "src/server.ts"
                 },
                 "region": {
-                  "endLine": 203,
-                  "startLine": 195
+                  "endLine": 226,
+                  "startLine": 220
                 }
               }
             }
           ],
-          "ruleId": "scan/input-validation",
-          "ruleIndex": 1
+          "ruleId": "scan/rendering-flow-review",
+          "ruleIndex": 4
         },
         {
           "codeFlows": [
@@ -3204,7 +4212,7 @@
             }
           ],
           "message": {
-            "text": "GET /redirect: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+            "text": "GET /redirect: Request-field validation evidence is incomplete [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
           },
           "properties": {
             "scan.assessment": {
@@ -3223,8 +4231,8 @@
                 }
               },
               {
-                "kind": "input_validation_unresolved",
-                "detail": "a call receives req.query.url before the sink, and that call is not a proven validator",
+                "kind": "input_validation_absent",
+                "detail": "req.query.url is read and no handler or applicable middleware validator handles it",
                 "at": {
                   "file": "src/server.ts",
                   "start_line": 237,
@@ -3243,9 +4251,9 @@
               "route_id": "route:src/server.ts:7985:GET:/redirect",
               "record_type": "analysis",
               "status": "needs_review",
-              "title": "Request-field validation needs review",
+              "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.url before the sink, and that call is not a proven validator",
+              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.url is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -3309,6 +4317,445 @@
           ],
           "ruleId": "scan/input-validation",
           "ruleIndex": 1
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 248,
+                            "startLine": 243
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 244,
+                            "startLine": 244
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 2,
+                      "location": {
+                        "message": {
+                          "text": "field_projection"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 244,
+                            "startLine": 244
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 3,
+                      "location": {
+                        "message": {
+                          "text": "call_argument_dependency"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 246,
+                            "startLine": 246
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 246,
+                            "startLine": 246
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 5,
+                      "location": {
+                        "message": {
+                          "text": "expression"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 247,
+                            "startLine": 247
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 6,
+                      "location": {
+                        "message": {
+                          "text": "rendering_data"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 247,
+                            "startLine": 247
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 248,
+                            "startLine": 243
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 244,
+                            "startLine": 244
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 2,
+                      "location": {
+                        "message": {
+                          "text": "field_projection"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 244,
+                            "startLine": 244
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 3,
+                      "location": {
+                        "message": {
+                          "text": "call_argument_dependency"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 246,
+                            "startLine": 246
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 246,
+                            "startLine": 246
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 5,
+                      "location": {
+                        "message": {
+                          "text": "expression"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 247,
+                            "startLine": 247
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 6,
+                      "location": {
+                        "message": {
+                          "text": "rendering_data"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 247,
+                            "startLine": 247
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "POST /api/merge",
+                  "kind": "function",
+                  "name": "POST /api/merge"
+                }
+              ],
+              "message": {
+                "text": "Protect the specific browser rendering context"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 247,
+                  "startLine": 247
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "POST /api/merge: API data needs a rendering link before XSS assessment [needs_review]. Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim. No HTML sink has been established for this data edge."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "unknown_value",
+                "detail": "unresolved local value: _",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 246,
+                  "end_line": 246,
+                  "start_byte": 8388,
+                  "end_byte": 8389
+                }
+              },
+              {
+                "kind": "unknown_transfer",
+                "detail": "call may transform or discard its arguments: _.merge",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 246,
+                  "end_line": 246,
+                  "start_byte": 8388,
+                  "end_byte": 8411
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "rendering-flow-review"
+              ],
+              "id": "finding:render-data:route:src/server.ts:8210:POST:/api/merge:src/server.ts:8415",
+              "use_id": "render-data:route:src/server.ts:8210:POST:/api/merge:src/server.ts:8415",
+              "route_id": "route:src/server.ts:8210:POST:/api/merge",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "API data needs a rendering link before XSS assessment",
+              "summary": "Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim.",
+              "input_validation": "Not established from the supplied evidence.",
+              "use_protection": "No HTML sink has been established for this data edge.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Protect the specific browser rendering context",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                ],
+                "example_status": ""
+              }
+            },
+            "scan.kind": "xss_data_candidate",
+            "scan.recommendations": {
+              "title": "Protect the specific browser rendering context",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+              ],
+              "example_status": ""
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "POST /api/merge",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "render-data:route:src/server.ts:8210:POST:/api/merge:src/server.ts:8415"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 248,
+                  "startLine": 243
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 248,
+                  "startLine": 243
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/rendering-flow-review",
+          "ruleIndex": 4
         },
         {
           "codeFlows": [
@@ -3536,6 +4983,22 @@
             },
             {
               "help": {
+                "markdown": "Protect the specific browser rendering context\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.\n- For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.\n- Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.\n- Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.\n",
+                "text": "Protect the specific browser rendering context. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text. For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version. Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them. Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+              },
+              "id": "scan/xss-output-protection",
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-79"
+                ]
+              },
+              "shortDescription": {
+                "text": "Protect the specific browser rendering context"
+              }
+            },
+            {
+              "help": {
                 "markdown": "Review protection for the named use\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Resolve the source-to-use relationship and applicable guards.\n- Apply the destination/API-specific protection and the route's declared field requirements.\n- Add vulnerable, protected and inconclusive regression cases.\n",
                 "text": "Review protection for the named use. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Resolve the source-to-use relationship and applicable guards. Apply the destination/API-specific protection and the route's declared field requirements. Add vulnerable, protected and inconclusive regression cases."
               },
@@ -3547,6 +5010,21 @@
               },
               "shortDescription": {
                 "text": "Review protection for the named use"
+              }
+            },
+            {
+              "help": {
+                "markdown": "Protect the specific browser rendering context\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.\n- For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.\n- Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.\n- Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.\n",
+                "text": "Protect the specific browser rendering context. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text. For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version. Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them. Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+              },
+              "id": "scan/rendering-flow-review",
+              "properties": {
+                "tags": [
+                  "security"
+                ]
+              },
+              "shortDescription": {
+                "text": "Protect the specific browser rendering context"
               }
             }
           ]

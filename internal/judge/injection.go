@@ -3,6 +3,9 @@ package judge
 import "github.com/zazzcode/zazzles/internal/graph"
 
 func questionsFor(use graph.StringUse) []question {
+	if use.Kind == "xss_candidate" {
+		return xssQuestions
+	}
 	if logUse(use) {
 		return logQuestions
 	}
@@ -23,6 +26,9 @@ func questionsFor(use graph.StringUse) []question {
 }
 
 func questionChoices(q question) []map[string]string {
+	if c := xssChoices(q.name); c != nil {
+		return c
+	}
 	if c := logChoices(q.name); c != nil {
 		return c
 	}

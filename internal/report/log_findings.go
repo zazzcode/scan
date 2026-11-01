@@ -36,7 +36,19 @@ func describeLog(u graph.StringUse, f *graph.Finding) {
 		f.Status = "poor_practice"
 		f.Title = "Request credential is written to logs"
 		f.Summary = "A credential carried by the request reaches a verified logging call with its content intact. Remove it from the log entry or log a non-revealing fact, such as whether it was present."
-	case hasGap(u, "log_sensitive_field_hint") || hasGap(u, "log_request_container") || hasGap(u, "log_transform_unresolved"):
+	case hasGap(u, "log_request_container") && !hasGap(u, "log_sensitive_field_hint"):
+		container := "request data"
+		for _, dependency := range u.Dependencies {
+			if strings.HasSuffix(dependency.Source.Text, ".query") {
+				container = "request query"
+			} else if strings.HasSuffix(dependency.Source.Text, ".body") {
+				container = "request body"
+			}
+		}
+		f.RecordType, f.Status = "analysis", "needs_review"
+		f.Title = "Whole " + container + " is sent to a logging call"
+		f.Summary = "The handler passes a whole request container to a verified logging call. This is logging evidence, not an established sensitive-data leak: no credential or personal-data field has been identified in this container. Review which fields are logged and retain only necessary data."
+	case hasGap(u, "log_sensitive_field_hint") || hasGap(u, "log_transform_unresolved"):
 		f.RecordType = "analysis"
 		f.Status = "needs_review"
 		f.Title = "Possible sensitive data in a log entry"

@@ -14,6 +14,12 @@ func guidance(use graph.StringUse) Guidance {
 	}
 	var g Guidance
 	switch kind {
+	case "xss_candidate", "xss_data_candidate":
+		g = Guidance{Title: "Protect the specific browser rendering context", Actions: []string{
+			"Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+			"For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+			"Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+			"Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."}}
 	case "sql_query", "sql_query_candidate":
 		g = Guidance{Title: "Separate input data from SQL structure", Actions: []string{
 			"Pass untrusted values through the verified driver's parameter-binding API. Keep SQL query, update, and insert structure separate from data. Review NoSQL APIs separately.",

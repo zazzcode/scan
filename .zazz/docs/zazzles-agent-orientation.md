@@ -16,7 +16,14 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 
 ## Current work
 
-**Current worktree, 2026-11-01: `logger-leak`.** Verify the actual path, branch, and changes with
+**Active worktree, 2026-11-01: `xss-response`.** Read the local, gitignored
+[XSS analysis/judging handoff](../ephemeral/xss-analysis-handoff.md) and
+[implementation results](../evaluation/xss-implementation-results.md) first. The user requested
+committing/pushing this first pass; further hardening is for a separate agent/session in this same
+worktree. Baseline targets remain unchanged; remediation uses copies. Five approved Luna decisions
+are saved and replayable offline; they do not authorize more requests.
+
+**Historical worktree context: `logger-leak`.** Verify the actual path, branch, and changes with
 `pwd` and `git status --short --branch`. The user requested stable agent guidance, README setup/usage,
 clearer validation and database results, fresh offline target scans, and JSON-driven standalone HTML with expandable rows and remediation.
 See the [reporting contract](../specifications/human-readable-reports.md). Logger-leak detection follows
@@ -50,8 +57,9 @@ exception is not this assignment.
   authorization for a new scanner slice. Explicit user requests are sufficient under
   [AGENTS.md](../../AGENTS.md#authorization-and-delivery); no separate greenlight is required.
 
-**Local session handoff:** when resuming this checkout, read
-[SQL/NoSQL judgment handoff](../ephemeral/sql-nosql-judgment-handoff.md) first. It records current
+**Historical local session notes:** the optional
+[SQL/NoSQL judgment handoff](../ephemeral/sql-nosql-judgment-handoff.md) records earlier work. Active
+XSS work resumes from the local XSS handoff above, not these ignored historical files. It records current
 calibration failures and the logger-leak gate. The earlier
 [route-string-validation handoff](../ephemeral/route-string-validation-handoff.md) is historical context. This is an
 ignored local execution artifact; durable design/contracts/results remain indexed below.

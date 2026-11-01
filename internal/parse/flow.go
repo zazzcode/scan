@@ -9,23 +9,37 @@ import (
 )
 
 type value struct {
-	deps []graph.Dependency
-	gaps []graph.Gap
+	domNode            bool
+	urlParams          bool
+	trustedContext     string
+	apiPath, apiMethod string
+	model              string
+	read               *graph.Evidence
+	fields             map[string]value
+	templateFile       string
+	outputHTML         bool
+	outputContext      string
+	deps               []graph.Dependency
+	gaps               []graph.Gap
 }
 type flow struct {
-	module  *sourceModule
-	set     *moduleSet
-	route   graph.Route
-	request string
-	env     map[string]value
-	context []graph.Evidence
-	gaps    []graph.Gap
-	uses    []graph.StringUse
-	returns []value
-	work    int
-	depth   int
-	helpers *helperExpansion
-	facts   *inputFacts
+	client       *clientContext
+	response     string
+	responseType string
+	registration *sourceModule
+	module       *sourceModule
+	set          *moduleSet
+	route        graph.Route
+	request      string
+	env          map[string]value
+	context      []graph.Evidence
+	gaps         []graph.Gap
+	uses         []graph.StringUse
+	returns      []value
+	work         int
+	depth        int
+	helpers      *helperExpansion
+	facts        *inputFacts
 	// parts maps destructured request-parameter names (query, body, ...) to their container.
 	parts map[string]string
 }
@@ -42,7 +56,7 @@ func (f *flow) statements(body *sitter.Node) {
 	if body == nil {
 		return
 	}
-	if body.Kind() != "statement_block" {
+	if body.Kind() != "statement_block" && body.Kind() != "program" {
 		// An expression-bodied function returns that expression. The route handler's
 		// own implicit return is recorded and then ignored by the caller.
 		f.returns = append(f.returns, f.transfer(f.eval(body), "return_value", body))
@@ -63,6 +77,9 @@ func (f *flow) statements(body *sitter.Node) {
 					f.env[name.Utf8Text(f.module.src)] = f.transfer(v, "assignment", d)
 					if name.Utf8Text(f.module.src) == f.request {
 						f.request = ""
+					}
+					if name.Utf8Text(f.module.src) == f.response {
+						f.response = ""
 					}
 				} else {
 					if name.Kind() == "object_pattern" {
@@ -139,8 +156,16 @@ func (f *flow) eval(n *sitter.Node) value {
 		return value{gaps: []graph.Gap{gap}}
 	}
 	src := f.module.src
+	if f.client != nil {
+		if v, ok := f.clientValue(n); ok {
+			return v
+		}
+		if v, ok := f.clientJSX(n); ok {
+			return v
+		}
+	}
 	switch n.Kind() {
-	case "identifier":
+	case "identifier", "shorthand_property_identifier":
 		if v, ok := f.env[n.Utf8Text(src)]; ok {
 			return v
 		}
@@ -169,20 +194,57 @@ func (f *flow) eval(n *sitter.Node) value {
 			}
 			return v
 		}
+		if v, ok := f.storedProperty(n); ok {
+			return v
+		}
 		v := f.children(n)
 		return f.transfer(v, "property_read", n)
 	case "assignment_expression":
 		left := n.ChildByFieldName("left")
 		v := f.transfer(f.eval(n.ChildByFieldName("right")), "assignment", n)
+		if f.client != nil && f.clientAssignment(n, left, v) {
+			return v
+		}
 		if left != nil && left.Kind() == "identifier" {
 			f.env[left.Utf8Text(src)] = v
 			if left.Utf8Text(src) == f.request {
 				f.request = ""
 			}
+			if left.Utf8Text(src) == f.response {
+				f.response = ""
+			}
 		} else {
+			f.assignStoredField(left, v)
 			v.gaps = append(v.gaps, f.gap("unsupported_write", "heap/property assignment is not modeled", n))
 		}
 		return v
+	case "object":
+		v := value{fields: map[string]value{}}
+		for i := uint(0); i < n.NamedChildCount(); i++ {
+			p := n.NamedChild(i)
+			key, child := p.ChildByFieldName("key"), p.ChildByFieldName("value")
+			if key != nil && child != nil {
+				field := f.eval(p)
+				v = combine(v, field)
+				v.model, v.read = "", nil
+				v.fields[key.Utf8Text(src)] = field
+			} else if p.Kind() == "shorthand_property_identifier" {
+				field := f.eval(p)
+				v = combine(v, field)
+				v.fields[p.Utf8Text(src)] = field
+			}
+		}
+		return v
+	case "new_expression":
+		if f.client != nil {
+			if v, ok := f.clientConstructor(n); ok {
+				return v
+			}
+		}
+		if v, ok := f.xssConstructor(n); ok {
+			return v
+		}
+		return f.transfer(f.children(n), "expression", n)
 	case "call_expression":
 		return f.call(n)
 	case "binary_expression":
@@ -255,7 +317,9 @@ func (f *flow) children(n *sitter.Node) value {
 }
 
 func (f *flow) transfer(v value, kind string, n *sitter.Node) value {
-	out := value{gaps: append([]graph.Gap{}, v.gaps...)}
+	out := v
+	out.deps = nil
+	out.gaps = append([]graph.Gap{}, v.gaps...)
 	for _, d := range v.deps {
 		if len(d.Transfers) >= 64 {
 			out.gaps = append(out.gaps, f.gap("transfer_limit", "dependency exceeds 64 transfer steps", n))
@@ -269,6 +333,27 @@ func (f *flow) transfer(v value, kind string, n *sitter.Node) value {
 }
 
 func combine(a, b value) value {
+	if a.model == "" {
+		a.model, a.read = b.model, b.read
+	}
+	if a.fields == nil && b.fields != nil {
+		a.fields = b.fields
+	}
+	if a.templateFile == "" {
+		a.templateFile = b.templateFile
+	}
+	a.outputHTML = a.outputHTML || b.outputHTML
+	a.domNode = a.domNode || b.domNode
+	a.urlParams = a.urlParams || b.urlParams
+	if a.trustedContext == "" {
+		a.trustedContext = b.trustedContext
+	}
+	if a.apiPath == "" {
+		a.apiPath, a.apiMethod = b.apiPath, b.apiMethod
+	}
+	if a.outputContext == "" {
+		a.outputContext = b.outputContext
+	}
 	a.deps = append(append([]graph.Dependency{}, a.deps...), b.deps...)
 	a.gaps = append(append([]graph.Gap{}, a.gaps...), b.gaps...)
 	if len(a.deps) > 64 {
@@ -288,20 +373,41 @@ func (f *flow) call(n *sitter.Node) value {
 		return value{}
 	}
 	name := fn.Utf8Text(f.module.src)
+	if f.client != nil {
+		if v, handled := f.clientCall(n, fn, args); handled {
+			return v
+		}
+	}
+	if modeled, handled := f.templateCall(n, fn, args); handled {
+		return modeled
+	}
 	// An outer chained call must still visit its receiver, including a query call.
 	// Its result is kept so a.b().c() still depends on what a.b() depended on.
 	var chained value
 	if fn.Kind() == "member_expression" {
 		obj := fn.ChildByFieldName("object")
-		if obj != nil && obj.Kind() == "call_expression" {
+		if obj != nil && (obj.Kind() == "call_expression" || obj.Kind() == "new_expression") {
 			chained = f.eval(obj)
 		}
 	}
+	modelValue, modelCall := f.modelCallValue(n, fn, chained)
 	var values []value
 	if args != nil {
 		for i := uint(0); i < args.NamedChildCount(); i++ {
-			values = append(values, f.eval(args.NamedChild(i)))
+			arg := args.NamedChild(i)
+			if isFunction(arg) && modelCall {
+				f.modelCallback(arg, modelValue, name)
+				values = append(values, value{})
+			} else {
+				values = append(values, f.eval(arg))
+			}
 		}
+	}
+	if f.responseCall(n, fn, args, values) {
+		return value{}
+	}
+	if modelCall {
+		f.recordStorageWrite(n, fn, args, values, modelValue)
 	}
 	// A verified logger is an emission sink, not a validator of its arguments.
 	if binding, ok := f.logSink(n, fn); ok {
@@ -309,6 +415,14 @@ func (f *flow) call(n *sitter.Node) value {
 		return value{gaps: []graph.Gap{f.gap("unknown_call_result", "logger return value is not modeled", n)}}
 	}
 	kind := queryKind(name, args, f.module.src, values)
+	if kind == "" && modelCall && strings.HasPrefix(modelValue.model, "mongoose:") && requestDeps(values) {
+		if prop := fn.ChildByFieldName("property"); prop != nil {
+			switch prop.Utf8Text(f.module.src) {
+			case "find", "findOne", "findById", "update", "updateOne", "deleteOne":
+				kind = "nosql_query_candidate"
+			}
+		}
+	}
 	if kind == "" && collectionWrite(name) && requestDeps(values) && f.set != nil {
 		probe := graph.StringUse{Sink: f.module.evidence("nosql_query_candidate", n)}
 		if len(f.set.collectionBinding(probe)) > 0 {
@@ -334,7 +448,13 @@ func (f *flow) call(n *sitter.Node) value {
 			f.uses = append(f.uses, graph.StringUse{ID: fmt.Sprintf("use:%s:%s:%d", f.route.ID, f.module.file, n.StartByte()), RouteID: f.route.ID, Kind: kind, Sink: f.module.evidence(kind, n), Dependencies: v.deps, Context: context, Gaps: gaps, Assessment: graph.Assessment{Status: "not_run"}})
 		}
 		// Response values are new external sources, never aliases of request arguments.
+		if modelCall {
+			return modelValue
+		}
 		return value{gaps: []graph.Gap{f.gap("unknown_call_result", "sink/transport return value is not modeled", n)}}
+	}
+	if modelCall {
+		return modelValue
 	}
 	ret, entered, precise := f.enterHelper(n, name, values)
 	if entered && precise {

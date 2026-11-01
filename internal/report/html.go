@@ -40,6 +40,7 @@ type htmlView struct {
 	Glossary                    []graph.FindingType
 	Root                        string
 	Rows                        []*htmlRow
+	ClientRows                  []*htmlRow
 	Gaps                        []graph.Gap
 	Limitations                 []string
 	Findings, Review, Protected int
@@ -59,8 +60,17 @@ func HTML(w io.Writer, r *graph.StringReport) error {
 		rows[e.Route.ID] = row
 		v.Rows = append(v.Rows, row)
 	}
+	for _, e := range r.ClientEntries {
+		row := &htmlRow{ID: e.ID, SourceType: "Browser " + e.Kind, Path: e.Location.File, Signature: e.Name, Location: e.Location}
+		rows[e.ID] = row
+		v.Rows = append(v.Rows, row)
+	}
 	for i, u := range r.Uses {
-		row := rows[u.RouteID]
+		identity := u.RouteID
+		if u.ClientID != "" {
+			identity = u.ClientID
+		}
+		row := rows[identity]
 		if row == nil {
 			row = &htmlRow{ID: u.RouteID, SourceType: "Unresolved entry", Signature: "Route association unavailable"}
 			rows[u.RouteID] = row
@@ -104,6 +114,15 @@ func HTML(w io.Writer, r *graph.StringReport) error {
 		}
 		return a.Method < b.Method
 	})
+	serverRows := make([]*htmlRow, 0, len(v.Rows))
+	for _, row := range v.Rows {
+		if len(row.SourceType) >= 8 && row.SourceType[:8] == "Browser " {
+			v.ClientRows = append(v.ClientRows, row)
+		} else {
+			serverRows = append(serverRows, row)
+		}
+	}
+	v.Rows = serverRows
 	return htmlReport.Execute(w, v)
 }
 func displayLabel(value string) string {

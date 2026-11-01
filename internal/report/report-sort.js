@@ -1,4 +1,23 @@
 (() => {
+  const protectedFilter = document.getElementById('hide-protected');
+  const filterStatus = document.getElementById('filter-status');
+  if (protectedFilter) {
+    protectedFilter.disabled = false;
+    const applyFilter = () => {
+      const hide = protectedFilter.checked;
+      for (const entry of document.querySelectorAll('details.entry')) {
+        for (const item of entry.querySelectorAll('article.finding')) {
+          item.hidden = hide && item.dataset.recordType === 'protection';
+        }
+        entry.hidden = hide && Number(entry.dataset.findings) === 0 && Number(entry.dataset.review) === 0;
+      }
+      if (filterStatus) filterStatus.textContent = hide
+        ? 'Showing open Findings and Review items. Protected results are hidden; total counts and saved evidence are unchanged.'
+        : 'Showing all results. Filtering changes this view only; saved evidence and total counts remain intact.';
+    };
+    protectedFilter.addEventListener('change', applyFilter);
+    applyFilter();
+  }
   const container = document.getElementById('source-rows');
   const status = document.getElementById('sort-status');
   const buttons = Array.from(document.querySelectorAll('[data-sort]'));

@@ -19,7 +19,7 @@ func TestLogOutcomes(t *testing.T) {
 		{"protocol credential", []string{"log_protocol_credential"}, "finding", "poor_practice", "credential"},
 		{"credential beside unresolved field", []string{"log_transform_unresolved", "log_protocol_credential"}, "finding", "poor_practice", "credential"},
 		{"field-name hint", []string{"log_sensitive_field_hint"}, "analysis", "needs_review", "Possible"},
-		{"whole container", []string{"log_request_container"}, "analysis", "needs_review", "Possible"},
+		{"whole container", []string{"log_request_container"}, "analysis", "needs_review", "Whole"},
 		{"unresolved masking", []string{"log_transform_unresolved"}, "analysis", "needs_review", "Possible"},
 		{"hint beside non-content", []string{"log_non_content_only", "log_sensitive_field_hint"}, "analysis", "needs_review", "Possible"},
 		{"non-content only", []string{"log_non_content_only"}, "protection", "protected_for_claim", "non-revealing"},

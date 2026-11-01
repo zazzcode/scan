@@ -33,6 +33,7 @@ var extensions = map[string]Language{
 	".jsx":  JavaScript,
 	".mjs":  JavaScript,
 	".cjs":  JavaScript,
+	".vue":  JavaScript,
 	".py":   Python,
 	".go":   Go,
 	".java": Java,

@@ -180,3 +180,15 @@ The second command converts saved scanner JSON offline without a judge request. 
 route identity, scoped status, source evidence, gaps and illustrative remediation templates. Examples
 are unverified suggestions, not applied fixes. `--sarif` and `--json` are mutually exclusive.
 The same source JSON can be exported as [standalone HTML](interpreting-results.md).
+
+## XSS and remediation view
+
+Current reports include bounded server response/template, stored-rendering and browser XSS analysis.
+Server/API routes and Browser/client-side sources use separate headings; client rows identify
+components/source files and output locations rather than HTTP methods/routes. Selecting an API entry
+file limits server registrations; browser discovery still inspects supported scripts in the target.
+See [the XSS analysis guide](analysis/xss.md) for protection gates and current limits.
+
+Use **Hide protected results** to focus on Findings and Review. It hides protected records and
+protected-only source entries; saved JSON/SARIF and total counts remain unchanged. A Protected result
+is scoped to its exact output and evidence, never the entire route/application.

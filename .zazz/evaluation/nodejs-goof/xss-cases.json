@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "target_repository": "https://github.com/snyk-labs/nodejs-goof",
+  "target_revision": "add14ba59e98240d9e00a235dd7d42cd61ae9912",
+  "label_basis": "Pinned source and upstream documentation; no scanner verdicts define labels.",
+  "runtime_confirmation": "not_performed",
+  "independent_label_review": "pending",
+  "benchmark_role": "authored development evaluation; not held-out; written after first comparator run",
+  "source_sha256": {
+    "README.md": "70c6c5b816dd3c24a6e5a83e3b3424b952ee10a11b134f0c38900bc9b4ce87cb",
+    "package.json": "d93de0d5af790ec763d4c62177d92f4fbed7b9d48f21d6dafaa7984bd8733c31",
+    "package-lock.json": "b94e05f7e0ede5f9dd0a172e6a41f8b0f96324719516ee8d74fe7dc8b186475a",
+    "app.js": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd",
+    "mongoose-db.js": "22591758d30ca24b01641fcd90d373299e3e68134b8a09f26ed0a069a184d370",
+    "routes/index.js": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22",
+    "views/admin.ejs": "564904a37eef5d6e4813ef306ad9a0dcfedf66c15ca15241f330e51e657713b6",
+    "views/index.ejs": "463e33887aa6f75a4a2e9be31159bdb8dfdd1bc08e0b2a92eeef534da0f36335",
+    "views/edit.ejs": "867ce350c8ae5d7793208c3b170d98f2733bc15382900833efbc55a59f74e4fe",
+    "views/account.hbs": "e0deb8dda0e022c32e06cc3afde665a36001b1440bfa67c7c3ac5b7f6fadc4ff",
+    "public/js/ga.js": "ec0bd48aaa6c1da6132f86157ff8419cc0d6a016026d17f237a636938d914164",
+    "exploits/marked-exploit.sh": "4a536ed28f809b80880c7031022786d739ac967378f42befd9cf903fd8e92882",
+    "views/about_new.dust": "bdb86e1fdc2c7df3ef71cbf9bce3d5bbb7ab446ef57066c8d459f3706d073b98"
+  },
+  "cases": [
+    {
+      "id": "GOOF-XSS-01",
+      "expected": "expected_vulnerable",
+      "type": "reflected_server",
+      "entry": "GET /login",
+      "source": "req.query.redirectPage",
+      "sink": "views/admin.ejs:17",
+      "context": "raw HTML in quoted attribute",
+      "evidence_basis": "source + upstream README"
+    },
+    {
+      "id": "GOOF-XSS-02",
+      "expected": "expected_vulnerable",
+      "type": "stored_server",
+      "entry": "POST /create -> GET /",
+      "source": "req.body.content -> Todo.content",
+      "sink": "views/index.ejs:20",
+      "context": "Markdown HTML, versioned sanitizer bypass",
+      "evidence_basis": "source + upstream marked demonstration"
+    },
+    {
+      "id": "GOOF-XSS-03",
+      "expected": "expected_vulnerable",
+      "type": "stored_server",
+      "entry": "POST /update/:id -> GET /",
+      "source": "req.body.content -> Todo.content",
+      "sink": "views/index.ejs:20",
+      "context": "Markdown HTML, versioned sanitizer bypass",
+      "evidence_basis": "source + upstream marked demonstration"
+    },
+    {
+      "id": "GOOF-XSS-N01",
+      "expected": "expected_protected_for_claim",
+      "type": "escaped_output",
+      "entry": "GET /edit/:id",
+      "source": "Todo.content",
+      "sink": "views/edit.ejs:23",
+      "context": "HTML text",
+      "evidence_basis": "source: escaped EJS output"
+    },
+    {
+      "id": "GOOF-XSS-N02",
+      "expected": "expected_protected_for_claim",
+      "type": "escaped_output",
+      "entry": "GET /edit/:id",
+      "source": "Todo.content",
+      "sink": "views/edit.ejs:20",
+      "context": "quoted HTML attribute",
+      "evidence_basis": "source: escaped EJS output"
+    },
+    {
+      "id": "GOOF-XSS-N03",
+      "expected": "expected_review",
+      "type": "escaped_output",
+      "entry": "POST /account_details",
+      "source": "req.body fields",
+      "sink": "views/account.hbs",
+      "context": "HTML text and quoted attributes",
+      "evidence_basis": "Escaped field syntax, but request body also controls full render locals/options; upstream README documents layout injection.",
+      "observed_protection": "HTML field escaping only; full rendering flow unresolved"
+    },
+    {
+      "id": "GOOF-XSS-N04",
+      "expected": "expected_no_xss_flow",
+      "type": "fixed_client_script",
+      "entry": null,
+      "source": "literal script name and fixed Google Analytics hosts",
+      "sink": "public/js/ga.js:3-5",
+      "context": "DOM script element",
+      "evidence_basis": "source: no attacker-controlled HTML or script destination"
+    }
+  ]
+}

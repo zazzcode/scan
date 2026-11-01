@@ -1,0 +1,59 @@
+# Node.js Goof evaluation sample
+
+[All samples](../README.md) · [Bearer runbook](bearer-runbook.md) ·
+[Capability inventory](../../../.zazz/evaluation/nodejs-goof-capabilities.md) ·
+[Independent XSS answer key](xss-answer-key.md)
+
+Added 2026-11-01 from [Snyk Labs Node.js Goof](https://github.com/snyk-labs/nodejs-goof),
+package version `1.0.1`, revision `add14ba59e98240d9e00a235dd7d42cd61ae9912`.
+The local reference checkout is `<DEV_ROOT>/nodejs-goof`; see the
+[workspace convention](../../../.zazz/docs/zazzles-agent-orientation.md#portable-workspace-and-dev_root).
+The checkout was clean when inspected. Its README, package manifest, route registrations,
+handlers and templates supplied the initial case inventory.
+
+## Current zazzles report
+
+[HTML](findings.html) · [JSON](findings.json) · [SARIF](findings.sarif) · [Provenance](metadata.json)
+
+The current source scan has **19 route entries and 33 use records** across XSS, input validation,
+Mongoose NoSQL and logging. It includes the mounted `/users` routes. Two records are Findings
+(reflected login XSS, now a source-complete static Luna judgment; stored todo Markdown output,
+orange construction finding). Twenty-nine are Review and two are Protected: the edit template's
+escaped todo-content text and quoted attribute. Account-details fields remain Review because the
+whole request object also controls rendering options. No route or application is declared safe.
+
+Five explicitly approved `gpt-6-luna` decisions are saved with raw request/response bodies and scored
+answers in the [decision evaluation](decisions/20261101-five-case-01/README.md). Other uses are
+unassessed. The [independent answer key](xss-answer-key.md) defines expected source properties;
+model answers never replace it. No target runtime/exploit or remediation was performed.
+
+## Initial comparator baseline
+
+The [pre-XSS comparison](../../../.zazz/evaluation/nodejs-goof-results.md) and
+[Bearer summary](bearer/20261101-goof-baseline-02/SUMMARY.md) retain the historical 43 findings / 12
+rules, including the false XSS record at fixed script creation. The initial zazzles evidence scan
+had zero routes/uses because CommonJS was unsupported. Historical per-increment reports are
+snapshots; earlier account-details protection labels were superseded by the current Review status.
+
+## Saved results
+
+Curated Bearer runs belong under `docs/samples/nodejs-goof/bearer/<run-id>/`.
+Each run MUST contain these files before being listed here as a completed baseline:
+
+| File | Purpose |
+|---|---|
+| `bearer-nodejs-goof.json` | Unmodified Bearer findings, grouped by severity |
+| `bearer-nodejs-goof.log` | Debug diagnostics, including worker/file failures |
+| `bearer-nodejs-goof.execution.json` | Exact command, duration, exit status and validity |
+| `metadata.json` | Tool/rules/target identities, binary hash and environment policy |
+| `nodejs-goof.scope.json` | Included source paths and SHA256 hashes, exclusions and revision |
+| `bearer-version.txt`, `bearer-scan-help.txt` | Inspected binary version and supported flags |
+| `SUMMARY.md` | Reviewed rule/severity totals, case matches, omissions and limitations |
+
+The sample directory is published by the repository's sample Pages workflow. Review logs and
+metadata before copying them here; keep source snapshots, temporary files and machine-local paths
+in ignored scratch. Preserve raw diagnostics in scratch if a public log needs redaction and record
+the redaction in `SUMMARY.md`. Include the upstream Apache-2.0 license when publishing source
+excerpts. Do not overwrite prior runs or create empty findings as a substitute for a pending run.
+
+Zazzles `findings.json`, HTML and SARIF reports are separate artifacts under `zazzles/<run-id>/`. The sample refresh script handles all three current zazzles reports; it does not ingest Bearer JSON.

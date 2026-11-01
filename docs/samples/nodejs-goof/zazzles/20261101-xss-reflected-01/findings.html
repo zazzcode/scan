@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'sha256-BUkI3SvnNDl921F9e3Sp3i8d5OgI0Zcjwoyep1yLfRk='; base-uri 'none'; form-action 'none'">
+<title>scan · Source security report</title>
+<style>
+:root{color-scheme:light;--ink:#182d38;--muted:#536971;--line:#d5e0e4;--paper:#fff;--bg:#f1f5f4;--green:#165f52;--amber:#815207}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,sans-serif}main{max-width:1720px;margin:auto;padding:38px 32px 80px}.brand{color:var(--green);font-size:18px;font-weight:800;letter-spacing:.08em}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}h1{font-size:38px;letter-spacing:-.04em;line-height:1.15;margin:12px 0}h2{font-size:22px}h3{font-size:18px;margin:12px 0 6px}h4{margin:16px 0 6px}p{margin:8px 0}.sub{color:var(--muted);max-width:850px}.root{overflow-wrap:anywhere;font:13px ui-monospace,monospace;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:28px 0}.stat{border-top:3px solid var(--green);padding:15px 20px;background:var(--paper);border-radius:4px}.stat strong{display:block;font-size:32px;line-height:1.25}.stat span{color:var(--muted);font-size:13px}.note{border-left:3px solid #bc8b3b;background:#fffaf0;padding:13px 18px;margin:20px 0;color:#604d31}.grid-head,.row-summary{display:grid;grid-template-columns:110px minmax(165px,1.4fr) minmax(150px,1fr) 85px 65px 95px minmax(240px,1.5fr);gap:12px;align-items:center}.grid-head{position:sticky;top:0;background:var(--bg);z-index:1;padding:12px 22px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.entry{background:white;border:1px solid var(--line);border-radius:8px;margin:8px 0;overflow:hidden}.row-summary{padding:18px 22px;cursor:pointer;list-style:none}.row-summary::-webkit-details-marker{display:none}.row-summary:hover{background:#f7faf9}.row-summary:focus-visible,summary:focus-visible{outline:3px solid #268476;outline-offset:-3px}.source:before{content:'▸';margin-right:9px;color:var(--green)}.entry[open]>.row-summary .source:before{content:'▾'}.signature{font:600 14px ui-monospace,monospace;overflow-wrap:anywhere}.location{font:12px ui-monospace,monospace;overflow-wrap:anywhere;color:var(--muted)}.count{font-size:17px;font-weight:700}.count small{display:none}.body{padding:8px 24px 24px;border-top:1px solid var(--line)}.finding{border-top:1px solid var(--line);padding:20px 0}.finding:first-of-type{border-top:0}.badge{display:inline-block;background:#edf3f3;border:1px solid #ccdcdd;color:#35585d;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600}.badge.finding{background:#fff5de;color:var(--amber);border-color:#e4cd9e;padding:3px 10px}.badge.protection{background:#e6f3ed;color:var(--green)}.facets{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:18px 0}.facet{background:#f5f8f7;padding:14px 18px;border-radius:6px}.facet h4{margin-top:0}.uncertainty{font-size:13px;color:var(--muted)}pre{background:#142d35;color:#e6f0ee;padding:16px;border-radius:6px;font:13px/1.6 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:340px;overflow:auto}code{font:13px ui-monospace,monospace;overflow-wrap:anywhere}summary{cursor:pointer}li{margin:6px 0}.technical{font-size:13px;color:var(--muted)}.evidence{margin:12px 0;border-left:2px solid var(--line);padding-left:15px}.scope{background:white;border:1px solid var(--line);border-radius:8px;padding:16px 22px;margin-top:24px}.empty{color:var(--muted);padding:16px 0}footer{color:var(--muted);font-size:12px;margin-top:28px}@media(max-width:1100px){main{padding:24px 16px}.grid-head{display:none}.row-summary{grid-template-columns:1fr 1fr 1fr;gap:12px}.source,.signature,.location,.type-pills{grid-column:1/-1}.count small{display:inline;font-size:11px;color:var(--muted);font-weight:400}.stats{grid-template-columns:1fr 1fr}.facets{grid-template-columns:1fr}h1{font-size:30px}}@media print{body{background:white}main{padding:0}pre{max-height:none;background:#f1f3f3;color:black}.entry,.finding{break-inside:avoid}.stats{grid-template-columns:repeat(4,1fr)}}
+
+.type-pills{display:flex;flex-wrap:wrap;gap:7px;align-items:center}.type-pills.none-reported{color:var(--muted);font-size:12px}.type-pill{font:600 12px/1.5 system-ui,sans-serif;border:1px solid #b9cdd0;border-radius:18px;background:#eef5f5;color:#315961;padding:5px 10px;cursor:pointer;text-align:left;max-width:100%}.type-pill.poor-practice{background:#fff6e3;border-color:#dec897;color:#775313}.type-pill.protected{background:#e8f4ee;border-color:#acd0be;color:#236049}.type-pill:hover{box-shadow:0 0 0 2px #33867828}.type-pill:focus-visible,.panel-close:focus-visible{outline:3px solid #268476;outline-offset:2px}.pill-status{font-size:10px;font-weight:500;opacity:.85}.glossary-link{color:var(--green);font-weight:600}.glossary-panel{inset:0 0 0 auto;margin:0;width:min(480px,100vw);height:100dvh;max-height:100dvh;overflow-y:auto;border:0;border-left:1px solid var(--line);padding:30px;background:#fff;color:var(--ink);box-shadow:-12px 0 45px #17343c24}.glossary-panel::backdrop{background:#162b3420}.panel-top{display:flex;align-items:center;justify-content:space-between;gap:14px}.panel-close{border:1px solid var(--line);background:#f3f7f6;border-radius:6px;padding:7px 12px;color:var(--ink);cursor:pointer;font:inherit}.glossary-panel h2{font-size:28px;line-height:1.2}.glossary-item{border-top:1px solid var(--line);padding:18px 0}.glossary-item:first-of-type{border-top:0}.glossary-coverage{color:var(--muted);font-size:12px}.location-label{font-weight:600;color:var(--muted)}@media print{.glossary-panel,.type-pill{display:none}}
+
+.badge,.badge.analysis,.type-pill,.type-pill.review{background:#eff6ff;border-color:#bfd2e9;color:#315d88}
+.badge.finding,.type-pill.poor-practice{background:#fff5e5;border-color:#e6c797;color:#805314}
+.badge.protection,.type-pill.protected{background:#edf7f0;border-color:#b7d7c1;color:#2d6544}
+.badge.status-confirmed_vulnerability,.type-pill.confirmed-vulnerability{background:#fff0f0;border-color:#eab8b8;color:#9a3434}
+
+.sort-button{appearance:none;background:none;border:0;padding:0;color:inherit;font:inherit;text-transform:inherit;letter-spacing:inherit;cursor:pointer;text-align:left}.sort-button:focus-visible{outline:3px solid #268476;outline-offset:4px}.sort-button:disabled{cursor:default}.sort-direction{letter-spacing:0}.status-sort{grid-column:4/7;display:grid;grid-template-columns:85px 65px 95px;gap:12px;align-items:center}.sort-button:hover{color:var(--green)}.grid-head .categories-heading{padding-left:12px}.row-summary .type-pills{padding-left:12px}@media(max-width:1100px){.grid-head{display:grid;position:static;grid-template-columns:1fr;gap:18px}.grid-head>span{display:none}.status-sort{grid-column:auto;grid-template-columns:repeat(3,1fr);gap:12px}.row-summary .type-pills{padding-left:0}}
+</style></head><body><main>
+<div class="brand">scan<span style="font-weight:400;color:#6b8185"> / report</span></div>
+<p class="eyebrow">Local source analysis · presentation v3</p><h1>Understand the code.<br>Review the evidence.</h1>
+<p class="sub">Expand a source entry to review observations, analysis gaps, and recommended changes. Input validation and protection at a sensitive operation are reported separately.</p>
+<p class="root">nodejs-goof</p>
+<div class="stats"><div class="stat"><strong>17</strong><span>Source entries</span></div><div class="stat"><strong>1</strong><span>Findings · established problems to fix</span></div><div class="stat"><strong>11</strong><span>Review · unresolved questions</span></div><div class="stat"><strong>6</strong><span>Claims with supported protection</span></div></div>
+<div class="note"><strong>Read the status with the finding.</strong> Findings include established vulnerabilities and poor practice to remediate or refactor. An exploit demonstration is not required for a poor-practice finding. Review means the evidence does not yet establish a problem or adequate protection. Protection applies only to the stated claim. No findings reported does not mean a route is safe. Counts are per use and route; shared helpers may appear more than once.</div>
+<h2>Sources &amp; findings</h2><p class="sub">Select a row to expand. Routes start sorted by Findings, Review, then Protected counts, highest first; blank rows appear last. Select Route signature or the grouped Findings / Review / Protected header to change the order; select again to reverse it. The Findings sort orders by Findings, Review, then Protected counts, with blank rows last and route path A–Z breaking ties. Entries without a resolved route appear last. Route location identifies where the route is declared; finding locations appear inside the expanded row. Select a type pill to see its definition. Categories can overlap; a category pill is not an additional finding. Read the status to distinguish poor practice from unresolved review. <a class="glossary-link" href="#finding-glossary">Browse the glossary</a>.</p>
+<p class="sub" id="sort-status" role="status" aria-live="polite">Sorted by Findings, then Review, then Protected (highest first), then route path A–Z and method.</p>
+<div class="grid-head"><span>Source type</span><button type="button" class="sort-button" data-sort="path" aria-pressed="false" aria-label="Sort by route path" disabled>Route signature<span class="sort-direction" aria-hidden="true"> ↕</span></button><span>Route location</span><button type="button" class="sort-button status-sort" data-sort="findings" aria-pressed="true" aria-label="Sort result counts together: Findings, then Review, then Protected" disabled><span>Findings<span class="sort-direction" aria-hidden="true"> ↓</span></span><span>Review</span><span>Protected</span></button><span class="categories-heading">Categories</span></div>
+<section id="source-rows" aria-label="Sources and findings">
+<details class="entry" id="route:app.js:1450:GET:/login" data-path="/login" data-method="GET" data-findings="1" data-review="1" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /login</span><span class="location" title="Where the route is declared">app.js:54</span><span class="count" aria-label="1 findings">1 <small>findings</small></span><span class="count" aria-label="1 analysis items to review">1 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Input Validation <span class="pill-status">· review (1)</span></button><button type="button" class="type-pill poor-practice" popovertarget="glossary-reflected-xss" aria-label="Reflected XSS glossary: 1 records; 0 vulnerabilities, 1 poor practice, 0 potential issues, 0 to review, 0 protected">Reflected XSS <span class="pill-status">· poor practice (1)</span></button></span></summary>
+<div class="body"><article class="finding"><span class="badge finding status-poor_practice">Poor practice · remediate</span><h3>Untrusted data reaches raw HTML output</h3><p>A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate.</p><p class="location"><span class="location-label">Finding location · </span>views/admin.ejs:17</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: html_attribute. Untrusted data reaches raw HTML output without modeled context-appropriate encoding or sanitization.</p></div></div>
+<h4>Fix scope &amp; remaining questions</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.</p>
+<h4>Observed operation</h4><pre>&lt;%- redirectPage %&gt;</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:84</p><pre>req.query.redirectPage</pre></details>
+<h4>Remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.</li><li>For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.</li><li>Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.</li><li>Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:app.js:1450:GET:/login:views/admin.ejs:513 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:54</span></p><details><summary>Additional source context</summary><p class="location">app.js:54</p><pre>app.get(&#39;/login&#39;, routes.login)</pre><p class="location">routes/index.js:80</p><pre>{
+  return res.render(&#39;admin&#39;, {
+    title: &#39;Admin Access&#39;,
+    granted: false,
+    redirectPage: req.query.redirectPage
+  });
+}</pre><p class="location">app.js:38</p><pre>app.set(&#39;views&#39;, path.join(__dirname, &#39;views&#39;))</pre><p class="location">app.js:39</p><pre>app.set(&#39;view engine&#39;, &#39;ejs&#39;)</pre><p class="location">routes/index.js:81</p><pre>res.render(&#39;admin&#39;, {
+    title: &#39;Admin Access&#39;,
+    granted: false,
+    redirectPage: req.query.redirectPage
+  })</pre></details></details>
+</article><article class="finding"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation evidence is incomplete</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:84</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.redirectPage is read and no handler or applicable middleware validator handles it</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>req.query.redirectPage</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:84</p><pre>req.query.redirectPage</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.</li><li>Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.</li><li>Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use input:route:app.js:1450:GET:/login:req.query.redirectPage:2143 · input_validation_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:54</span></p><p><code>input_validation_absent</code> · req.query.redirectPage is read and no handler or applicable middleware validator handles it <span class="location">routes/index.js:84</span></p><details><summary>Additional source context</summary><p class="location">app.js:54</p><pre>app.get(&#39;/login&#39;, routes.login)</pre><p class="location">routes/index.js:80</p><pre>{
+  return res.render(&#39;admin&#39;, {
+    title: &#39;Admin Access&#39;,
+    granted: false,
+    redirectPage: req.query.redirectPage
+  });
+}</pre></details></details>
+</article>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:54</span></p></details></div></details><details class="entry" id="route:app.js:1953:GET:/about_new" data-path="/about_new" data-method="GET" data-findings="0" data-review="4" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /about_new</span><span class="location" title="Where the route is declared">app.js:65</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="4 analysis items to review">4 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 2 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 2 to review, 0 protected">Input Validation <span class="pill-status">· review (2)</span></button><button type="button" class="type-pill review" popovertarget="glossary-reflected-xss" aria-label="Reflected XSS glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Reflected XSS <span class="pill-status">· review (1)</span></button><button type="button" class="type-pill review" popovertarget="glossary-sensitive-data-logging" aria-label="Sensitive Data Logging glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Sensitive Data Logging <span class="pill-status">· review (1)</span></button></span></summary>
+<div class="body"><article class="finding"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Possible sensitive data in a log entry</h3><p>A verified logging call receives a request value whose field name or container suggests credentials or personal data, or that passes through an unresolved transformation. Confirm what the value contains and whether redaction applies before changing behavior. A field name is a hint, not proof.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:312</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>Field validation is reported separately; it does not change what this log line contains.</p></div><div class="facet"><h4>Protection at this use</h4><p>Logging evidence: the whole request query is written to the log and may include credentials or personal data.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>console.log(JSON.stringify(req.query))</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:312</p><pre>req.query</pre><p class="technical">call_argument_dependency · routes/index.js:312</p><pre>JSON.stringify(req.query)</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.</li><li>Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.</li><li>If redaction is required, apply a verified redaction before the logger call or in the logger&#39;s configuration, and test that emitted lines no longer contain the value.</li><li>Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead.</li></ul><details><summary>Illustrative remediation example · unverified</summary><pre>// Illustrative: log a fact about the credential, not the credential.
+console.info(&#39;login attempt&#39;, { username, passwordProvided: typeof password === &#39;string&#39; &amp;&amp; password.length &gt; 0 });</pre><p class="technical">illustrative_template; not a verified application patch</p></details>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use use:route:app.js:1953:GET:/about_new:routes/index.js:7844 · log_sink_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:65</span></p><p><code>unknown_value</code> · unresolved local value: JSON <span class="location">routes/index.js:312</span></p><p><code>unknown_transfer</code> · call may transform or discard its arguments: JSON.stringify <span class="location">routes/index.js:312</span></p><p><code>log_request_container</code> · the whole request query is written to the log and may include credentials or personal data <span class="location">routes/index.js:312</span></p><p><code>log_destination_unresolved</code> · logger transports, levels, formats and redaction configuration are not modeled <span class="location">routes/index.js:312</span></p><details><summary>Additional source context</summary><p class="location">app.js:65</p><pre>app.get(&#39;/about_new&#39;, routes.about_new)</pre><p class="location">routes/index.js:311</p><pre>{
+  console.log(JSON.stringify(req.query));
+  return res.render(&#34;about_new.dust&#34;,
+    {
+      title: &#39;Patch TODO List&#39;,
+      subhead: &#39;Vulnerabilities at their best&#39;,
+      device: req.query.device
+    });
+}</pre><p class="location">routes/index.js:312</p><pre>global console.log</pre></details></details>
+</article><article class="finding"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>HTML rendering protection needs review</h3><p>A source value reaches a rendering operation. Resolve its output context and every transformation before judging XSS.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:313</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: unknown. Rendering context is not established for every value.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>res.render(&#34;about_new.dust&#34;,
+    {
+      title: &#39;Patch TODO List&#39;,
+      subhead: &#39;Vulnerabilities at their best&#39;,
+      device: req.query.device
+    })</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:317</p><pre>req.query.device</pre><p class="technical">expression · routes/index.js:317</p><pre>device: req.query.device</pre><p class="technical">expression · routes/index.js:314</p><pre>{
+      title: &#39;Patch TODO List&#39;,
+      subhead: &#39;Vulnerabilities at their best&#39;,
+      device: req.query.device
+    }</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.</li><li>For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.</li><li>Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.</li><li>Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:app.js:1953:GET:/about_new:routes/index.js:7893 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:65</span></p><details><summary>Additional source context</summary><p class="location">app.js:65</p><pre>app.get(&#39;/about_new&#39;, routes.about_new)</pre><p class="location">routes/index.js:311</p><pre>{
+  console.log(JSON.stringify(req.query));
+  return res.render(&#34;about_new.dust&#34;,
+    {
+      title: &#39;Patch TODO List&#39;,
+      subhead: &#39;Vulnerabilities at their best&#39;,
+      device: req.query.device
+    });
+}</pre><p class="location">app.js:38</p><pre>app.set(&#39;views&#39;, path.join(__dirname, &#39;views&#39;))</pre><p class="location">app.js:39</p><pre>app.set(&#39;view engine&#39;, &#39;ejs&#39;)</pre></details></details>
+</article><article class="finding"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation needs review</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:312</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query before the sink, and that call is not a proven validator</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>req.query</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:312</p><pre>req.query</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.</li><li>Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.</li><li>Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use input:route:app.js:1953:GET:/about_new:req.query:7871 · input_validation_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:65</span></p><p><code>input_validation_unresolved</code> · a call receives req.query before the sink, and that call is not a proven validator <span class="location">routes/index.js:312</span></p><details><summary>Additional source context</summary><p class="location">app.js:65</p><pre>app.get(&#39;/about_new&#39;, routes.about_new)</pre><p class="location">routes/index.js:311</p><pre>{
+  console.log(JSON.stringify(req.query));
+  return res.render(&#34;about_new.dust&#34;,
+    {
+      title: &#39;Patch TODO List&#39;,
+      subhead: &#39;Vulnerabilities at their best&#39;,
+      device: req.query.device
+    });
+}</pre></details></details>
+</article><article class="finding"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation evidence is incomplete</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:317</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.device is read and no handler or applicable middleware validator handles it</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>req.query.device</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:317</p><pre>req.query.device</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.</li><li>Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.</li><li>Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use input:route:app.js:1953:GET:/about_new:req.query.device:8022 · input_validation_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:65</span></p><p><code>input_validation_absent</code> · req.query.device is read and no handler or applicable middleware validator handles it <span class="location">routes/index.js:317</span></p><details><summary>Additional source context</summary><p class="location">app.js:65</p><pre>app.get(&#39;/about_new&#39;, routes.about_new)</pre><p class="location">routes/index.js:311</p><pre>{
+  console.log(JSON.stringify(req.query));
+  return res.render(&#34;about_new.dust&#34;,
+    {
+      title: &#39;Patch TODO List&#39;,
+      subhead: &#39;Vulnerabilities at their best&#39;,
+      device: req.query.device
+    });
+}</pre></details></details>
+</article>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:65</span></p></details></div></details><details class="entry" id="route:app.js:1483:POST:/login" data-path="/login" data-method="POST" data-findings="0" data-review="2" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">POST /login</span><span class="location" title="Where the route is declared">app.js:55</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="2 analysis items to review">2 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 2 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 2 to review, 0 protected">Input Validation <span class="pill-status">· review (2)</span></button></span></summary>
+<div class="body"><article class="finding"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation needs review</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:52</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body.password before the sink, and that call is not a proven validator</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>req.body.password</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:52</p><pre>req.body.password</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.</li><li>Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.</li><li>Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use input:route:app.js:1483:POST:/login:req.body.password:1316 · input_validation_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:55</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:51</span></p><p><code>input_validation_unresolved</code> · a call receives req.body.password before the sink, and that call is not a proven validator <span class="location">routes/index.js:52</span></p><details><summary>Additional source context</summary><p class="location">app.js:55</p><pre>app.post(&#39;/login&#39;, routes.loginHandler)</pre><p class="location">routes/index.js:50</p><pre>{
+  if (validator.isEmail(req.body.username)) {
+    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {
+      if (users.length &gt; 0) {
+        const redirectPage = req.body.redirectPage
+        const session = req.session
+        const username = req.body.username
+        return adminLoginSuccess(redirectPage, session, username, res)
+      } else {
+        return res.status(401).send()
+      }
+    });
+  } else {
+    return res.status(401).send()
+  }
+}</pre><p class="location">routes/index.js:51</p><pre>if (validator.isEmail(req.body.username)) {
+    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {
+      if (users.length &gt; 0) {
+        const redirectPage = req.body.redirectPage
+        const session = req.session
+        const username = req.body.username
+        return adminLoginSuccess(redirectPage, session, username, res)
+      } else {
+        return res.status(401).send()
+      }
+    });
+  } else {
+    return res.status(401).send()
+  }</pre></details></details>
+</article><article class="finding"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation needs review</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:51</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body.username before the sink, and that call is not a proven validator</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>req.body.username</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:51</p><pre>req.body.username</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.</li><li>Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.</li><li>Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use input:route:app.js:1483:POST:/login:req.body.username:1239 · input_validation_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:55</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:51</span></p><p><code>input_validation_unresolved</code> · a call receives req.body.username before the sink, and that call is not a proven validator <span class="location">routes/index.js:51</span></p><details><summary>Additional source context</summary><p class="location">app.js:55</p><pre>app.post(&#39;/login&#39;, routes.loginHandler)</pre><p class="location">routes/index.js:50</p><pre>{
+  if (validator.isEmail(req.body.username)) {
+    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {
+      if (users.length &gt; 0) {
+        const redirectPage = req.body.redirectPage
+        const session = req.session
+        const username = req.body.username
+        return adminLoginSuccess(redirectPage, session, username, res)
+      } else {
+        return res.status(401).send()
+      }
+    });
+  } else {
+    return res.status(401).send()
+  }
+}</pre><p class="location">routes/index.js:51</p><pre>if (validator.isEmail(req.body.username)) {
+    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {
+      if (users.length &gt; 0) {
+        const redirectPage = req.body.redirectPage
+        const session = req.session
+        const username = req.body.username
+        return adminLoginSuccess(redirectPage, session, username, res)
+      } else {
+        return res.status(401).send()
+      }
+    });
+  } else {
+    return res.status(401).send()
+  }</pre></details></details>
+</article>
+<details class="evidence"><summary>Entry analysis gaps (2)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:55</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:51</span></p></details></div></details><details class="entry" id="route:app.js:1652:POST:/account_details" data-path="/account_details" data-method="POST" data-findings="0" data-review="1" data-protected="6"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">POST /account_details</span><span class="location" title="Where the route is declared">app.js:58</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="1 analysis items to review">1 <small>review</small></span><span class="count" aria-label="6 protected claims">6 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Input Validation <span class="pill-status">· review (1)</span></button><button type="button" class="type-pill protected" popovertarget="glossary-reflected-xss" aria-label="Reflected XSS glossary: 6 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 0 to review, 6 protected">Reflected XSS <span class="pill-status">· protected (6)</span></button></span></summary>
+<div class="body"><article class="finding"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation needs review</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:104</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>req.body</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:104</p><pre>req.body</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.</li><li>Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.</li><li>Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use input:route:app.js:1652:POST:/account_details:req.body:2677 · input_validation_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:58</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:106</span></p><p><code>input_validation_unresolved</code> · a call receives req.body before the sink, and that call is not a proven validator <span class="location">routes/index.js:104</span></p><details><summary>Additional source context</summary><p class="location">app.js:58</p><pre>app.post(&#39;/account_details&#39;, routes.isLoggedIn, routes.save_account_details)</pre><p class="location">routes/index.js:102</p><pre>{
+  // get the profile details from the JSON
+	const profile = req.body
+  // validate the input
+  if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }
+}</pre><p class="location">routes/index.js:106</p><pre>if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }</pre></details></details>
+</article><article class="finding"><span class="badge protection status-protected_for_claim">Protection supported for this claim</span><h3>Context-appropriate rendering protection is present</h3><p>The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.</p><p class="location"><span class="location-label">Finding location · </span>views/account.hbs:6</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: html_text. The template HTML-escapes this value in HTML text or a quoted non-active attribute.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>{{firstname}}</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:104</p><pre>req.body</pre><p class="technical">assignment · routes/index.js:104</p><pre>profile = req.body</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.</li><li>For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.</li><li>Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.</li><li>Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:app.js:1652:POST:/account_details:views/account.hbs:108 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:58</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:106</span></p><p><code>template_projection_unresolved</code> · render locals field firstname is not resolved <span class="location">routes/index.js:120</span></p><details><summary>Additional source context</summary><p class="location">app.js:58</p><pre>app.post(&#39;/account_details&#39;, routes.isLoggedIn, routes.save_account_details)</pre><p class="location">routes/index.js:102</p><pre>{
+  // get the profile details from the JSON
+	const profile = req.body
+  // validate the input
+  if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }
+}</pre><p class="location">routes/index.js:106</p><pre>if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }</pre><p class="location">app.js:38</p><pre>app.set(&#39;views&#39;, path.join(__dirname, &#39;views&#39;))</pre><p class="location">app.js:39</p><pre>app.set(&#39;view engine&#39;, &#39;ejs&#39;)</pre><p class="location">routes/index.js:120</p><pre>res.render(&#39;account.hbs&#39;, profile)</pre></details></details>
+</article><article class="finding"><span class="badge protection status-protected_for_claim">Protection supported for this claim</span><h3>Context-appropriate rendering protection is present</h3><p>The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.</p><p class="location"><span class="location-label">Finding location · </span>views/account.hbs:18</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>{{firstname}}</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:104</p><pre>req.body</pre><p class="technical">assignment · routes/index.js:104</p><pre>profile = req.body</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.</li><li>For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.</li><li>Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.</li><li>Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:app.js:1652:POST:/account_details:views/account.hbs:508 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:58</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:106</span></p><p><code>template_projection_unresolved</code> · render locals field firstname is not resolved <span class="location">routes/index.js:120</span></p><details><summary>Additional source context</summary><p class="location">app.js:58</p><pre>app.post(&#39;/account_details&#39;, routes.isLoggedIn, routes.save_account_details)</pre><p class="location">routes/index.js:102</p><pre>{
+  // get the profile details from the JSON
+	const profile = req.body
+  // validate the input
+  if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }
+}</pre><p class="location">routes/index.js:106</p><pre>if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }</pre><p class="location">app.js:38</p><pre>app.set(&#39;views&#39;, path.join(__dirname, &#39;views&#39;))</pre><p class="location">app.js:39</p><pre>app.set(&#39;view engine&#39;, &#39;ejs&#39;)</pre><p class="location">routes/index.js:120</p><pre>res.render(&#39;account.hbs&#39;, profile)</pre></details></details>
+</article><article class="finding"><span class="badge protection status-protected_for_claim">Protection supported for this claim</span><h3>Context-appropriate rendering protection is present</h3><p>The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.</p><p class="location"><span class="location-label">Finding location · </span>views/account.hbs:22</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>{{lastname}}</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:104</p><pre>req.body</pre><p class="technical">assignment · routes/index.js:104</p><pre>profile = req.body</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.</li><li>For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.</li><li>Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.</li><li>Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:app.js:1652:POST:/account_details:views/account.hbs:633 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:58</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:106</span></p><p><code>template_projection_unresolved</code> · render locals field lastname is not resolved <span class="location">routes/index.js:120</span></p><details><summary>Additional source context</summary><p class="location">app.js:58</p><pre>app.post(&#39;/account_details&#39;, routes.isLoggedIn, routes.save_account_details)</pre><p class="location">routes/index.js:102</p><pre>{
+  // get the profile details from the JSON
+	const profile = req.body
+  // validate the input
+  if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }
+}</pre><p class="location">routes/index.js:106</p><pre>if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }</pre><p class="location">app.js:38</p><pre>app.set(&#39;views&#39;, path.join(__dirname, &#39;views&#39;))</pre><p class="location">app.js:39</p><pre>app.set(&#39;view engine&#39;, &#39;ejs&#39;)</pre><p class="location">routes/index.js:120</p><pre>res.render(&#39;account.hbs&#39;, profile)</pre></details></details>
+</article><article class="finding"><span class="badge protection status-protected_for_claim">Protection supported for this claim</span><h3>Context-appropriate rendering protection is present</h3><p>The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.</p><p class="location"><span class="location-label">Finding location · </span>views/account.hbs:26</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>{{country}}</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:104</p><pre>req.body</pre><p class="technical">assignment · routes/index.js:104</p><pre>profile = req.body</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.</li><li>For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.</li><li>Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.</li><li>Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:app.js:1652:POST:/account_details:views/account.hbs:752 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:58</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:106</span></p><p><code>template_projection_unresolved</code> · render locals field country is not resolved <span class="location">routes/index.js:120</span></p><details><summary>Additional source context</summary><p class="location">app.js:58</p><pre>app.post(&#39;/account_details&#39;, routes.isLoggedIn, routes.save_account_details)</pre><p class="location">routes/index.js:102</p><pre>{
+  // get the profile details from the JSON
+	const profile = req.body
+  // validate the input
+  if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }
+}</pre><p class="location">routes/index.js:106</p><pre>if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }</pre><p class="location">app.js:38</p><pre>app.set(&#39;views&#39;, path.join(__dirname, &#39;views&#39;))</pre><p class="location">app.js:39</p><pre>app.set(&#39;view engine&#39;, &#39;ejs&#39;)</pre><p class="location">routes/index.js:120</p><pre>res.render(&#39;account.hbs&#39;, profile)</pre></details></details>
+</article><article class="finding"><span class="badge protection status-protected_for_claim">Protection supported for this claim</span><h3>Context-appropriate rendering protection is present</h3><p>The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.</p><p class="location"><span class="location-label">Finding location · </span>views/account.hbs:30</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>{{phone}}</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:104</p><pre>req.body</pre><p class="technical">assignment · routes/index.js:104</p><pre>profile = req.body</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.</li><li>For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.</li><li>Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.</li><li>Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:app.js:1652:POST:/account_details:views/account.hbs:873 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:58</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:106</span></p><p><code>template_projection_unresolved</code> · render locals field phone is not resolved <span class="location">routes/index.js:120</span></p><details><summary>Additional source context</summary><p class="location">app.js:58</p><pre>app.post(&#39;/account_details&#39;, routes.isLoggedIn, routes.save_account_details)</pre><p class="location">routes/index.js:102</p><pre>{
+  // get the profile details from the JSON
+	const profile = req.body
+  // validate the input
+  if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }
+}</pre><p class="location">routes/index.js:106</p><pre>if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }</pre><p class="location">app.js:38</p><pre>app.set(&#39;views&#39;, path.join(__dirname, &#39;views&#39;))</pre><p class="location">app.js:39</p><pre>app.set(&#39;view engine&#39;, &#39;ejs&#39;)</pre><p class="location">routes/index.js:120</p><pre>res.render(&#39;account.hbs&#39;, profile)</pre></details></details>
+</article><article class="finding"><span class="badge protection status-protected_for_claim">Protection supported for this claim</span><h3>Context-appropriate rendering protection is present</h3><p>The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.</p><p class="location"><span class="location-label">Finding location · </span>views/account.hbs:34</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>{{email}}</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:104</p><pre>req.body</pre><p class="technical">assignment · routes/index.js:104</p><pre>profile = req.body</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.</li><li>For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.</li><li>Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.</li><li>Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:app.js:1652:POST:/account_details:views/account.hbs:985 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:58</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:106</span></p><p><code>template_projection_unresolved</code> · render locals field email is not resolved <span class="location">routes/index.js:120</span></p><details><summary>Additional source context</summary><p class="location">app.js:58</p><pre>app.post(&#39;/account_details&#39;, routes.isLoggedIn, routes.save_account_details)</pre><p class="location">routes/index.js:102</p><pre>{
+  // get the profile details from the JSON
+	const profile = req.body
+  // validate the input
+  if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }
+}</pre><p class="location">routes/index.js:106</p><pre>if (validator.isEmail(profile.email, { allow_display_name: true })
+    // allow_display_name allows us to receive input as:
+    // Display Name &lt;email-address&gt;
+    // which we consider valid too
+    &amp;&amp; validator.isMobilePhone(profile.phone, &#39;he-IL&#39;)
+    &amp;&amp; validator.isAscii(profile.firstname)
+    &amp;&amp; validator.isAscii(profile.lastname)
+    &amp;&amp; validator.isAscii(profile.country)
+  ) {
+    // trim any extra spaces on the right of the name
+    profile.firstname = validator.rtrim(profile.firstname)
+    profile.lastname = validator.rtrim(profile.lastname)
+
+    // render the view
+    return res.render(&#39;account.hbs&#39;, profile)
+  } else {
+    // if input validation fails, we just render the view as is
+    console.log(&#39;error in form details&#39;)
+    return res.render(&#39;account.hbs&#39;)
+  }</pre><p class="location">app.js:38</p><pre>app.set(&#39;views&#39;, path.join(__dirname, &#39;views&#39;))</pre><p class="location">app.js:39</p><pre>app.set(&#39;view engine&#39;, &#39;ejs&#39;)</pre><p class="location">routes/index.js:120</p><pre>res.render(&#39;account.hbs&#39;, profile)</pre></details></details>
+</article>
+<details class="evidence"><summary>Entry analysis gaps (2)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:58</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:106</span></p></details></div></details><details class="entry" id="route:app.js:1765:POST:/create" data-path="/create" data-method="POST" data-findings="0" data-review="1" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">POST /create</span><span class="location" title="Where the route is declared">app.js:60</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="1 analysis items to review">1 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Input Validation <span class="pill-status">· review (1)</span></button></span></summary>
+<div class="body"><article class="finding"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation needs review</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:168</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body.content before the sink, and that call is not a proven validator</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>req.body.content</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:168</p><pre>req.body.content</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.</li><li>Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.</li><li>Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use input:route:app.js:1765:POST:/create:req.body.content:4362 · input_validation_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:60</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:170</span></p><p><code>input_validation_unresolved</code> · a call receives req.body.content before the sink, and that call is not a proven validator <span class="location">routes/index.js:168</span></p><details><summary>Additional source context</summary><p class="location">app.js:60</p><pre>app.post(&#39;/create&#39;, routes.create)</pre><p class="location">routes/index.js:165</p><pre>{
+  // console.log(&#39;req.body: &#39; &#43; JSON.stringify(req.body));
+
+  var item = req.body.content;
+  var imgRegex = /\!\[alt text\]\((http.*)\s\&#34;.*/;
+  if (typeof (item) == &#39;string&#39; &amp;&amp; item.match(imgRegex)) {
+    var url = item.match(imgRegex)[1];
+    console.log(&#39;found img: &#39; &#43; url);
+
+    exec(&#39;identify &#39; &#43; url, function (err, stdout, stderr) {
+      console.log(err);
+      if (err !== null) {
+        console.log(&#39;Error (&#39; &#43; err &#43; &#39;):&#39; &#43; stderr);
+      }
+    });
+
+  } else {
+    item = parse(item);
+  }
+
+  new Todo({
+    content: item,
+    updated_at: Date.now(),
+  }).save(function (err, todo, count) {
+    if (err) return next(err);
+
+    /*
+    res.setHeader(&#39;Data&#39;, todo.content.toString(&#39;base64&#39;));
+    res.redirect(&#39;/&#39;);
+    */
+
+    res.setHeader(&#39;Location&#39;, &#39;/&#39;);
+    res.status(302).send(todo.content.toString(&#39;base64&#39;));
+
+    // res.redirect(&#39;/#&#39; &#43; todo.content.toString(&#39;base64&#39;));
+  });
+}</pre><p class="location">routes/index.js:170</p><pre>if (typeof (item) == &#39;string&#39; &amp;&amp; item.match(imgRegex)) {
+    var url = item.match(imgRegex)[1];
+    console.log(&#39;found img: &#39; &#43; url);
+
+    exec(&#39;identify &#39; &#43; url, function (err, stdout, stderr) {
+      console.log(err);
+      if (err !== null) {
+        console.log(&#39;Error (&#39; &#43; err &#43; &#39;):&#39; &#43; stderr);
+      }
+    });
+
+  } else {
+    item = parse(item);
+  }</pre></details></details>
+</article>
+<details class="evidence"><summary>Entry analysis gaps (2)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:60</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:170</span></p></details></div></details><details class="entry" id="route:app.js:1801:GET:/destroy/:id" data-path="/destroy/:id" data-method="GET" data-findings="0" data-review="1" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /destroy/:id</span><span class="location" title="Where the route is declared">app.js:61</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="1 analysis items to review">1 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Input Validation <span class="pill-status">· review (1)</span></button></span></summary>
+<div class="body"><article class="finding"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation needs review</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:204</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.params.id before the sink, and that call is not a proven validator</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>req.params.id</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:204</p><pre>req.params.id</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.</li><li>Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.</li><li>Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use input:route:app.js:1801:GET:/destroy/:id:req.params.id:5249 · input_validation_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:61</span></p><p><code>input_validation_unresolved</code> · a call receives req.params.id before the sink, and that call is not a proven validator <span class="location">routes/index.js:204</span></p><details><summary>Additional source context</summary><p class="location">app.js:61</p><pre>app.get(&#39;/destroy/:id&#39;, routes.destroy)</pre><p class="location">routes/index.js:203</p><pre>{
+  Todo.findById(req.params.id, function (err, todo) {
+
+    try {
+      todo.remove(function (err, todo) {
+        if (err) return next(err);
+        res.redirect(&#39;/&#39;);
+      });
+    } catch (e) {
+    }
+  });
+}</pre></details></details>
+</article>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:61</span></p></details></div></details><details class="entry" id="route:app.js:1877:POST:/update/:id" data-path="/update/:id" data-method="POST" data-findings="0" data-review="1" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">POST /update/:id</span><span class="location" title="Where the route is declared">app.js:63</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="1 analysis items to review">1 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Input Validation <span class="pill-status">· review (1)</span></button></span></summary>
+<div class="body"><article class="finding"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation needs review</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:232</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.params.id before the sink, and that call is not a proven validator</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>req.params.id</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">routes/index.js:232</p><pre>req.params.id</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.</li><li>Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.</li><li>Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use input:route:app.js:1877:POST:/update/:id:req.params.id:5788 · input_validation_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:63</span></p><p><code>input_validation_unresolved</code> · a call receives req.params.id before the sink, and that call is not a proven validator <span class="location">routes/index.js:232</span></p><details><summary>Additional source context</summary><p class="location">app.js:63</p><pre>app.post(&#39;/update/:id&#39;, routes.update)</pre><p class="location">routes/index.js:231</p><pre>{
+  Todo.findById(req.params.id, function (err, todo) {
+
+    todo.content = req.body.content;
+    todo.updated_at = Date.now();
+    todo.save(function (err, todo, count) {
+      if (err) return next(err);
+
+      res.redirect(&#39;/&#39;);
+    });
+  });
+}</pre></details></details>
+</article>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:63</span></p></details></div></details><details class="entry" id="route:app.js:1422:GET:/" data-path="/" data-method="GET" data-findings="0" data-review="0" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /</span><span class="location" title="Where the route is declared">app.js:53</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="0 analysis items to review">0 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills none-reported"><span>None reported</span></span></summary>
+<div class="body"><p class="empty">No established findings reported for this source entry within the analyzed scope. This is not a safety verdict.</p>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:53</span></p></details></div></details><details class="entry" id="route:app.js:1576:GET:/account_details" data-path="/account_details" data-method="GET" data-findings="0" data-review="0" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /account_details</span><span class="location" title="Where the route is declared">app.js:57</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="0 analysis items to review">0 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills none-reported"><span>None reported</span></span></summary>
+<div class="body"><p class="empty">No established findings reported for this source entry within the analyzed scope. This is not a safety verdict.</p>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:57</span></p></details></div></details><details class="entry" id="route:app.js:1524:GET:/admin" data-path="/admin" data-method="GET" data-findings="0" data-review="0" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /admin</span><span class="location" title="Where the route is declared">app.js:56</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="0 analysis items to review">0 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills none-reported"><span>None reported</span></span></summary>
+<div class="body"><p class="empty">No established findings reported for this source entry within the analyzed scope. This is not a safety verdict.</p>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:56</span></p></details></div></details><details class="entry" id="route:app.js:2064:DELETE:/chat" data-path="/chat" data-method="DELETE" data-findings="0" data-review="0" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">DELETE /chat</span><span class="location" title="Where the route is declared">app.js:68</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="0 analysis items to review">0 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills none-reported"><span>None reported</span></span></summary>
+<div class="body"><p class="empty">No established findings reported for this source entry within the analyzed scope. This is not a safety verdict.</p>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>unresolved_handler</code> · handler is not a directly resolved function <span class="location">app.js:1</span></p></details></div></details><details class="entry" id="route:app.js:1994:GET:/chat" data-path="/chat" data-method="GET" data-findings="0" data-review="0" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /chat</span><span class="location" title="Where the route is declared">app.js:66</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="0 analysis items to review">0 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills none-reported"><span>None reported</span></span></summary>
+<div class="body"><p class="empty">No established findings reported for this source entry within the analyzed scope. This is not a safety verdict.</p>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>unresolved_handler</code> · handler is not a directly resolved function <span class="location">app.js:1</span></p></details></div></details><details class="entry" id="route:app.js:2029:PUT:/chat" data-path="/chat" data-method="PUT" data-findings="0" data-review="0" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">PUT /chat</span><span class="location" title="Where the route is declared">app.js:67</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="0 analysis items to review">0 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills none-reported"><span>None reported</span></span></summary>
+<div class="body"><p class="empty">No established findings reported for this source entry within the analyzed scope. This is not a safety verdict.</p>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>unresolved_handler</code> · handler is not a directly resolved function <span class="location">app.js:1</span></p></details></div></details><details class="entry" id="route:app.js:1842:GET:/edit/:id" data-path="/edit/:id" data-method="GET" data-findings="0" data-review="0" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /edit/:id</span><span class="location" title="Where the route is declared">app.js:62</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="0 analysis items to review">0 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills none-reported"><span>None reported</span></span></summary>
+<div class="body"><p class="empty">No established findings reported for this source entry within the analyzed scope. This is not a safety verdict.</p>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:62</span></p></details></div></details><details class="entry" id="route:app.js:1917:POST:/import" data-path="/import" data-method="POST" data-findings="0" data-review="0" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">POST /import</span><span class="location" title="Where the route is declared">app.js:64</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="0 analysis items to review">0 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills none-reported"><span>None reported</span></span></summary>
+<div class="body"><p class="empty">No established findings reported for this source entry within the analyzed scope. This is not a safety verdict.</p>
+<details class="evidence"><summary>Entry analysis gaps (4)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:64</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:255</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:264</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:267</span></p></details></div></details><details class="entry" id="route:app.js:1730:GET:/logout" data-path="/logout" data-method="GET" data-findings="0" data-review="0" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /logout</span><span class="location" title="Where the route is declared">app.js:59</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="0 analysis items to review">0 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills none-reported"><span>None reported</span></span></summary>
+<div class="body"><p class="empty">No established findings reported for this source entry within the analyzed scope. This is not a safety verdict.</p>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:59</span></p></details></div></details><details class="entry" id="route:app.js:2105:USE:/users" data-path="/users" data-method="USE" data-findings="0" data-review="0" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">USE /users</span><span class="location" title="Where the route is declared">app.js:69</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="0 analysis items to review">0 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills none-reported"><span>None reported</span></span></summary>
+<div class="body"><p class="empty">No established findings reported for this source entry within the analyzed scope. This is not a safety verdict.</p>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>unresolved_handler</code> · handler is not a directly resolved function <span class="location">app.js:1</span></p></details></div></details>
+</section>
+<section class="scope"><h2>Scope &amp; limitations</h2><ul><li>ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain</li><li>Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved</li><li>Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain</li><li>SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities</li></ul></section>
+<details class="scope" id="finding-glossary"><summary><strong>Finding-type glossary</strong> · 8 definitions</summary><p class="sub">Types identify security review areas. A type name does not establish vulnerability or detector coverage; always read the result status.</p><section class="glossary-item"><h3>SQL Injection</h3><p class="glossary-coverage">Coverage: bounded analysis</p><p>Input changes executable SQL structure instead of remaining a data value, potentially changing what the database reads or writes.</p><h4>How to interpret this type</h4><p>An SQL Injection pill identifies the risk family being reviewed. String-built executable SQL is poor practice to remediate even without a proven exploit; a library-managed search value may remain unresolved. The finding status and evidence determine the actual claim. The pill alone does not confirm injection.</p><h4>Remediation approach</h4><p>Use the verified driver&#39;s parameter-binding API for values. Review dynamic identifiers separately. Keep business-field validation independent of query-structure protection.</p></section><section class="glossary-item"><h3>NoSQL Injection</h3><p class="glossary-coverage">Coverage: bounded analysis</p><p>Untrusted input changes a NoSQL query&#39;s operators, selector structure, or executable expression rather than remaining an allowed data value.</p><h4>How to interpret this type</h4><p>Executable $where string construction is poor practice to refactor even without a proven exploit. An unmodeled document constraint alone is Review, not an established defect. Inspect actual value types, keys, transformations, library behavior, and the named status.</p><h4>Remediation approach</h4><p>Prefer data-only query APIs, constrain scalar slots and permitted keys/operators, and avoid building executable $where strings from input.</p></section><section class="glossary-item"><h3>Input Validation</h3><p class="glossary-coverage">Coverage: bounded analysis</p><p>Server-side checks enforce the business requirements for a field, such as required presence, runtime type, permitted format, range, or length.</p><h4>How to interpret this type</h4><p>Poor input validation means an applicable requirement is not adequately enforced. This neutral family label also covers unresolved checks and supported protection: no validator identified in an analyzed slice is not proof that every execution path lacks validation. Free-text punctuation is not itself a defect.</p><h4>Remediation approach</h4><p>Define field-specific requirements and enforce them before use on all applicable paths. Verify guard behavior and middleware. Apply destination-specific protection separately.</p></section><section class="glossary-item"><h3>Account Creation Validation</h3><p class="glossary-coverage">Coverage: bounded analysis</p><p>Required account fields and enforcing guards must be checked before an account is persisted.</p><h4>How to interpret this type</h4><p>Review field requirements, conditional bypasses, and generated persistence behavior. A modeled create operation alone does not prove a registration bypass.</p><h4>Remediation approach</h4><p>Enforce required fields before persistence, terminate rejected paths, add appropriate database constraints, and test the persisted result.</p></section><section class="glossary-item"><h3>Outbound Request Safety</h3><p class="glossary-coverage">Coverage: bounded analysis</p><p>Input used in an outbound request may affect its destination, headers, or other request values. Unrestricted destination control can lead to server-side request forgery (SSRF).</p><h4>How to interpret this type</h4><p>The current scanner records bounded outbound-use evidence. A pill does not establish SSRF, destination reachability, or complete response-flow analysis.</p><h4>Remediation approach</h4><p>Verify allowed destinations and protocols, redirect handling, network boundaries, and sensitive request values for the specific HTTP client.</p></section><section class="glossary-item"><h3>Reflected XSS</h3><p class="glossary-coverage">Coverage: bounded server response and template analysis</p><p>Request-controlled content is reflected into a browser response in a context that allows it to execute as script.</p><h4>How to interpret this type</h4><p>Request input reaches an HTML response or template output. Raw output is a construction finding; unknown context or sanitizers remain Review. Escaping protects only its modeled output context. Runtime exploitation is not implied.</p><h4>Remediation approach</h4><p>Use context-appropriate output encoding and safe template or DOM APIs. Input validation alone does not replace correct output handling.</p></section><section class="glossary-item"><h3>Sensitive Data Logging</h3><p class="glossary-coverage">Coverage: bounded analysis</p><p>Logs expose credentials, tokens, personal information, or other sensitive values to readers or storage that should not receive them.</p><h4>How to interpret this type</h4><p>Covers verified console and winston calls in analyzed route handlers that receive request values with credential or personal-data evidence. A field name is a hint for review, not proof; Authorization and Cookie headers are credentials by HTTP semantics. Morgan request logging that records URLs is checked against credentials read from the query string. Constant messages are not leaks. Non-request secrets and logger redaction configuration are not yet analyzed.</p><h4>Remediation approach</h4><p>Avoid logging secrets; minimize sensitive fields and apply verified redaction before emission. Review log access and retention.</p></section><section class="glossary-item"><h3>Sensitive Operation Review</h3><p class="glossary-coverage">Coverage: bounded analysis</p><p>A possible sensitive use was recorded but does not yet map to a more specific supported risk family.</p><h4>How to interpret this type</h4><p>This is an analysis category. Inspect the evidence and missing operation semantics before making a security claim.</p><h4>Remediation approach</h4><p>Resolve the source, operation, API behavior, and required protection before selecting a fix.</p></section></details>
+<aside id="glossary-sql-injection" class="glossary-panel" popover="auto" role="dialog" aria-labelledby="glossary-heading-sql-injection"><div class="panel-top"><span class="eyebrow">Finding-type glossary</span><button type="button" class="panel-close" popovertarget="glossary-sql-injection" popovertargetaction="hide" autofocus>Close</button></div><h2 id="glossary-heading-sql-injection">SQL Injection</h2><p class="glossary-coverage">Coverage: bounded analysis</p><p>Input changes executable SQL structure instead of remaining a data value, potentially changing what the database reads or writes.</p><h3>What this label tells you</h3><p>An SQL Injection pill identifies the risk family being reviewed. String-built executable SQL is poor practice to remediate even without a proven exploit; a library-managed search value may remain unresolved. The finding status and evidence determine the actual claim. The pill alone does not confirm injection.</p><h3>Remediation approach</h3><p>Use the verified driver&#39;s parameter-binding API for values. Review dynamic identifiers separately. Keep business-field validation independent of query-structure protection.</p><div class="note">The label names a review area. Read each finding's evidence and assessment status to understand what scan established.</div></aside><aside id="glossary-nosql-injection" class="glossary-panel" popover="auto" role="dialog" aria-labelledby="glossary-heading-nosql-injection"><div class="panel-top"><span class="eyebrow">Finding-type glossary</span><button type="button" class="panel-close" popovertarget="glossary-nosql-injection" popovertargetaction="hide" autofocus>Close</button></div><h2 id="glossary-heading-nosql-injection">NoSQL Injection</h2><p class="glossary-coverage">Coverage: bounded analysis</p><p>Untrusted input changes a NoSQL query&#39;s operators, selector structure, or executable expression rather than remaining an allowed data value.</p><h3>What this label tells you</h3><p>Executable $where string construction is poor practice to refactor even without a proven exploit. An unmodeled document constraint alone is Review, not an established defect. Inspect actual value types, keys, transformations, library behavior, and the named status.</p><h3>Remediation approach</h3><p>Prefer data-only query APIs, constrain scalar slots and permitted keys/operators, and avoid building executable $where strings from input.</p><div class="note">The label names a review area. Read each finding's evidence and assessment status to understand what scan established.</div></aside><aside id="glossary-input-validation" class="glossary-panel" popover="auto" role="dialog" aria-labelledby="glossary-heading-input-validation"><div class="panel-top"><span class="eyebrow">Finding-type glossary</span><button type="button" class="panel-close" popovertarget="glossary-input-validation" popovertargetaction="hide" autofocus>Close</button></div><h2 id="glossary-heading-input-validation">Input Validation</h2><p class="glossary-coverage">Coverage: bounded analysis</p><p>Server-side checks enforce the business requirements for a field, such as required presence, runtime type, permitted format, range, or length.</p><h3>What this label tells you</h3><p>Poor input validation means an applicable requirement is not adequately enforced. This neutral family label also covers unresolved checks and supported protection: no validator identified in an analyzed slice is not proof that every execution path lacks validation. Free-text punctuation is not itself a defect.</p><h3>Remediation approach</h3><p>Define field-specific requirements and enforce them before use on all applicable paths. Verify guard behavior and middleware. Apply destination-specific protection separately.</p><div class="note">The label names a review area. Read each finding's evidence and assessment status to understand what scan established.</div></aside><aside id="glossary-account-creation-validation" class="glossary-panel" popover="auto" role="dialog" aria-labelledby="glossary-heading-account-creation-validation"><div class="panel-top"><span class="eyebrow">Finding-type glossary</span><button type="button" class="panel-close" popovertarget="glossary-account-creation-validation" popovertargetaction="hide" autofocus>Close</button></div><h2 id="glossary-heading-account-creation-validation">Account Creation Validation</h2><p class="glossary-coverage">Coverage: bounded analysis</p><p>Required account fields and enforcing guards must be checked before an account is persisted.</p><h3>What this label tells you</h3><p>Review field requirements, conditional bypasses, and generated persistence behavior. A modeled create operation alone does not prove a registration bypass.</p><h3>Remediation approach</h3><p>Enforce required fields before persistence, terminate rejected paths, add appropriate database constraints, and test the persisted result.</p><div class="note">The label names a review area. Read each finding's evidence and assessment status to understand what scan established.</div></aside><aside id="glossary-outbound-request-safety" class="glossary-panel" popover="auto" role="dialog" aria-labelledby="glossary-heading-outbound-request-safety"><div class="panel-top"><span class="eyebrow">Finding-type glossary</span><button type="button" class="panel-close" popovertarget="glossary-outbound-request-safety" popovertargetaction="hide" autofocus>Close</button></div><h2 id="glossary-heading-outbound-request-safety">Outbound Request Safety</h2><p class="glossary-coverage">Coverage: bounded analysis</p><p>Input used in an outbound request may affect its destination, headers, or other request values. Unrestricted destination control can lead to server-side request forgery (SSRF).</p><h3>What this label tells you</h3><p>The current scanner records bounded outbound-use evidence. A pill does not establish SSRF, destination reachability, or complete response-flow analysis.</p><h3>Remediation approach</h3><p>Verify allowed destinations and protocols, redirect handling, network boundaries, and sensitive request values for the specific HTTP client.</p><div class="note">The label names a review area. Read each finding's evidence and assessment status to understand what scan established.</div></aside><aside id="glossary-reflected-xss" class="glossary-panel" popover="auto" role="dialog" aria-labelledby="glossary-heading-reflected-xss"><div class="panel-top"><span class="eyebrow">Finding-type glossary</span><button type="button" class="panel-close" popovertarget="glossary-reflected-xss" popovertargetaction="hide" autofocus>Close</button></div><h2 id="glossary-heading-reflected-xss">Reflected XSS</h2><p class="glossary-coverage">Coverage: bounded server response and template analysis</p><p>Request-controlled content is reflected into a browser response in a context that allows it to execute as script.</p><h3>What this label tells you</h3><p>Request input reaches an HTML response or template output. Raw output is a construction finding; unknown context or sanitizers remain Review. Escaping protects only its modeled output context. Runtime exploitation is not implied.</p><h3>Remediation approach</h3><p>Use context-appropriate output encoding and safe template or DOM APIs. Input validation alone does not replace correct output handling.</p><div class="note">The label names a review area. Read each finding's evidence and assessment status to understand what scan established.</div></aside><aside id="glossary-sensitive-data-logging" class="glossary-panel" popover="auto" role="dialog" aria-labelledby="glossary-heading-sensitive-data-logging"><div class="panel-top"><span class="eyebrow">Finding-type glossary</span><button type="button" class="panel-close" popovertarget="glossary-sensitive-data-logging" popovertargetaction="hide" autofocus>Close</button></div><h2 id="glossary-heading-sensitive-data-logging">Sensitive Data Logging</h2><p class="glossary-coverage">Coverage: bounded analysis</p><p>Logs expose credentials, tokens, personal information, or other sensitive values to readers or storage that should not receive them.</p><h3>What this label tells you</h3><p>Covers verified console and winston calls in analyzed route handlers that receive request values with credential or personal-data evidence. A field name is a hint for review, not proof; Authorization and Cookie headers are credentials by HTTP semantics. Morgan request logging that records URLs is checked against credentials read from the query string. Constant messages are not leaks. Non-request secrets and logger redaction configuration are not yet analyzed.</p><h3>Remediation approach</h3><p>Avoid logging secrets; minimize sensitive fields and apply verified redaction before emission. Review log access and retention.</p><div class="note">The label names a review area. Read each finding's evidence and assessment status to understand what scan established.</div></aside><aside id="glossary-sensitive-operation-review" class="glossary-panel" popover="auto" role="dialog" aria-labelledby="glossary-heading-sensitive-operation-review"><div class="panel-top"><span class="eyebrow">Finding-type glossary</span><button type="button" class="panel-close" popovertarget="glossary-sensitive-operation-review" popovertargetaction="hide" autofocus>Close</button></div><h2 id="glossary-heading-sensitive-operation-review">Sensitive Operation Review</h2><p class="glossary-coverage">Coverage: bounded analysis</p><p>A possible sensitive use was recorded but does not yet map to a more specific supported risk family.</p><h3>What this label tells you</h3><p>This is an analysis category. Inspect the evidence and missing operation semantics before making a security claim.</p><h3>Remediation approach</h3><p>Resolve the source, operation, API behavior, and required protection before selecting a fix.</p><div class="note">The label names a review area. Read each finding's evidence and assessment status to understand what scan established.</div></aside>
+<footer>Generated from scan evidence JSON. Offline snapshot · no external assets, network requests, or model calls. Embedded script only reorders displayed rows. Regenerate this HTML after updating its JSON source. Independent findings review and runtime confirmation are not performed by this viewer.</footer>
+</main><script>(() => {
+  const container = document.getElementById('source-rows');
+  const status = document.getElementById('sort-status');
+  const buttons = Array.from(document.querySelectorAll('[data-sort]'));
+  if (!container || !status) return;
+  const rows = Array.from(container.children).map((element, index) => ({ element, index }));
+  let column = 'findings';
+  let direction = 'desc';
+  const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
+  const pathOrder = (a, b, order) => {
+    const x = a.element.dataset;
+    const y = b.element.dataset;
+    if (Boolean(x.path) !== Boolean(y.path)) return x.path ? -1 : 1;
+    const path = compare(x.path, y.path);
+    return path * order || compare(x.method, y.method) || a.index - b.index;
+  };
+  for (const button of buttons) {
+    button.disabled = false;
+    button.addEventListener('click', () => {
+      const next = button.dataset.sort;
+      direction = next === column ? (direction === 'asc' ? 'desc' : 'asc') : (next === 'findings' ? 'desc' : 'asc');
+      column = next;
+      const order = direction === 'asc' ? 1 : -1;
+      rows.sort((a, b) => column === 'findings'
+        ? ['findings', 'review', 'protected'].reduce((result, key) => result || (Number(a.element.dataset[key]) - Number(b.element.dataset[key])) * order, 0) || pathOrder(a, b, 1)
+        : pathOrder(a, b, order));
+      for (const row of rows) container.appendChild(row.element);
+      for (const control of buttons) {
+        const active = control.dataset.sort === column;
+        control.setAttribute('aria-pressed', String(active));
+        control.querySelector('.sort-direction').textContent = active ? (direction === 'asc' ? ' ↑' : ' ↓') : ' ↕';
+      }
+      status.textContent = column === 'findings'
+        ? `Sorted by Findings, then Review, then Protected (${direction === 'desc' ? 'highest' : 'lowest'} first), then route path A–Z and method.`
+        : `Sorted by route path ${direction === 'asc' ? 'A–Z' : 'Z–A'}, then method; unresolved entries last.`;
+    });
+  }
+})();
+</script></body></html>

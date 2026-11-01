@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-11-01",
+  "review_basis": "Source inspection; not scanner agreement or runtime exploitation. See each sample answer key.",
+  "targets": {
+    "nodejs-goof": {
+      "repository": "https://github.com/snyk-labs/nodejs-goof",
+      "revision": "add14ba59e98240d9e00a235dd7d42cd61ae9912",
+      "answer_key": "docs/samples/nodejs-goof/xss-answer-key.md",
+      "files": {
+        "README.md": "70c6c5b816dd3c24a6e5a83e3b3424b952ee10a11b134f0c38900bc9b4ce87cb",
+        "app.js": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd",
+        "mongoose-db.js": "22591758d30ca24b01641fcd90d373299e3e68134b8a09f26ed0a069a184d370",
+        "routes/index.js": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22",
+        "routes/users.js": "6ad8ac7589f66b5892f6fc5a66d0b2114f7888b8654e6a3cd6d3b637d50c2ef6",
+        "views/index.ejs": "463e33887aa6f75a4a2e9be31159bdb8dfdd1bc08e0b2a92eeef534da0f36335",
+        "views/admin.ejs": "564904a37eef5d6e4813ef306ad9a0dcfedf66c15ca15241f330e51e657713b6",
+        "views/edit.ejs": "867ce350c8ae5d7793208c3b170d98f2733bc15382900833efbc55a59f74e4fe",
+        "views/account.hbs": "e0deb8dda0e022c32e06cc3afde665a36001b1440bfa67c7c3ac5b7f6fadc4ff",
+        "public/js/ga.js": "ec0bd48aaa6c1da6132f86157ff8419cc0d6a016026d17f237a636938d914164",
+        "exploits/marked-exploit.sh": "4a536ed28f809b80880c7031022786d739ac967378f42befd9cf903fd8e92882",
+        "package.json": "d93de0d5af790ec763d4c62177d92f4fbed7b9d48f21d6dafaa7984bd8733c31",
+        "package-lock.json": "b94e05f7e0ede5f9dd0a172e6a41f8b0f96324719516ee8d74fe7dc8b186475a"
+      }
+    },
+    "juice-shop": {
+      "repository": "https://github.com/juice-shop/juice-shop",
+      "revision": "f189f521266f42c6bd05884468292000cee852ed",
+      "answer_key": "docs/samples/juice-shop/xss-answer-key.md",
+      "files": {
+        "server.ts": "1aef4d60cbdfb3458a25610d017a678ab4d69fc835bb8b592db9a13aceb20cb1",
+        "routes/trackOrder.ts": "8f0d91a9c902a7634ecb5822e8d348354f6bc7ee0c10e21079134e7f4aa17958",
+        "routes/saveLoginIp.ts": "d163f868f4cbee5791db410202cab7869294a4ef30271d3d796f3ec629753823",
+        "routes/login.ts": "cf11d682edff6744bcb54339bce4b2dd6da5e80f9038facd7605df857b0a0b7b",
+        "routes/updateUserProfile.ts": "2eec586af91cd04ab60503ec3477e52dd7c524cfdbfad9ffcfeb4000a23b0641",
+        "routes/userProfile.ts": "07251f3d0dd9f4c530da60e3911091d8ff1bded650f72c31cbee499093979b39",
+        "routes/videoHandler.ts": "5c3bdfb5e0662bf1da44f63ae4f3d62ac857d9579b8b11e937bab4b7229ec552",
+        "routes/imageCaptcha.ts": "ba895da0a21170d3978556bc7d33ce77da8eec712b08f8109ade4fbfeacb80a6",
+        "models/user.ts": "89d0636aec0ddbd582162c40da590fa361fef7617573bd95ecef3339171deb59",
+        "models/feedback.ts": "24ef867d9854df2889c9286a688b6cee8668a08a5e1d987f867c9268dbeb4750",
+        "models/product.ts": "7b1fe1706e76274ba545d4c37dc86ddf8e0375852225d9e0ab809efb9ce05b15",
+        "lib/insecurity.ts": "c3496760cac6a5fde403bf739a8ab5e2536d2bbc57a6e3b6a0ac50b01a6e8b8d",
+        "views/userProfile.pug": "e46f9403b7e699584907622f1526d82296e0b17cfc9789d25cc4ac4eb89f7638",
+        "frontend/src/app/search-result/search-result.component.ts": "d39a84c9802c82814a6c126f16e28685e42bc074478a3d8053df28fa10ca1127",
+        "frontend/src/app/search-result/search-result.component.html": "7736a256738752b90ff090c98174e2baff81d34e71e61718ee26c4f20f500929",
+        "frontend/src/app/track-result/track-result.component.ts": "d5f11aa26dbaabfbf9ef24011d2cd0fee3c7cfa31857c23a7a5f78e9d7bc9f28",
+        "frontend/src/app/track-result/track-result.component.html": "ab0c72b01bb42b9018a9ad09bb5aca1aafad70b38ee863e5d826455f80933e11",
+        "frontend/src/app/last-login-ip/last-login-ip.component.ts": "5cf33fc3aa4c6dfd8d09a3b072b4c90d4658abf1a4f7733dff4b8c6302c1eb63",
+        "frontend/src/app/last-login-ip/last-login-ip.component.html": "66fd04cb9cfb4d024bc5fd4d60df6d52b6199abd8b07422702b46953bd2d4b60",
+        "frontend/src/app/administration/administration.component.ts": "b995ed647c8e0208e698513b52d455365a4f9bd7b4a8c5257167fea8a4f6281d",
+        "frontend/src/app/administration/administration.component.html": "6d208bde5250446a2a385b462415f2761169ec40db9d7ea34413be0aca30c051",
+        "frontend/src/app/about/about.component.ts": "3fd45fc6c323b87b7f01af20cbb00ba9c7e7c423cf28fae85506510b100dacd4",
+        "frontend/src/app/about/about.component.html": "1d5c7daa2bebda017a5bece02253aed14ddebce22b2d6dd3832df7e0cc8fc1e0",
+        "frontend/src/app/product/product.component.ts": "36c31e03e20ae60821ad292f59aecf43c94935bd6424ed914c0d275daad8b8d9",
+        "frontend/src/app/product-details/product-details.component.html": "45dd3bb8067f9c35d50e94ba326a2bab538dfedce476ee14631010876d382d90",
+        "frontend/src/app/data-export/data-export.component.ts": "3c6d7e04b023264155dd28679d3b8c1598067622a9581037d57d2ded3541488e",
+        "frontend/src/app/data-export/data-export.component.html": "fad2d8ac4f3879d1cb2718c4596c1a237eeae19e7bf5bae7699f110566a4a194"
+      }
+    },
+    "vulnerable-typescript-app": {
+      "repository": "https://github.com/ryanmcmorrowsnyk/vulnerable-typescript-app",
+      "revision": "7f8b240a2f02beba099da3632d1ba679ff8bc32f",
+      "answer_key": "docs/samples/vulnerable-typescript-app/xss-answer-key.md",
+      "files": {
+        "README.md": "5363098f3cdd18371ec87aac06da56c0671f70a7c3583d12d59c98f296512366",
+        "src/server.ts": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb",
+        "package.json": "654c071947aa9212caef62134222cce0de48a4fdf66423c58fd4b08b67e3d791"
+      }
+    }
+  }
+}

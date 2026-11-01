@@ -1,0 +1,195 @@
+package parse
+
+import (
+	"strings"
+
+	sitter "github.com/tree-sitter/go-tree-sitter"
+	"github.com/zazzcode/zazzles/internal/graph"
+)
+
+func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
+	if args == nil {
+		return value{}, false
+	}
+	if fn.Kind() == "identifier" {
+		name := fn.Utf8Text(f.module.src)
+		if imp, ok := f.module.imports[name]; ok && imp.module == "jquery" && !shadowed(n, name, f.module.src) {
+			f.context = append(f.context, f.module.evidence("render_binding", imp.declaration))
+			return value{domNode: true}, true
+		}
+		if (name == "setTimeout" || name == "setInterval" || name == "eval") && browserGlobal(f.module, n, name) && args.NamedChildCount() > 0 && !isFunction(args.NamedChild(0)) {
+			v := f.eval(args.NamedChild(0))
+			f.clientRecord(n, v, "script", false, f.clientClassEvidence(fn))
+			return value{}, true
+		}
+		if name == "fetch" && browserGlobal(f.module, n, name) {
+			return f.clientHTTPValue(f.module, n, args.NamedChild(0), "GET", nil), true
+		}
+		return value{}, false
+	}
+	if fn.Kind() != "member_expression" {
+		return value{}, false
+	}
+	obj, prop := fn.ChildByFieldName("object"), fn.ChildByFieldName("property")
+	if obj == nil || prop == nil {
+		return value{}, false
+	}
+	object, method := obj.Utf8Text(f.module.src), prop.Utf8Text(f.module.src)
+	if object == "this" {
+		if v, ok := f.clientMethod(n, method, args); ok {
+			return v, true
+		}
+	}
+	if object == "document" && browserGlobal(f.module, n, "document") {
+		switch method {
+		case "getElementById", "querySelector", "createElement", "createRange":
+			f.context = append(f.context, f.module.evidence("render_binding", n))
+			return value{domNode: true}, true
+		case "write", "writeln":
+			if args.NamedChildCount() > 0 {
+				f.clientRecord(n, f.eval(args.NamedChild(0)), "html_text", false, f.clientClassEvidence(fn))
+			}
+			return value{}, true
+		}
+	}
+	if strings.HasPrefix(object, "this.") {
+		field := strings.TrimPrefix(object, "this.")
+		injection := f.client.injected[field]
+		if injection.module == "@angular/platform-browser" && injection.name == "DomSanitizer" && args.NamedChildCount() == 1 {
+			context := ""
+			switch method {
+			case "bypassSecurityTrustHtml":
+				context = "html_text"
+			case "bypassSecurityTrustScript":
+				context = "script"
+			case "bypassSecurityTrustUrl", "bypassSecurityTrustResourceUrl":
+				context = "url"
+			}
+			if context != "" {
+				v := f.eval(args.NamedChild(0))
+				if len(v.deps) == 0 {
+					v.deps = []graph.Dependency{{Source: f.module.evidence("unresolved_source", args.NamedChild(0))}}
+				}
+				v = f.transfer(v, "trust_bypass", n)
+				v.trustedContext = context
+				before := len(f.uses)
+				f.clientRecord(n, v, "unknown", false, f.clientClassEvidence(injection.node))
+				if len(f.uses) > before {
+					f.uses[len(f.uses)-1].Sink.Kind = "trust_bypass"
+				}
+				return v, true
+			}
+		}
+		if v, ok := f.clientServiceCall(n, object, method); ok {
+			return v, true
+		}
+		if object == "this" {
+			if v, ok := f.clientMethod(n, method, args); ok {
+				return v, true
+			}
+		}
+	}
+	if method == "subscribe" || method == "then" || method == "pipe" || method == "get" || method == "trim" || method == "json" || method == "addEventListener" || method == "insertAdjacentHTML" || method == "createContextualFragment" || method == "html" || method == "append" {
+		receiver := f.eval(obj)
+		switch method {
+		case "get":
+			if receiver.urlParams {
+				return f.transfer(receiver, "browser_parameter", n), true
+			}
+		case "trim":
+			if len(receiver.deps) > 0 && args.NamedChildCount() == 0 {
+				return f.transfer(receiver, "string_operation", n), true
+			}
+		case "json", "pipe":
+			if receiver.apiPath != "" {
+				return receiver, true
+			}
+		case "subscribe", "then":
+			if args.NamedChildCount() > 0 {
+				callback := args.NamedChild(0)
+				if callback.Kind() == "object" {
+					callback = property(callback, "next", f.module.src)
+				}
+				if isFunction(callback) {
+					if len(receiver.deps) == 0 {
+						receiver.deps = []graph.Dependency{{Source: f.module.evidence("unresolved_source", n)}}
+					}
+					f.clientCallback(callback, receiver)
+					return receiver, true
+				}
+			}
+		case "addEventListener":
+			global := (object == "window" || object == "document") && browserGlobal(f.module, n, object)
+			if (global || receiver.domNode) && args.NamedChildCount() > 1 {
+				event, _ := stringLiteral(args.NamedChild(0), f.module.src)
+				if event == "message" || event == "input" || event == "change" || event == "submit" {
+					f.clientCallback(args.NamedChild(1), f.browserSource(n))
+					return value{}, true
+				}
+			}
+		case "insertAdjacentHTML", "createContextualFragment", "html", "append":
+			if receiver.domNode {
+				index := uint(0)
+				if method == "insertAdjacentHTML" {
+					index = 1
+				}
+				if args.NamedChildCount() > index {
+					f.clientRecord(n, f.eval(args.NamedChild(index)), "html_text", false, f.clientClassEvidence(obj))
+				}
+				return value{}, true
+			}
+		}
+	}
+	return value{}, false
+}
+
+func (f *flow) clientCallback(callback *sitter.Node, v value) {
+	if !isFunction(callback) || f.depth >= 4 {
+		return
+	}
+	child := *f
+	child.env, child.uses = copyValues(f.env), nil
+	child.depth++
+	if params, ok := functionParameters(callback, f.module.src); ok && len(params) > 0 {
+		child.env[params[0].name] = v
+	}
+	child.statements(callback.ChildByFieldName("body"))
+	f.uses = append(f.uses, child.uses...)
+	for key, v := range child.env {
+		if strings.HasPrefix(key, "this.") {
+			f.env[key] = v
+		}
+	}
+}
+
+func (f *flow) clientMethod(call *sitter.Node, method string, args *sitter.Node) (value, bool) {
+	fn := f.client.methods[method]
+	if fn == nil || f.depth >= 3 {
+		return value{}, false
+	}
+	params, ok := functionParameters(fn, f.module.src)
+	if !ok {
+		return value{}, false
+	}
+	child := *f
+	child.env, child.uses, child.returns = copyValues(f.env), nil, nil
+	child.depth++
+	for i, parameter := range params {
+		child.env[parameter.name] = value{}
+		if args.NamedChildCount() > uint(i) {
+			child.env[parameter.name] = f.eval(args.NamedChild(uint(i)))
+		}
+	}
+	child.statements(fn.ChildByFieldName("body"))
+	f.uses = append(f.uses, child.uses...)
+	var out value
+	for _, v := range child.returns {
+		out = combine(out, v)
+	}
+	for name, v := range child.env {
+		if strings.HasPrefix(name, "this.") {
+			f.env[name] = v
+		}
+	}
+	return out, true
+}

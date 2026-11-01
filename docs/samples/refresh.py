@@ -11,7 +11,7 @@ def main():
     parser.add_argument('--scan', default='./bin/scan', help='compiled scan executable')
     args = parser.parse_args()
     executable = str(Path(args.scan).resolve())
-    for name in ('juice-shop', 'vulnerable-typescript-app'):
+    for name in ('juice-shop', 'vulnerable-typescript-app', 'nodejs-goof'):
         folder = Path(__file__).resolve().parent / name
         source = folder / 'findings.json'
         report = json.loads(source.read_text())

@@ -51,15 +51,17 @@ func (f *flow) enterHelper(call *sitter.Node, name string, args []value) (ret va
 	f.context = append(f.context, hm.evidence("helper_definition", helper))
 	before := len(f.gaps)
 	child := flow{
-		module:  hm,
-		set:     f.set,
-		route:   f.route,
-		env:     map[string]value{},
-		context: append(append([]graph.Evidence{}, f.context...), f.module.evidence("helper_call", call)),
-		gaps:    append([]graph.Gap{}, f.gaps...),
-		depth:   f.depth + 1,
-		helpers: f.helpers,
-		facts:   f.facts,
+		client:       f.client,
+		registration: f.registration,
+		module:       hm,
+		set:          f.set,
+		route:        f.route,
+		env:          map[string]value{},
+		context:      append(append([]graph.Evidence{}, f.context...), f.module.evidence("helper_call", call)),
+		gaps:         append([]graph.Gap{}, f.gaps...),
+		depth:        f.depth + 1,
+		helpers:      f.helpers,
+		facts:        f.facts,
 	}
 	unbound := false
 	for i, p := range params {

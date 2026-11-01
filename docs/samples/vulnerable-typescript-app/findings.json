@@ -1,6 +1,22 @@
 {
   "finding_types": [
     {
+      "id": "dom-xss",
+      "label": "Client-side XSS",
+      "description": "Browser or API data reaches a DOM or framework rendering operation in an active output context.",
+      "interpretation": "Client entries identify browser sources and verified sinks. Raw flows are construction findings; unknown origin, trust-to-template linkage or API response mapping remains Review. Framework defaults can protect a specific output.",
+      "remediation": "Prefer text APIs and default framework escaping/sanitization. Sanitize rich HTML before rendering, remove unnecessary trust bypasses and verify API origins.",
+      "coverage": "bounded browser DOM and Angular/React/Vue analysis"
+    },
+    {
+      "id": "rendering-flow-review",
+      "label": "Rendering Flow Review",
+      "description": "Data returned by an API needs its browser consumer linked before a rendering claim can be assessed.",
+      "interpretation": "JSON output alone is not an XSS sink or a vulnerability. This record is incomplete flow context for further analysis.",
+      "remediation": "Locate the browser consumer, establish its output context and protections, and assess that rendering flow before changing API data handling.",
+      "coverage": "bounded API response evidence"
+    },
+    {
       "id": "sql-injection",
       "label": "SQL Injection",
       "description": "Input changes executable SQL structure instead of remaining a data value, potentially changing what the database reads or writes.",
@@ -44,9 +60,17 @@
       "id": "reflected-xss",
       "label": "Reflected XSS",
       "description": "Request-controlled content is reflected into a browser response in a context that allows it to execute as script.",
-      "interpretation": "XSS means cross-site scripting. This glossary entry is vocabulary for a planned detector; the current reporting increment does not detect or assign Reflected XSS findings.",
+      "interpretation": "Request input reaches an HTML response or template output. Raw output is a construction finding; unknown context or sanitizers remain Review. Escaping protects only its modeled output context. Runtime exploitation is not implied.",
       "remediation": "Use context-appropriate output encoding and safe template or DOM APIs. Input validation alone does not replace correct output handling.",
-      "coverage": "planned"
+      "coverage": "bounded server response and template analysis"
+    },
+    {
+      "id": "stored-xss",
+      "label": "Stored XSS",
+      "description": "Untrusted data is persisted and later rendered in an active browser context.",
+      "interpretation": "A matching model and field link source writes to rendering reads. Unresolved write origins remain Review; a verified raw path is a construction finding. A dependency version alone does not establish a reachable XSS flow.",
+      "remediation": "Preserve the intended stored data; apply context-appropriate escaping or maintained sanitization at every rendering sink, and review existing stored content.",
+      "coverage": "bounded model-field write/read and server template analysis"
     },
     {
       "id": "sensitive-data-logging",
@@ -171,6 +195,32 @@
     },
     {
       "type_ids": [
+        "reflected-xss"
+      ],
+      "id": "finding:xss:route:src/server.ts:3915:GET:/api/search:src/server.ts:4084",
+      "use_id": "xss:route:src/server.ts:3915:GET:/api/search:src/server.ts:4084",
+      "route_id": "route:src/server.ts:3915:GET:/api/search",
+      "record_type": "finding",
+      "status": "poor_practice",
+      "title": "Untrusted data reaches raw HTML output",
+      "summary": "A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Output context: html_text. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
         "input-validation"
       ],
       "id": "finding:input:route:src/server.ts:3915:GET:/api/search:req.query.query:3997",
@@ -178,9 +228,9 @@
       "route_id": "route:src/server.ts:3915:GET:/api/search",
       "record_type": "analysis",
       "status": "needs_review",
-      "title": "Request-field validation needs review",
+      "title": "Request-field validation evidence is incomplete",
       "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.query before the sink, and that call is not a proven validator",
+      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.query is read and no handler or applicable middleware validator handles it",
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
@@ -218,6 +268,32 @@
           "Add vulnerable, protected and inconclusive regression cases."
         ],
         "example_status": "no code example for an unverified library model"
+      }
+    },
+    {
+      "type_ids": [
+        "rendering-flow-review"
+      ],
+      "id": "finding:render-data:route:src/server.ts:4614:POST:/api/calculate:src/server.ts:4805",
+      "use_id": "render-data:route:src/server.ts:4614:POST:/api/calculate:src/server.ts:4805",
+      "route_id": "route:src/server.ts:4614:POST:/api/calculate",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "API data needs a rendering link before XSS assessment",
+      "summary": "Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim.",
+      "input_validation": "Not established from the supplied evidence.",
+      "use_protection": "No HTML sink has been established for this data edge.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
       }
     },
     {
@@ -322,6 +398,32 @@
     },
     {
       "type_ids": [
+        "rendering-flow-review"
+      ],
+      "id": "finding:render-data:route:src/server.ts:6272:POST:/api/parse-yaml:src/server.ts:6489",
+      "use_id": "render-data:route:src/server.ts:6272:POST:/api/parse-yaml:src/server.ts:6489",
+      "route_id": "route:src/server.ts:6272:POST:/api/parse-yaml",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "API data needs a rendering link before XSS assessment",
+      "summary": "Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim.",
+      "input_validation": "Not established from the supplied evidence.",
+      "use_protection": "No HTML sink has been established for this data edge.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
         "input-validation"
       ],
       "id": "finding:input:route:src/server.ts:6272:POST:/api/parse-yaml:req.body:6361",
@@ -347,27 +449,28 @@
     },
     {
       "type_ids": [
-        "input-validation"
+        "rendering-flow-review"
       ],
-      "id": "finding:input:route:src/server.ts:6637:POST:/api/register:req.body:6824",
-      "use_id": "input:route:src/server.ts:6637:POST:/api/register:req.body:6824",
-      "route_id": "route:src/server.ts:6637:POST:/api/register",
+      "id": "finding:render-data:route:src/server.ts:7357:POST:/api/validate-email:src/server.ts:7647",
+      "use_id": "render-data:route:src/server.ts:7357:POST:/api/validate-email:src/server.ts:7647",
+      "route_id": "route:src/server.ts:7357:POST:/api/validate-email",
       "record_type": "analysis",
       "status": "needs_review",
-      "title": "Request-field validation needs review",
-      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
-      "use_protection": "Not established from the supplied evidence.",
+      "title": "API data needs a rendering link before XSS assessment",
+      "summary": "Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim.",
+      "input_validation": "Not established from the supplied evidence.",
+      "use_protection": "No HTML sink has been established for this data edge.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Protect the specific browser rendering context",
         "actions": [
           "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": ""
       }
     },
     {
@@ -404,9 +507,9 @@
       "route_id": "route:src/server.ts:7985:GET:/redirect",
       "record_type": "analysis",
       "status": "needs_review",
-      "title": "Request-field validation needs review",
+      "title": "Request-field validation evidence is incomplete",
       "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.url before the sink, and that call is not a proven validator",
+      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.url is read and no handler or applicable middleware validator handles it",
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
@@ -418,6 +521,32 @@
           "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
         ],
         "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "rendering-flow-review"
+      ],
+      "id": "finding:render-data:route:src/server.ts:8210:POST:/api/merge:src/server.ts:8415",
+      "use_id": "render-data:route:src/server.ts:8210:POST:/api/merge:src/server.ts:8415",
+      "route_id": "route:src/server.ts:8210:POST:/api/merge",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "API data needs a rendering link before XSS assessment",
+      "summary": "Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim.",
+      "input_validation": "Not established from the supplied evidence.",
+      "use_protection": "No HTML sink has been established for this data edge.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
       }
     },
     {
@@ -2771,6 +2900,278 @@
       }
     },
     {
+      "xss": {
+        "type": "reflected",
+        "entry_kind": "server",
+        "output_context": "html_text",
+        "content_type": "text/html",
+        "protection": "raw",
+        "protection_reason": "A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+        "origin_resolved": true
+      },
+      "api_model": {
+        "id": "html-output-v1",
+        "library": "express",
+        "semantics": "Request values reach an HTML rendering operation in the recorded output context.",
+        "reference": "https://expressjs.com/en/api.html#res.send"
+      },
+      "completeness": {
+        "model_facts": [
+          "output_context=html_text",
+          "protection=raw",
+          "origin_resolved=true"
+        ],
+        "claim_kind": "xss",
+        "required": [
+          "render_source",
+          "render_binding",
+          "render_context"
+        ],
+        "evidence": {
+          "render_binding": [
+            {
+              "kind": "render_binding",
+              "text": "import { Request, Response } from 'express';",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 16,
+                "end_line": 16,
+                "start_byte": 545,
+                "end_byte": 589
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "render_binding",
+              "text": "import { Request, Response } from 'express';",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 16,
+                "end_line": 16,
+                "start_byte": 545,
+                "end_byte": 589
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "render_binding",
+              "text": "import * as express from 'express';",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 4,
+                "end_line": 4,
+                "start_byte": 116,
+                "end_byte": 151
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ],
+          "render_context": [
+            {
+              "kind": "html_response",
+              "text": "res.send(`<h1>Search Results for: ${query}</h1>`)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 4084,
+                "end_byte": 4133
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ],
+          "render_source": [
+            {
+              "kind": "request_source",
+              "text": "req.query.query",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 115,
+                "end_line": 115,
+                "start_byte": 3997,
+                "end_byte": 4012
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
+        },
+        "blockers": [],
+        "coverage": [
+          {
+            "kind": "middleware_unresolved",
+            "detail": "effective middleware/guard chain is not modeled",
+            "at": {
+              "file": "src/server.ts",
+              "start_line": 114,
+              "end_line": 118,
+              "start_byte": 3915,
+              "end_byte": 4137
+            }
+          }
+        ],
+        "scope": "Bounded source-to-rendering flow; output context and protections are scoped to this sink."
+      },
+      "id": "xss:route:src/server.ts:3915:GET:/api/search:src/server.ts:4084",
+      "route_id": "route:src/server.ts:3915:GET:/api/search",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "html_response",
+        "text": "res.send(`<h1>Search Results for: ${query}</h1>`)",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 117,
+          "end_line": 117,
+          "start_byte": 4084,
+          "end_byte": 4133
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query.query",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 115,
+              "end_line": 115,
+              "start_byte": 3997,
+              "end_byte": 4012
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": [
+            {
+              "kind": "expression",
+              "text": "req.query.query as string",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 115,
+                "end_line": 115,
+                "start_byte": 3997,
+                "end_byte": 4022
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "assignment",
+              "text": "query: string = req.query.query as string",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 115,
+                "end_line": 115,
+                "start_byte": 3981,
+                "end_byte": 4022
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "expression",
+              "text": "${query}",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 4118,
+                "end_byte": 4126
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "expression",
+              "text": "`<h1>Search Results for: ${query}</h1>`",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 117,
+                "end_line": 117,
+                "start_byte": 4093,
+                "end_byte": 4132
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/api/search', (req: Request, res: Response) => {\n  const query: string = req.query.query as string;\n  // Vulnerable: Reflects user input without sanitization\n  res.send(`<h1>Search Results for: ${query}</h1>`);\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 114,
+            "end_line": 118,
+            "start_byte": 3915,
+            "end_byte": 4137
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const query: string = req.query.query as string;\n  // Vulnerable: Reflects user input without sanitization\n  res.send(`<h1>Search Results for: ${query}</h1>`);\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 114,
+            "end_line": 118,
+            "start_byte": 3971,
+            "end_byte": 4136
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "render_binding",
+          "text": "import { Request, Response } from 'express';",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 16,
+            "end_line": 16,
+            "start_byte": 545,
+            "end_byte": 589
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "render_binding",
+          "text": "import { Request, Response } from 'express';",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 16,
+            "end_line": 16,
+            "start_byte": 545,
+            "end_byte": 589
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "render_binding",
+          "text": "import * as express from 'express';",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 4,
+            "end_line": 4,
+            "start_byte": 116,
+            "end_byte": 151
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 114,
+            "end_line": 118,
+            "start_byte": 3915,
+            "end_byte": 4137
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
       "id": "input:route:src/server.ts:3915:GET:/api/search:req.query.query:3997",
       "route_id": "route:src/server.ts:3915:GET:/api/search",
       "kind": "input_validation_candidate",
@@ -2842,8 +3243,8 @@
           }
         },
         {
-          "kind": "input_validation_unresolved",
-          "detail": "a call receives req.query.query before the sink, and that call is not a proven validator",
+          "kind": "input_validation_absent",
+          "detail": "req.query.query is read and no handler or applicable middleware validator handles it",
           "at": {
             "file": "src/server.ts",
             "start_line": 115,
@@ -3007,6 +3408,140 @@
             "end_line": 125,
             "start_byte": 4415,
             "end_byte": 4437
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "xss": {
+        "type": "cross_tier",
+        "entry_kind": "server",
+        "output_context": "api_json",
+        "content_type": "application/json",
+        "protection": "unknown",
+        "protection_reason": "Data transfer alone is not XSS; a browser rendering sink and its protection must be linked.",
+        "origin_resolved": false
+      },
+      "id": "render-data:route:src/server.ts:4614:POST:/api/calculate:src/server.ts:4805",
+      "route_id": "route:src/server.ts:4614:POST:/api/calculate",
+      "kind": "xss_data_candidate",
+      "sink": {
+        "kind": "rendering_data",
+        "text": "res.json({ result })",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 138,
+          "end_line": 138,
+          "start_byte": 4805,
+          "end_byte": 4825
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 134,
+              "end_line": 134,
+              "start_byte": 4701,
+              "end_byte": 4709
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": [
+            {
+              "kind": "field_projection",
+              "text": "expression",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 134,
+                "end_line": 134,
+                "start_byte": 4686,
+                "end_byte": 4696
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "eval(expression)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 137,
+                "end_line": 137,
+                "start_byte": 4783,
+                "end_byte": 4799
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "assignment",
+              "text": "result = eval(expression)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 137,
+                "end_line": 137,
+                "start_byte": 4774,
+                "end_byte": 4799
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/api/calculate', (req: Request, res: Response) => {\n  const { expression } = req.body;\n  try {\n    // Vulnerable: Direct eval of user input\n    const result = eval(expression);\n    res.json({ result });\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 133,
+            "end_line": 142,
+            "start_byte": 4614,
+            "end_byte": 4910
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const { expression } = req.body;\n  try {\n    // Vulnerable: Direct eval of user input\n    const result = eval(expression);\n    res.json({ result });\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 133,
+            "end_line": 142,
+            "start_byte": 4674,
+            "end_byte": 4909
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "control_statement",
+          "text": "try {\n    // Vulnerable: Direct eval of user input\n    const result = eval(expression);\n    res.json({ result });\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 135,
+            "end_line": 141,
+            "start_byte": 4713,
+            "end_byte": 4907
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: eval",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 137,
+            "end_line": 137,
+            "start_byte": 4783,
+            "end_byte": 4799
           }
         }
       ],
@@ -3432,6 +3967,151 @@
       }
     },
     {
+      "xss": {
+        "type": "cross_tier",
+        "entry_kind": "server",
+        "output_context": "api_json",
+        "content_type": "application/json",
+        "protection": "unknown",
+        "protection_reason": "Data transfer alone is not XSS; a browser rendering sink and its protection must be linked.",
+        "origin_resolved": false
+      },
+      "id": "render-data:route:src/server.ts:6272:POST:/api/parse-yaml:src/server.ts:6489",
+      "route_id": "route:src/server.ts:6272:POST:/api/parse-yaml",
+      "kind": "xss_data_candidate",
+      "sink": {
+        "kind": "rendering_data",
+        "text": "res.json(parsed)",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 188,
+          "end_line": 188,
+          "start_byte": 6489,
+          "end_byte": 6505
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 184,
+              "end_line": 184,
+              "start_byte": 6361,
+              "end_byte": 6369
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": [
+            {
+              "kind": "field_projection",
+              "text": "yamlContent",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 184,
+                "end_line": 184,
+                "start_byte": 6345,
+                "end_byte": 6356
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "yaml.safeLoad(yamlContent)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 187,
+                "end_line": 187,
+                "start_byte": 6457,
+                "end_byte": 6483
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "assignment",
+              "text": "parsed = yaml.safeLoad(yamlContent)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 187,
+                "end_line": 187,
+                "start_byte": 6448,
+                "end_byte": 6483
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/api/parse-yaml', (req: Request, res: Response) => {\n  const { yamlContent } = req.body;\n  try {\n    // Vulnerable: YAML parsing can execute arbitrary code\n    const parsed = yaml.safeLoad(yamlContent);\n    res.json(parsed);\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 183,
+            "end_line": 192,
+            "start_byte": 6272,
+            "end_byte": 6590
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const { yamlContent } = req.body;\n  try {\n    // Vulnerable: YAML parsing can execute arbitrary code\n    const parsed = yaml.safeLoad(yamlContent);\n    res.json(parsed);\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 183,
+            "end_line": 192,
+            "start_byte": 6333,
+            "end_byte": 6589
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "control_statement",
+          "text": "try {\n    // Vulnerable: YAML parsing can execute arbitrary code\n    const parsed = yaml.safeLoad(yamlContent);\n    res.json(parsed);\n  } catch (error: any) {\n    res.status(400).json({ error: error.message });\n  }",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 185,
+            "end_line": 191,
+            "start_byte": 6373,
+            "end_byte": 6587
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: yaml",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 187,
+            "end_line": 187,
+            "start_byte": 6457,
+            "end_byte": 6461
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: yaml.safeLoad",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 187,
+            "end_line": 187,
+            "start_byte": 6457,
+            "end_byte": 6483
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
       "id": "input:route:src/server.ts:6272:POST:/api/parse-yaml:req.body:6361",
       "route_id": "route:src/server.ts:6272:POST:/api/parse-yaml",
       "kind": "input_validation_candidate",
@@ -3542,18 +4222,27 @@
       }
     },
     {
-      "id": "input:route:src/server.ts:6637:POST:/api/register:req.body:6824",
-      "route_id": "route:src/server.ts:6637:POST:/api/register",
-      "kind": "input_validation_candidate",
+      "xss": {
+        "type": "cross_tier",
+        "entry_kind": "server",
+        "output_context": "api_json",
+        "content_type": "application/json",
+        "protection": "unknown",
+        "protection_reason": "Data transfer alone is not XSS; a browser rendering sink and its protection must be linked.",
+        "origin_resolved": false
+      },
+      "id": "render-data:route:src/server.ts:7357:POST:/api/validate-email:src/server.ts:7647",
+      "route_id": "route:src/server.ts:7357:POST:/api/validate-email",
+      "kind": "xss_data_candidate",
       "sink": {
-        "kind": "request_source",
-        "text": "req.body",
+        "kind": "rendering_data",
+        "text": "res.json({ valid: isValid })",
         "span": {
           "file": "src/server.ts",
-          "start_line": 199,
-          "end_line": 199,
-          "start_byte": 6824,
-          "end_byte": 6832
+          "start_line": 225,
+          "end_line": 225,
+          "start_byte": 7647,
+          "end_byte": 7675
         },
         "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
       },
@@ -3564,63 +4253,101 @@
             "text": "req.body",
             "span": {
               "file": "src/server.ts",
-              "start_line": 199,
-              "end_line": 199,
-              "start_byte": 6824,
-              "end_byte": 6832
+              "start_line": 221,
+              "end_line": 221,
+              "start_byte": 7444,
+              "end_byte": 7452
             },
             "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
           },
-          "transfers": []
+          "transfers": [
+            {
+              "kind": "field_projection",
+              "text": "email",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 221,
+                "end_line": 221,
+                "start_byte": 7434,
+                "end_byte": 7439
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "emailRegex.test(email)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 224,
+                "end_line": 224,
+                "start_byte": 7621,
+                "end_byte": 7643
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "assignment",
+              "text": "isValid: boolean = emailRegex.test(email)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 224,
+                "end_line": 224,
+                "start_byte": 7602,
+                "end_byte": 7643
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "expression",
+              "text": "valid: isValid",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 225,
+                "end_line": 225,
+                "start_byte": 7658,
+                "end_byte": 7672
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
         }
       ],
       "context": [
         {
           "kind": "registration",
-          "text": "app.post('/api/register', (req: Request, res: Response) => {\n  // Vulnerable: Directly assigning all properties from user input\n  const newUser: User = {\n    id: users.length + 1,\n    ...req.body, // Attacker could set role: 'admin'\n  };\n  users.push(newUser);\n  res.json({ success: true, user: newUser });\n})",
+          "text": "app.post('/api/validate-email', (req: Request, res: Response) => {\n  const { email } = req.body;\n  // Vulnerable: Complex regex that can cause ReDoS\n  const emailRegex = /^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$/;\n  const isValid: boolean = emailRegex.test(email);\n  res.json({ valid: isValid });\n})",
           "span": {
             "file": "src/server.ts",
-            "start_line": 195,
-            "end_line": 203,
-            "start_byte": 6637,
-            "end_byte": 6946
+            "start_line": 220,
+            "end_line": 226,
+            "start_byte": 7357,
+            "end_byte": 7679
           },
           "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
         },
         {
           "kind": "handler",
-          "text": "{\n  // Vulnerable: Directly assigning all properties from user input\n  const newUser: User = {\n    id: users.length + 1,\n    ...req.body, // Attacker could set role: 'admin'\n  };\n  users.push(newUser);\n  res.json({ success: true, user: newUser });\n}",
+          "text": "{\n  const { email } = req.body;\n  // Vulnerable: Complex regex that can cause ReDoS\n  const emailRegex = /^([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,4})+$/;\n  const isValid: boolean = emailRegex.test(email);\n  res.json({ valid: isValid });\n}",
           "span": {
             "file": "src/server.ts",
-            "start_line": 195,
-            "end_line": 203,
-            "start_byte": 6696,
-            "end_byte": 6945
+            "start_line": 220,
+            "end_line": 226,
+            "start_byte": 7422,
+            "end_byte": 7678
           },
           "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
         }
       ],
       "gaps": [
         {
-          "kind": "middleware_unresolved",
-          "detail": "effective middleware/guard chain is not modeled",
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: emailRegex.test",
           "at": {
             "file": "src/server.ts",
-            "start_line": 195,
-            "end_line": 203,
-            "start_byte": 6637,
-            "end_byte": 6946
-          }
-        },
-        {
-          "kind": "input_validation_unresolved",
-          "detail": "a call receives req.body before the sink, and that call is not a proven validator",
-          "at": {
-            "file": "src/server.ts",
-            "start_line": 199,
-            "end_line": 199,
-            "start_byte": 6824,
-            "end_byte": 6832
+            "start_line": 224,
+            "end_line": 224,
+            "start_byte": 7621,
+            "end_byte": 7643
           }
         }
       ],
@@ -3787,14 +4514,223 @@
           }
         },
         {
-          "kind": "input_validation_unresolved",
-          "detail": "a call receives req.query.url before the sink, and that call is not a proven validator",
+          "kind": "input_validation_absent",
+          "detail": "req.query.url is read and no handler or applicable middleware validator handles it",
           "at": {
             "file": "src/server.ts",
             "start_line": 237,
             "end_line": 237,
             "start_byte": 8063,
             "end_byte": 8076
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "xss": {
+        "type": "cross_tier",
+        "entry_kind": "server",
+        "output_context": "api_json",
+        "content_type": "application/json",
+        "protection": "unknown",
+        "protection_reason": "Data transfer alone is not XSS; a browser rendering sink and its protection must be linked.",
+        "origin_resolved": false
+      },
+      "id": "render-data:route:src/server.ts:8210:POST:/api/merge:src/server.ts:8415",
+      "route_id": "route:src/server.ts:8210:POST:/api/merge",
+      "kind": "xss_data_candidate",
+      "sink": {
+        "kind": "rendering_data",
+        "text": "res.json({ result: merged })",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 247,
+          "end_line": 247,
+          "start_byte": 8415,
+          "end_byte": 8443
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 244,
+              "end_line": 244,
+              "start_byte": 8297,
+              "end_byte": 8305
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": [
+            {
+              "kind": "field_projection",
+              "text": "target",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 244,
+                "end_line": 244,
+                "start_byte": 8278,
+                "end_byte": 8284
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "_.merge(target, source)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 246,
+                "end_line": 246,
+                "start_byte": 8388,
+                "end_byte": 8411
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "assignment",
+              "text": "merged = _.merge(target, source)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 246,
+                "end_line": 246,
+                "start_byte": 8379,
+                "end_byte": 8411
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "expression",
+              "text": "result: merged",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 247,
+                "end_line": 247,
+                "start_byte": 8426,
+                "end_byte": 8440
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 244,
+              "end_line": 244,
+              "start_byte": 8297,
+              "end_byte": 8305
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": [
+            {
+              "kind": "field_projection",
+              "text": "source",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 244,
+                "end_line": 244,
+                "start_byte": 8286,
+                "end_byte": 8292
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "_.merge(target, source)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 246,
+                "end_line": 246,
+                "start_byte": 8388,
+                "end_byte": 8411
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "assignment",
+              "text": "merged = _.merge(target, source)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 246,
+                "end_line": 246,
+                "start_byte": 8379,
+                "end_byte": 8411
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "expression",
+              "text": "result: merged",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 247,
+                "end_line": 247,
+                "start_byte": 8426,
+                "end_byte": 8440
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/api/merge', (req: Request, res: Response) => {\n  const { target, source } = req.body;\n  // Vulnerable: Using lodash merge without proper sanitization\n  const merged = _.merge(target, source);\n  res.json({ result: merged });\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 243,
+            "end_line": 248,
+            "start_byte": 8210,
+            "end_byte": 8447
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const { target, source } = req.body;\n  // Vulnerable: Using lodash merge without proper sanitization\n  const merged = _.merge(target, source);\n  res.json({ result: merged });\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 243,
+            "end_line": 248,
+            "start_byte": 8266,
+            "end_byte": 8446
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: _",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 246,
+            "end_line": 246,
+            "start_byte": 8388,
+            "end_byte": 8389
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: _.merge",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 246,
+            "end_line": 246,
+            "start_byte": 8388,
+            "end_byte": 8411
           }
         }
       ],
@@ -3906,15 +4842,15 @@
     }
   ],
   "limitations": [
-    "ESM named relative imports and direct returned handler factories only; no re-exports or CommonJS resolution",
-    "ESM Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
+    "ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain",
+    "Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
     "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
     "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities"
   ],
   "practice": [
     {
       "id": "javascript",
-      "version": "3",
+      "version": "4",
       "languages": [
         "javascript",
         "typescript"

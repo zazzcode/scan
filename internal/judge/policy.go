@@ -5,6 +5,10 @@ import "github.com/zazzcode/zazzles/internal/graph"
 // applyPolicy uses claim-scoped completeness when supplied. Legacy candidates
 // remain conservative until their dependency and binding evidence is assembled.
 func applyPolicy(use graph.StringUse, a *graph.Assessment) {
+	if use.Kind == "xss_candidate" {
+		applyXSSPolicy(use, a)
+		return
+	}
 	if logUse(use) {
 		applyLogPolicy(use, a)
 		return

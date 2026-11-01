@@ -9,6 +9,11 @@ capability parity across CLI and Pro, with fewer false positives at equal-or-bet
 Local CLI comparisons begin that evaluation; they cannot alone
 establish parity with capabilities unavailable in the tested edition.
 
+For the additional Node.js Goof target, use its [case inventory](nodejs-goof-capabilities.md) and
+[baseline runbook](../../docs/samples/nodejs-goof/bearer-runbook.md). That runbook retains templates,
+which the historical runner's JS/TS/JSON-only sample snapshot would omit. The
+[initial Goof comparison](nodejs-goof-results.md) is complete and preserves pre-XSS coverage limits.
+
 ## Local setup evidence
 
 Reference checkout: `<DEV_ROOT>/bearer`, commit `e3753de6347988bed15bdba80b9ff731bf028c80`,

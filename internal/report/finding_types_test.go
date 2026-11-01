@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestFindingTypesPreserveScopeAndPlannedCoverage(t *testing.T) {
+func TestFindingTypesPreserveImplementedScope(t *testing.T) {
 	cases := []struct {
 		name, kind, gap string
 		want            []string
@@ -21,6 +21,7 @@ func TestFindingTypesPreserveScopeAndPlannedCoverage(t *testing.T) {
 		{"outbound", "outbound_http_candidate", "", []string{"outbound-request-safety"}},
 		{"logging", "log_sink_candidate", "log_sensitive_field_hint", []string{"sensitive-data-logging"}},
 		{"logging ignores validation gaps", "log_sink_candidate", "input_validation_absent", []string{"sensitive-data-logging"}},
+		{"XSS", "xss_candidate", "", []string{"reflected-xss"}},
 		{"unknown", "unrecognized_future_use", "", []string{"sensitive-operation-review"}},
 	}
 	for _, tt := range cases {
@@ -50,7 +51,7 @@ func TestFindingTypesPreserveScopeAndPlannedCoverage(t *testing.T) {
 		}
 		ids[typ.ID] = true
 	}
-	if findingTypesByID["reflected-xss"].Coverage != "planned" || findingTypesByID["sensitive-data-logging"].Coverage != "bounded analysis" {
+	if findingTypesByID["reflected-xss"].Coverage != "bounded server response and template analysis" || findingTypesByID["sensitive-data-logging"].Coverage != "bounded analysis" {
 		t.Fatal("glossary advertised planned detectors")
 	}
 }
@@ -82,13 +83,13 @@ func TestHTMLTypePanelsAndDistinctLocations(t *testing.T) {
 		t.Fatal(err)
 	}
 	html := b.String()
-	for _, want := range []string{`<span>Route location</span>`, `server.ts:3`, `Finding location · </span>handler.ts:11`, `class="type-pill poor-practice"`, `popovertarget="glossary-sql-injection"`, `id="glossary-sql-injection" class="glossary-panel" popover="auto"`, `popovertargetaction="hide"`, `aria-labelledby="glossary-heading-sql-injection"`, `SQL Injection <span class="pill-status">· poor practice`, `Input Validation <span class="pill-status">· poor practice`, `Coverage: planned`, `id="finding-glossary"`} {
+	for _, want := range []string{`<span>Route location</span>`, `server.ts:3`, `Finding location · </span>handler.ts:11`, `class="type-pill poor-practice"`, `popovertarget="glossary-sql-injection"`, `id="glossary-sql-injection" class="glossary-panel" popover="auto"`, `popovertargetaction="hide"`, `aria-labelledby="glossary-heading-sql-injection"`, `SQL Injection <span class="pill-status">· poor practice`, `Input Validation <span class="pill-status">· poor practice`, `Coverage: bounded server response and template analysis`, `id="finding-glossary"`} {
 		if !strings.Contains(html, want) {
 			t.Fatalf("missing %s", want)
 		}
 	}
 	if strings.Contains(html, `popovertarget="glossary-reflected-xss" aria-label=`) {
-		t.Fatal("planned XSS attached to row")
+		t.Fatal("XSS attached to a SQL-only row")
 	}
 	sarif := SARIF(r)
 	data, err := json.Marshal(sarif)

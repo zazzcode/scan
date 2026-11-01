@@ -129,7 +129,7 @@ func TestStandaloneHTMLGroupsAndEscapesSavedEvidence(t *testing.T) {
 			t.Fatalf("missing %q", want)
 		}
 	}
-	if strings.Count(html, `<details class="entry`) != 4 || strings.Count(html, `<article class="finding">`) != 3 {
+	if strings.Count(html, `<details class="entry`) != 4 || strings.Count(html, `<article class="finding" `) != 3 {
 		t.Fatal("lost or duplicated rows/findings")
 	}
 	for _, bad := range []string{"<img", "<link", "fetch(", "XMLHttpRequest"} {

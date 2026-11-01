@@ -78,7 +78,8 @@ func wireBundle(use graph.StringUse) any {
 		ModelFacts   []string            `json:"model_facts,omitempty"`
 		Resolved     []graph.Gap         `json:"resolved_gaps,omitempty"`
 		APIModel     *graph.APIModel     `json:"api_model,omitempty"`
-	}{use.ID, use.Kind, use.Check, sink, context, dependencies, required, roles, blockers, coverage, scope, table, edges, modelFacts(use), resolvedGaps(use), use.APIModel}
+		XSS          *graph.XSSFacts     `json:"xss,omitempty"`
+	}{use.ID, use.Kind, use.Check, sink, context, dependencies, required, roles, blockers, coverage, scope, table, edges, modelFacts(use), resolvedGaps(use), use.APIModel, use.XSS}
 }
 
 func modelFacts(use graph.StringUse) []string {

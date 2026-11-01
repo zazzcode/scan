@@ -26,7 +26,7 @@ func rowTypePills(items []htmlItem) []htmlTypePill {
 			case "protected_for_claim":
 				p.Protected++
 			case "confirmed_vulnerability":
-				if id == "sql-injection" || id == "nosql-injection" {
+				if id == "sql-injection" || id == "nosql-injection" || id == "reflected-xss" || id == "stored-xss" || id == "dom-xss" {
 					p.Confirmed++
 				} else {
 					p.Review++

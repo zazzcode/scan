@@ -1,0 +1,4122 @@
+{
+  "finding_types": [
+    {
+      "id": "sql-injection",
+      "label": "SQL Injection",
+      "description": "Input changes executable SQL structure instead of remaining a data value, potentially changing what the database reads or writes.",
+      "interpretation": "An SQL Injection pill identifies the risk family being reviewed. String-built executable SQL is poor practice to remediate even without a proven exploit; a library-managed search value may remain unresolved. The finding status and evidence determine the actual claim. The pill alone does not confirm injection.",
+      "remediation": "Use the verified driver's parameter-binding API for values. Review dynamic identifiers separately. Keep business-field validation independent of query-structure protection.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "nosql-injection",
+      "label": "NoSQL Injection",
+      "description": "Untrusted input changes a NoSQL query's operators, selector structure, or executable expression rather than remaining an allowed data value.",
+      "interpretation": "Executable $where string construction is poor practice to refactor even without a proven exploit. An unmodeled document constraint alone is Review, not an established defect. Inspect actual value types, keys, transformations, library behavior, and the named status.",
+      "remediation": "Prefer data-only query APIs, constrain scalar slots and permitted keys/operators, and avoid building executable $where strings from input.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "input-validation",
+      "label": "Input Validation",
+      "description": "Server-side checks enforce the business requirements for a field, such as required presence, runtime type, permitted format, range, or length.",
+      "interpretation": "Poor input validation means an applicable requirement is not adequately enforced. This neutral family label also covers unresolved checks and supported protection: no validator identified in an analyzed slice is not proof that every execution path lacks validation. Free-text punctuation is not itself a defect.",
+      "remediation": "Define field-specific requirements and enforce them before use on all applicable paths. Verify guard behavior and middleware. Apply destination-specific protection separately.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "account-creation-validation",
+      "label": "Account Creation Validation",
+      "description": "Required account fields and enforcing guards must be checked before an account is persisted.",
+      "interpretation": "Review field requirements, conditional bypasses, and generated persistence behavior. A modeled create operation alone does not prove a registration bypass.",
+      "remediation": "Enforce required fields before persistence, terminate rejected paths, add appropriate database constraints, and test the persisted result.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "outbound-request-safety",
+      "label": "Outbound Request Safety",
+      "description": "Input used in an outbound request may affect its destination, headers, or other request values. Unrestricted destination control can lead to server-side request forgery (SSRF).",
+      "interpretation": "The current scanner records bounded outbound-use evidence. A pill does not establish SSRF, destination reachability, or complete response-flow analysis.",
+      "remediation": "Verify allowed destinations and protocols, redirect handling, network boundaries, and sensitive request values for the specific HTTP client.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "reflected-xss",
+      "label": "Reflected XSS",
+      "description": "Request-controlled content is reflected into a browser response in a context that allows it to execute as script.",
+      "interpretation": "Request input reaches an HTML response or template output. Raw output is a construction finding; unknown context or sanitizers remain Review. Escaping protects only its modeled output context. Runtime exploitation is not implied.",
+      "remediation": "Use context-appropriate output encoding and safe template or DOM APIs. Input validation alone does not replace correct output handling.",
+      "coverage": "bounded server response and template analysis"
+    },
+    {
+      "id": "sensitive-data-logging",
+      "label": "Sensitive Data Logging",
+      "description": "Logs expose credentials, tokens, personal information, or other sensitive values to readers or storage that should not receive them.",
+      "interpretation": "Covers verified console and winston calls in analyzed route handlers that receive request values with credential or personal-data evidence. A field name is a hint for review, not proof; Authorization and Cookie headers are credentials by HTTP semantics. Morgan request logging that records URLs is checked against credentials read from the query string. Constant messages are not leaks. Non-request secrets and logger redaction configuration are not yet analyzed.",
+      "remediation": "Avoid logging secrets; minimize sensitive fields and apply verified redaction before emission. Review log access and retention.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "sensitive-operation-review",
+      "label": "Sensitive Operation Review",
+      "description": "A possible sensitive use was recorded but does not yet map to a more specific supported risk family.",
+      "interpretation": "This is an analysis category. Inspect the evidence and missing operation semantics before making a security claim.",
+      "remediation": "Resolve the source, operation, API behavior, and required protection before selecting a fix.",
+      "coverage": "bounded analysis"
+    }
+  ],
+  "presentation_version": 3,
+  "findings": [
+    {
+      "type_ids": [
+        "reflected-xss"
+      ],
+      "id": "finding:xss:route:app.js:1450:GET:/login:views/admin.ejs:513",
+      "use_id": "xss:route:app.js:1450:GET:/login:views/admin.ejs:513",
+      "route_id": "route:app.js:1450:GET:/login",
+      "record_type": "finding",
+      "status": "poor_practice",
+      "title": "Untrusted data reaches raw HTML output",
+      "summary": "A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Output context: html_attribute. Untrusted data reaches raw HTML output without modeled context-appropriate encoding or sanitization.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:app.js:1450:GET:/login:req.query.redirectPage:2143",
+      "use_id": "input:route:app.js:1450:GET:/login:req.query.redirectPage:2143",
+      "route_id": "route:app.js:1450:GET:/login",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation evidence is incomplete",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.redirectPage is read and no handler or applicable middleware validator handles it",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:app.js:1483:POST:/login:req.body.password:1316",
+      "use_id": "input:route:app.js:1483:POST:/login:req.body.password:1316",
+      "route_id": "route:app.js:1483:POST:/login",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body.password before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:app.js:1483:POST:/login:req.body.username:1239",
+      "use_id": "input:route:app.js:1483:POST:/login:req.body.username:1239",
+      "route_id": "route:app.js:1483:POST:/login",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body.username before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "reflected-xss"
+      ],
+      "id": "finding:xss:route:app.js:1652:POST:/account_details:views/account.hbs:108",
+      "use_id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:108",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "record_type": "protection",
+      "status": "protected_for_claim",
+      "title": "Context-appropriate rendering protection is present",
+      "summary": "The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Output context: html_text. The template HTML-escapes this value in HTML text or a quoted non-active attribute.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
+        "reflected-xss"
+      ],
+      "id": "finding:xss:route:app.js:1652:POST:/account_details:views/account.hbs:508",
+      "use_id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:508",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "record_type": "protection",
+      "status": "protected_for_claim",
+      "title": "Context-appropriate rendering protection is present",
+      "summary": "The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
+        "reflected-xss"
+      ],
+      "id": "finding:xss:route:app.js:1652:POST:/account_details:views/account.hbs:633",
+      "use_id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:633",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "record_type": "protection",
+      "status": "protected_for_claim",
+      "title": "Context-appropriate rendering protection is present",
+      "summary": "The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
+        "reflected-xss"
+      ],
+      "id": "finding:xss:route:app.js:1652:POST:/account_details:views/account.hbs:752",
+      "use_id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:752",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "record_type": "protection",
+      "status": "protected_for_claim",
+      "title": "Context-appropriate rendering protection is present",
+      "summary": "The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
+        "reflected-xss"
+      ],
+      "id": "finding:xss:route:app.js:1652:POST:/account_details:views/account.hbs:873",
+      "use_id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:873",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "record_type": "protection",
+      "status": "protected_for_claim",
+      "title": "Context-appropriate rendering protection is present",
+      "summary": "The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
+        "reflected-xss"
+      ],
+      "id": "finding:xss:route:app.js:1652:POST:/account_details:views/account.hbs:985",
+      "use_id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:985",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "record_type": "protection",
+      "status": "protected_for_claim",
+      "title": "Context-appropriate rendering protection is present",
+      "summary": "The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:app.js:1652:POST:/account_details:req.body:2677",
+      "use_id": "input:route:app.js:1652:POST:/account_details:req.body:2677",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:app.js:1765:POST:/create:req.body.content:4362",
+      "use_id": "input:route:app.js:1765:POST:/create:req.body.content:4362",
+      "route_id": "route:app.js:1765:POST:/create",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body.content before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:app.js:1801:GET:/destroy/:id:req.params.id:5249",
+      "use_id": "input:route:app.js:1801:GET:/destroy/:id:req.params.id:5249",
+      "route_id": "route:app.js:1801:GET:/destroy/:id",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.params.id before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:app.js:1877:POST:/update/:id:req.params.id:5788",
+      "use_id": "input:route:app.js:1877:POST:/update/:id:req.params.id:5788",
+      "route_id": "route:app.js:1877:POST:/update/:id",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.params.id before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "sensitive-data-logging"
+      ],
+      "id": "finding:use:route:app.js:1953:GET:/about_new:routes/index.js:7844",
+      "use_id": "use:route:app.js:1953:GET:/about_new:routes/index.js:7844",
+      "route_id": "route:app.js:1953:GET:/about_new",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Possible sensitive data in a log entry",
+      "summary": "A verified logging call receives a request value whose field name or container suggests credentials or personal data, or that passes through an unresolved transformation. Confirm what the value contains and whether redaction applies before changing behavior. A field name is a hint, not proof.",
+      "input_validation": "Field validation is reported separately; it does not change what this log line contains.",
+      "use_protection": "Logging evidence: the whole request query is written to the log and may include credentials or personal data.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Keep credential and personal-data content out of logs",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.",
+          "Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.",
+          "If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
+          "Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+        ],
+        "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' && password.length > 0 });",
+        "example_status": "illustrative_template; not a verified application patch"
+      }
+    },
+    {
+      "type_ids": [
+        "reflected-xss"
+      ],
+      "id": "finding:xss:route:app.js:1953:GET:/about_new:routes/index.js:7893",
+      "use_id": "xss:route:app.js:1953:GET:/about_new:routes/index.js:7893",
+      "route_id": "route:app.js:1953:GET:/about_new",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "HTML rendering protection needs review",
+      "summary": "A source value reaches a rendering operation. Resolve its output context and every transformation before judging XSS.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Output context: unknown. Rendering context is not established for every value.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:app.js:1953:GET:/about_new:req.query:7871",
+      "use_id": "input:route:app.js:1953:GET:/about_new:req.query:7871",
+      "route_id": "route:app.js:1953:GET:/about_new",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query before the sink, and that call is not a proven validator",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:app.js:1953:GET:/about_new:req.query.device:8022",
+      "use_id": "input:route:app.js:1953:GET:/about_new:req.query.device:8022",
+      "route_id": "route:app.js:1953:GET:/about_new",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Request-field validation evidence is incomplete",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.device is read and no handler or applicable middleware validator handles it",
+      "use_protection": "Not established from the supplied evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    }
+  ],
+  "schema_version": 1,
+  "root": "nodejs-goof",
+  "entries": [
+    {
+      "route": {
+        "id": "route:app.js:1422:GET:/",
+        "method": "GET",
+        "path_pattern": "/",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 53,
+          "end_line": 53,
+          "start_byte": 1422,
+          "end_byte": 1448
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 53,
+                "end_line": 53,
+                "start_byte": 1422,
+                "end_byte": 1429
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  Todo.\n    find({}).\n    sort('-updated_at').\n    exec(function (err, todos) {\n      if (err) return next(err);\n\n      res.render('index', {\n        title: 'Patch TODO List',\n        subhead: 'Vulnerabilities at their best',\n        todos: todos,\n      });\n    });\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 35,
+          "end_line": 48,
+          "start_byte": 892,
+          "end_byte": 1161
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 53,
+            "end_line": 53,
+            "start_byte": 1422,
+            "end_byte": 1448
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1450:GET:/login",
+        "method": "GET",
+        "path_pattern": "/login",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 54,
+          "end_line": 54,
+          "start_byte": 1450,
+          "end_byte": 1481
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 54,
+                "end_line": 54,
+                "start_byte": 1450,
+                "end_byte": 1457
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  return res.render('admin', {\n    title: 'Admin Access',\n    granted: false,\n    redirectPage: req.query.redirectPage\n  });\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 80,
+          "end_line": 86,
+          "start_byte": 2045,
+          "end_byte": 2173
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 54,
+            "end_line": 54,
+            "start_byte": 1450,
+            "end_byte": 1481
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1483:POST:/login",
+        "method": "POST",
+        "path_pattern": "/login",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 55,
+          "end_line": 55,
+          "start_byte": 1483,
+          "end_byte": 1522
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 55,
+                "end_line": 55,
+                "start_byte": 1483,
+                "end_byte": 1491
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 50,
+          "end_line": 65,
+          "start_byte": 1213,
+          "end_byte": 1711
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 55,
+            "end_line": 55,
+            "start_byte": 1483,
+            "end_byte": 1522
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 51,
+            "end_line": 64,
+            "start_byte": 1217,
+            "end_byte": 1709
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1524:GET:/admin",
+        "method": "GET",
+        "path_pattern": "/admin",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 56,
+          "end_line": 56,
+          "start_byte": 1524,
+          "end_byte": 1574
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 56,
+                "end_line": 56,
+                "start_byte": 1524,
+                "end_byte": 1531
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  return res.render('admin', {\n    title: 'Admin Access Granted',\n    granted: true,\n  });\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 88,
+          "end_line": 93,
+          "start_byte": 2218,
+          "end_byte": 2312
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 56,
+            "end_line": 56,
+            "start_byte": 1524,
+            "end_byte": 1574
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1576:GET:/account_details",
+        "method": "GET",
+        "path_pattern": "/account_details",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 57,
+          "end_line": 57,
+          "start_byte": 1576,
+          "end_byte": 1650
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 57,
+                "end_line": 57,
+                "start_byte": 1576,
+                "end_byte": 1583
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  // @TODO need to add a database call to get the profile from the database\n  // and provide it to the view to display\n  const profile = {}\n \treturn res.render('account.hbs', profile)\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 95,
+          "end_line": 100,
+          "start_byte": 2370,
+          "end_byte": 2557
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 57,
+            "end_line": 57,
+            "start_byte": 1576,
+            "end_byte": 1650
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1652:POST:/account_details",
+        "method": "POST",
+        "path_pattern": "/account_details",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 58,
+          "end_line": 58,
+          "start_byte": 1652,
+          "end_byte": 1728
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 58,
+                "end_line": 58,
+                "start_byte": 1652,
+                "end_byte": 1660
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 102,
+          "end_line": 126,
+          "start_byte": 2615,
+          "end_byte": 3495
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1730:GET:/logout",
+        "method": "GET",
+        "path_pattern": "/logout",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 59,
+          "end_line": 59,
+          "start_byte": 1730,
+          "end_byte": 1763
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 59,
+                "end_line": 59,
+                "start_byte": 1730,
+                "end_byte": 1737
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  req.session.loggedIn = 0\n  req.session.destroy(function() { \n    return res.redirect('/')  \n  })\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 136,
+          "end_line": 141,
+          "start_byte": 3690,
+          "end_byte": 3792
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 59,
+            "end_line": 59,
+            "start_byte": 1730,
+            "end_byte": 1763
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1765:POST:/create",
+        "method": "POST",
+        "path_pattern": "/create",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 60,
+          "end_line": 60,
+          "start_byte": 1765,
+          "end_byte": 1799
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 60,
+                "end_line": 60,
+                "start_byte": 1765,
+                "end_byte": 1773
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 165,
+          "end_line": 201,
+          "start_byte": 4287,
+          "end_byte": 5184
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 60,
+            "end_line": 60,
+            "start_byte": 1765,
+            "end_byte": 1799
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 170,
+            "end_line": 183,
+            "start_byte": 4433,
+            "end_byte": 4788
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1801:GET:/destroy/:id",
+        "method": "GET",
+        "path_pattern": "/destroy/:id",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 61,
+          "end_line": 61,
+          "start_byte": 1801,
+          "end_byte": 1840
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 61,
+                "end_line": 61,
+                "start_byte": 1801,
+                "end_byte": 1808
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  Todo.findById(req.params.id, function (err, todo) {\n\n    try {\n      todo.remove(function (err, todo) {\n        if (err) return next(err);\n        res.redirect('/');\n      });\n    } catch (e) {\n    }\n  });\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 203,
+          "end_line": 214,
+          "start_byte": 5231,
+          "end_byte": 5442
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 61,
+            "end_line": 61,
+            "start_byte": 1801,
+            "end_byte": 1840
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1842:GET:/edit/:id",
+        "method": "GET",
+        "path_pattern": "/edit/:id",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 62,
+          "end_line": 62,
+          "start_byte": 1842,
+          "end_byte": 1875
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 62,
+                "end_line": 62,
+                "start_byte": 1842,
+                "end_byte": 1849
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  Todo.\n    find({}).\n    sort('-updated_at').\n    exec(function (err, todos) {\n      if (err) return next(err);\n\n      res.render('edit', {\n        title: 'TODO',\n        todos: todos,\n        current: req.params.id\n      });\n    });\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 216,
+          "end_line": 229,
+          "start_byte": 5486,
+          "end_byte": 5724
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 62,
+            "end_line": 62,
+            "start_byte": 1842,
+            "end_byte": 1875
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1877:POST:/update/:id",
+        "method": "POST",
+        "path_pattern": "/update/:id",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 63,
+          "end_line": 63,
+          "start_byte": 1877,
+          "end_byte": 1915
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 63,
+                "end_line": 63,
+                "start_byte": 1877,
+                "end_byte": 1885
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  Todo.findById(req.params.id, function (err, todo) {\n\n    todo.content = req.body.content;\n    todo.updated_at = Date.now();\n    todo.save(function (err, todo, count) {\n      if (err) return next(err);\n\n      res.redirect('/');\n    });\n  });\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 231,
+          "end_line": 242,
+          "start_byte": 5770,
+          "end_byte": 6016
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 63,
+            "end_line": 63,
+            "start_byte": 1877,
+            "end_byte": 1915
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1917:POST:/import",
+        "method": "POST",
+        "path_pattern": "/import",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 64,
+          "end_line": 64,
+          "start_byte": 1917,
+          "end_byte": 1951
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.post",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 64,
+                "end_line": 64,
+                "start_byte": 1917,
+                "end_byte": 1925
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  if (!req.files) {\n    res.send('No files were uploaded.');\n    return;\n  }\n\n  var importFile = req.files.importFile;\n  var data;\n  var importedFileType = fileType(importFile.data);\n  var zipFileExt = { ext: \"zip\", mime: \"application/zip\" };\n  if (importedFileType === null) {\n    importedFileType = { ext: \"txt\", mime: \"text/plain\" };\n  }\n  if (importedFileType[\"mime\"] === zipFileExt[\"mime\"]) {\n    var zip = AdmZip(importFile.data);\n    var extracted_path = \"/tmp/extracted_files\";\n    zip.extractAllTo(extracted_path, true);\n    data = \"No backup.txt file found\";\n    fs.readFile('backup.txt', 'ascii', function (err, data) {\n      if (!err) {\n        data = data;\n      }\n    });\n  } else {\n    data = importFile.data.toString('ascii');\n  }\n  var lines = data.split('\\n');\n  lines.forEach(function (line) {\n    var parts = line.split(',');\n    var what = parts[0];\n    console.log('importing ' + what);\n    var when = parts[1];\n    var locale = parts[2];\n    var format = parts[3];\n    var item = what;\n    if (!isBlank(what)) {\n      if (!isBlank(when) && !isBlank(locale) && !isBlank(format)) {\n        console.log('setting locale ' + parts[1]);\n        moment.locale(locale);\n        var d = moment(when);\n        console.log('formatting ' + d);\n        item += ' [' + d.format(format) + ']';\n      }\n\n      new Todo({\n        content: item,\n        updated_at: Date.now(),\n      }).save(function (err, todo, count) {\n        if (err) return next(err);\n        console.log('added ' + todo);\n      });\n    }\n  });\n\n  res.redirect('/');\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 254,
+          "end_line": 309,
+          "start_byte": 6244,
+          "end_byte": 7791
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 64,
+            "end_line": 64,
+            "start_byte": 1917,
+            "end_byte": 1951
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 255,
+            "end_line": 258,
+            "start_byte": 6248,
+            "end_byte": 6322
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 264,
+            "end_line": 266,
+            "start_byte": 6491,
+            "end_byte": 6586
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 267,
+            "end_line": 279,
+            "start_byte": 6589,
+            "end_byte": 6992
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1953:GET:/about_new",
+        "method": "GET",
+        "path_pattern": "/about_new",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 65,
+          "end_line": 65,
+          "start_byte": 1953,
+          "end_byte": 1992
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 65,
+                "end_line": 65,
+                "start_byte": 1953,
+                "end_byte": 1960
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "handler",
+        "text": "{\n  console.log(JSON.stringify(req.query));\n  return res.render(\"about_new.dust\",\n    {\n      title: 'Patch TODO List',\n      subhead: 'Vulnerabilities at their best',\n      device: req.query.device\n    });\n}",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 311,
+          "end_line": 319,
+          "start_byte": 7840,
+          "end_byte": 8048
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 65,
+            "end_line": 65,
+            "start_byte": 1953,
+            "end_byte": 1992
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:1994:GET:/chat",
+        "method": "GET",
+        "path_pattern": "/chat",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 66,
+          "end_line": 66,
+          "start_byte": 1994,
+          "end_byte": 2027
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 66,
+                "end_line": 66,
+                "start_byte": 1994,
+                "end_byte": 2001
+              }
+            }
+          }
+        ]
+      },
+      "gaps": [
+        {
+          "kind": "unresolved_handler",
+          "detail": "handler is not a directly resolved function",
+          "at": {
+            "file": "app.js",
+            "start_line": 1,
+            "end_line": 89,
+            "start_byte": 0,
+            "end_byte": 2642
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:2029:PUT:/chat",
+        "method": "PUT",
+        "path_pattern": "/chat",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 67,
+          "end_line": 67,
+          "start_byte": 2029,
+          "end_byte": 2062
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.put",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 67,
+                "end_line": 67,
+                "start_byte": 2029,
+                "end_byte": 2036
+              }
+            }
+          }
+        ]
+      },
+      "gaps": [
+        {
+          "kind": "unresolved_handler",
+          "detail": "handler is not a directly resolved function",
+          "at": {
+            "file": "app.js",
+            "start_line": 1,
+            "end_line": 89,
+            "start_byte": 0,
+            "end_byte": 2642
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:2064:DELETE:/chat",
+        "method": "DELETE",
+        "path_pattern": "/chat",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 68,
+          "end_line": 68,
+          "start_byte": 2064,
+          "end_byte": 2103
+        },
+        "handler": {
+          "name": "",
+          "kind": "",
+          "span": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.delete",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 68,
+                "end_line": 68,
+                "start_byte": 2064,
+                "end_byte": 2074
+              }
+            }
+          }
+        ]
+      },
+      "gaps": [
+        {
+          "kind": "unresolved_handler",
+          "detail": "handler is not a directly resolved function",
+          "at": {
+            "file": "app.js",
+            "start_line": 1,
+            "end_line": 89,
+            "start_byte": 0,
+            "end_byte": 2642
+          }
+        }
+      ]
+    },
+    {
+      "route": {
+        "id": "route:app.js:2105:USE:/users",
+        "method": "USE",
+        "path_pattern": "/users",
+        "framework": "express",
+        "registration": {
+          "file": "app.js",
+          "start_line": 69,
+          "end_line": 69,
+          "start_byte": 2105,
+          "end_byte": 2135
+        },
+        "handler": {
+          "name": "routesUsers",
+          "kind": "identifier",
+          "span": {
+            "file": "app.js",
+            "start_line": 69,
+            "end_line": 69,
+            "start_byte": 2123,
+            "end_byte": 2134
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.use",
+              "kind": "method",
+              "span": {
+                "file": "app.js",
+                "start_line": 69,
+                "end_line": 69,
+                "start_byte": 2105,
+                "end_byte": 2112
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "routesUsers",
+              "kind": "identifier",
+              "span": {
+                "file": "app.js",
+                "start_line": 69,
+                "end_line": 69,
+                "start_byte": 2123,
+                "end_byte": 2134
+              }
+            }
+          }
+        ]
+      },
+      "gaps": [
+        {
+          "kind": "unresolved_handler",
+          "detail": "handler is not a directly resolved function",
+          "at": {
+            "file": "app.js",
+            "start_line": 1,
+            "end_line": 89,
+            "start_byte": 0,
+            "end_byte": 2642
+          }
+        }
+      ]
+    }
+  ],
+  "uses": [
+    {
+      "xss": {
+        "type": "reflected",
+        "entry_kind": "server",
+        "output_context": "html_attribute",
+        "content_type": "text/html",
+        "protection": "raw",
+        "protection_reason": "Untrusted data reaches raw HTML output without modeled context-appropriate encoding or sanitization."
+      },
+      "api_model": {
+        "id": "html-output-v1",
+        "library": "express",
+        "semantics": "Request values reach an HTML rendering operation in the recorded output context.",
+        "reference": "https://expressjs.com/en/api.html#res.send"
+      },
+      "id": "xss:route:app.js:1450:GET:/login:views/admin.ejs:513",
+      "route_id": "route:app.js:1450:GET:/login",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "template_output",
+        "text": "<%- redirectPage %>",
+        "span": {
+          "file": "views/admin.ejs",
+          "start_line": 17,
+          "end_line": 17,
+          "start_byte": 513,
+          "end_byte": 532
+        },
+        "sha256": "564904a37eef5d6e4813ef306ad9a0dcfedf66c15ca15241f330e51e657713b6"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query.redirectPage",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 84,
+              "end_line": 84,
+              "start_byte": 2143,
+              "end_byte": 2165
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/login', routes.login)",
+          "span": {
+            "file": "app.js",
+            "start_line": 54,
+            "end_line": 54,
+            "start_byte": 1450,
+            "end_byte": 1481
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  return res.render('admin', {\n    title: 'Admin Access',\n    granted: false,\n    redirectPage: req.query.redirectPage\n  });\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 80,
+            "end_line": 86,
+            "start_byte": 2045,
+            "end_byte": 2173
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('views', path.join(__dirname, 'views'))",
+          "span": {
+            "file": "app.js",
+            "start_line": 38,
+            "end_line": 38,
+            "start_byte": 1051,
+            "end_byte": 1098
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('view engine', 'ejs')",
+          "span": {
+            "file": "app.js",
+            "start_line": 39,
+            "end_line": 39,
+            "start_byte": 1100,
+            "end_byte": 1129
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_render",
+          "text": "res.render('admin', {\n    title: 'Admin Access',\n    granted: false,\n    redirectPage: req.query.redirectPage\n  })",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 81,
+            "end_line": 85,
+            "start_byte": 2056,
+            "end_byte": 2170
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 54,
+            "end_line": 54,
+            "start_byte": 1450,
+            "end_byte": 1481
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:app.js:1450:GET:/login:req.query.redirectPage:2143",
+      "route_id": "route:app.js:1450:GET:/login",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.query.redirectPage",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 84,
+          "end_line": 84,
+          "start_byte": 2143,
+          "end_byte": 2165
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query.redirectPage",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 84,
+              "end_line": 84,
+              "start_byte": 2143,
+              "end_byte": 2165
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/login', routes.login)",
+          "span": {
+            "file": "app.js",
+            "start_line": 54,
+            "end_line": 54,
+            "start_byte": 1450,
+            "end_byte": 1481
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  return res.render('admin', {\n    title: 'Admin Access',\n    granted: false,\n    redirectPage: req.query.redirectPage\n  });\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 80,
+            "end_line": 86,
+            "start_byte": 2045,
+            "end_byte": 2173
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 54,
+            "end_line": 54,
+            "start_byte": 1450,
+            "end_byte": 1481
+          }
+        },
+        {
+          "kind": "input_validation_absent",
+          "detail": "req.query.redirectPage is read and no handler or applicable middleware validator handles it",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 84,
+            "end_line": 84,
+            "start_byte": 2143,
+            "end_byte": 2165
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:app.js:1483:POST:/login:req.body.password:1316",
+      "route_id": "route:app.js:1483:POST:/login",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.body.password",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 52,
+          "end_line": 52,
+          "start_byte": 1316,
+          "end_byte": 1333
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body.password",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 52,
+              "end_line": 52,
+              "start_byte": 1316,
+              "end_byte": 1333
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/login', routes.loginHandler)",
+          "span": {
+            "file": "app.js",
+            "start_line": 55,
+            "end_line": 55,
+            "start_byte": 1483,
+            "end_byte": 1522
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 50,
+            "end_line": 65,
+            "start_byte": 1213,
+            "end_byte": 1711
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 51,
+            "end_line": 64,
+            "start_byte": 1217,
+            "end_byte": 1709
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 55,
+            "end_line": 55,
+            "start_byte": 1483,
+            "end_byte": 1522
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 51,
+            "end_line": 64,
+            "start_byte": 1217,
+            "end_byte": 1709
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body.password before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 52,
+            "end_line": 52,
+            "start_byte": 1316,
+            "end_byte": 1333
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:app.js:1483:POST:/login:req.body.username:1239",
+      "route_id": "route:app.js:1483:POST:/login",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.body.username",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 51,
+          "end_line": 51,
+          "start_byte": 1239,
+          "end_byte": 1256
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body.username",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 51,
+              "end_line": 51,
+              "start_byte": 1239,
+              "end_byte": 1256
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/login', routes.loginHandler)",
+          "span": {
+            "file": "app.js",
+            "start_line": 55,
+            "end_line": 55,
+            "start_byte": 1483,
+            "end_byte": 1522
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 50,
+            "end_line": 65,
+            "start_byte": 1213,
+            "end_byte": 1711
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 51,
+            "end_line": 64,
+            "start_byte": 1217,
+            "end_byte": 1709
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 55,
+            "end_line": 55,
+            "start_byte": 1483,
+            "end_byte": 1522
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 51,
+            "end_line": 64,
+            "start_byte": 1217,
+            "end_byte": 1709
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body.username before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 51,
+            "end_line": 51,
+            "start_byte": 1239,
+            "end_byte": 1256
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "xss": {
+        "type": "reflected",
+        "entry_kind": "server",
+        "output_context": "html_text",
+        "content_type": "text/html",
+        "protection": "encoded",
+        "protection_reason": "The template HTML-escapes this value in HTML text or a quoted non-active attribute."
+      },
+      "api_model": {
+        "id": "html-output-v1",
+        "library": "express",
+        "semantics": "Request values reach an HTML rendering operation in the recorded output context.",
+        "reference": "https://expressjs.com/en/api.html#res.send"
+      },
+      "id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:108",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "template_output",
+        "text": "{{firstname}}",
+        "span": {
+          "file": "views/account.hbs",
+          "start_line": 6,
+          "end_line": 6,
+          "start_byte": 108,
+          "end_byte": 121
+        },
+        "sha256": "e0deb8dda0e022c32e06cc3afde665a36001b1440bfa67c7c3ac5b7f6fadc4ff"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/account_details', routes.isLoggedIn, routes.save_account_details)",
+          "span": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 102,
+            "end_line": 126,
+            "start_byte": 2615,
+            "end_byte": 3495
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('views', path.join(__dirname, 'views'))",
+          "span": {
+            "file": "app.js",
+            "start_line": 38,
+            "end_line": 38,
+            "start_byte": 1051,
+            "end_byte": 1098
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('view engine', 'ejs')",
+          "span": {
+            "file": "app.js",
+            "start_line": 39,
+            "end_line": 39,
+            "start_byte": 1100,
+            "end_byte": 1129
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_render",
+          "text": "res.render('account.hbs', profile)",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          }
+        },
+        {
+          "kind": "template_projection_unresolved",
+          "detail": "render locals field firstname is not resolved",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "xss": {
+        "type": "reflected",
+        "entry_kind": "server",
+        "output_context": "html_attribute",
+        "content_type": "text/html",
+        "protection": "encoded",
+        "protection_reason": "The template HTML-escapes this value in HTML text or a quoted non-active attribute."
+      },
+      "api_model": {
+        "id": "html-output-v1",
+        "library": "express",
+        "semantics": "Request values reach an HTML rendering operation in the recorded output context.",
+        "reference": "https://expressjs.com/en/api.html#res.send"
+      },
+      "id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:508",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "template_output",
+        "text": "{{firstname}}",
+        "span": {
+          "file": "views/account.hbs",
+          "start_line": 18,
+          "end_line": 18,
+          "start_byte": 508,
+          "end_byte": 521
+        },
+        "sha256": "e0deb8dda0e022c32e06cc3afde665a36001b1440bfa67c7c3ac5b7f6fadc4ff"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/account_details', routes.isLoggedIn, routes.save_account_details)",
+          "span": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 102,
+            "end_line": 126,
+            "start_byte": 2615,
+            "end_byte": 3495
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('views', path.join(__dirname, 'views'))",
+          "span": {
+            "file": "app.js",
+            "start_line": 38,
+            "end_line": 38,
+            "start_byte": 1051,
+            "end_byte": 1098
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('view engine', 'ejs')",
+          "span": {
+            "file": "app.js",
+            "start_line": 39,
+            "end_line": 39,
+            "start_byte": 1100,
+            "end_byte": 1129
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_render",
+          "text": "res.render('account.hbs', profile)",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          }
+        },
+        {
+          "kind": "template_projection_unresolved",
+          "detail": "render locals field firstname is not resolved",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "xss": {
+        "type": "reflected",
+        "entry_kind": "server",
+        "output_context": "html_attribute",
+        "content_type": "text/html",
+        "protection": "encoded",
+        "protection_reason": "The template HTML-escapes this value in HTML text or a quoted non-active attribute."
+      },
+      "api_model": {
+        "id": "html-output-v1",
+        "library": "express",
+        "semantics": "Request values reach an HTML rendering operation in the recorded output context.",
+        "reference": "https://expressjs.com/en/api.html#res.send"
+      },
+      "id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:633",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "template_output",
+        "text": "{{lastname}}",
+        "span": {
+          "file": "views/account.hbs",
+          "start_line": 22,
+          "end_line": 22,
+          "start_byte": 633,
+          "end_byte": 645
+        },
+        "sha256": "e0deb8dda0e022c32e06cc3afde665a36001b1440bfa67c7c3ac5b7f6fadc4ff"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/account_details', routes.isLoggedIn, routes.save_account_details)",
+          "span": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 102,
+            "end_line": 126,
+            "start_byte": 2615,
+            "end_byte": 3495
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('views', path.join(__dirname, 'views'))",
+          "span": {
+            "file": "app.js",
+            "start_line": 38,
+            "end_line": 38,
+            "start_byte": 1051,
+            "end_byte": 1098
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('view engine', 'ejs')",
+          "span": {
+            "file": "app.js",
+            "start_line": 39,
+            "end_line": 39,
+            "start_byte": 1100,
+            "end_byte": 1129
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_render",
+          "text": "res.render('account.hbs', profile)",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          }
+        },
+        {
+          "kind": "template_projection_unresolved",
+          "detail": "render locals field lastname is not resolved",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "xss": {
+        "type": "reflected",
+        "entry_kind": "server",
+        "output_context": "html_attribute",
+        "content_type": "text/html",
+        "protection": "encoded",
+        "protection_reason": "The template HTML-escapes this value in HTML text or a quoted non-active attribute."
+      },
+      "api_model": {
+        "id": "html-output-v1",
+        "library": "express",
+        "semantics": "Request values reach an HTML rendering operation in the recorded output context.",
+        "reference": "https://expressjs.com/en/api.html#res.send"
+      },
+      "id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:752",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "template_output",
+        "text": "{{country}}",
+        "span": {
+          "file": "views/account.hbs",
+          "start_line": 26,
+          "end_line": 26,
+          "start_byte": 752,
+          "end_byte": 763
+        },
+        "sha256": "e0deb8dda0e022c32e06cc3afde665a36001b1440bfa67c7c3ac5b7f6fadc4ff"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/account_details', routes.isLoggedIn, routes.save_account_details)",
+          "span": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 102,
+            "end_line": 126,
+            "start_byte": 2615,
+            "end_byte": 3495
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('views', path.join(__dirname, 'views'))",
+          "span": {
+            "file": "app.js",
+            "start_line": 38,
+            "end_line": 38,
+            "start_byte": 1051,
+            "end_byte": 1098
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('view engine', 'ejs')",
+          "span": {
+            "file": "app.js",
+            "start_line": 39,
+            "end_line": 39,
+            "start_byte": 1100,
+            "end_byte": 1129
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_render",
+          "text": "res.render('account.hbs', profile)",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          }
+        },
+        {
+          "kind": "template_projection_unresolved",
+          "detail": "render locals field country is not resolved",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "xss": {
+        "type": "reflected",
+        "entry_kind": "server",
+        "output_context": "html_attribute",
+        "content_type": "text/html",
+        "protection": "encoded",
+        "protection_reason": "The template HTML-escapes this value in HTML text or a quoted non-active attribute."
+      },
+      "api_model": {
+        "id": "html-output-v1",
+        "library": "express",
+        "semantics": "Request values reach an HTML rendering operation in the recorded output context.",
+        "reference": "https://expressjs.com/en/api.html#res.send"
+      },
+      "id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:873",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "template_output",
+        "text": "{{phone}}",
+        "span": {
+          "file": "views/account.hbs",
+          "start_line": 30,
+          "end_line": 30,
+          "start_byte": 873,
+          "end_byte": 882
+        },
+        "sha256": "e0deb8dda0e022c32e06cc3afde665a36001b1440bfa67c7c3ac5b7f6fadc4ff"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/account_details', routes.isLoggedIn, routes.save_account_details)",
+          "span": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 102,
+            "end_line": 126,
+            "start_byte": 2615,
+            "end_byte": 3495
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('views', path.join(__dirname, 'views'))",
+          "span": {
+            "file": "app.js",
+            "start_line": 38,
+            "end_line": 38,
+            "start_byte": 1051,
+            "end_byte": 1098
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('view engine', 'ejs')",
+          "span": {
+            "file": "app.js",
+            "start_line": 39,
+            "end_line": 39,
+            "start_byte": 1100,
+            "end_byte": 1129
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_render",
+          "text": "res.render('account.hbs', profile)",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          }
+        },
+        {
+          "kind": "template_projection_unresolved",
+          "detail": "render locals field phone is not resolved",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "xss": {
+        "type": "reflected",
+        "entry_kind": "server",
+        "output_context": "html_attribute",
+        "content_type": "text/html",
+        "protection": "encoded",
+        "protection_reason": "The template HTML-escapes this value in HTML text or a quoted non-active attribute."
+      },
+      "api_model": {
+        "id": "html-output-v1",
+        "library": "express",
+        "semantics": "Request values reach an HTML rendering operation in the recorded output context.",
+        "reference": "https://expressjs.com/en/api.html#res.send"
+      },
+      "id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:985",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "template_output",
+        "text": "{{email}}",
+        "span": {
+          "file": "views/account.hbs",
+          "start_line": 34,
+          "end_line": 34,
+          "start_byte": 985,
+          "end_byte": 994
+        },
+        "sha256": "e0deb8dda0e022c32e06cc3afde665a36001b1440bfa67c7c3ac5b7f6fadc4ff"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "profile = req.body",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 104,
+                "end_line": 104,
+                "start_byte": 2667,
+                "end_byte": 2685
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/account_details', routes.isLoggedIn, routes.save_account_details)",
+          "span": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 102,
+            "end_line": 126,
+            "start_byte": 2615,
+            "end_byte": 3495
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('views', path.join(__dirname, 'views'))",
+          "span": {
+            "file": "app.js",
+            "start_line": 38,
+            "end_line": 38,
+            "start_byte": 1051,
+            "end_byte": 1098
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('view engine', 'ejs')",
+          "span": {
+            "file": "app.js",
+            "start_line": 39,
+            "end_line": 39,
+            "start_byte": 1100,
+            "end_byte": 1129
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_render",
+          "text": "res.render('account.hbs', profile)",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          }
+        },
+        {
+          "kind": "template_projection_unresolved",
+          "detail": "render locals field email is not resolved",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 120,
+            "end_line": 120,
+            "start_byte": 3302,
+            "end_byte": 3336
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:app.js:1652:POST:/account_details:req.body:2677",
+      "route_id": "route:app.js:1652:POST:/account_details",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.body",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 104,
+          "end_line": 104,
+          "start_byte": 2677,
+          "end_byte": 2685
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 104,
+              "end_line": 104,
+              "start_byte": 2677,
+              "end_byte": 2685
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/account_details', routes.isLoggedIn, routes.save_account_details)",
+          "span": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 102,
+            "end_line": 126,
+            "start_byte": 2615,
+            "end_byte": 3495
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 58,
+            "end_line": 58,
+            "start_byte": 1652,
+            "end_byte": 1728
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 106,
+            "end_line": 125,
+            "start_byte": 2712,
+            "end_byte": 3493
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 104,
+            "end_line": 104,
+            "start_byte": 2677,
+            "end_byte": 2685
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:app.js:1765:POST:/create:req.body.content:4362",
+      "route_id": "route:app.js:1765:POST:/create",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.body.content",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 168,
+          "end_line": 168,
+          "start_byte": 4362,
+          "end_byte": 4378
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.body.content",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 168,
+              "end_line": 168,
+              "start_byte": 4362,
+              "end_byte": 4378
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/create', routes.create)",
+          "span": {
+            "file": "app.js",
+            "start_line": 60,
+            "end_line": 60,
+            "start_byte": 1765,
+            "end_byte": 1799
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 165,
+            "end_line": 201,
+            "start_byte": 4287,
+            "end_byte": 5184
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 170,
+            "end_line": 183,
+            "start_byte": 4433,
+            "end_byte": 4788
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 60,
+            "end_line": 60,
+            "start_byte": 1765,
+            "end_byte": 1799
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 170,
+            "end_line": 183,
+            "start_byte": 4433,
+            "end_byte": 4788
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.body.content before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 168,
+            "end_line": 168,
+            "start_byte": 4362,
+            "end_byte": 4378
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:app.js:1801:GET:/destroy/:id:req.params.id:5249",
+      "route_id": "route:app.js:1801:GET:/destroy/:id",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.params.id",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 204,
+          "end_line": 204,
+          "start_byte": 5249,
+          "end_byte": 5262
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.params.id",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 204,
+              "end_line": 204,
+              "start_byte": 5249,
+              "end_byte": 5262
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/destroy/:id', routes.destroy)",
+          "span": {
+            "file": "app.js",
+            "start_line": 61,
+            "end_line": 61,
+            "start_byte": 1801,
+            "end_byte": 1840
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  Todo.findById(req.params.id, function (err, todo) {\n\n    try {\n      todo.remove(function (err, todo) {\n        if (err) return next(err);\n        res.redirect('/');\n      });\n    } catch (e) {\n    }\n  });\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 203,
+            "end_line": 214,
+            "start_byte": 5231,
+            "end_byte": 5442
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 61,
+            "end_line": 61,
+            "start_byte": 1801,
+            "end_byte": 1840
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.params.id before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 204,
+            "end_line": 204,
+            "start_byte": 5249,
+            "end_byte": 5262
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:app.js:1877:POST:/update/:id:req.params.id:5788",
+      "route_id": "route:app.js:1877:POST:/update/:id",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.params.id",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 232,
+          "end_line": 232,
+          "start_byte": 5788,
+          "end_byte": 5801
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.params.id",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 232,
+              "end_line": 232,
+              "start_byte": 5788,
+              "end_byte": 5801
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.post('/update/:id', routes.update)",
+          "span": {
+            "file": "app.js",
+            "start_line": 63,
+            "end_line": 63,
+            "start_byte": 1877,
+            "end_byte": 1915
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  Todo.findById(req.params.id, function (err, todo) {\n\n    todo.content = req.body.content;\n    todo.updated_at = Date.now();\n    todo.save(function (err, todo, count) {\n      if (err) return next(err);\n\n      res.redirect('/');\n    });\n  });\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 231,
+            "end_line": 242,
+            "start_byte": 5770,
+            "end_byte": 6016
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 63,
+            "end_line": 63,
+            "start_byte": 1877,
+            "end_byte": 1915
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.params.id before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 232,
+            "end_line": 232,
+            "start_byte": 5788,
+            "end_byte": 5801
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "use:route:app.js:1953:GET:/about_new:routes/index.js:7844",
+      "route_id": "route:app.js:1953:GET:/about_new",
+      "kind": "log_sink_candidate",
+      "sink": {
+        "kind": "log_sink_candidate",
+        "text": "console.log(JSON.stringify(req.query))",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 312,
+          "end_line": 312,
+          "start_byte": 7844,
+          "end_byte": 7882
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 312,
+              "end_line": 312,
+              "start_byte": 7871,
+              "end_byte": 7880
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "call_argument_dependency",
+              "text": "JSON.stringify(req.query)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 312,
+                "end_line": 312,
+                "start_byte": 7856,
+                "end_byte": 7881
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/about_new', routes.about_new)",
+          "span": {
+            "file": "app.js",
+            "start_line": 65,
+            "end_line": 65,
+            "start_byte": 1953,
+            "end_byte": 1992
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  console.log(JSON.stringify(req.query));\n  return res.render(\"about_new.dust\",\n    {\n      title: 'Patch TODO List',\n      subhead: 'Vulnerabilities at their best',\n      device: req.query.device\n    });\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 311,
+            "end_line": 319,
+            "start_byte": 7840,
+            "end_byte": 8048
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "logger_binding",
+          "text": "global console.log",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 312,
+            "end_line": 312,
+            "start_byte": 7844,
+            "end_byte": 7855
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 65,
+            "end_line": 65,
+            "start_byte": 1953,
+            "end_byte": 1992
+          }
+        },
+        {
+          "kind": "unknown_value",
+          "detail": "unresolved local value: JSON",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 312,
+            "end_line": 312,
+            "start_byte": 7856,
+            "end_byte": 7860
+          }
+        },
+        {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: JSON.stringify",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 312,
+            "end_line": 312,
+            "start_byte": 7856,
+            "end_byte": 7881
+          }
+        },
+        {
+          "kind": "log_request_container",
+          "detail": "the whole request query is written to the log and may include credentials or personal data",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 312,
+            "end_line": 312,
+            "start_byte": 7844,
+            "end_byte": 7882
+          }
+        },
+        {
+          "kind": "log_destination_unresolved",
+          "detail": "logger transports, levels, formats and redaction configuration are not modeled",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 312,
+            "end_line": 312,
+            "start_byte": 7844,
+            "end_byte": 7882
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "xss": {
+        "type": "reflected",
+        "entry_kind": "server",
+        "output_context": "unknown",
+        "content_type": "text/html",
+        "protection": "unknown",
+        "protection_reason": "Rendering context is not established for every value."
+      },
+      "api_model": {
+        "id": "html-output-v1",
+        "library": "express",
+        "semantics": "Request values reach an HTML rendering operation in the recorded output context.",
+        "reference": "https://expressjs.com/en/api.html#res.send"
+      },
+      "id": "xss:route:app.js:1953:GET:/about_new:routes/index.js:7893",
+      "route_id": "route:app.js:1953:GET:/about_new",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "template_render",
+        "text": "res.render(\"about_new.dust\",\n    {\n      title: 'Patch TODO List',\n      subhead: 'Vulnerabilities at their best',\n      device: req.query.device\n    })",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 313,
+          "end_line": 318,
+          "start_byte": 7893,
+          "end_byte": 8045
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query.device",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 317,
+              "end_line": 317,
+              "start_byte": 8022,
+              "end_byte": 8038
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": [
+            {
+              "kind": "expression",
+              "text": "device: req.query.device",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 317,
+                "end_line": 317,
+                "start_byte": 8014,
+                "end_byte": 8038
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "expression",
+              "text": "{\n      title: 'Patch TODO List',\n      subhead: 'Vulnerabilities at their best',\n      device: req.query.device\n    }",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 314,
+                "end_line": 318,
+                "start_byte": 7926,
+                "end_byte": 8044
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/about_new', routes.about_new)",
+          "span": {
+            "file": "app.js",
+            "start_line": 65,
+            "end_line": 65,
+            "start_byte": 1953,
+            "end_byte": 1992
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  console.log(JSON.stringify(req.query));\n  return res.render(\"about_new.dust\",\n    {\n      title: 'Patch TODO List',\n      subhead: 'Vulnerabilities at their best',\n      device: req.query.device\n    });\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 311,
+            "end_line": 319,
+            "start_byte": 7840,
+            "end_byte": 8048
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('views', path.join(__dirname, 'views'))",
+          "span": {
+            "file": "app.js",
+            "start_line": 38,
+            "end_line": 38,
+            "start_byte": 1051,
+            "end_byte": 1098
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "template_configuration",
+          "text": "app.set('view engine', 'ejs')",
+          "span": {
+            "file": "app.js",
+            "start_line": 39,
+            "end_line": 39,
+            "start_byte": 1100,
+            "end_byte": 1129
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 65,
+            "end_line": 65,
+            "start_byte": 1953,
+            "end_byte": 1992
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:app.js:1953:GET:/about_new:req.query:7871",
+      "route_id": "route:app.js:1953:GET:/about_new",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.query",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 312,
+          "end_line": 312,
+          "start_byte": 7871,
+          "end_byte": 7880
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 312,
+              "end_line": 312,
+              "start_byte": 7871,
+              "end_byte": 7880
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/about_new', routes.about_new)",
+          "span": {
+            "file": "app.js",
+            "start_line": 65,
+            "end_line": 65,
+            "start_byte": 1953,
+            "end_byte": 1992
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  console.log(JSON.stringify(req.query));\n  return res.render(\"about_new.dust\",\n    {\n      title: 'Patch TODO List',\n      subhead: 'Vulnerabilities at their best',\n      device: req.query.device\n    });\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 311,
+            "end_line": 319,
+            "start_byte": 7840,
+            "end_byte": 8048
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 65,
+            "end_line": 65,
+            "start_byte": 1953,
+            "end_byte": 1992
+          }
+        },
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "a call receives req.query before the sink, and that call is not a proven validator",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 312,
+            "end_line": 312,
+            "start_byte": 7871,
+            "end_byte": 7880
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "id": "input:route:app.js:1953:GET:/about_new:req.query.device:8022",
+      "route_id": "route:app.js:1953:GET:/about_new",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "req.query.device",
+        "span": {
+          "file": "routes/index.js",
+          "start_line": 317,
+          "end_line": 317,
+          "start_byte": 8022,
+          "end_byte": 8038
+        },
+        "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "req.query.device",
+            "span": {
+              "file": "routes/index.js",
+              "start_line": 317,
+              "end_line": 317,
+              "start_byte": 8022,
+              "end_byte": 8038
+            },
+            "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/about_new', routes.about_new)",
+          "span": {
+            "file": "app.js",
+            "start_line": 65,
+            "end_line": 65,
+            "start_byte": 1953,
+            "end_byte": 1992
+          },
+          "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  console.log(JSON.stringify(req.query));\n  return res.render(\"about_new.dust\",\n    {\n      title: 'Patch TODO List',\n      subhead: 'Vulnerabilities at their best',\n      device: req.query.device\n    });\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 311,
+            "end_line": 319,
+            "start_byte": 7840,
+            "end_byte": 8048
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "app.js",
+            "start_line": 65,
+            "end_line": 65,
+            "start_byte": 1953,
+            "end_byte": 1992
+          }
+        },
+        {
+          "kind": "input_validation_absent",
+          "detail": "req.query.device is read and no handler or applicable middleware validator handles it",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 317,
+            "end_line": 317,
+            "start_byte": 8022,
+            "end_byte": 8038
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    }
+  ],
+  "gaps": [],
+  "files": [
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "app.js",
+        "start_line": 1,
+        "end_line": 89,
+        "start_byte": 0,
+        "end_byte": 2642
+      },
+      "sha256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+    },
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "routes/index.js",
+        "start_line": 1,
+        "end_line": 381,
+        "start_byte": 0,
+        "end_byte": 9541
+      },
+      "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+    },
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "routes/users.js",
+        "start_line": 2,
+        "end_line": 45,
+        "start_byte": 1,
+        "end_byte": 1157
+      },
+      "sha256": "6ad8ac7589f66b5892f6fc5a66d0b2114f7888b8654e6a3cd6d3b637d50c2ef6"
+    },
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "views/about_new.dust",
+        "start_line": 1,
+        "end_line": 19,
+        "start_byte": 0,
+        "end_byte": 397
+      },
+      "sha256": "bdb86e1fdc2c7df3ef71cbf9bce3d5bbb7ab446ef57066c8d459f3706d073b98"
+    },
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "views/account.hbs",
+        "start_line": 1,
+        "end_line": 44,
+        "start_byte": 0,
+        "end_byte": 1117
+      },
+      "sha256": "e0deb8dda0e022c32e06cc3afde665a36001b1440bfa67c7c3ac5b7f6fadc4ff"
+    },
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "views/admin.ejs",
+        "start_line": 1,
+        "end_line": 24,
+        "start_byte": 0,
+        "end_byte": 621
+      },
+      "sha256": "564904a37eef5d6e4813ef306ad9a0dcfedf66c15ca15241f330e51e657713b6"
+    }
+  ],
+  "limitations": [
+    "ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain",
+    "Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
+    "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
+    "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities"
+  ],
+  "practice": [
+    {
+      "id": "javascript",
+      "version": "3",
+      "languages": [
+        "javascript",
+        "typescript"
+      ]
+    }
+  ]
+}

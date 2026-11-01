@@ -70,6 +70,15 @@ func (s *moduleSet) collectionBinding(use graph.StringUse) []graph.Evidence {
 	if method == nil {
 		return nil
 	}
+	if obj := fn.ChildByFieldName("object"); obj != nil && obj.Kind() == "identifier" && !shadowed(call, obj.Utf8Text(m.src), m.src) {
+		if id := s.modelIdentity(m, obj.Utf8Text(m.src), 0); strings.HasPrefix(id, "mongoose:") {
+			binding := append([]graph.Evidence{}, s.modelEvidence[id]...)
+			for i := range binding {
+				binding[i].Kind = "sink_binding"
+			}
+			return binding
+		}
+	}
 	switch method.Utf8Text(m.src) {
 	case "find", "findOne", "update", "insert", "remove":
 	default:

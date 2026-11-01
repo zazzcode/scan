@@ -7,6 +7,12 @@ Bearer source: `e3753de6347988bed15bdba80b9ff731bf028c80`; rules:
 `82c335f781a61a6d8b052394f84fd1d93edec467`. Product statements below describe that pinned README,
 not a verified current commercial offering. Pro was unavailable for local evaluation.
 
+The [Node.js Goof target inventory](nodejs-goof-capabilities.md) adds source-inspected template,
+stored Markdown, database and other cases on 2026-11-01. Its [initial baseline](nodejs-goof-results.md)
+is complete (43 findings / 12 rules; limited XSS detection); use the
+[runbook](../../docs/samples/nodejs-goof/bearer-runbook.md) to produce and curate results under
+`docs/samples/nodejs-goof/bearer/<run-id>/`. These cases do not change the observed results below.
+
 | Capability | Pinned comparator evidence | Scan state | Phase / acceptance still required |
 |---|---|---|---|
 | JS/TS Express source analysis | Exercised both samples and controls | Bounded implemented | Phases 3–7; framework/version and mount/alias negatives |

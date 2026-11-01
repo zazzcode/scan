@@ -1,0 +1,107 @@
+{
+  "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "artifacts": [
+        {
+          "hashes": {
+            "sha-256": "f84d3889f5bfafb0fc5906e5d7c948ae125a4643b6a39f2677f45ed9c1c56bcd"
+          },
+          "location": {
+            "uri": "app.js"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "executionSuccessful": true
+        }
+      ],
+      "properties": {
+        "scan.findingTypes": [
+          {
+            "id": "sql-injection",
+            "label": "SQL Injection",
+            "description": "Input changes executable SQL structure instead of remaining a data value, potentially changing what the database reads or writes.",
+            "interpretation": "An SQL Injection pill identifies the risk family being reviewed. String-built executable SQL is poor practice to remediate even without a proven exploit; a library-managed search value may remain unresolved. The finding status and evidence determine the actual claim. The pill alone does not confirm injection.",
+            "remediation": "Use the verified driver's parameter-binding API for values. Review dynamic identifiers separately. Keep business-field validation independent of query-structure protection.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "nosql-injection",
+            "label": "NoSQL Injection",
+            "description": "Untrusted input changes a NoSQL query's operators, selector structure, or executable expression rather than remaining an allowed data value.",
+            "interpretation": "Executable $where string construction is poor practice to refactor even without a proven exploit. An unmodeled document constraint alone is Review, not an established defect. Inspect actual value types, keys, transformations, library behavior, and the named status.",
+            "remediation": "Prefer data-only query APIs, constrain scalar slots and permitted keys/operators, and avoid building executable $where strings from input.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "input-validation",
+            "label": "Input Validation",
+            "description": "Server-side checks enforce the business requirements for a field, such as required presence, runtime type, permitted format, range, or length.",
+            "interpretation": "Poor input validation means an applicable requirement is not adequately enforced. This neutral family label also covers unresolved checks and supported protection: no validator identified in an analyzed slice is not proof that every execution path lacks validation. Free-text punctuation is not itself a defect.",
+            "remediation": "Define field-specific requirements and enforce them before use on all applicable paths. Verify guard behavior and middleware. Apply destination-specific protection separately.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "account-creation-validation",
+            "label": "Account Creation Validation",
+            "description": "Required account fields and enforcing guards must be checked before an account is persisted.",
+            "interpretation": "Review field requirements, conditional bypasses, and generated persistence behavior. A modeled create operation alone does not prove a registration bypass.",
+            "remediation": "Enforce required fields before persistence, terminate rejected paths, add appropriate database constraints, and test the persisted result.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "outbound-request-safety",
+            "label": "Outbound Request Safety",
+            "description": "Input used in an outbound request may affect its destination, headers, or other request values. Unrestricted destination control can lead to server-side request forgery (SSRF).",
+            "interpretation": "The current scanner records bounded outbound-use evidence. A pill does not establish SSRF, destination reachability, or complete response-flow analysis.",
+            "remediation": "Verify allowed destinations and protocols, redirect handling, network boundaries, and sensitive request values for the specific HTTP client.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "reflected-xss",
+            "label": "Reflected XSS",
+            "description": "Request-controlled content is reflected into a browser response in a context that allows it to execute as script.",
+            "interpretation": "XSS means cross-site scripting. This glossary entry is vocabulary for a planned detector; the current reporting increment does not detect or assign Reflected XSS findings.",
+            "remediation": "Use context-appropriate output encoding and safe template or DOM APIs. Input validation alone does not replace correct output handling.",
+            "coverage": "planned"
+          },
+          {
+            "id": "sensitive-data-logging",
+            "label": "Sensitive Data Logging",
+            "description": "Logs expose credentials, tokens, personal information, or other sensitive values to readers or storage that should not receive them.",
+            "interpretation": "Covers verified console and winston calls in analyzed route handlers that receive request values with credential or personal-data evidence. A field name is a hint for review, not proof; Authorization and Cookie headers are credentials by HTTP semantics. Morgan request logging that records URLs is checked against credentials read from the query string. Constant messages are not leaks. Non-request secrets and logger redaction configuration are not yet analyzed.",
+            "remediation": "Avoid logging secrets; minimize sensitive fields and apply verified redaction before emission. Review log access and retention.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "sensitive-operation-review",
+            "label": "Sensitive Operation Review",
+            "description": "A possible sensitive use was recorded but does not yet map to a more specific supported risk family.",
+            "interpretation": "This is an analysis category. Inspect the evidence and missing operation semantics before making a security claim.",
+            "remediation": "Resolve the source, operation, API behavior, and required protection before selecting a fix.",
+            "coverage": "bounded analysis"
+          }
+        ],
+        "scan.identityPolicy": "snapshot-local use IDs; edit-stable baseline identity is not implemented",
+        "scan.limitations": [
+          "ESM named relative imports and direct returned handler factories only; no re-exports or CommonJS resolution",
+          "ESM Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
+          "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
+          "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities"
+        ],
+        "scan.selectedRoute": ""
+      },
+      "results": [],
+      "tool": {
+        "driver": {
+          "informationUri": "https://github.com/zazzcode/zazzles",
+          "name": "scan",
+          "rules": []
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}
