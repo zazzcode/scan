@@ -19,7 +19,9 @@ baseline flows are vulnerable, protected or unresolved, independently of detecto
 [Bearer baseline](nodejs-goof/bearer/20261101-goof-baseline-02/SUMMARY.md) and
 [five-case Decisions evaluation](nodejs-goof/decisions/20261101-five-case-01/README.md) are saved
 separately from the canonical zazzles results. Semgrep CE comparison runs follow the
-[Semgrep CE cheat sheet](../semgrep-ce-cheat-sheet.md) and stay under `_test-findings`.
+[Semgrep CE cheat sheet](../semgrep-ce-cheat-sheet.md). Normalized Semgrep CE baselines for all three apps are
+under `<app>/semgrep/20261101-baseline-01/` (JSON, SARIF, text), compared in the
+[Semgrep results](../../.zazz/evaluation/semgrep-results.md).
 
 Reports start with the grouped Findings → Review → Protected sort, highest counts first, then route
 path A–Z; blank rows appear last. Click that grouped header or Route signature to change the order.

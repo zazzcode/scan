@@ -1,0 +1,182 @@
+                   
+                   
+┌─────────────────┐
+│ 7 Code Findings │
+└─────────────────┘
+                                                              
+    src/server.ts
+    ❯❱ javascript.express.security.audit.express-session-hardcoded-secret.express-session-
+       hardcoded-secret                                                                                          
+          ❰❰ Blocking ❱❱
+          A hard-coded credential was detected. It is not recommended to store credentials in source-code, as
+          this risks secrets being leaked and used by either an internal or external malicious adversary. It 
+          is recommended to use environment variables to securely provide credentials or retrieve credentials
+          from a secure vault or HSM (Hardware Security Module).                                             
+          Details: https://sg.run/LYvG                                                                       
+                                                                                                             
+           36┆ secret: 'insecure-typescript-session-secret',
+   
+    ❯❱ javascript.jsonwebtoken.security.jwt-hardcode.hardcoded-jwt-secret
+          ❰❰ Blocking ❱❱
+          A hard-coded credential was detected. It is not recommended to store credentials in source-code, as
+          this risks secrets being leaked and used by either an internal or external malicious adversary. It 
+          is recommended to use environment variables to securely provide credentials or retrieve credentials
+          from a secure vault or HSM (Hardware Security Module).                                             
+          Details: https://sg.run/4xN9                                                                       
+                                                                                                             
+           79┆ const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn:
+               '24h' });                                                                                
+    
+    
+          Taint comes from:
+    
+           22┆ const JWT_SECRET: string = 'super_secret_typescript_key_12345';
+    
+    
+          Taint flows through these intermediate variables:
+    
+           22┆ const JWT_SECRET: string = 'super_secret_typescript_key_12345';
+    
+    
+                This is how taint reaches the sink:
+    
+           79┆ const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn:
+               '24h' });                                                                                
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-
+       resolve-traversal                                                                                              
+          ❰❰ Blocking ❱❱
+          Possible writing outside of the destination, make sure that the target path is nested in the
+          intended destination                                                                        
+          Details: https://sg.run/weRn                                                                
+                                                                                                      
+          103┆ const filePath: string = path.join(__dirname, '../uploads', filename);
+    
+    
+          Taint comes from:
+    
+          101┆ const filename: string = req.query.filename as string;
+    
+    
+          Taint flows through these intermediate variables:
+    
+          101┆ const filename: string = req.query.filename as string;
+    
+    
+                This is how taint reaches the sink:
+    
+          103┆ const filePath: string = path.join(__dirname, '../uploads', filename);
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.security.audit.xss.direct-response-write.direct-response-write
+          ❰❰ Blocking ❱❱
+          Detected directly writing to a Response object from user-defined input. This bypasses any HTML      
+          escaping and may expose your application to a Cross-Site-scripting (XSS) vulnerability. Instead, use
+          'resp.render()' to render safely escaped HTML.                                                      
+          Details: https://sg.run/vzGl                                                                        
+                                                                                                              
+          117┆ res.send(`<h1>Search Results for: ${query}</h1>`);
+    
+    
+          Taint comes from:
+    
+          115┆ const query: string = req.query.query as string;
+    
+    
+          Taint flows through these intermediate variables:
+    
+          115┆ const query: string = req.query.query as string;
+    
+    
+                This is how taint reaches the sink:
+    
+          117┆ res.send(`<h1>Search Results for: ${query}</h1>`);
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.security.injection.raw-html-format.raw-html-format
+          ❰❰ Blocking ❱❱
+          User data flows into the host portion of this manually-constructed HTML. This can introduce a Cross-
+          Site-Scripting (XSS) vulnerability if this comes from user-provided input. Consider using a         
+          sanitization library such as DOMPurify to sanitize the HTML within.                                 
+          Details: https://sg.run/5DO3                                                                        
+                                                                                                              
+          117┆ res.send(`<h1>Search Results for: ${query}</h1>`);
+    
+    
+          Taint comes from:
+    
+          115┆ const query: string = req.query.query as string;
+    
+    
+          Taint flows through these intermediate variables:
+    
+          115┆ const query: string = req.query.query as string;
+    
+    
+                This is how taint reaches the sink:
+    
+          117┆ res.send(`<h1>Search Results for: ${query}</h1>`);
+    
+    
+            ⋮┆----------------------------------------
+   
+   ❯❯❱ javascript.lang.security.audit.code-string-concat.code-string-concat
+          ❰❰ Blocking ❱❱
+          Found data from an Express or Next web request flowing to `eval`. If this data is user-controllable
+          this can lead to execution of arbitrary system commands in the context of your application process.
+          Avoid `eval` whenever possible.                                                                    
+          Details: https://sg.run/96Yk                                                                       
+                                                                                                             
+          137┆ const result = eval(expression);
+    
+    
+          Taint comes from:
+    
+          134┆ const { expression } = req.body;
+    
+    
+          Taint flows through these intermediate variables:
+    
+          134┆ const { expression } = req.body;
+    
+          134┆ const { expression } = req.body;
+    
+    
+                This is how taint reaches the sink:
+    
+          137┆ const result = eval(expression);
+    
+    
+            ⋮┆----------------------------------------
+   
+    ❯❱ javascript.express.security.audit.express-open-redirect.express-open-redirect
+          ❰❰ Blocking ❱❱
+          The application redirects to a URL specified by user-supplied input `req` that is not validated.   
+          This could redirect users to malicious locations. Consider using an allow-list approach to validate
+          URLs, or warn users they are being redirected to a third-party website.                            
+          Details: https://sg.run/EpoP                                                                       
+                                                                                                             
+          239┆ res.redirect(url);
+    
+    
+          Taint comes from:
+    
+          237┆ const url: string = req.query.url as string;
+    
+    
+          Taint flows through these intermediate variables:
+    
+          237┆ const url: string = req.query.url as string;
+    
+    
+                This is how taint reaches the sink:
+    
+          239┆ res.redirect(url);
+    

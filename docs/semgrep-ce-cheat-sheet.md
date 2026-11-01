@@ -25,53 +25,62 @@ semgrep --version
   reproducible comparison, snapshot the pack to a YAML file first and scan with that file.
 - Registry rules are covered by the Semgrep Rules License; the CE engine is LGPL-2.1. Use them to run
   comparisons; do not copy registry rules into Zazzles' source or detection logic.
+- Results report absolute target paths. Make them target-relative before committing a curated copy.
 - Do not use `semgrep login`, `semgrep ci` or `--pro`; those are the AppSec Platform and Pro Engine,
   not CE.
 
 ## Layout
 
 ```text
-<DEV_ROOT>/zazzcode/zazzles/_test-findings/<app>/semgrep-<YYYYMMDD>-<n>/
-  rules/            snapshotted rule packs (YAML)
-  results.json      --json-output
-  results.sarif     --sarif-output
-  results.txt       --text-output (human summary)
-  run.md            version, command, target revision, rule hashes
+<DEV_ROOT>/zazzcode/zazzles/_test-findings/
+  semgrep-rules/<YYYYMMDD>/          shared rule snapshot: *.yaml, SHA256SUMS, SEMGREP_VERSION
+  <app>/semgrep-<YYYYMMDD>-<n>/      results.json, results.sarif, results.txt, target-revision.txt
 ```
 
-## Snapshot rules, then scan
+Curated baselines are copied into `docs/samples/<app>/semgrep/<YYYYMMDD>-baseline-<n>/` with a
+`metadata.json`; the current one is described in the
+[Semgrep results](../.zazz/evaluation/semgrep-results.md).
+
+## Snapshot rules once
 
 ```bash
-APP=nodejs-goof                       # or juice-shop, vulnerable-typescript-app
-TARGET="$HOME/Dev/$APP"
-OUT="$HOME/Dev/zazzcode/zazzles/_test-findings/$APP/semgrep-$(date +%Y%m%d)-1"
-mkdir -p "$OUT/rules"
+cd "$HOME/Dev/zazzcode/zazzles/_test-findings"
+RULES="semgrep-rules/$(date +%Y%m%d)"
+mkdir -p "$RULES"
 for pack in javascript typescript xss owasp-top-ten; do
-  curl -fsSL "https://semgrep.dev/c/p/$pack" -o "$OUT/rules/$pack.yaml"
+  curl -fsSL "https://semgrep.dev/c/p/$pack" -o "$RULES/$pack.yaml"
 done
-shasum -a 256 "$OUT"/rules/*.yaml > "$OUT/rules/SHA256SUMS"
+shasum -a 256 "$RULES"/*.yaml > "$RULES/SHA256SUMS"
+semgrep --version > "$RULES/SEMGREP_VERSION"
+semgrep scan --metrics=off --validate --config "$RULES"
 ```
 
+Some packs arrive as JSON; Semgrep reads them as YAML. The 2026-11-01 snapshot holds 563 rules.
+
+## Scan an app
+
+Run from the `_test-findings` root with a relative `--config`. Semgrep prefixes local rule IDs with the
+config path, so this keeps the prefix neutral (`semgrep-rules.<date>.`) instead of a home-directory path.
+
 ```bash
-semgrep scan --metrics=off \
-  --config "$OUT/rules" \
-  --exclude node_modules --exclude 'exploits' --exclude '*.min.js' \
+cd "$HOME/Dev/zazzcode/zazzles/_test-findings"
+APP=nodejs-goof                       # or juice-shop, vulnerable-typescript-app
+OUT="$APP/semgrep-$(date +%Y%m%d)-1"
+mkdir -p "$OUT"
+semgrep scan --metrics=off --config "$RULES" \
+  --exclude node_modules --exclude .github --exclude exploits --exclude dist --exclude build \
+  --exclude '*.min.js' --exclude 'public/js/bundle.js' --exclude 'frontend/src/assets/private/three.js' \
+  --timeout 30 --dataflow-traces \
   --json-output "$OUT/results.json" \
   --sarif-output "$OUT/results.sarif" \
   --text-output "$OUT/results.txt" \
-  --dataflow-traces \
-  "$TARGET"
+  "$HOME/Dev/$APP"
+git -C "$HOME/Dev/$APP" rev-parse HEAD > "$OUT/target-revision.txt"
+git -C "$HOME/Dev/$APP" status --porcelain --ignored   # must print nothing
 ```
 
-Then record the target revision and confirm the target is untouched:
-
-```bash
-git -C "$TARGET" rev-parse HEAD
-git -C "$TARGET" status --porcelain --ignored
-```
-
-The status output must be empty. Use the same exclusions as the Zazzles sample run (for Goof, see
-the [Bearer runbook](samples/nodejs-goof/bearer-runbook.md) scope) so file sets match.
+Yes, Semgrep writes SARIF 2.1.0 (`--sarif-output`). It embeds every rule definition, so expect about
+1 MB even for a few results. The exclusions match the Zazzles source scope, so file sets are comparable.
 
 ## Useful options
 
