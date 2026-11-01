@@ -53,6 +53,7 @@ type Entry struct {
 
 // StringReport is the bounded analysis artifact, separate from route-v1 JSON.
 type StringReport struct {
+	FindingTypes        []FindingType `json:"finding_types,omitempty"`
 	PresentationVersion int           `json:"presentation_version,omitempty"`
 	Findings            []Finding     `json:"findings,omitempty"`
 	SelectedRoute       string        `json:"selected_route,omitempty"`

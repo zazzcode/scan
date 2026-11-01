@@ -9,7 +9,8 @@ import (
 // Enrich adds deterministic display records while preserving raw evidence and assessments.
 // Rebuilding from uses also lets older saved reports use the current presentation rules.
 func Enrich(r *graph.StringReport) {
-	r.PresentationVersion = 1
+	r.PresentationVersion = 2
+	r.FindingTypes = append([]graph.FindingType(nil), findingTypes...)
 	r.Findings = make([]graph.Finding, 0, len(r.Uses))
 	for _, u := range r.Uses {
 		r.Findings = append(r.Findings, describe(u))
@@ -17,7 +18,7 @@ func Enrich(r *graph.StringReport) {
 }
 
 func describe(u graph.StringUse) graph.Finding {
-	f := graph.Finding{ID: "finding:" + u.ID, UseID: u.ID, RouteID: u.RouteID,
+	f := graph.Finding{ID: "finding:" + u.ID, TypeIDs: findingTypeIDs(u), UseID: u.ID, RouteID: u.RouteID,
 		RecordType: "analysis", Status: "needs_review", Title: "Sensitive operation needs review",
 		Summary:    "Scan recorded a possible sensitive operation. Its security behavior has not been established.",
 		Validation: "Not established from the supplied evidence.", Protection: "Not established from the supplied evidence.",

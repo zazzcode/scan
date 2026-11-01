@@ -52,7 +52,8 @@ label email validation alone a sufficient SQL-injection fix or guarantee an impe
 Schema-v1 evidence remains compatible. Additive `presentation_version` and `findings` fields describe
 one result record per use. A record includes `id`, `use_id`, `route_id`, `record_type`, `status`, `title`,
 `summary`, separate `input_validation` and `use_protection` explanations, `uncertainty`, and
-`recommendations`. Evidence stays in the referenced use; it is not replaced by generated prose.
+`recommendations`. Presentation version 2 adds `type_ids` and the report-level `finding_types`
+[glossary](finding-types.md); risk families remain separate from assessment status. Evidence stays in the referenced use; it is not replaced by generated prose.
 `internal/report/findings.go` owns interpretation; `guidance.go` owns reviewable remediation.
 
 `record_type` is `finding` for an observed construction/check issue or supported potential issue,

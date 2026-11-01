@@ -2,10 +2,11 @@ package report
 
 import (
 	_ "embed"
-	"github.com/zazzcode/scan/internal/graph"
 	"html/template"
 	"io"
 	"sort"
+
+	"github.com/zazzcode/scan/internal/graph"
 )
 
 //go:embed report.html
@@ -22,10 +23,12 @@ type htmlRow struct {
 	ID, SourceType, Signature   string
 	Location                    graph.Span
 	Items                       []htmlItem
+	Types                       []htmlTypePill
 	Gaps                        []graph.Gap
 	Findings, Review, Protected int
 }
 type htmlView struct {
+	Glossary                    []graph.FindingType
 	Root                        string
 	Rows                        []*htmlRow
 	Gaps                        []graph.Gap
@@ -36,7 +39,7 @@ type htmlView struct {
 // HTML renders a standalone snapshot with native disclosure rows and no network resources.
 func HTML(w io.Writer, r *graph.StringReport) error {
 	Enrich(r)
-	v := htmlView{Root: r.Root, Gaps: r.Gaps, Limitations: r.Limitations}
+	v := htmlView{Glossary: r.FindingTypes, Root: r.Root, Gaps: r.Gaps, Limitations: r.Limitations}
 	rows := map[string]*htmlRow{}
 	for _, e := range r.Entries {
 		row := &htmlRow{ID: e.Route.ID, SourceType: "HTTP route", Signature: e.Route.Method + " " + e.Route.PathPattern, Location: e.Route.Registration, Gaps: e.Gaps}
@@ -46,7 +49,7 @@ func HTML(w io.Writer, r *graph.StringReport) error {
 	for i, u := range r.Uses {
 		row := rows[u.RouteID]
 		if row == nil {
-			row = &htmlRow{ID: u.RouteID, SourceType: "Unresolved entry", Signature: "Route association unavailable", Location: u.Sink.Span}
+			row = &htmlRow{ID: u.RouteID, SourceType: "Unresolved entry", Signature: "Route association unavailable"}
 			rows[u.RouteID] = row
 			v.Rows = append(v.Rows, row)
 		}
@@ -63,6 +66,9 @@ func HTML(w io.Writer, r *graph.StringReport) error {
 			row.Review++
 			v.Review++
 		}
+	}
+	for _, row := range v.Rows {
+		row.Types = rowTypePills(row.Items)
 	}
 	sort.SliceStable(v.Rows, func(i, j int) bool {
 		a, b := v.Rows[i], v.Rows[j]

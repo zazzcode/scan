@@ -41,8 +41,10 @@ Saved input is capped at 64 MiB by the shared JSON export reader.
 ## Entry grid and disclosure
 
 Show one expandable entry per inventoried source, grouped by route ID rather than path alone. Columns:
-source type, method/path signature, registration location, finding count, analysis-review count, and
-protected-claim count. Findings appear first, then unresolved analysis and zero-finding entries;
+source type, method/path signature, **Route location**, finding count, analysis-review count,
+protected-claim count, and row-end finding-type pills. Route location is the source declaration,
+not a finding location. An unresolved entry displays “Not resolved”; operation locations remain
+in the expanded records labeled **Finding location**. Findings appear first, then unresolved analysis and zero-finding entries;
 within these groups, sort by signature with stable input order for ties. Distinct HTTP methods sharing a path remain separate. Today the source type is
 HTTP route; a use without a matching entry appears under an explicit unresolved entry, never an invented
 route. Other entry types require future detector contracts rather than labels inferred by the viewer.
@@ -63,6 +65,29 @@ analysis gaps. They do not receive a safety badge. Counts describe route/use rec
 vulnerabilities; shared helper observations can appear under several routes. No severity or exploit
 confirmation is invented for offline observations. The review and runtime-confirmation stages remain
 unimplemented; opening an HTML report does not perform either stage.
+
+## Finding-type pills and glossary
+
+Presentation version 2 adds `type_ids` to each human-readable finding and a report-level
+`finding_types` registry. The canonical definitions live in
+[`internal/report/finding_types.go`](../../internal/report/finding_types.go); [finding-type design](finding-types.md)
+owns their interpretation. JSON carries definitions and references; SARIF retains definitions in
+`scan.findingTypes` and references in `scan.finding`. Existing saved schema-v1 input is reinterpreted
+from raw uses at export time with the current presentation, without upgrading raw assessment state.
+
+Deduplicate type pills per row. Each pill shows the family, record count, and observed/review/potential/
+protected/mixed status. A family label such as SQL Injection identifies what is being reviewed, not a
+confirmed vulnerability. Planned types are documented in the glossary but never attached by existing
+detectors. Counts are per use and type; one record can belong to both SQL Injection and Input Validation.
+
+Pill buttons use `popovertarget` to open a native `popover="auto"` side panel outside the row's disclosure.
+One panel per registry type includes a definition, interpretation, coverage, and remediation approach.
+A native hide button closes it; the browser provides light dismissal and Escape handling. Rows retain
+native `details` controls. No JavaScript is required, and source text remains escaped. The complete
+registry is also available in an inline expandable glossary for reference, printing, and browsers
+without popover support. Popover panels themselves are hidden when printing.
+
+The native behavior follows [MDN's declarative popover guide](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API/Using).
 
 ## Standalone behavior and source safety
 

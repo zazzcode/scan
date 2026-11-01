@@ -2,6 +2,7 @@ package graph
 
 // Finding is a human-readable interpretation of one evidence use, not a new detector verdict.
 type Finding struct {
+	TypeIDs         []string       `json:"type_ids"`
 	ID              string         `json:"id"`
 	UseID           string         `json:"use_id"`
 	RouteID         string         `json:"route_id"`
@@ -21,4 +22,14 @@ type Recommendation struct {
 	Actions       []string `json:"actions"`
 	Example       string   `json:"illustrative_example,omitempty"`
 	ExampleStatus string   `json:"example_status"`
+}
+
+// FindingType defines a risk family independently of a result's assessment status.
+type FindingType struct {
+	ID             string `json:"id"`
+	Label          string `json:"label"`
+	Description    string `json:"description"`
+	Interpretation string `json:"interpretation"`
+	Remediation    string `json:"remediation"`
+	Coverage       string `json:"coverage"`
 }

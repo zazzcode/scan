@@ -20,6 +20,12 @@ JSON. Implement in the assigned `logger-leak` worktree before logger-leak detect
 - Provide `--export-html <saved-json>` using Go `html/template`, embedded CSS, and native details/summary
   rows. No JavaScript, CDN, browser JSON fetch, or server. The HTML is regenerated from saved JSON and
   lives beside it; regeneration must require no target-source access or model call.
+- Add stable finding-type IDs and a shared glossary to JSON/SARIF/HTML presentation. Row-end pills
+  summarize distinct types and preserve observed/review/protected state. Type names identify risk
+  families, not confirmed vulnerabilities. Future Reflected XSS and sensitive-data logging definitions
+  are marked planned and never assigned by existing detectors. Rename Registration to Route location;
+  expanded records explicitly label Finding location. Native HTML popovers show one glossary panel
+  per type with descriptions, interpretation, remediation, and a close button, without JavaScript.
 - Rows group by source entry, showing source type, method/path signature, location, counts, and analysis
   state. Expand for human findings, source excerpts, input/transfer/sink evidence, assessment state,
   limitations, and remediation. Retain entries without findings and unmatched uses without inventing routes.
@@ -39,6 +45,8 @@ JSON. Implement in the assigned `logger-leak` worktree before logger-leak detect
   protected claims, and failed/not-run assessments without inventing confirmed vulnerabilities.
 - HTML escapes hostile source/path text, preserves provenance and remediation, groups by route ID,
   retains zero-finding rows and orphan uses, and has no scripts or network resources.
+- Verify taxonomy references, deduplicated row pills, independent status labels, registry coverage,
+  planned-type exclusion, native popover targets/close controls, and route versus finding locations.
 - CLI tests cover valid saved JSON, invalid input, output modes, and conflicting flags.
 - Test output-dir precedence, disabled file output, separate successive runs, JSON/SARIF validity,
   private file permissions, unavailable paths, and the retained exit-1 bundle after assessment failure.
@@ -54,3 +62,11 @@ Use [AGENTS.md](../../AGENTS.md), [testing](../standards/testing.md),
 Work serially in this checkout, preserve existing edits, and record evidence in
 `.zazz/ephemeral/human-reports-run-log.md`. Stop for unresolved evidence or scope changes; do not
 fabricate security judgments to complete the presentation. Human UX feedback guides the next iteration.
+
+## Implementation and review change log
+
+### 2026-11-01 — Finding-type pills and glossary panels
+
+User UI feedback requests row-end type pills, plain descriptions in a separate panel, and clearer
+location labeling. Add shared presentation taxonomy and native HTML popovers; no new detectors or
+upgraded vulnerability verdicts. Verify mappings, row aggregation, locations, and regenerated reports.
