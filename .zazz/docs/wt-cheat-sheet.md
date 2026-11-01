@@ -17,7 +17,7 @@ Commands below run from the resolved container or named worktree, not an assumed
 
 ## Where to run Worktrunk
 
-From the repo container:
+From the repo container:  `~/Dev/zazzcode/scan`
 
 ```bash
 cd <repo-container>
