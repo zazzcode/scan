@@ -16,64 +16,47 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 
 ## Current work
 
-**Active worktree, 2026-11-01: `xss-response`.** Read the local, gitignored
-[XSS analysis/judging handoff](../ephemeral/xss-analysis-handoff.md) and
-[implementation results](../evaluation/xss-implementation-results.md) first. The user requested
-committing/pushing this first pass; further hardening is for a separate agent/session in this same
-worktree. Baseline targets remain unchanged; remediation uses copies. Five approved Luna decisions
-are saved and replayable offline; they do not authorize more requests.
+**Active worktree, 2026-11-01: `xss-response`.** The first XSS discovery/reporting pass was
+committed and pushed as `26f50d0`. Verify the actual path, branch and changes with `pwd` and
+`git status --short --branch`; later work may have advanced the branch.
 
-**Historical worktree context: `logger-leak`.** Verify the actual path, branch, and changes with
-`pwd` and `git status --short --branch`. The user requested stable agent guidance, README setup/usage,
-clearer validation and database results, fresh offline target scans, and JSON-driven standalone HTML with expandable rows and remediation.
-See the [reporting contract](../specifications/human-readable-reports.md). Logger-leak detection follows
-this reporting increment and is not implemented by it. The historical definition-only `stage/`
-exception is not this assignment.
+For the next analysis/judging hardening session, read in this order:
 
-- **Implemented:** `--list` and a Tree-sitter JS/TS route inventory (`--routes`).
-- **Verified:** Juice Shop `v20.3.0` login/search registrations; repeatable syntactic output.
-  Whole-tree matches include HTTP clients and training snippets. Read the
-  [assessment](../project/06-route-validation-assessment.md#route-verification) before claiming coverage.
-- **Next objective:** extend automatic claim-scoped evidence assembly to novel targets, then independently
-  evaluate findings; selected route/check bundles already connect inputs, helpers, guards and uses.
-- **Long-term objective:** equal-or-better SAST detection/code analysis than Bearer and equivalent
-  capabilities across CLI/Pro with fewer false positives. For each route, report sufficient protection,
-  lacking protection, and poor code-practice findings; see [objectives](../project.md#long-term-objectives). This is an ambition,
-  not current parity. Start with the local CLI comparison and build a versioned capability inventory.
-- **Model direction:** GPT Decisions or Jev provides the semantic judge, with future adapters allowed.
-  OpenAI is first. The independent LLM Findings Reviewer remains a separate role; provider schemas,
-  keys, quality and calibration are separate. See the [graph design](../architecture/repository-graph.md)
-  for inbound API routes, internal paths, outbound requests and response continuations.
-- **Implemented in this worktree:** `--strings` emits bounded source-to-use dependency witnesses,
-  resolves selected relative named imports and handler factories, and records candidate SQL/outbound
-  HTTP uses. Optional `--judge openai|jev` provides separate validation/protection answers and explicit
-  failures. See the [contract](../specifications/route-string-validation.md) and [setup](openai-decisions-setup.md).
-- **Still incomplete:** general CFG/interprocedural/heap analysis, effective middleware, external
-  response continuations and independent Findings Review. The [two-case Luna run](../evaluation/juice-shop/results.md) produced supported potential findings;
-  [original controls](../evaluation/corpus/README.md) exercise vulnerable/protected/unknown cases;
-  held-out repository accuracy and runtime confirmation remain unmeasured.
-  Current user restriction: live calls use `gpt-6-luna` only, with small explicit request caps.
-- **Authorization:** the earlier route/string implementation request is historical context, not
-  authorization for a new scanner slice. Explicit user requests are sufficient under
-  [AGENTS.md](../../AGENTS.md#authorization-and-delivery); no separate greenlight is required.
+1. [Implementation results](../evaluation/xss-implementation-results.md) for delivered behavior,
+   current sample counts, actual model observations and verification limits.
+2. The local, gitignored [XSS handoff](../ephemeral/xss-analysis-handoff.md), if present, for prioritized
+   investigations, code entry points and the suggested first bounded task. Handoffs MUST stay under
+   `.zazz/ephemeral/` and MUST NOT be committed. A fresh clone will not contain them; resume from
+   the tracked results, contract and reference documents instead.
+3. [XSS contract](../specifications/xss-response.md), [scope](../project/xss-detection-scope.md),
+   [product analysis guide](../../docs/analysis/xss.md) and the target's independent source-reviewed
+   answer key linked from [sample reference policy](../../docs/samples/reference-policy.md).
 
-**Historical local session notes:** the optional
-[SQL/NoSQL judgment handoff](../ephemeral/sql-nosql-judgment-handoff.md) records earlier work. Active
-XSS work resumes from the local XSS handoff above, not these ignored historical files. It records current
-calibration failures and the logger-leak gate. The earlier
-[route-string-validation handoff](../ephemeral/route-string-validation-handoff.md) is historical context. This is an
-ignored local execution artifact; durable design/contracts/results remain indexed below.
-The initial [Bearer comparison](../evaluation/bearer-results.md) is complete: both samples and
-thirteen controls, no new model calls. Supported same-file and relative-imported helper calls now
-discover SQL sinks through argument, parameter and direct-return evidence. The next slice is
-non-mutating guards versus reassignment, then a fresh capped Luna run on the changed bundles.
-The [Juice Shop index](../evaluation/juice-shop/README.md) includes all 116 documented challenges and
-a 671-finding review ledger; three findings are source-inspected false positives, 664 remain pending.
+**Current capability:** bounded JS/TS/CommonJS route and browser-source analysis, server/template/stored
+and DOM/framework XSS facts, existing validation/database/outbound/logging analyzers, optional
+versioned model judgments, and shared JSON/HTML/SARIF classification. Browser entries have a separate
+report section. HTML can hide Protected records. This is not whole-program soundness or proven
+scanner parity. Cross-tier origin, helper/control-flow and protection completeness remain hardening
+work; unsupported paths stay Review. The [results](../evaluation/xss-implementation-results.md) own
+current details; historical reports may contain superseded protection labels.
 
-The [near-term plan](../project/implementation-plan.md#route-string-validation-delivery-sequence)
-owns proposed delivery order. The [architecture](../architecture.md#current-provider-decision) owns
-provider responsibilities. The [project overview](../project.md#concept-stage-repository-state) owns
-repository capability state.
+**Next-session boundaries:** further XSS hardening uses this same worktree, one bounded case at a
+time. Preserve all implemented analyzers and compare against independent source references.
+Baseline vulnerable apps MUST remain unchanged; remediation uses copies. Five approved Luna calls
+are complete and saved for offline inspection/replay. They authorize no additional paid requests.
+Changed evidence MUST NOT reuse old model answers. Python vulnerable-app support follows XSS;
+shared graph/judgment/report facts remain language-neutral. No merge or integration push is authorized.
+
+The long-term objective is source-backed vulnerability and protection analysis across languages,
+with accuracy evaluated independently of model confidence or scanner agreement. Independent Findings
+Review remains distinct from the semantic judge. See the [project objectives](../project.md#long-term-objectives)
+and [graph design](../architecture/repository-graph.md).
+
+Earlier logger-leak, route-string and SQL/NoSQL session notes describe historical work. Their old
+“next slice” instructions are not the active assignment. Consult the tracked
+[route/string contract](../specifications/route-string-validation.md),
+[original Bearer evaluation](../evaluation/bearer-results.md), and
+[Juice Shop evaluation index](../evaluation/juice-shop/README.md) only when the current case needs them.
 
 ## Portable workspace and DEV_ROOT
 
