@@ -116,7 +116,7 @@ branch. Rejected inference: Juice Shop's length limit in `routes/search.ts` alon
 protection (see [source assessment](../project/06-route-validation-assessment.md#suggested-first-security-slice)).
 
 Parameterized SQL, output encoding, allow-lists and path containment have different preconditions.
-A model can recognize a custom validator without scan hard-coding its regex, but the analyzer must
+A model can recognize a custom validator without zazzles hard-coding its regex, but the analyzer must
 still establish that its result controls the relevant use. Unknown transfers may preserve possible
 taint conservatively; they MUST NOT manufacture a proven source-to-sink witness or safe outcome.
 

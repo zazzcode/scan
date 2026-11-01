@@ -103,7 +103,7 @@ accepted implementation code, and their incomplete package URLs are replaced by 
 - The pasted client snippets and numerical thresholds are illustrative. Verify the chosen client's
   current API and calibrate policy before implementation; no blind copy of unchecked type assertions.
 - Sub-quarter-second latency, fractional-cent requests, and “98% filtered” are unverified hypotheses
-  for scan. Measure end-to-end behavior, including network time, retries, and coverage lost to limits.
+  for zazzles. Measure end-to-end behavior, including network time, retries, and coverage lost to limits.
 
 ## Graph representation decision
 
@@ -111,7 +111,7 @@ accepted implementation code, and their incomplete package URLs are replaced by 
 Gonum remains an optional algorithm library when a named need justifies it. This narrows the planned
 implementation; it is not a claim that custom storage benchmarks faster or uses less memory.
 
-| Concern | Gonum | Scan-owned adjacency |
+| Concern | Gonum | Zazzles-owned adjacency |
 |---|---|---|
 | Graph algorithms | Reusable traversal/topology algorithms and graph interfaces | Implement the small worklist/witness operations needed initially; test their correctness |
 | Program semantics | Custom nodes/edges or views can carry domain facts; CFG/dataflow semantics remain our work | Domain records and relation indexes directly express values, guards, bindings, and provenance |

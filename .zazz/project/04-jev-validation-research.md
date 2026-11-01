@@ -1,7 +1,7 @@
 # 04 — Jev Assessment and Findings Review research
 
 **Research reviewed 2026-10-19; concept-stage recommendations.** No live Jev tests have been run for
-scan. The Project Owner has not yet signed up or obtained a key. This durable note preserves the
+zazzles. The Project Owner has not yet signed up or obtained a key. This durable note preserves the
 research independently of temporary chat attachments. Related:
 [proposal](03-jev-design-proposal.md), [architecture](../architecture.md),
 [implementation plan](implementation-plan.md).

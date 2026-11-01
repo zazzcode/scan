@@ -22,7 +22,7 @@ unassessed records remain visible. The target root is replaced with its public p
 source locations, hashes, use IDs, and provider judgments are preserved. Source excerpts belong to
 the upstream projects; vulnerable fixture values are training data, not scan provider credentials.
 
-## Refresh as scan improves
+## Refresh as zazzles improves
 
 Build scan, then regenerate both checked-in HTML/SARIF views from the saved JSON:
 

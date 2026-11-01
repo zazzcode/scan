@@ -112,7 +112,7 @@ Each sample records the pinned upstream source revision, source attribution, act
 model-assessment coverage, scanner baseline/question versions, and limitations. Public project labels
 replace developer-specific absolute roots. HTML and SARIF are generated from matching canonical JSON;
 no model call is needed to view them or refresh their presentation. The offline refresh script is
-owned by the [sample guide](../../docs/samples/README.md#refresh-as-scan-improves).
+owned by the [sample guide](../../docs/samples/README.md#refresh-as-zazzles-improves).
 
 Keep examples honest: preserve incomplete/failed/unassessed states, source hashes and IDs. Do not
 invent a protected finding or vulnerability for visual effect. Input-validation and DB-protection
