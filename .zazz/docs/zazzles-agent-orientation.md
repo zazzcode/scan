@@ -44,7 +44,8 @@ current details; historical reports may contain superseded protection labels.
 time. Preserve all implemented analyzers and compare against independent source references.
 Baseline vulnerable apps MUST remain unchanged; remediation uses copies. Five approved Luna calls
 are complete and saved for offline inspection/replay. They authorize no additional paid requests.
-Changed evidence MUST NOT reuse old model answers. Python vulnerable-app support follows XSS;
+Changed evidence MUST NOT reuse old model answers. Python vulnerable-app support follows XSS, then the remaining vulnerability types, then SCA for JS/TS and
+Python; other languages come after all OWASP attack types and SCA;
 shared graph/judgment/report facts remain language-neutral. No merge or integration push is authorized.
 
 **Sample applications are read-only scan targets.** Zazzles detects vulnerabilities; agents do not

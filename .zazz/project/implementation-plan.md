@@ -99,7 +99,7 @@ The current [human-report contract](../specifications/human-readable-reports.md)
 finding explanations, standard SARIF output, and the [standalone HTML UI](../architecture/html-reporting.md).
 The UI was reviewed against the input-validation and SQL/NoSQL cases before logger-leak detection began.
 Local scan artifacts live outside worktrees under the configured
-`_test-finding/<repo-name>/run-<id>/` root; they are not committed as routine test output.
+`_test-findings/<repo-name>/run-<id>/` root; they are not committed as routine test output.
 
 ### Curated public sample outputs
 
@@ -117,7 +117,7 @@ owned by the [sample guide](../../docs/samples/README.md#refresh-as-zazzles-impr
 Keep examples honest: preserve incomplete/failed/unassessed states, source hashes and IDs. Do not
 invent a protected finding or vulnerability for visual effect. Input-validation and DB-protection
 claims remain distinct, and third-party comparisons never appear in product report content.
-Routine scans continue using the external _test-finding root; changes to bundled examples require
+Routine scans continue using the external _test-findings root; changes to bundled examples require
 an intentional refresh and review. Independent UI acceptance and broader held-out accuracy checks
 remain separate from publishing these illustrative samples.
 
@@ -145,9 +145,17 @@ after `logger-leak` merged and the project was renamed to Zazzles. The [XSS dete
 records the four XSS types, sinks, protections, evidence rules, Juice Shop and TypeScript targets, and
 delivery increments. Rows are listed in the intended order.
 
+**Sequence decision, 2026-11-01 (user):** after `xss-response`, (1) Python support next: a Python
+adapter for the delivered families (input validation, SQL/NoSQL, logging, XSS) against a selected
+vulnerable Python app, reusing the language-neutral source/context/protection/storage facts; (2) then
+the remaining vulnerability-type rows below, in order, for JavaScript, TypeScript and Python; (3) then
+SCA library auditing for JavaScript/TypeScript and Python; (4) only after all OWASP attack types and that
+SCA work, other languages such as Go and Java. This supersedes the Go-after-Python ordering of Phases 11–13.
+
 | Future branch | First acceptance target |
 |---|---|
 | `xss-response` | All XSS in one worktree, backend first: (1) HTML responses on the vulnerable TypeScript app `/api/search`; (2) Juice Shop server templates; (3) API-side stored and echoed data; (4) judgment; (5) browser side last, including Angular template parsing. JSON responses and encoded output stay negatives. See the [scope](xss-detection-scope.md) |
+| `python-support` | Python adapter for the delivered families on a selected vulnerable Python app; same report and judgment facts as JS/TS |
 | `hardcoded-secrets` | Private material in source; public verification keys stay negatives |
 | `command-injection` | `exec` of request input on the vulnerable TypeScript app `/api/ping` |
 | `path-traversal` | `fs.readFile` of a request path on `/api/files` |
@@ -158,7 +166,8 @@ delivery increments. Rows are listed in the intended order.
 | `cookie-session-headers` | `httpOnly`, `secure`, session secret, and missing baseline headers |
 | `ssrf-destination` | Judge the existing `axios.default.get` candidate; Bearer missed this call |
 | `prototype-pollution` | `_.merge` of request objects; Bearer did not flag it |
-| `language-and-delivery` | Other languages, baselines, CI, and SCA, in the later phases |
+| `sca-library-audit` | Dependency vulnerability auditing for JS/TS (npm/pnpm) and Python (pip-audit) inputs |
+| `other-languages` | Go, Java and others, only after all OWASP attack types and SCA; baselines and CI alongside |
 
 ## Next concrete case: registration validation
 
@@ -529,7 +538,8 @@ matrix and bundle quality are reviewed; re-evaluate model questions on Python ex
 ## Phase 12 — Go adapter
 
 **Sequence update, 2026-10-31.** The committed languages are JavaScript, TypeScript, Python, and Go.
-This phase is Go. Java is not in that sequence.
+This phase is Go. Java is not in that sequence. **2026-11-01:** Go is deferred until all OWASP attack
+types and SCA for JS/TS and Python are delivered (see the sequence decision above).
 
 **Future specs:** `go-resolution-and-lowering`; `go-flow-and-rules`.
 Go stresses receivers and interfaces.
@@ -553,7 +563,8 @@ positive/negative corpus, uncertainty routing, and evidence of benefit beyond pa
 ## Follow-on phase — SCA ecosystem auditing
 
 After the accepted route/source-to-use milestone, add ecosystem audit adapters and dependency
-findings. This does not wait for all proposed source-language adapters. The
+findings. Per the 2026-11-01 sequence decision, SCA for JS/TS and Python follows the remaining
+vulnerability types and precedes other source languages. The
 [SCA design](../architecture/sca-design.md) owns SCA-1 schema/tool selection, SCA-2 bounded audit
 execution/reporting, and SCA-3 optional route-reachability correlation. Start with npm/pnpm audit for
 JS/TS targets and add pip-audit for Python inputs under its own verified adapter contract. Preserve

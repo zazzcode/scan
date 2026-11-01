@@ -39,8 +39,9 @@ session and routes to its operating rules.
 
 ## Proposed later scope
 
-- Python, then Go adapters with language-specific analysis semantics; further languages such as Java
-  require a separate sequence decision.
+- Python adapter next (2026-11-01 decision), then the remaining OWASP vulnerability types and SCA for
+  JS/TS and Python; Go, Java and other languages only after those. See the
+  [sequence decision](implementation-plan.md#future-capability-branches).
 - Additional frameworks, rule families and optional sensitive-data impact tags.
 - Route-oriented reports with a bounded SARIF export; see [report design](../architecture/reporting-and-sarif.md).
 - Stable finding identity, reviewable baselines, and measured CI policy after the first slices

@@ -61,8 +61,8 @@ does not establish analysis support. A clean scan does not certify that an appli
 
 Each type is delivered as its own bounded increment with source-reviewed answer keys, paired
 protected/unknown controls, and fresh sample reports. The order follows the
-[implementation plan](.zazz/project/implementation-plan.md#future-capability-branches); the project
-owner decides final sequencing.
+[implementation plan](.zazz/project/implementation-plan.md#future-capability-branches): Python support
+comes next, then the remaining types below for JavaScript, TypeScript and Python.
 
 | Vulnerability type | Status | First acceptance target |
 |---|---|---|
@@ -72,6 +72,7 @@ owner decides final sequencing.
 | Sensitive-data logging | Delivered | Credentials and request data reaching verified loggers and access logs |
 | Outbound request destinations | Review records | Request-influenced `fetch`/`axios` targets; SSRF judgment is planned below |
 | Cross-site scripting (XSS) | In progress | Reflected, stored, template, DOM and cross-tier cases across all three samples; Juice Shop stored/JWT/dialog origins remain |
+| **Python support** | **Next** | Python adapter for the delivered types above on a vulnerable Python app, with the same reports and judgment |
 | Hard-coded secrets | Planned | Private material in source; public verification keys stay negatives |
 | Command injection | Planned | `exec` of request input (TypeScript app `/api/ping`) |
 | Path traversal | Planned | `fs.readFile` of a request path (`/api/files`) |
@@ -83,9 +84,9 @@ owner decides final sequencing.
 | Server-side request forgery (SSRF) | Planned | Judge existing outbound destination candidates |
 | Prototype pollution | Planned | `_.merge` of request objects |
 
-Language and delivery work follows separately: a Python adapter after XSS (reusing the same
-language-neutral source, context and protection facts), then Go and other languages, dependency
-vulnerability scanning (SCA), finding baselines and CI gating. The
+After all of these OWASP attack types: dependency vulnerability scanning (SCA) for JavaScript,
+TypeScript and Python libraries. Other languages such as Go and Java come after that, along with finding
+baselines and CI gating. The
 [Semgrep CE and Bearer comparisons](.zazz/evaluation/semgrep-results.md) track each type against
 other scanners on the same labeled cases.
 
