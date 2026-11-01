@@ -51,8 +51,9 @@ Each run MUST contain these files before being listed here as a completed baseli
 | `SUMMARY.md` | Reviewed rule/severity totals, case matches, omissions and limitations |
 
 The sample directory is published by the repository's sample Pages workflow. Review logs and
-metadata before copying them here; keep source snapshots, temporary files and machine-local paths
-in ignored scratch. Preserve raw diagnostics in scratch if a public log needs redaction and record
+metadata before copying them here. Do not retain or publish Goof source snapshots: the runbook
+deletes its temporary snapshot after the scan. Raw run output and machine-local paths stay in
+`<DEV_ROOT>/zazzcode/zazzles/_test-findings/`. Preserve raw diagnostics there if a public log needs redaction and record
 the redaction in `SUMMARY.md`. Include the upstream Apache-2.0 license when publishing source
 excerpts. Do not overwrite prior runs or create empty findings as a substitute for a pending run.
 

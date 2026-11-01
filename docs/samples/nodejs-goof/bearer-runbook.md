@@ -4,8 +4,9 @@
 [Case inventory](../../../.zazz/evaluation/nodejs-goof-capabilities.md) ·
 [Earlier comparator protocol](../../../.zazz/evaluation/bearer-comparison.md)
 
-Run from the `xss-response` worktree. This procedure statically scans a pinned copy of tracked
-application source, templates, tests and package manifests. It requires no npm install, MongoDB,
+Run from the `xss-response` worktree. This procedure statically scans a temporary, filtered snapshot of the
+pinned checkout's application source, templates, tests and package manifests. The checkout at
+`<DEV_ROOT>/nodejs-goof` remains the only source copy; the repository stores analysis, not Goof source. It requires no npm install, MongoDB,
 target server, exploit requests or model key. It does not measure dependency vulnerabilities (SCA),
 container vulnerabilities, runtime monitoring or Bearer Pro.
 
@@ -23,7 +24,7 @@ export GOOF_BEARER_SOURCE="$GOOF_DEV_ROOT/bearer"
 export GOOF_BEARER="$PWD/.zazz/ephemeral/bearer"
 export GOOF_RULES="$PWD/.zazz/ephemeral/bearer-rules"
 export GOOF_RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
-export GOOF_OUTPUT="$PWD/.zazz/ephemeral/nodejs-goof/$GOOF_RUN_ID"
+export GOOF_OUTPUT="$GOOF_DEV_ROOT/zazzcode/zazzles/_test-findings/nodejs-goof/bearer-$GOOF_RUN_ID"
 git status --short --branch
 git -C "$GOOF_TARGET" status --short
 git -C "$GOOF_TARGET" rev-parse HEAD
@@ -84,7 +85,7 @@ for args, name in [(["version"], "bearer-version.txt"),
     with (output / name).open("w") as stream:
         subprocess.run([str(binary), *args], env=environment,
                        stdout=stream, stderr=subprocess.STDOUT, check=True)
-snapshot = output / "nodejs-goof-source"
+snapshot = scratch / "nodejs-goof-source"  # temporary; removed after the scan
 snapshot.mkdir()
 suffixes = {".js", ".jsx", ".ts", ".tsx", ".json", ".ejs", ".hbs", ".dust", ".html"}
 skip_dirs = {"node_modules", "vendor", "dist", "build", "out", "target",
@@ -128,11 +129,16 @@ command = [str(binary), "scan", "--disable-version-check", "--disable-default-ru
            "--skip-test=false", "--skip-git-ignore", "--ignore-git", "--force",
            "--parallel", "2", "--hide-progress-bar", "--no-color", "--format", "json",
            "--debug", str(snapshot)]
-comparison.run("bearer-nodejs-goof", command, output, environment)
+try:
+    comparison.run("bearer-nodejs-goof", command, output, environment)
+finally:
+    shutil.rmtree(snapshot)
 print(f"Review baseline in {output}")
 PY
 ```
 
+The snapshot exists only for the scan and is deleted afterward; `nodejs-goof.scope.json` records its
+revision, file hashes and exclusions. Scratch run folders MUST NOT retain or publish target source.
 The child process receives only `PATH` and `TMPDIR`, excluding model/provider credentials.
 Explicit empty config/ignore files and filesystem discovery prevent local config or ignored scratch
 from silently changing the scope. This configuration follows the pinned experiment; it does not
@@ -161,10 +167,10 @@ missing evidence. Neither no finding nor agreement between tools proves safety o
 After reviewing validity and publication contents, copy only the files listed in the
 [artifact policy](README.md#saved-results) into a new
 `docs/samples/nodejs-goof/bearer/<run-id>/` directory. Keep original commands/absolute paths in
-scratch; replace local prefixes in public metadata/logs with documented tokens such as
+the `_test-findings` run folder; replace local prefixes in public metadata/logs with documented tokens such as
 `<TARGET_SNAPSHOT>`, `<BEARER_BINARY>`, `<RULES_ROOT>` and `<RUN_ROOT>`, recording substitutions
 in the summary. Preserve relative finding paths, hashes and findings. If any report path requires
-normalization, retain the original in scratch and describe that transformation explicitly.
+normalization, retain the original in the run folder and describe that transformation explicitly.
 
 Link the completed run from the sample README, update its pending status and fill the inventory's
 observed Bearer column from the saved evidence. Do not change the earlier two-target Bearer results

@@ -135,7 +135,7 @@ python3 .zazz/evaluation/test_bearer_comparison.py
 python3 .zazz/evaluation/run-bearer-comparison.py \
   --bearer .zazz/ephemeral/bearer --bearer-source <DEV_ROOT>/bearer \
   --rules .zazz/ephemeral/bearer-rules --scan .zazz/ephemeral/scan-eval \
-  --output .zazz/ephemeral/bearer-comparison/new-run \
+  --output <DEV_ROOT>/zazzcode/zazzles/_test-findings/bearer-comparison/<run-id> \
   --juice-shop <DEV_ROOT>/juice-shop --second-target <DEV_ROOT>/vulnerable-typescript-app \
   --snapshot-samples --sample-exclude frontend/src/assets/private/three.js
 ```

@@ -10,7 +10,7 @@ it is not cloned, installed, or started by zazzles.
 After compiling, configure a results root outside the worktree and run a local scan:
 
 ```bash
-export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-finding"
+export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-findings"
 ./bin/scan --strings --entry server.ts /path/to/juice-shop
 ./bin/scan --strings --entry src/server.ts /path/to/vulnerable-typescript-app
 ```
@@ -18,7 +18,7 @@ export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-finding"
 Each command prints a new run folder. The layout keeps repositories and successive runs separate:
 
 ```text
-_test-finding/
+_test-findings/
   juice-shop/
     run-<id>/
       findings.json

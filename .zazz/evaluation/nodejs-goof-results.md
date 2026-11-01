@@ -22,9 +22,9 @@ domain resolution and caches were disabled; external pinned rules supplied detec
 environments contained only PATH/TMPDIR. No target server, database, exploit script, dependency audit
 or model assessment ran. Zero new model calls/tokens.
 
-Attempt 01 failed on sandbox-blocked loopback worker sockets despite exit 0. Its invalid output
-remains in ignored scratch. Attempt 02 ran with authorized worker socket access, exited 1 (findings),
-and passed execution validation with no worker/file errors. Elapsed Bearer time: 1.579 seconds.
+Attempt 01 failed on sandbox-blocked loopback worker sockets despite exit 0. Its invalid output was
+not published and has been removed from scratch. Attempt 02 ran with authorized worker socket
+access, exited 1 (findings), and passed execution validation with no worker/file errors. Elapsed Bearer time: 1.579 seconds.
 These are single local timings with different analysis coverage, not a speed benchmark.
 
 ## Saved artifacts
@@ -37,7 +37,7 @@ These are single local timings with different analysis coverage, not a speed ben
 
 Public artifacts normalize local prefixes to documented tokens and the zazzles report root to
 `nodejs-goof`. Relative locations, source hashes, fingerprints and diagnostic messages are retained.
-Original outputs and exact local commands remain in ignored execution scratch.
+Original uncurated outputs were temporary scratch and are not retained.
 
 ## Results and claim comparison
 

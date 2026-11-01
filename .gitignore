@@ -19,8 +19,10 @@ go.work.sum
 # graphify generated output (rebuild with `graphify update .`)
 graphify-out/
 
-# Zazz ephemeral working directory (run logs, QA notes, handoffs). Never commit it.
-.zazz/ephemeral/
+# Zazz ephemeral working directory (run logs, QA notes, handoffs). Never commit its contents;
+# only the README explaining the directory is tracked.
+.zazz/ephemeral/*
+!.zazz/ephemeral/README.md
 
 # Machine-local Worktrunk project config (propagated via `wt step copy-ignored`)
 .config/wt.toml
