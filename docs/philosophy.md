@@ -23,9 +23,9 @@ add regression checks appropriate to each change.
 
 ## Review is a question to resolve
 
-Review means scan cannot yet establish a problem or sufficient protection. A validator's unknown
+Review means zazzles cannot yet establish a problem or sufficient protection. A validator's unknown
 effect, an unresolved library binding, or missing business requirements belongs here. The fact that
-scan did not model a check is not proof that the application has no check. Investigate the named
+zazzles did not model a check is not proof that the application has no check. Investigate the named
 blocker and decide whether a fix is needed; avoid speculative edits that reject valid inputs or
 remove existing protection.
 

@@ -21,10 +21,10 @@ Configure only the provider you deliberately choose:
 Obtain a key through the selected provider's account/console. Keep it in a password manager or local
 ignored `.env`, never chat, tracked files, logs, or command arguments. The tracked
 [.env.sample](../.env.sample) has empty credential fields. Preserve an existing `.env` rather than
-replacing it. See [environment loading](getting-started.md#local-environment-file): scan reads process
+replacing it. See [environment loading](getting-started.md#local-environment-file): zazzles reads process
 environment variables and does not automatically load the file.
 
-A funded API account/key is separate from source-transmission permission and the scan's request cap.
+A funded API account/key is separate from source-transmission permission and the zazzles's request cap.
 The scanner has no currency-budget enforcement; choose an explicit small limit. There is no automatic
 provider fallback, and Jev requires an explicit model name. Agents must also obey the user's active provider/model restrictions.
 

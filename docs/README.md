@@ -1,6 +1,6 @@
-# scan documentation
+# zazzles documentation
 
-`scan` helps developers and coding agents harden application code from source-backed security
+`zazzles` helps developers and coding agents harden application code from source-backed security
 results. Start with a local JavaScript/TypeScript application, produce JSON/HTML/SARIF reports, and
 review vulnerabilities, poor practice, unresolved questions, and sufficient protection separately.
 The scanner is under active development with bounded analysis; see the limits in the running guide.

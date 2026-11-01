@@ -13,10 +13,10 @@ routes to references available in this repository. Upstream focused section docu
 
 ## Scan applicability during project definition
 
-This guide describes the shared delivery process as adapted for scan. Repository status is recorded in
+This guide describes the shared delivery process as adapted for zazzles. Repository status is recorded in
 the [project overview](../project.md#concept-stage-repository-state); the documentation-only `stage/`
 exception is declared in [AGENTS.md](../../AGENTS.md#branch-model). Workspace/session guidance and
-methodology refinement live in the [orientation](scan-agent-orientation.md).
+methodology refinement live in the [orientation](zazzles-agent-orientation.md).
 
 The [project plan](../project/implementation-plan.md) groups future specs into phases. Those groupings
 are neither execution approval nor scheduled milestones. Explicit user implementation requests
@@ -128,13 +128,13 @@ relevant local guide or skill. Do not assume upstream section documents exist in
 ## Section Guide
 
 These are available local routes for the lifecycle stages. Product/architecture documents describe
-scan's current proposals; workflow skills and standards describe how approved work is handled.
+zazzles's current proposals; workflow skills and standards describe how approved work is handled.
 
 | Stage / local reference | Local role |
 | ------- | ------- |
-| [Project Document](../project.md) | Scan's top-level product orientation. |
+| [Project Document](../project.md) | Zazzles's top-level product orientation. |
 | [Document Storage](../../AGENTS.md#document-model) | Defines where durable docs, active implementation scratch, completed specs, project plans, roadmaps, and milestones live. |
-| [Architecture](../architecture.md) | Scan's proposed technical shape. |
+| [Architecture](../architecture.md) | Zazzles's proposed technical shape. |
 | [Proposals](../project/03-jev-design-proposal.md) | Current proposal, rationale, research inputs, and open decisions. |
 | [Features and Project Milestones](../project/implementation-plan.md) | Proposed phases/spec slices; milestones and owners remain to be assigned. |
 | [Specifications](../../.agents/skills/spec-builder/SKILL.md) | Defines deliverable specifications as bounded execution contracts. |

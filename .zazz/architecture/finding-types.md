@@ -9,7 +9,7 @@ This document owns the internal taxonomy contract.
 Use one project vocabulary across canonical JSON, standalone HTML, and SARIF. A type describes the
 risk family under review; the result status describes what the evidence establishes. Type labels
 must not independently promote an observation or unresolved analysis item to a vulnerability.
-This taxonomy is scan's terminology contract, not a claim that every listed detector is implemented.
+This taxonomy is zazzles's terminology contract, not a claim that every listed detector is implemented.
 
 The authoritative definition registry is
 [`internal/report/finding_types.go`](../../internal/report/finding_types.go). Each definition has a

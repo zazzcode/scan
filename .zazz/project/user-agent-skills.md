@@ -4,12 +4,12 @@
 
 Planned product capability: help a user's coding agent run scan against their repository, understand
 its findings, and implement verified remediation. These are consumer-facing skills, distinct from
-`.agents/skills/` and `.zazz/` guidance used to develop scan itself. Developer workspace orientation
+`.agents/skills/` and `.zazz/` guidance used to develop zazzles itself. Developer workspace orientation
 must stay in contributor documentation, outside the primary user introduction.
 
 Public usage and analysis guidance belongs in root `docs/`. Future distributable skills should link
 to that guidance and the supported CLI/result contract, without requiring the user's agent to load
-scan's internal SDLC material. Packaging and supported agent integrations remain to be decided.
+zazzles's internal SDLC material. Packaging and supported agent integrations remain to be decided.
 This plan does not claim installed skills or automatic remediation exist today.
 
 ## Proposed workflow

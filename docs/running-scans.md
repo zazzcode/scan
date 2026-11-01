@@ -3,7 +3,7 @@
 [Documentation index](README.md) · [Getting started](getting-started.md) · [Interpret results](interpreting-results.md)
 
 All commands below run from the scanner checkout root. The target application is inspected as source;
-it is not cloned, installed, or started by scan.
+it is not cloned, installed, or started by zazzles.
 
 ## Run
 
@@ -54,7 +54,7 @@ not mean an injection is confirmed. The complete glossary is also available belo
 Expand a source row to see the HTTP method and path, findings, validation and operation-protection
 explanations, code evidence, unresolved analysis, and remediation recommendations. HTML embeds its
 styles, content, and a small sorting script, with native disclosure and glossary controls. No server
-or external assets are required; without JavaScript the default findings-first view remains usable. It presents scan results only. JSON retains the richer evidence for agents; SARIF is
+or external assets are required; without JavaScript the default findings-first view remains usable. It presents zazzles results only. JSON retains the richer evidence for agents; SARIF is
 the standard interchange format for security-tool integrations. Generated reports contain source
 excerpts, so keep them with the same access controls as that source.
 

@@ -22,7 +22,7 @@ provide the basis for corpus expectations rather than a universal â€œsanitizedâ€
 
 ## Published evidence and limits
 
-| Source | What it reports | Interpretation for scan |
+| Source | What it reports | Interpretation for zazzles |
 |---|---|---|
 | [TypeSafe introduction](https://docs.typesafe.ai/introduction) | State and typed atomic questions, composed by application code | Appropriate interface for narrow semantic classification; no security-specific accuracy guarantee |
 | [TypeSafe Jev 1.13 limitations](https://docs.typesafe.ai/model-jaggedness/jev-1.13) | Weaknesses with indirection, irrelevant context, adversarial text, option ordering, and generation | Keep evidence focused; test helper indirection, misleading comments, and question sensitivity |
@@ -106,7 +106,7 @@ on acceptable false-safe/error rates and review load before interpreting results
 
 Use the [acceptance-target plan](implementation-plan.md#acceptance-targets) for Juice Shop's role,
 revision/challenge mapping, safe counterparts, exclusions, and label-leakage controls. The
-[orientation](../docs/scan-agent-orientation.md#portable-workspace-and-dev_root) owns local clone lookup;
+[orientation](../docs/zazzles-agent-orientation.md#portable-workspace-and-dev_root) owns local clone lookup;
 [worktree setup](../docs/worktree-setup.md#reference-application-checkout) owns reference-clone handling. Evaluate only the selected source-analysis cases when measuring model capability.
 
 ## Current integration direction

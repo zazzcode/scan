@@ -1,7 +1,8 @@
-# scan
+# zazzles
 
-`scan` is a Go static application security scanner under active development. It aims to help
-developers and coding agents understand how request inputs reach security-sensitive operations,
+`zazzles` is a Go static application security scanner (SAST) and dependency-audit CLI under active
+development. It aims to help developers and coding agents understand how request inputs reach
+security-sensitive operations,
 what validation and protection already hold, and where code needs hardening. Reports should give
 reviewers source evidence and explicit analysis gaps so they can judge each finding.
 
@@ -16,23 +17,23 @@ See the expandable report UI and source evidence from two intentionally vulnerab
 
 | Application | What the current sample shows | Output |
 |---|---|---|
-| **OWASP Juice Shop** | 152 route entries; 3 static injection findings, a credential written to access logs, and 3 query-construction findings | [View in browser](https://zazzcode.github.io/scan/juice-shop/findings.html) · [HTML file](docs/samples/juice-shop/findings.html) · [JSON](docs/samples/juice-shop/findings.json) · [SARIF](docs/samples/juice-shop/findings.sarif) |
-| **Vulnerable TypeScript app** | 19 route entries; a password logged in SQL text (Review) and other evidence and incomplete-analysis records | [View in browser](https://zazzcode.github.io/scan/vulnerable-typescript-app/findings.html) · [HTML file](docs/samples/vulnerable-typescript-app/findings.html) · [JSON](docs/samples/vulnerable-typescript-app/findings.json) · [SARIF](docs/samples/vulnerable-typescript-app/findings.sarif) |
+| **OWASP Juice Shop** | 152 route entries; 3 static injection findings, a credential written to access logs, and 3 query-construction findings | [View in browser](https://zazzcode.github.io/zazzles/juice-shop/findings.html) · [HTML file](docs/samples/juice-shop/findings.html) · [JSON](docs/samples/juice-shop/findings.json) · [SARIF](docs/samples/juice-shop/findings.sarif) |
+| **Vulnerable TypeScript app** | 19 route entries; a password logged in SQL text (Review) and other evidence and incomplete-analysis records | [View in browser](https://zazzcode.github.io/zazzles/vulnerable-typescript-app/findings.html) · [HTML file](docs/samples/vulnerable-typescript-app/findings.html) · [JSON](docs/samples/vulnerable-typescript-app/findings.json) · [SARIF](docs/samples/vulnerable-typescript-app/findings.sarif) |
 
-**View in browser** opens the hosted copy published by GitHub Pages ([all samples](https://zazzcode.github.io/scan/)). GitHub's
+**View in browser** opens the hosted copy published by GitHub Pages ([all samples](https://zazzcode.github.io/zazzles/)). GitHub's
 file view shows HTML source rather than running it, so you can also download an HTML file and open
 it locally. Findings appear first; expand rows for evidence and remediation, or click a category pill for its
 glossary. No setup or model calls are needed. These [evolving samples](docs/samples/README.md) include
-coverage limits and refresh instructions; they will be updated as scan improves.
+coverage limits and refresh instructions; they will be updated as zazzles improves.
 
 ## Goals and current scope
 
 The goal is to report vulnerabilities, weak security practices, and sufficient protection by route,
-with useful explanations and remediation guidance. Longer term, scan aims to match or exceed Bearer's
+with useful explanations and remediation guidance. Longer term, zazzles aims to match or exceed Bearer's
 SAST and developer-workflow capabilities with fewer false positives, measured at comparable detection
 coverage on independently labeled cases. That is a project objective; broad parity is not established.
 
-Today, scan analyzes local JavaScript and TypeScript source. It inventories Express-style route
+Today, zazzles analyzes local JavaScript and TypeScript source. It inventories Express-style route
 registrations, follows a bounded subset of handlers and request-value dependencies into candidate SQL
 and outbound HTTP uses, and exports source evidence as JSON, standalone HTML, or SARIF. Optional OpenAI Decisions or Jev
 judging assesses validation and protection from that evidence.
@@ -72,7 +73,7 @@ go build -o bin/scan ./cmd/scan
 ```
 
 For a new local setup, copy [.env.sample](.env.sample) to `.env`; merge settings if `.env` already
-exists so you preserve your keys. Scan does not auto-load `.env`. Offline scanning needs no API key.
+exists so you preserve your keys. zazzles does not auto-load `.env`. Offline scanning needs no API key.
 See the [setup guide](docs/getting-started.md) for full instructions.
 
 ### Optional decision-model setup
@@ -128,15 +129,15 @@ implemented.
 
 ## Contributing
 
-Developing scan: use the [contributor guide](docs/contributing.md), [AGENTS.md](AGENTS.md), and
-[developer agent orientation](.zazz/docs/scan-agent-orientation.md) for workspace conventions, branches,
+Developing zazzles: use the [contributor guide](docs/contributing.md), [AGENTS.md](AGENTS.md), and
+[developer agent orientation](.zazz/docs/zazzles-agent-orientation.md) for workspace conventions, branches,
 commands, and the internal documentation map. Run relevant scoped checks;
 CI verifies formatting, vet, build, and race tests. Work stays on feature branches, draft PRs target
 `stage`, and humans review and merge. Live model calls are separate from offline tests.
 
 Internal engineering material lives under `.zazz/`: [architecture](.zazz/architecture.md),
 [implementation plan](.zazz/project/implementation-plan.md), [contracts](.zazz/specifications/README.md),
-and the [engineering documentation map](.zazz/docs/scan-agent-orientation.md#documentation-map).
+and the [engineering documentation map](.zazz/docs/zazzles-agent-orientation.md#documentation-map).
 
-Analysis contributors: read the [scan analysis rules and guidelines](docs/analysis/README.md) for
+Analysis contributors: read the [zazzles analysis rules and guidelines](docs/analysis/README.md) for
 SQL/NoSQL judgment, input-validation policy, and calibration controls.

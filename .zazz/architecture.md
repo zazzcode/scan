@@ -49,7 +49,7 @@ primary semantic assessor for whether a candidate string is adequately validated
 its particular use. The LLM Findings Reviewer reviews identified issues against their evidence.**
 Go retains orchestration, reconciliation, reporting, and CI policy.
 
-All scan-authored scanner and code-analysis code is Go: language adapters, graph/flow analysis,
+All zazzles-authored scanner and code-analysis code is Go: language adapters, graph/flow analysis,
 rules, model API clients, orchestration, reporting, and evaluation harnesses. Python and other target
 languages describe code being scanned, not implementation runtimes. Tree-sitter's native parser and
 grammars remain dependencies with explicit build requirements; this is not a pure-Go dependency claim.
@@ -161,7 +161,7 @@ future contract to test, not an assertion that any symbol chain is globally uniq
 
 ### Graph storage decision
 
-Use scan-owned typed Go adjacency structures as the canonical in-memory representation. Node/edge
+Use zazzles-owned typed Go adjacency structures as the canonical in-memory representation. Node/edge
 records carry relation kinds and provenance; forward/reverse indexes support relation-filtered
 queries. Preserve multiple relations between the same endpoints and self-edges where the IR requires
 them. Dense internal indexes may optimize access but are distinct from persistent semantic identities.

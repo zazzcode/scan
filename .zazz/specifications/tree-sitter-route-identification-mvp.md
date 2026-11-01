@@ -68,7 +68,7 @@ Per [`.zazz/standards/index.yaml`](../standards/index.yaml):
 ### 1.f Project Orientation
 
 - [`AGENTS.md`](../../AGENTS.md) — `stage` is the integration branch; agents do not merge.
-- [`.zazz/docs/scan-agent-orientation.md` Portable workspace](../docs/scan-agent-orientation.md#portable-workspace-and-dev_root) — Juice Shop lookup. Do not hardcode a machine path.
+- [`.zazz/docs/zazzles-agent-orientation.md` Portable workspace](../docs/zazzles-agent-orientation.md#portable-workspace-and-dev_root) — Juice Shop lookup. Do not hardcode a machine path.
 
 ---
 

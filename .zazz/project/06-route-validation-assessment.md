@@ -9,7 +9,7 @@ owns the next delivery sequence; the [architecture](../architecture.md) owns tec
 
 Target: clean local OWASP Juice Shop checkout, tag `v20.3.0`, commit
 `f189f521266f42c6bd05884468292000cee852ed`. Resolve its local location using the
-[workspace conventions](../docs/scan-agent-orientation.md#portable-workspace-and-dev_root).
+[workspace conventions](../docs/zazzles-agent-orientation.md#portable-workspace-and-dev_root).
 No application installation, server startup, HTTP attack, or model call was needed.
 
 Run from the feature worktree, with the target root substituted:
@@ -78,7 +78,7 @@ and small controlled safe/vulnerable/unknown pairs. The selected target source s
   A length limit does not establish SQL parameter separation.
 
 These are human source-review observations for candidate/fixture design, not findings produced by
-scan. Confirm sink API/library semantics in the owning spec before asserting exploitability. Do not
+zazzles. Confirm sink API/library semantics in the owning spec before asserting exploitability. Do not
 label a case from challenge comments alone. A safe comparison should bind a parameter; an unknown
 comparison should include an unresolved helper or unsupported flow. Keep request-input validation
 separate from protection of the SQL use.

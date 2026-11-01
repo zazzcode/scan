@@ -1,7 +1,7 @@
 # Scan — project overview
 
 **Project definition: proposed direction, 2026-10-19.** This overview owns product purpose, direction,
-and repository state. The [agent orientation](docs/scan-agent-orientation.md#documentation-map) routes
+and repository state. The [agent orientation](docs/zazzles-agent-orientation.md#documentation-map) routes
 to the detailed documents and defines their responsibilities.
 
 ## Purpose
@@ -27,7 +27,7 @@ maintained solely in internal project documents.
 **Objective update, 2026-10-31:** build a source-code security scanner that is **as good as or better
 than Bearer at SAST detection and code analysis, with fewer false positives**, with the long-term goal of supporting all equivalent
 analysis and developer-workflow capabilities. This includes capabilities available across Bearer CLI
-and Pro; the free CLI is the first local comparison baseline, not the ceiling for scan's ambition.
+and Pro; the free CLI is the first local comparison baseline, not the ceiling for zazzles's ambition.
 
 Track parity through a versioned capability inventory: supported languages/frameworks and weakness
 families; source-to-sink taint and control/dataflow analysis; interprocedural and cross-file analysis;
@@ -124,7 +124,7 @@ Phase 0's walker, language registry, and CI remain. Their historical record is t
 does not establish security-analysis support for that language.
 
 Workspace conventions and the `stage` rules live in the
-[orientation](docs/scan-agent-orientation.md).
+[orientation](docs/zazzles-agent-orientation.md).
 
 ## Route reporting and dependency direction
 

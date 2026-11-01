@@ -9,7 +9,7 @@
 #
 # Curation policy: only stack-agnostic methodology standards are vendored from
 # zazz-skills/docs/standards, and the two that described the upstream repo's own
-# stack (contextual-split, pr-process) were rewritten for scan. The scan stack
+# stack (contextual-split, pr-process) were rewritten for zazzles. The zazzles stack
 # (Go + Tree-sitter + bounded flow + Jev Assessment and Findings Review) deliberately does NOT vendor
 # the upstream stack-specific baselines (Python/Flask, SQL Server sprocs, React/Next,
 # Lambda, Drizzle/Neon). Stack standards are authored for this repo with the

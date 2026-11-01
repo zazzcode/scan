@@ -38,7 +38,7 @@ SQL/NoSQL judgment against known-positive, protected, and unknown cases takes pr
 `GET /rest/user/change-password` carries `current`/`new`/`repeat` in the query string and
 `morgan('combined')` (`server.ts:366`) records the URL. None of Bearer's 278 logger findings covers
 this (false negative); its credential-looking logger lines log fixture keys, already-masked emails,
-or constant text. scan now reports the change-password case as a finding and the security-question
+or constant text. zazzles now reports the change-password case as a finding and the security-question
 email query as Review. The remaining Bearer logger rows were not individually adjudicated.
 
 These seven raw finding decisions contain three false positives and four supported potential rule

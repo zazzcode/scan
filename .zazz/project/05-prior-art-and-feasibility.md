@@ -19,11 +19,11 @@ novelty claim is established by this limited survey. This is not an exhaustive o
 
 | Source | Relevant precedent | Limit of the comparison |
 |---|---|---|
-| [IRIS paper](https://arxiv.org/abs/2405.17238) and [authors' repository](https://github.com/iris-sast/iris) | Combines static analysis with LLM-inferred taint specifications and contextual review of candidate paths | Java/CodeQL research; does not establish scan's Jev or JS/TS performance |
-| [Jev Security Scan](https://github.com/win4r/jev-security-scan/blob/main/README.en.md) | Static evidence plus Jev triage, a second localization/check pass, explicit coverage gaps | Agent Skill/MCP suspicious-behavior review; both passes use Jev, not scan's LLM Findings Reviewer |
-| [Jev Security Sentinel](https://github.com/JevForge/jev-security-sentinel) | Jev-based policy over existing SAST/SCA/IaC and other findings | Findings triage/gating is different from building scan's source-to-sink analysis |
+| [IRIS paper](https://arxiv.org/abs/2405.17238) and [authors' repository](https://github.com/iris-sast/iris) | Combines static analysis with LLM-inferred taint specifications and contextual review of candidate paths | Java/CodeQL research; does not establish zazzles's Jev or JS/TS performance |
+| [Jev Security Scan](https://github.com/win4r/jev-security-scan/blob/main/README.en.md) | Static evidence plus Jev triage, a second localization/check pass, explicit coverage gaps | Agent Skill/MCP suspicious-behavior review; both passes use Jev, not zazzles's LLM Findings Reviewer |
+| [Jev Security Sentinel](https://github.com/JevForge/jev-security-sentinel) | Jev-based policy over existing SAST/SCA/IaC and other findings | Findings triage/gating is different from building zazzles's source-to-sink analysis |
 | [Bearer](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/README.md) | Go, Tree-sitter, language analyzers, dataflow relationships, declarative rules, reporting | Read source for design ideas; do not assume parity with advanced/commercial analysis |
-| [CodeQL libraries and queries](https://github.com/github/codeql) | Explicit source/sink models, taint steps, barriers, path queries, and regression cases | MIT repository; the CLI/engine is separately licensed and is not scan's planned runtime |
+| [CodeQL libraries and queries](https://github.com/github/codeql) | Explicit source/sink models, taint steps, barriers, path queries, and regression cases | MIT repository; the CLI/engine is separately licensed and is not zazzles's planned runtime |
 
 These sources show precedent and implementation choices, not verified comparative quality.
 The [Jev capability note](04-jev-validation-research.md) owns sanitizer-specific published results and
@@ -39,10 +39,10 @@ between repeatable program analysis and contextual judgment. Scan chooses Go ana
 of validation/sanitization, and an LLM Findings Reviewer; IRIS does not establish Jev's fitness.
 Source: [authors' overview](https://github.com/iris-sast/iris#-overview).
 
-IRIS is an architectural reference, not a dependency or implementation template. Scan's analysis,
+IRIS is an architectural reference, not a dependency or implementation template. Zazzles's analysis,
 model clients, orchestration, and evaluation harnesses are Go, as defined in the
 [architecture](../architecture.md#1-architecture-premise). Studying IRIS does not introduce Python
-or CodeQL into scan's planned runtime.
+or CodeQL into zazzles's planned runtime.
 
 **Jev Security Scan:** a Python tool reviewing Agent Skills/MCP/source for suspicious behavior. It
 collects text, applies local checks, asks Jev category questions across chunks, then uses a second Jev
@@ -53,7 +53,7 @@ of a Go interprocedural OWASP scanner or a separate LLM Findings Reviewer.
 Source: [documented pipeline](https://github.com/win4r/jev-security-scan/blob/main/README.en.md#how-it-works).
 
 These tools demonstrate related building blocks. The limited survey does not establish a prior tool
-with precisely scan's chosen division of roles, nor prove that division is unprecedented.
+with precisely zazzles's chosen division of roles, nor prove that division is unprecedented.
 
 ## CodeQL as an additional design reference
 
@@ -65,7 +65,7 @@ This is a documentation/source reference; no CLI was installed or run for this r
 
 The supplied local clone was verified clean at `bc53c78af0de4ee7578850698f12ab5638bc1b6d` on
 2026-10-19, with origin `https://github.com/github/codeql.git`. Its portable location lives in the
-[orientation](../docs/scan-agent-orientation.md#portable-workspace-and-dev_root). This records clone
+[orientation](../docs/zazzles-agent-orientation.md#portable-workspace-and-dev_root). This records clone
 provenance; a local implementation study has not yet been performed.
 
 Start with the official [JS/TS dataflow guide](https://codeql.github.com/docs/codeql-language-guides/analyzing-data-flow-in-javascript-and-typescript/):
@@ -75,25 +75,25 @@ SQL/command/path corpus instead of surveying the whole repository. Record the so
 any concrete implementation study or reused material in its owning spec.
 
 Bearer informs Go/parser implementation patterns; CodeQL informs explicit semantic models, rule
-preconditions, and negative/regression cases. Neither supplies scan's unbuilt engine by analogy.
+preconditions, and negative/regression cases. Neither supplies zazzles's unbuilt engine by analogy.
 Translate useful concepts into the chosen Go IR/flow contracts and test them; do not add a QL runtime,
 database extractor, or CodeQL dependency to the plan. Any later reuse preserves the applicable notices.
 
 ## Bearer inspection provenance
 
 The Project Owner supplied a clone at the portable reference location recorded in the
-[orientation](../docs/scan-agent-orientation.md#portable-workspace-and-dev_root). Inspected commit:
+[orientation](../docs/zazzles-agent-orientation.md#portable-workspace-and-dev_root). Inspected commit:
 `e3753de6347988bed15bdba80b9ff731bf028c80`. The checkout was clean at inspection. No dependencies were installed, code
 executed, scanner run, or files modified in that clone. Findings below come from selected source,
 fixtures, and documentation, not a full correctness audit.
 
 The checkout's [module](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/go.mod) uses Go and `smacker/go-tree-sitter`. That supports the general
 stack choice, not an instruction to select the same binding/version. The parser spec still decides
-scan's binding and native/build requirements.
+zazzles's binding and native/build requirements.
 
 ## Concrete ideas worth studying
 
-| Area and pinned source | Observed mechanism | Lesson for scan |
+| Area and pinned source | Observed mechanism | Lesson for zazzles |
 |---|---|---|
 | [Language contract](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/pkg/scanner/language/language.go) | Each language supplies parser grammar, analyzer, pattern behavior, detector hooks, and string-fragment types | A common parser does not remove language-specific semantics; make adapters own those explicitly |
 | [JS/TS analyzer](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/pkg/languages/javascript/analyzer/analyzer.go) | Per-syntax handling of assignments, declarations, calls, imports, members, object spread, and ternaries | Build a tested transfer/capability matrix, not generic traversal that assumes all AST shapes mean the same thing |
@@ -103,7 +103,7 @@ scan's binding and native/build requirements.
 | [Ruleset](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/pkg/scanner/ruleset/ruleset.go) and [sanitizer detection](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/pkg/scanner/detectorset/detectorset.go) | Rules explicitly reference sanitizer rules; sanitizer matching participates in detection | Deterministically model known protections with preconditions; investigate custom/unknown protections through Jev |
 | [Sanitizer fixture](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/e2e/rules/testdata/rules/sanitizer.yml) and [paired cases](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/e2e/rules/testdata/data/sanitizer/sanitizer.rb) | Small cases distinguish raw, assigned, and transformed values | Test direct use and local-variable use of both unsafe and protected values. The fixture's `hash` is a synthetic example, not a universal sanitizer |
 | [JS/TS tests](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/pkg/languages/javascript/javascript_test.go) | Separate snapshot groups for flow, imports, strings, object destructuring, pattern variables, and scope | Organize fixtures by semantic construct so errors are attributable before model integration |
-| [SARIF emitter](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/pkg/report/output/sarif/sarif.go) and [security output](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/pkg/report/output/security/security.go) | Rule/location/severity output, fingerprints, baseline/ignore integration | Learn report packaging, but specify/test scan's identity and grouping instead of assuming copied fingerprints are stable enough |
+| [SARIF emitter](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/pkg/report/output/sarif/sarif.go) and [security output](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/pkg/report/output/security/security.go) | Rule/location/severity output, fingerprints, baseline/ignore integration | Learn report packaging, but specify/test zazzles's identity and grouping instead of assuming copied fingerprints are stable enough |
 | [Dataflow guide](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/docs/guides/dataflow.md) | Uses Juice Shop to demonstrate report structure | Useful reference for mapping our selected Juice Shop source cases and comparing report evidence |
 
 The inspected analyzer provides evidence of local value/alias modeling. It is not proof of complete
@@ -112,7 +112,7 @@ README distinguishes advanced cross-file analysis under the commercial offering;
 capabilities are present in the inspected CLI merely because the product description mentions them.
 
 The checkout uses [Elastic License 2.0](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/LICENSE.txt). This study records ideas and observations;
-no Bearer source or rules have been copied into scan. Any later code/rule reuse is a separate design
+no Bearer source or rules have been copied into zazzles. Any later code/rule reuse is a separate design
 and licensing decision, not an assumption of MIT/Apache-style terms.
 
 ## Where I expect the design to work
@@ -156,9 +156,9 @@ frontend. This isolates the semantic experiment without changing the chosen arch
 Use Bearer as a comparator, with its revision/rule/configuration pinned. Its output is not ground
 truth or a complete candidate source: include manually labeled cases it does not flag, and review
 both tools' disagreements. A temporary experiment harness can ingest prepared/Bearer evidence without
-committing scan to reusing Bearer internals.
+committing zazzles to reusing Bearer internals.
 
-Then build one complete source-to-sink slice in scan, extend to the agreed initial rule families, and
+Then build one complete source-to-sink slice in zazzles, extend to the agreed initial rule families, and
 measure discovery separately from Jev classification and Findings Review. Expand languages only after
 the selected slice meets its agreed evidence bar. The existing
 [ordered backlog](implementation-plan.md#ordered-specification-backlog) remains the execution plan;

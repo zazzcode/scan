@@ -1,6 +1,6 @@
 # Zazz Worktree Setup
 
-This document defines the required worktree structure for repos using the Zazz methodology, adapted for scan:
+This document defines the required worktree structure for repos using the Zazz methodology, adapted for zazzles:
 the integration branch is **`stage`**, and **`main`** is the release branch (stage merges to main at release time;
 a version tag is cut on main).
 
@@ -23,8 +23,8 @@ Supporting docs in this repo:
 
 Use a bare-repo container with sibling worktrees.
 
-Scan's container layout (resolve the development root using the
-[orientation](scan-agent-orientation.md#portable-workspace-and-dev_root)):
+Zazzles's container layout (resolve the development root using the
+[orientation](zazzles-agent-orientation.md#portable-workspace-and-dev_root)):
 
 ```text
 zazzles/                         # container; not a development checkout
@@ -49,7 +49,7 @@ Every spec is authored, refined, and implemented in its own feature worktree, wi
 into `stage`. The current definition-only `stage/` exception does not apply to specs. Implementation
 requires human spec greenlight. Multiple agents assigned to the same spec coordinate in its worktree;
 alternative implementations belong to separately scoped specs/worktrees. The generic stacked-lane
-guide does not authorize sharing a worktree across scan specs.
+guide does not authorize sharing a worktree across zazzles specs.
 
 ## Why This Pattern
 
@@ -77,9 +77,9 @@ Its role is:
 
 Do not use the integration worktree as the normal place for day-to-day feature implementation.
 
-Scan's current concept/architecture-definition documentation work is explicitly assigned to `stage/`
+Zazzles's current concept/architecture-definition documentation work is explicitly assigned to `stage/`
 by the Project Owner. Assigned methodology refinement may also happen there. This narrow exception is
-declared in [AGENTS.md](../../AGENTS.md) and the [orientation](scan-agent-orientation.md); it does not
+declared in [AGENTS.md](../../AGENTS.md) and the [orientation](zazzles-agent-orientation.md); it does not
 permit feature implementation, direct pushes, local merges, or releases. Later approved deliverables
 use sibling worktrees.
 
@@ -142,7 +142,7 @@ cd stage && git branch -vv
 ## Reference application checkout
 
 Juice Shop is a separate clone, not a branch or worktree of scan. Its portable lookup convention is
-recorded in the [orientation](scan-agent-orientation.md#portable-workspace-and-dev_root). Identify a
+recorded in the [orientation](zazzles-agent-orientation.md#portable-workspace-and-dev_root). Identify a
 fixture by upstream repository URL plus an agreed commit, independently of its local location.
 Future fixture configuration must allow a per-machine root override; no flag/environment contract
 is implemented now. Do not modify, install, or run the reference app merely for source inspection.
