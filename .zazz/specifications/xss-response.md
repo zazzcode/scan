@@ -103,3 +103,13 @@ unknown sibling beside encoded paths, an all-path-protected control, and returni
 branches. Goof create/update remain one orange Markdown sink with three separate paths. The changed
 stored request no longer replays its saved answer. Results and blockers:
 [evaluation](../evaluation/xss-implementation-results.md#hardening-08-stored-write-path-separation).
+
+### 2026-11-01 — Hardening 09: helpers, string building, gates, Angular paths, same-sink merge
+
+Source: user steering to harden XSS detection fully, and to write scan results to `_test-findings/<app>`.
+Precise content-neutral branching helpers, `+=` propagation (server and DOM), server-side DOMPurify and
+Handlebars SafeString gates, per-path Angular bypass classification, and merged same-sink browser records,
+each with paired fixtures. Goof matches all answer-key cases. The user also clarified that sample apps are
+read-only scan targets, recorded in the agent orientation. Results:
+[evaluation](../evaluation/xss-implementation-results.md#hardening-09-helpers-string-building-gates-and-same-sink-merging).
+

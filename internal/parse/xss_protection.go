@@ -100,6 +100,12 @@ func (f *flow) dependencyProtection(dependency graph.Dependency, context string)
 		if mode == "markdown" && f.set.packageVersion("marked") == "0.3.5" {
 			mode = "ineffective"
 		}
+		if mode == "sanitize_dom" {
+			mode = ""
+			if f.client != nil {
+				mode = "sanitize"
+			}
+		}
 		switch mode {
 		case "encode":
 			protection = "unknown"
@@ -180,10 +186,39 @@ func verifiedOutputProtection(m *sourceModule, call *sitter.Node) string {
 		if len(parts) == 1 {
 			return "sanitize"
 		}
-	case "dompurify", "isomorphic-dompurify":
+	case "dompurify":
+		// Without a DOM window (for example in Node) DOMPurify returns its input.
+		if method == "sanitize" {
+			return "sanitize_dom"
+		}
+	case "isomorphic-dompurify":
 		if method == "sanitize" {
 			return "sanitize"
 		}
 	}
 	return ""
+}
+
+// handlebarsSafeString reports a verified Handlebars SafeString construction on a
+// path. Handlebars emits SafeString content without escaping, even in {{...}}.
+func (f *flow) handlebarsSafeString(dependency graph.Dependency) bool {
+	for _, transfer := range dependency.Transfers {
+		m := f.set.modules[transfer.Span.File]
+		if m == nil || !strings.HasPrefix(transfer.Text, "new ") {
+			continue
+		}
+		n := nodeAt(m.tree.RootNode(), transfer.Span.StartByte, transfer.Span.EndByte)
+		if n == nil || n.Kind() != "new_expression" {
+			continue
+		}
+		parts := strings.Split(n.ChildByFieldName("constructor").Utf8Text(m.src), ".")
+		if len(parts) < 2 || parts[len(parts)-1] != "SafeString" || shadowed(n, parts[0], m.src) || bindingReassigned(m, parts[0]) {
+			continue
+		}
+		imp, ok := m.imports[parts[0]]
+		if ok && ((imp.module == "handlebars" && len(parts) == 2) || (imp.module == "hbs" && len(parts) == 3 && parts[1] == "handlebars")) {
+			return true
+		}
+	}
+	return false
 }

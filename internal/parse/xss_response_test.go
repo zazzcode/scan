@@ -101,3 +101,61 @@ func TestWholeRequestRenderOptionsRemainReview(t *testing.T) {
 		t.Fatalf("whole-object options were declared protected: %+v", uses)
 	}
 }
+
+func TestBranchingHelpersAndAugmentedAssignment(t *testing.T) {
+	tests := []struct{ name, helper, body, protection string }{
+		// A literal-token test without HTML-significant characters cannot guard markup: the unchanged path is raw.
+		{"content-neutral token branch", "function fmt(t){var tok=' in ';var r=t.toString().indexOf(tok);if(r>0){t=t.slice(0,r)}return t}", "res.send('<p>'+fmt(req.query.q))", "raw"},
+		{"unknown predicate may guard", "function clean(x){if(bad(x)){x=''}return x}", "res.send('<p>'+clean(req.query.q))", "unknown"},
+		{"HTML-significant literal may guard", "function clean(x){if(x.indexOf('<')>=0){x=''}return x}", "res.send('<p>'+clean(req.query.q))", "unknown"},
+		{"returning branch may guard", "function clean(x){if(x.length>9){return ''}return x}", "res.send('<p>'+clean(req.query.q))", "unknown"},
+		{"reassigned token is not a constant", "function fmt(t){var tok=' in ';tok=pick();if(t.indexOf(tok)>0){t=t.slice(1)}return t}", "res.send('<p>'+fmt(req.query.q))", "unknown"},
+		{"string building keeps request data", "", "let h='<p>';h+=req.query.q;res.send(h)", "raw"},
+		{"encoded string building", "", "let h='<p>';h+=escapeHtml(req.query.q);res.send(h)", "sanitized"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			root := t.TempDir()
+			writeSource(t, root, "app.js", "const express=require('express');const escapeHtml=require('escape-html');const app=express();"+tt.helper+";app.get('/x',(req,res)=>{"+tt.body+"})")
+			r, err := Strings(root, "app.js")
+			if err != nil {
+				t.Fatal(err)
+			}
+			uses := xssUses(r)
+			if len(uses) != 1 || uses[0].XSS.Protection != tt.protection {
+				t.Fatalf("want protection=%s; got %+v", tt.protection, uses)
+			}
+		})
+	}
+}
+
+func TestSanitizerBindingGates(t *testing.T) {
+	tests := []struct{ name, imports, body, template, protection string }{
+		{"server DOMPurify without a window", "const DOMPurify=require('dompurify');", "res.send('<p>'+DOMPurify.sanitize(req.query.q))", "", "unknown"},
+		{"isomorphic DOMPurify", "const DOMPurify=require('isomorphic-dompurify');", "res.send('<p>'+DOMPurify.sanitize(req.query.q))", "", "sanitized"},
+		{"sanitize-html with custom options", "const sanitizeHtml=require('sanitize-html');", "res.send('<p>'+sanitizeHtml(req.query.q,{allowedTags:false}))", "", "unknown"},
+		{"Handlebars SafeString in escaped output", "const Handlebars=require('handlebars');", "res.render('page',{name:new Handlebars.SafeString(req.query.q)})", "<p>{{name}}</p>", "raw"},
+		{"hbs SafeString in escaped output", "const hbs=require('hbs');", "res.render('page',{name:new hbs.handlebars.SafeString(req.query.q)})", "<p>{{name}}</p>", "raw"},
+		{"plain value in escaped output", "const Handlebars=require('handlebars');", "res.render('page',{name:req.query.q})", "<p>{{name}}</p>", "encoded"},
+		{"look-alike SafeString", "const Handlebars={SafeString:function(v){this.v=v}};", "res.render('page',{name:new Handlebars.SafeString(req.query.q)})", "<p>{{name}}</p>", "encoded"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			root := t.TempDir()
+			engine := ""
+			if tt.template != "" {
+				engine = "app.set('view engine','hbs');"
+				writeSource(t, root, "views/page.hbs", tt.template)
+			}
+			writeSource(t, root, "app.js", "const express=require('express');"+tt.imports+"const app=express();"+engine+"app.get('/x',(req,res)=>{"+tt.body+"})")
+			r, err := Strings(root, "app.js")
+			if err != nil {
+				t.Fatal(err)
+			}
+			uses := xssUses(r)
+			if len(uses) != 1 || uses[0].XSS.Protection != tt.protection {
+				t.Fatalf("want protection=%s; got %+v", tt.protection, uses)
+			}
+		})
+	}
+}

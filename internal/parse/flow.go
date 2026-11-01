@@ -143,7 +143,9 @@ func (f *flow) branches(n *sitter.Node) {
 	}
 	saved := copyValues(f.env)
 	var exits []exit
+	runs := 0
 	run := func(body *sitter.Node, branch *graph.Evidence) {
+		runs++
 		f.env = copyValues(saved)
 		if !f.statement(body) {
 			exits = append(exits, exit{f.env, branch})
@@ -179,6 +181,9 @@ func (f *flow) branches(n *sitter.Node) {
 				}
 			}
 		}
+	}
+	if bodies := len(exits); bodies < runs {
+		f.gaps = append(f.gaps, f.gap("branch_exit", "a branch returns or throws; its condition may guard later code", n))
 	}
 	if !complete {
 		exits = append(exits, exit{saved, nil})
@@ -299,6 +304,27 @@ func (f *flow) eval(n *sitter.Node) value {
 			}
 		} else {
 			f.assignStoredField(left, v)
+			v.gaps = append(v.gaps, f.gap("unsupported_write", "heap/property assignment is not modeled", n))
+		}
+		return v
+	case "augmented_assignment_expression":
+		// a += b keeps a's prior dependencies and adds b's (string building).
+		left := n.ChildByFieldName("left")
+		prior := value{}
+		if left != nil && left.Kind() == "identifier" {
+			prior = f.env[left.Utf8Text(src)]
+		} else if left != nil {
+			prior = f.eval(left)
+		}
+		v := f.transfer(combine(prior, f.eval(n.ChildByFieldName("right"))), "assignment", n)
+		if f.client != nil && f.clientAssignment(n, left, v) {
+			return v
+		}
+		if left != nil && left.Kind() == "identifier" {
+			if _, known := f.env[left.Utf8Text(src)]; known {
+				f.env[left.Utf8Text(src)] = v
+			}
+		} else if left != nil {
 			v.gaps = append(v.gaps, f.gap("unsupported_write", "heap/property assignment is not modeled", n))
 		}
 		return v

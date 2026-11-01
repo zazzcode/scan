@@ -64,6 +64,8 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 				context = "script"
 			case "bypassSecurityTrustUrl", "bypassSecurityTrustResourceUrl":
 				context = "url"
+			case "bypassSecurityTrustStyle":
+				context = "style"
 			}
 			if context != "" {
 				v := f.eval(args.NamedChild(0))

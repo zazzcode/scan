@@ -1,6 +1,11 @@
 package parse
 
-import "testing"
+import (
+	"strings"
+	"testing"
+
+	"github.com/zazzcode/zazzles/internal/graph"
+)
 
 func TestBrowserSourceSinkControls(t *testing.T) {
 	tests := []struct{ name, source, protection, context string }{
@@ -74,6 +79,12 @@ func TestAngularTrustAndTemplateBindings(t *testing.T) {
 		{"trust bypass", "this.sanitizer.bypassSecurityTrustHtml(q)", `<div [innerHTML]="value"></div>`, "raw"},
 		{"default sanitization", "q", `<div [innerHTML]="value"></div>`, "sanitized"},
 		{"missing renderer", "this.sanitizer.bypassSecurityTrustHtml(q)", `<div>constant</div>`, "unknown"},
+		// A plain sibling path keeps default sanitization but never hides the bypassed path, in either order.
+		{"bypass beside plain path", "(q.length>1?this.sanitizer.bypassSecurityTrustHtml(q):q)", `<div [innerHTML]="value"></div>`, "raw"},
+		{"plain path before bypass", "(q.length>1?q:this.sanitizer.bypassSecurityTrustHtml(q))", `<div [innerHTML]="value"></div>`, "raw"},
+		{"bypass for another context", "this.sanitizer.bypassSecurityTrustUrl(q)", `<div [innerHTML]="value"></div>`, "unknown"},
+		{"URL bypass in URL binding", "this.sanitizer.bypassSecurityTrustUrl(q)", `<a [href]="value">x</a>`, "raw"},
+		{"unknown wrapper is not default protection", "this.wrap(q)", `<div [innerHTML]="value"></div>`, "unknown"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
@@ -91,5 +102,70 @@ func TestAngularTrustAndTemplateBindings(t *testing.T) {
 				t.Fatal("template witness missing")
 			}
 		})
+	}
+}
+
+func TestSameSinkClientRecordsMerge(t *testing.T) {
+	dep := func(text string, at uint) graph.Dependency {
+		return graph.Dependency{Source: graph.Evidence{Kind: "browser_source", Text: text, Span: graph.Span{File: "c.ts", StartByte: int(at)}}, Transfers: []graph.Evidence{}}
+	}
+	use := func(kind, protection string, resolved bool, d graph.Dependency) graph.StringUse {
+		return graph.StringUse{ID: "xss:client:c.ts:1", ClientID: "client:c.ts", Kind: "xss_candidate", Sink: graph.Evidence{Span: graph.Span{File: "c.html", StartByte: 9}},
+			Dependencies: []graph.Dependency{d}, XSS: &graph.XSSFacts{Type: kind, Protection: protection, OriginResolved: resolved, ResponsePath: map[bool]string{false: "/api/x"}[resolved]}}
+	}
+	tests := []struct {
+		name       string
+		uses       []graph.StringUse
+		protection string
+		typ        string
+		paths      string
+	}{
+		{"weak cross-tier first does not hide later raw DOM", []graph.StringUse{use("cross_tier", "unknown", false, dep("api", 1)), use("dom", "raw", true, dep("location.hash", 2))}, "raw", "dom", "raw,unknown"},
+		// The unresolved cross-tier claim is kept (Review), not replaced by the protected sibling.
+		{"unresolved cross-tier raw path is not covered by a protected sibling", []graph.StringUse{use("dom", "encoded", true, dep("location.hash", 2)), use("cross_tier", "raw", false, dep("api", 1))}, "raw", "cross_tier", "raw,encoded"},
+		{"protected record does not cover an unknown sibling", []graph.StringUse{use("dom", "encoded", true, dep("a", 1)), use("dom", "unknown", true, dep("b", 2))}, "unknown", "dom", "unknown,encoded"},
+		{"identical records stay one protected record", []graph.StringUse{use("dom", "encoded", true, dep("a", 1)), use("dom", "encoded", true, dep("a", 1))}, "encoded", "dom", ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &graph.StringReport{}
+			addClientUses(r, &clientContext{entry: graph.ClientEntry{ID: "client:c.ts"}}, tt.uses)
+			if len(r.Uses) != 1 || r.Uses[0].XSS.Protection != tt.protection || r.Uses[0].XSS.Type != tt.typ {
+				t.Fatalf("want one %s %s record: %+v", tt.typ, tt.protection, r.Uses)
+			}
+			var got []string
+			for _, p := range r.Uses[0].XSS.Paths {
+				got = append(got, p.Protection)
+			}
+			if strings.Join(got, ",") != tt.paths || len(r.Uses[0].Dependencies) != len(strings.Split(tt.paths, ",")) && tt.paths != "" {
+				t.Fatalf("paths %v, want %s", got, tt.paths)
+			}
+			if tt.typ == "dom" && tt.uses[0].XSS.Type == "cross_tier" {
+				found := false
+				for _, g := range r.Uses[0].Gaps {
+					found = found || g.Kind == "cross_tier_sibling_unresolved"
+				}
+				if !found {
+					t.Fatal("unlinked API sibling lost its gap")
+				}
+			}
+		})
+	}
+}
+
+func TestDOMAugmentedSink(t *testing.T) {
+	for _, tt := range []struct{ source, protection string }{
+		{"const el=document.getElementById('r');el.innerHTML+=location.hash", "raw"},
+		{"import DOMPurify from 'dompurify';const el=document.getElementById('r');el.innerHTML+=DOMPurify.sanitize(location.hash)", "sanitized"},
+	} {
+		root := t.TempDir()
+		writeSource(t, root, "browser.js", tt.source)
+		r, err := Strings(root, "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if uses := xssUses(r); len(uses) != 1 || uses[0].XSS.Protection != tt.protection {
+			t.Fatalf("%s: want %s, got %+v", tt.source, tt.protection, uses)
+		}
 	}
 }

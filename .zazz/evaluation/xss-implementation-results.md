@@ -53,10 +53,46 @@ newly traversed branch; a key comparison found no distinct path lost. Newly trav
 Review records: Juice Shop whoami, continue-code, b2b and snippet JSON data edges and two webhook
 outbound requests, and the TypeScript `/api/files` file-content response, which has an unresolved origin.
 
-Remaining blockers: `parse`-style helpers with internal branches are imprecise, so their paths stay
-unknown; branch feasibility (for example the image regex) is not evaluated; `switch` bodies are not
+Remaining blockers at that point (helpers were addressed in hardening 09): `parse`-style helpers with
+internal branches were imprecise, so their paths stayed unknown; branch feasibility (for example the image regex) is not evaluated; `switch` bodies are not
 traversed; Juice Shop has 38 outbound-HTTP records sharing 11 IDs (36 before this change), a
 pre-existing identity issue outside XSS.
+
+## Hardening 09: helpers, string building, gates and same-sink merging
+
+Saved as `20261101-xss-hardening-09` and promoted to the canonical reports. Offline, no model calls.
+
+- **Branching helpers.** A helper with `if` branches is now entered precisely when every condition is
+  content-neutral: lengths, `typeof`, literals, comparisons/logic over those, and `indexOf`/`includes`/
+  `startsWith`/`endsWith` tests for a literal (or single unreassigned constant) without HTML-significant
+  characters (`<>"'&` `` ` `` `=/:`), and no branch returns or throws. Any other condition may guard
+  content, so the helper stays unknown. Goof `parse` qualifies: its unchanged path (no ` in ` token) is
+  now a supported ineffective path, which matches `GOOF-XSS-02`. Paths through `slice`/`hms` stay unknown.
+- **String building.** `a += b` now keeps `a`'s dependencies and adds `b`'s. Previously
+  `h += req.query.q; res.send(h)` and `el.innerHTML += location.hash` produced no XSS record.
+- **Sanitizer gates.** Plain `dompurify` counts only in browser flows; in Node without a window it returns
+  its input, so server use is unknown (`isomorphic-dompurify` stays a sanitizer). A verified Handlebars
+  or `hbs.handlebars` `SafeString` reaching escaped `{{…}}` output is raw; a look-alike object is not.
+- **Angular per path.** Each path to a one-way binding is classified on its own: a matching
+  `bypassSecurityTrust*` is unsafe, a plain path keeps default sanitization, a mismatched bypass or
+  unknown wrapper is unknown. `bypassSecurityTrustStyle` is recognized.
+- **Same-sink browser records** from module, function and class flows are merged rather than
+  first-wins. Juice Shop's search-result sink previously dropped a later DOM record behind a cross-tier
+  one. The merge keeps the strongest claim and retains siblings and an unlinked-API gap.
+
+Goof now matches every answer-key case: `01` red (replayed), `02`/`03` as separate supported paths on
+one orange Markdown finding, `N01`/`N02` Protected, `N03` Review and `N04` no finding. The stored request
+changed again, so its saved answer stays `not_run`. Across the three targets, no use lost a source compared
+with hardening 08, and statuses and counts are unchanged.
+
+Fresh offline runs of the three real checkouts (Goof scanned directly at `<DEV_ROOT>/nodejs-goof`, not
+the filtered snapshot) are under `<DEV_ROOT>/zazzcode/zazzles/_test-findings/<app>/run-<id>/`.
+
+Remaining blockers: branch feasibility is not evaluated; `switch` bodies are not traversed; numeric
+facts such as `indexOf` results still carry content dependencies, which adds unknown sibling paths;
+cross-tier producer/model/JWT/dialog links (handoff priority 3) are not yet linked, so the Juice Shop
+product-description dialog sink remains unestablished; EJS custom `escape` options are not modeled;
+duplicate outbound-HTTP IDs remain.
 
 ## Decisions and source references
 

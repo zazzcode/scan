@@ -2,6 +2,7 @@ package parse
 
 import (
 	"fmt"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -167,6 +168,19 @@ func (f *flow) recordXSS(sink graph.Evidence, v value, context, contentType stri
 	}
 	protection, reason, protections := f.xssPathProtection(v, context, escaped)
 	paths := xssPaths(protections, nil)
+	if ext := strings.ToLower(filepath.Ext(sink.Span.File)); escaped && (ext == ".hbs" || ext == ".handlebars") {
+		safe := make([]string, len(v.deps))
+		for i, d := range v.deps {
+			safe[i] = protection
+			if f.handlebarsSafeString(d) {
+				safe[i] = "raw"
+				protection, reason = "raw", "A Handlebars SafeString reaches this output; Handlebars does not escape SafeString content."
+			}
+		}
+		if protection == "raw" {
+			paths = xssPaths(safe, nil)
+		}
+	}
 	if context == "unknown" || context == "mixed" {
 		protection, reason, paths = "unknown", "Rendering context is not established for every value.", nil
 	}

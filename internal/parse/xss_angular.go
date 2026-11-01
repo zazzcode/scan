@@ -118,15 +118,7 @@ func (s *moduleSet) angularOutputs(f *flow) {
 			continue
 		}
 		u := &f.uses[len(f.uses)-1]
-		if v.trustedContext == "" {
-			if plainFrameworkInput(v) {
-				u.XSS.Protection, u.XSS.ProtectionReason = "sanitized", "A plain browser/request value reaches Angular's one-way binding with no unknown transformation or trust bypass; its default sanitization applies."
-			} else {
-				u.XSS.Protection, u.XSS.ProtectionReason = "unknown", "Default Angular sanitization is expected for plain values, but the return type/transformations of this value are not established; a trusted wrapper cannot be excluded."
-			}
-		} else if v.trustedContext != context {
-			u.XSS.Protection, u.XSS.ProtectionReason = "unknown", "The trust bypass and rendering context do not match."
-		}
+		u.XSS.Protection, u.XSS.ProtectionReason, u.XSS.Paths = f.angularPathProtection(v, context)
 		if v.apiPath != "" {
 			u.XSS.Type, u.XSS.OriginResolved = "cross_tier", false
 			u.XSS.ResponsePath, u.XSS.ResponseMethod = v.apiPath, v.apiMethod
@@ -146,6 +138,63 @@ func (s *moduleSet) angularOutputs(f *flow) {
 		}
 	}
 	f.uses = uses
+}
+
+// angularPathProtection classifies each path to a one-way Angular binding. A
+// matching trust bypass is unsafe unless verified sanitization precedes it; a
+// plain path gets default sanitization; any other transformation is unknown.
+func (f *flow) angularPathProtection(v value, context string) (string, string, []graph.XSSPath) {
+	paths := make([]string, len(v.deps))
+	unsafe, unknown, mismatch := false, false, false
+	for i, d := range v.deps {
+		bypass := ""
+		for _, e := range d.Transfers {
+			if e.Kind == "trust_bypass" {
+				bypass = trustBypassContext(e.Text)
+			}
+		}
+		switch {
+		case d.Source.Kind == "unresolved_source":
+			paths[i] = "unknown"
+		case bypass != "" && bypass != context:
+			paths[i], mismatch = "unknown", true
+		case bypass != "":
+			paths[i] = f.dependencyProtection(d, context)
+		case plainFrameworkInput(value{deps: []graph.Dependency{d}}):
+			paths[i] = "sanitized"
+		default:
+			paths[i] = "unknown"
+		}
+		switch paths[i] {
+		case "raw", "ineffective":
+			unsafe = true
+		case "unknown":
+			unknown = true
+		}
+	}
+	switch {
+	case unsafe:
+		return "raw", "A verified Angular trust bypass for this context reaches the binding on a source path without modeled sanitization; other paths remain in the evidence.", xssPaths(paths, nil)
+	case mismatch:
+		return "unknown", "The trust bypass and rendering context do not match.", xssPaths(paths, nil)
+	case unknown:
+		return "unknown", "Default Angular sanitization is expected for plain values, but the return type/transformations of this value are not established; a trusted wrapper cannot be excluded.", xssPaths(paths, nil)
+	}
+	return "sanitized", "A plain browser/request value reaches Angular's one-way binding with no unknown transformation or trust bypass; its default sanitization applies.", nil
+}
+
+func trustBypassContext(text string) string {
+	switch {
+	case strings.Contains(text, "bypassSecurityTrustHtml"):
+		return "html_text"
+	case strings.Contains(text, "bypassSecurityTrustScript"):
+		return "script"
+	case strings.Contains(text, "bypassSecurityTrustStyle"):
+		return "style"
+	case strings.Contains(text, "bypassSecurityTrustUrl"), strings.Contains(text, "bypassSecurityTrustResourceUrl"):
+		return "url"
+	}
+	return ""
 }
 
 func plainFrameworkInput(v value) bool {

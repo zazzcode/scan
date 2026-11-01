@@ -7445,6 +7445,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -8619,6 +8630,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -9912,6 +9934,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -11315,6 +11348,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -12397,6 +12441,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -13571,6 +13626,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -14864,6 +14930,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -16267,6 +16344,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -17349,6 +17437,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -18523,6 +18622,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -19816,6 +19926,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -21219,6 +21340,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -22292,6 +22424,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -23484,6 +23627,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -24768,6 +24922,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -26171,6 +26336,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -27244,6 +27420,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -28436,6 +28623,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -29720,6 +29918,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -31123,6 +31332,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -32196,6 +32416,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -33388,6 +33619,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -34672,6 +34914,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -36075,6 +36328,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -37093,6 +37357,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -38170,6 +38445,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/verify.ts",
+                  "start_line": 101,
+                  "end_line": 105,
+                  "start_byte": 5226,
+                  "end_byte": 5427
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -38222,6 +38508,17 @@
                   "end_line": 40,
                   "start_byte": 1673,
                   "end_byte": 1747
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/verify.ts",
+                  "start_line": 107,
+                  "end_line": 111,
+                  "start_byte": 5433,
+                  "end_byte": 5634
                 }
               },
               {
@@ -38545,6 +38842,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -39728,6 +40036,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -41021,6 +41340,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -42424,6 +42754,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -44300,6 +44641,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -45474,6 +45826,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -46767,6 +47130,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -48179,6 +48553,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -49418,8 +49803,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/profileImageFileUpload.ts",
+                  "start_line": 18,
+                  "end_line": 22,
+                  "start_byte": 563,
+                  "end_byte": 674
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/profileImageFileUpload.ts",
+                  "start_line": 24,
+                  "end_line": 28,
+                  "start_byte": 742,
+                  "end_byte": 863
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/profileImageFileUpload.ts",
                   "start_line": 24,
@@ -49440,8 +49847,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/profileImageFileUpload.ts",
+                  "start_line": 29,
+                  "end_line": 33,
+                  "start_byte": 868,
+                  "end_byte": 1122
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/profileImageFileUpload.ts",
+                  "start_line": 35,
+                  "end_line": 38,
+                  "start_byte": 1203,
+                  "end_byte": 1323
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/profileImageFileUpload.ts",
                   "start_line": 35,
@@ -50276,6 +50705,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/profileImageUrlUpload.ts",
+                  "start_line": 25,
+                  "end_line": 27,
+                  "start_byte": 944,
+                  "end_byte": 1075
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -50284,6 +50724,28 @@
                   "end_line": 41,
                   "start_byte": 1690,
                   "end_byte": 2027
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/profileImageUrlUpload.ts",
+                  "start_line": 34,
+                  "end_line": 41,
+                  "start_byte": 1690,
+                  "end_byte": 2027
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/profileImageUrlUpload.ts",
+                  "start_line": 22,
+                  "end_line": 46,
+                  "start_byte": 856,
+                  "end_byte": 2158
                 }
               },
               {
@@ -51352,6 +51814,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -52906,6 +53379,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -54736,6 +55220,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -55776,6 +56271,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -56807,6 +57313,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -57869,6 +58386,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -59064,6 +59592,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/basketItems.ts",
+                  "start_line": 72,
+                  "end_line": 74,
+                  "start_byte": 2842,
+                  "end_byte": 2920
+                }
+              },
+              {
                 "kind": "input_validation_absent",
                 "detail": "req.body.quantity is read and no handler or applicable middleware validator handles it",
                 "at": {
@@ -59524,6 +60063,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/basketItems.ts",
+                  "start_line": 72,
+                  "end_line": 74,
+                  "start_byte": 2842,
+                  "end_byte": 2920
+                }
+              },
+              {
                 "kind": "input_validation_absent",
                 "detail": "req.params.id is read and no handler or applicable middleware validator handles it",
                 "at": {
@@ -59955,6 +60505,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -64921,6 +65482,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 22,
+                  "end_line": 24,
+                  "start_byte": 735,
+                  "end_byte": 843
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -64932,8 +65504,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 27,
+                  "end_line": 29,
+                  "start_byte": 899,
+                  "end_byte": 969
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 35,
+                  "end_line": 37,
+                  "start_byte": 1133,
+                  "end_byte": 1190
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/2fa.ts",
                   "start_line": 35,
@@ -65055,6 +65649,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -66759,6 +67364,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 22,
+                  "end_line": 24,
+                  "start_byte": 735,
+                  "end_byte": 843
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -66770,8 +67386,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 27,
+                  "end_line": 29,
+                  "start_byte": 899,
+                  "end_byte": 969
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 35,
+                  "end_line": 37,
+                  "start_byte": 1133,
+                  "end_byte": 1190
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/2fa.ts",
                   "start_line": 35,
@@ -67331,6 +67969,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 100,
+                  "end_line": 102,
+                  "start_byte": 3137,
+                  "end_byte": 3216
+                }
+              },
+              {
                 "kind": "unsupported_binding",
                 "detail": "destructuring alias/default not modeled",
                 "at": {
@@ -67353,8 +68002,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 107,
+                  "end_line": 109,
+                  "start_byte": 3315,
+                  "end_byte": 3432
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 111,
+                  "end_line": 113,
+                  "start_byte": 3438,
+                  "end_byte": 3525
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/2fa.ts",
                   "start_line": 111,
@@ -67375,6 +68046,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 116,
+                  "end_line": 118,
+                  "start_byte": 3619,
+                  "end_byte": 3713
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -67386,8 +68068,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 119,
+                  "end_line": 121,
+                  "start_byte": 3718,
+                  "end_byte": 3884
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 125,
+                  "end_line": 127,
+                  "start_byte": 3987,
+                  "end_byte": 4062
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/2fa.ts",
                   "start_line": 125,
@@ -67841,6 +68545,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 145,
+                  "end_line": 147,
+                  "start_byte": 4465,
+                  "end_byte": 4544
+                }
+              },
+              {
                 "kind": "unsupported_binding",
                 "detail": "destructuring alias/default not modeled",
                 "at": {
@@ -67863,8 +68578,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 152,
+                  "end_line": 154,
+                  "start_byte": 4617,
+                  "end_byte": 4734
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/2fa.ts",
+                  "start_line": 158,
+                  "end_line": 160,
+                  "start_byte": 4837,
+                  "end_byte": 4912
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/2fa.ts",
                   "start_line": 158,
@@ -69594,8 +70331,41 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 22,
+                  "end_line": 25,
+                  "start_byte": 856,
+                  "end_byte": 990
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 19,
+                  "end_line": 25,
+                  "start_byte": 717,
+                  "end_byte": 990
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 28,
+                  "end_line": 31,
+                  "start_byte": 1092,
+                  "end_byte": 1213
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 28,
@@ -69616,8 +70386,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 34,
+                  "end_line": 37,
+                  "start_byte": 1283,
+                  "end_byte": 1403
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 39,
+                  "end_line": 42,
+                  "start_byte": 1409,
+                  "end_byte": 1586
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 39,
@@ -69640,6 +70432,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 46,
+                  "end_line": 49,
+                  "start_byte": 1670,
+                  "end_byte": 1761
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 46,
@@ -69761,6 +70564,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -70951,8 +71765,41 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 22,
+                  "end_line": 25,
+                  "start_byte": 856,
+                  "end_byte": 990
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 19,
+                  "end_line": 25,
+                  "start_byte": 717,
+                  "end_byte": 990
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 28,
+                  "end_line": 31,
+                  "start_byte": 1092,
+                  "end_byte": 1213
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 28,
@@ -70973,8 +71820,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 34,
+                  "end_line": 37,
+                  "start_byte": 1283,
+                  "end_byte": 1403
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 39,
+                  "end_line": 42,
+                  "start_byte": 1409,
+                  "end_byte": 1586
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 39,
@@ -70997,6 +71866,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 46,
+                  "end_line": 49,
+                  "start_byte": 1670,
+                  "end_byte": 1761
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 46,
@@ -71526,8 +72406,41 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 22,
+                  "end_line": 25,
+                  "start_byte": 856,
+                  "end_byte": 990
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 19,
+                  "end_line": 25,
+                  "start_byte": 717,
+                  "end_byte": 990
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 28,
+                  "end_line": 31,
+                  "start_byte": 1092,
+                  "end_byte": 1213
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 28,
@@ -71548,8 +72461,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 34,
+                  "end_line": 37,
+                  "start_byte": 1283,
+                  "end_byte": 1403
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 39,
+                  "end_line": 42,
+                  "start_byte": 1409,
+                  "end_byte": 1586
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 39,
@@ -71572,6 +72507,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 46,
+                  "end_line": 49,
+                  "start_byte": 1670,
+                  "end_byte": 1761
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 46,
@@ -72101,8 +73047,41 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 22,
+                  "end_line": 25,
+                  "start_byte": 856,
+                  "end_byte": 990
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 19,
+                  "end_line": 25,
+                  "start_byte": 717,
+                  "end_byte": 990
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 28,
+                  "end_line": 31,
+                  "start_byte": 1092,
+                  "end_byte": 1213
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 28,
@@ -72123,8 +73102,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 34,
+                  "end_line": 37,
+                  "start_byte": 1283,
+                  "end_byte": 1403
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 39,
+                  "end_line": 42,
+                  "start_byte": 1409,
+                  "end_byte": 1586
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 39,
@@ -72147,6 +73148,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 46,
+                  "end_line": 49,
+                  "start_byte": 1670,
+                  "end_byte": 1761
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 46,
@@ -72676,8 +73688,41 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 22,
+                  "end_line": 25,
+                  "start_byte": 856,
+                  "end_byte": 990
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 19,
+                  "end_line": 25,
+                  "start_byte": 717,
+                  "end_byte": 990
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 28,
+                  "end_line": 31,
+                  "start_byte": 1092,
+                  "end_byte": 1213
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 28,
@@ -72698,8 +73743,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 34,
+                  "end_line": 37,
+                  "start_byte": 1283,
+                  "end_byte": 1403
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 39,
+                  "end_line": 42,
+                  "start_byte": 1409,
+                  "end_byte": 1586
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 39,
@@ -72722,6 +73789,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 46,
+                  "end_line": 49,
+                  "start_byte": 1670,
+                  "end_byte": 1761
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 46,
@@ -73522,8 +74600,41 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 22,
+                  "end_line": 25,
+                  "start_byte": 856,
+                  "end_byte": 990
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 19,
+                  "end_line": 25,
+                  "start_byte": 717,
+                  "end_byte": 990
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 28,
+                  "end_line": 31,
+                  "start_byte": 1092,
+                  "end_byte": 1213
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 28,
@@ -73544,8 +74655,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 34,
+                  "end_line": 37,
+                  "start_byte": 1283,
+                  "end_byte": 1403
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 39,
+                  "end_line": 42,
+                  "start_byte": 1409,
+                  "end_byte": 1586
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 39,
@@ -73568,6 +74701,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/changePassword.ts",
+                  "start_line": 46,
+                  "end_line": 49,
+                  "start_byte": 1670,
+                  "end_byte": 1761
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/changePassword.ts",
                   "start_line": 46,
@@ -74170,6 +75314,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 22,
+                  "end_line": 25,
+                  "start_byte": 811,
+                  "end_byte": 935
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -74181,8 +75336,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 26,
+                  "end_line": 29,
+                  "start_byte": 940,
+                  "end_byte": 1073
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 30,
+                  "end_line": 33,
+                  "start_byte": 1078,
+                  "end_byte": 1212
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/resetPassword.ts",
                   "start_line": 30,
@@ -74877,6 +76054,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 22,
+                  "end_line": 25,
+                  "start_byte": 811,
+                  "end_byte": 935
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -74888,8 +76076,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 26,
+                  "end_line": 29,
+                  "start_byte": 940,
+                  "end_byte": 1073
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 30,
+                  "end_line": 33,
+                  "start_byte": 1078,
+                  "end_byte": 1212
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/resetPassword.ts",
                   "start_line": 30,
@@ -75584,6 +76794,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 22,
+                  "end_line": 25,
+                  "start_byte": 811,
+                  "end_byte": 935
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -75595,8 +76816,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 26,
+                  "end_line": 29,
+                  "start_byte": 940,
+                  "end_byte": 1073
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 30,
+                  "end_line": 33,
+                  "start_byte": 1078,
+                  "end_byte": 1212
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/resetPassword.ts",
                   "start_line": 30,
@@ -76291,6 +77534,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 22,
+                  "end_line": 25,
+                  "start_byte": 811,
+                  "end_byte": 935
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -76302,8 +77556,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 26,
+                  "end_line": 29,
+                  "start_byte": 940,
+                  "end_byte": 1073
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/resetPassword.ts",
+                  "start_line": 30,
+                  "end_line": 33,
+                  "start_byte": 1078,
+                  "end_byte": 1212
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/resetPassword.ts",
                   "start_line": 30,
@@ -77771,6 +79047,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -80944,6 +82231,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -85771,6 +87069,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -87459,6 +88768,39 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 77,
+                  "end_line": 86,
+                  "start_byte": 3377,
+                  "end_byte": 3856
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 149,
+                  "end_line": 154,
+                  "start_byte": 6872,
+                  "end_byte": 7162
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 156,
+                  "end_line": 161,
+                  "start_byte": 7189,
+                  "end_byte": 7402
+                }
+              },
+              {
                 "kind": "unknown_control_effect",
                 "detail": "value may change across unsupported control flow",
                 "at": {
@@ -87500,6 +88842,17 @@
                   "end_line": 86,
                   "start_byte": 3377,
                   "end_byte": 3856
+                }
+              },
+              {
+                "kind": "unknown_control_effect",
+                "detail": "value may change across unsupported control flow",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 88,
+                  "end_line": 92,
+                  "start_byte": 3907,
+                  "end_byte": 4049
                 }
               },
               {
@@ -87665,6 +89018,17 @@
                   "end_line": 86,
                   "start_byte": 3377,
                   "end_byte": 3856
+                }
+              },
+              {
+                "kind": "unknown_control_effect",
+                "detail": "value may change across unsupported control flow",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 88,
+                  "end_line": 92,
+                  "start_byte": 3907,
+                  "end_byte": 4049
                 }
               },
               {
@@ -87859,6 +89223,17 @@
                 "detail": "value may change across unsupported control flow",
                 "at": {
                   "file": "routes/order.ts",
+                  "start_line": 88,
+                  "end_line": 92,
+                  "start_byte": 3907,
+                  "end_byte": 4049
+                }
+              },
+              {
+                "kind": "unknown_control_effect",
+                "detail": "value may change across unsupported control flow",
+                "at": {
+                  "file": "routes/order.ts",
                   "start_line": 75,
                   "end_line": 108,
                   "start_byte": 3190,
@@ -87951,105 +89326,6 @@
                   "end_line": 109,
                   "start_byte": 3094,
                   "end_byte": 4734
-                }
-              },
-              {
-                "kind": "unknown_control_effect",
-                "detail": "value may change across unsupported control flow",
-                "at": {
-                  "file": "routes/order.ts",
-                  "start_line": 113,
-                  "end_line": 118,
-                  "start_byte": 4878,
-                  "end_byte": 5146
-                }
-              },
-              {
-                "kind": "unknown_control_effect",
-                "detail": "value may change across unsupported control flow",
-                "at": {
-                  "file": "routes/order.ts",
-                  "start_line": 124,
-                  "end_line": 131,
-                  "start_byte": 5273,
-                  "end_byte": 5736
-                }
-              },
-              {
-                "kind": "unknown_control_effect",
-                "detail": "value may change across unsupported control flow",
-                "at": {
-                  "file": "routes/order.ts",
-                  "start_line": 149,
-                  "end_line": 154,
-                  "start_byte": 6872,
-                  "end_byte": 7162
-                }
-              },
-              {
-                "kind": "unknown_control_effect",
-                "detail": "value may change across unsupported control flow",
-                "at": {
-                  "file": "routes/order.ts",
-                  "start_line": 79,
-                  "end_line": 82,
-                  "start_byte": 3511,
-                  "end_byte": 3748
-                }
-              },
-              {
-                "kind": "unknown_control_effect",
-                "detail": "value may change across unsupported control flow",
-                "at": {
-                  "file": "routes/order.ts",
-                  "start_line": 77,
-                  "end_line": 86,
-                  "start_byte": 3377,
-                  "end_byte": 3856
-                }
-              },
-              {
-                "kind": "unknown_control_effect",
-                "detail": "value may change across unsupported control flow",
-                "at": {
-                  "file": "routes/order.ts",
-                  "start_line": 79,
-                  "end_line": 82,
-                  "start_byte": 3511,
-                  "end_byte": 3748
-                }
-              },
-              {
-                "kind": "unknown_control_effect",
-                "detail": "value may change across unsupported control flow",
-                "at": {
-                  "file": "routes/order.ts",
-                  "start_line": 77,
-                  "end_line": 86,
-                  "start_byte": 3377,
-                  "end_byte": 3856
-                }
-              },
-              {
-                "kind": "unknown_control_effect",
-                "detail": "value may change across unsupported control flow",
-                "at": {
-                  "file": "routes/order.ts",
-                  "start_line": 88,
-                  "end_line": 92,
-                  "start_byte": 3907,
-                  "end_byte": 4049
-                }
-              },
-              {
-                "kind": "unknown_control_effect",
-                "detail": "value may change across unsupported control flow",
-                "at": {
-                  "file": "routes/order.ts",
-                  "start_line": 75,
-                  "end_line": 108,
-                  "start_byte": 3190,
-                  "end_byte": 4722
                 }
               },
               {
@@ -88265,13 +89541,35 @@
               },
               {
                 "kind": "unknown_value",
-                "detail": "unresolved local value: req",
+                "detail": "unresolved local value: deluxePrice",
                 "at": {
                   "file": "routes/order.ts",
-                  "start_line": 111,
-                  "end_line": 111,
-                  "start_byte": 4823,
-                  "end_byte": 4826
+                  "start_line": 89,
+                  "end_line": 89,
+                  "start_byte": 3965,
+                  "end_byte": 3976
+                }
+              },
+              {
+                "kind": "unknown_value",
+                "detail": "unresolved local value: price",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 91,
+                  "end_line": 91,
+                  "start_byte": 4028,
+                  "end_byte": 4033
+                }
+              },
+              {
+                "kind": "unknown_value",
+                "detail": "unresolved local value: BasketItem",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 93,
+                  "end_line": 93,
+                  "start_byte": 4094,
+                  "end_byte": 4104
                 }
               },
               {
@@ -88287,6 +89585,39 @@
               },
               {
                 "kind": "unknown_value",
+                "detail": "unresolved local value: deluxePrice",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 89,
+                  "end_line": 89,
+                  "start_byte": 3965,
+                  "end_byte": 3976
+                }
+              },
+              {
+                "kind": "unknown_value",
+                "detail": "unresolved local value: price",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 91,
+                  "end_line": 91,
+                  "start_byte": 4028,
+                  "end_byte": 4033
+                }
+              },
+              {
+                "kind": "unknown_value",
+                "detail": "unresolved local value: BasketItem",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 93,
+                  "end_line": 93,
+                  "start_byte": 4094,
+                  "end_byte": 4104
+                }
+              },
+              {
+                "kind": "unknown_value",
                 "detail": "unresolved local value: req",
                 "at": {
                   "file": "routes/order.ts",
@@ -88294,6 +89625,39 @@
                   "end_line": 111,
                   "start_byte": 4823,
                   "end_byte": 4826
+                }
+              },
+              {
+                "kind": "unknown_value",
+                "detail": "unresolved local value: deluxePrice",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 89,
+                  "end_line": 89,
+                  "start_byte": 3965,
+                  "end_byte": 3976
+                }
+              },
+              {
+                "kind": "unknown_value",
+                "detail": "unresolved local value: price",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 91,
+                  "end_line": 91,
+                  "start_byte": 4028,
+                  "end_byte": 4033
+                }
+              },
+              {
+                "kind": "unknown_value",
+                "detail": "unresolved local value: BasketItem",
+                "at": {
+                  "file": "routes/order.ts",
+                  "start_line": 93,
+                  "end_line": 93,
+                  "start_byte": 4094,
+                  "end_byte": 4104
                 }
               },
               {
@@ -88459,28 +89823,6 @@
                   "end_line": 40,
                   "start_byte": 1673,
                   "end_byte": 1747
-                }
-              },
-              {
-                "kind": "unknown_call_result",
-                "detail": "call result is not modeled: calculateApplicableDiscount",
-                "at": {
-                  "file": "routes/order.ts",
-                  "start_line": 111,
-                  "end_line": 111,
-                  "start_byte": 4787,
-                  "end_byte": 4827
-                }
-              },
-              {
-                "kind": "unknown_call_result",
-                "detail": "call result is not modeled: (totalPrice * (discount / 100)).toFixed",
-                "at": {
-                  "file": "routes/order.ts",
-                  "start_line": 114,
-                  "end_line": 114,
-                  "start_byte": 4927,
-                  "end_byte": 4969
                 }
               },
               {
@@ -90658,8 +92000,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/coupon.ts",
+                  "start_line": 19,
+                  "end_line": 22,
+                  "start_byte": 701,
+                  "end_byte": 802
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/coupon.ts",
+                  "start_line": 25,
+                  "end_line": 29,
+                  "start_byte": 868,
+                  "end_byte": 999
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/coupon.ts",
                   "start_line": 25,
@@ -90978,8 +92342,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/coupon.ts",
+                  "start_line": 19,
+                  "end_line": 22,
+                  "start_byte": 701,
+                  "end_byte": 802
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/coupon.ts",
+                  "start_line": 25,
+                  "end_line": 29,
+                  "start_byte": 868,
+                  "end_byte": 999
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/coupon.ts",
                   "start_line": 25,
@@ -92108,6 +93494,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/restoreProgress.ts",
+                  "start_line": 44,
+                  "end_line": 46,
+                  "start_byte": 1622,
+                  "end_byte": 1728
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -92948,6 +94345,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/restoreProgress.ts",
+                  "start_line": 65,
+                  "end_line": 67,
+                  "start_byte": 2416,
+                  "end_byte": 2521
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -93222,6 +94630,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/restoreProgress.ts",
+                  "start_line": 20,
+                  "end_line": 22,
+                  "start_byte": 704,
+                  "end_byte": 804
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -93268,6 +94687,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -94921,6 +96351,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/restoreProgress.ts",
+                  "start_line": 20,
+                  "end_line": 22,
+                  "start_byte": 704,
+                  "end_byte": 804
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -95370,6 +96811,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -98263,6 +99715,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -100137,6 +101600,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 25,
+                  "end_line": 30,
+                  "start_byte": 976,
+                  "end_byte": 1143
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -101206,8 +102680,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 25,
+                  "end_line": 30,
+                  "start_byte": 976,
+                  "end_byte": 1143
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 32,
+                  "end_line": 37,
+                  "start_byte": 1153,
+                  "end_byte": 1359
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/dataExport.ts",
                   "start_line": 32,
@@ -102400,6 +103896,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 25,
+                  "end_line": 30,
+                  "start_byte": 976,
+                  "end_byte": 1143
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -102411,8 +103918,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 32,
+                  "end_line": 37,
+                  "start_byte": 1153,
+                  "end_byte": 1359
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 39,
+                  "end_line": 44,
+                  "start_byte": 1369,
+                  "end_byte": 1572
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/dataExport.ts",
                   "start_line": 39,
@@ -102545,6 +104074,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -104355,6 +105895,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 25,
+                  "end_line": 30,
+                  "start_byte": 976,
+                  "end_byte": 1143
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -104366,8 +105917,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 32,
+                  "end_line": 37,
+                  "start_byte": 1153,
+                  "end_byte": 1359
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 39,
+                  "end_line": 44,
+                  "start_byte": 1369,
+                  "end_byte": 1572
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/dataExport.ts",
                   "start_line": 39,
@@ -105624,6 +107197,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 25,
+                  "end_line": 30,
+                  "start_byte": 976,
+                  "end_byte": 1143
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -105635,8 +107219,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 32,
+                  "end_line": 37,
+                  "start_byte": 1153,
+                  "end_byte": 1359
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
+                "at": {
+                  "file": "routes/dataExport.ts",
+                  "start_line": 39,
+                  "end_line": 44,
+                  "start_byte": 1369,
+                  "end_byte": 1572
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/dataExport.ts",
                   "start_line": 39,
@@ -109945,6 +111551,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 20,
+                  "end_line": 23,
+                  "start_byte": 749,
+                  "end_byte": 891
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -109967,6 +111584,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 26,
+                  "end_line": 31,
+                  "start_byte": 1036,
+                  "end_byte": 1311
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -109980,6 +111608,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 36,
+                  "end_line": 39,
+                  "start_byte": 1483,
+                  "end_byte": 1741
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/deluxe.ts",
                   "start_line": 36,
@@ -110112,6 +111751,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -111336,6 +112986,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 20,
+                  "end_line": 23,
+                  "start_byte": 749,
+                  "end_byte": 891
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -111358,6 +113019,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 26,
+                  "end_line": 31,
+                  "start_byte": 1036,
+                  "end_byte": 1311
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -111371,6 +113043,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 36,
+                  "end_line": 39,
+                  "start_byte": 1483,
+                  "end_byte": 1741
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/deluxe.ts",
                   "start_line": 36,
@@ -112005,6 +113688,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 20,
+                  "end_line": 23,
+                  "start_byte": 749,
+                  "end_byte": 891
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -112027,6 +113721,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 26,
+                  "end_line": 31,
+                  "start_byte": 1036,
+                  "end_byte": 1311
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -112040,6 +113745,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 36,
+                  "end_line": 39,
+                  "start_byte": 1483,
+                  "end_byte": 1741
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/deluxe.ts",
                   "start_line": 36,
@@ -112674,6 +114390,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 20,
+                  "end_line": 23,
+                  "start_byte": 749,
+                  "end_byte": 891
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -112696,6 +114423,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 26,
+                  "end_line": 31,
+                  "start_byte": 1036,
+                  "end_byte": 1311
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -112709,6 +114447,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/deluxe.ts",
+                  "start_line": 36,
+                  "end_line": 39,
+                  "start_byte": 1483,
+                  "end_byte": 1741
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/deluxe.ts",
                   "start_line": 36,
@@ -114990,6 +116739,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -118279,6 +120039,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 20,
+                  "end_line": 22,
+                  "start_byte": 714,
+                  "end_byte": 793
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -119380,6 +121151,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 20,
+                  "end_line": 22,
+                  "start_byte": 714,
+                  "end_byte": 793
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -119402,8 +121184,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 26,
+                  "end_line": 28,
+                  "start_byte": 880,
+                  "end_byte": 962
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 31,
+                  "end_line": 33,
+                  "start_byte": 1007,
+                  "end_byte": 1117
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/likeProductReviews.ts",
                   "start_line": 31,
@@ -120555,6 +122359,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 20,
+                  "end_line": 22,
+                  "start_byte": 714,
+                  "end_byte": 793
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -120577,8 +122392,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 26,
+                  "end_line": 28,
+                  "start_byte": 880,
+                  "end_byte": 962
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 31,
+                  "end_line": 33,
+                  "start_byte": 1007,
+                  "end_byte": 1117
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/likeProductReviews.ts",
                   "start_line": 31,
@@ -121669,6 +123506,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 20,
+                  "end_line": 22,
+                  "start_byte": 714,
+                  "end_byte": 793
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -121691,8 +123539,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 26,
+                  "end_line": 28,
+                  "start_byte": 880,
+                  "end_byte": 962
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 31,
+                  "end_line": 33,
+                  "start_byte": 1007,
+                  "end_byte": 1117
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/likeProductReviews.ts",
                   "start_line": 31,
@@ -121825,6 +123695,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -122982,6 +124863,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 20,
+                  "end_line": 22,
+                  "start_byte": 714,
+                  "end_byte": 793
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -123004,8 +124896,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 26,
+                  "end_line": 28,
+                  "start_byte": 880,
+                  "end_byte": 962
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/likeProductReviews.ts",
+                  "start_line": 31,
+                  "end_line": 33,
+                  "start_byte": 1007,
+                  "end_byte": 1117
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/likeProductReviews.ts",
                   "start_line": 31,
@@ -128102,6 +130016,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -129611,6 +131536,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -131756,6 +133692,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -133035,6 +134982,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -135743,6 +137701,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -136783,6 +138752,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -137814,6 +139794,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -138865,6 +140856,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -140056,6 +142058,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -141733,6 +143746,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/videoHandler.ts",
+                  "start_line": 53,
+                  "end_line": 53,
+                  "start_byte": 1687,
+                  "end_byte": 1713
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: sendNotification",
                 "at": {
@@ -142576,8 +144600,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 27,
+                  "end_line": 32,
+                  "start_byte": 855,
+                  "end_byte": 998
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 35,
+                  "end_line": 37,
+                  "start_byte": 1080,
+                  "end_byte": 1195
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/userProfile.ts",
                   "start_line": 35,
@@ -142598,8 +144644,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 40,
+                  "end_line": 45,
+                  "start_byte": 1232,
+                  "end_byte": 1356
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 47,
+                  "end_line": 50,
+                  "start_byte": 1362,
+                  "end_byte": 1474
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/userProfile.ts",
                   "start_line": 47,
@@ -142644,6 +144712,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 62,
+                  "end_line": 64,
+                  "start_byte": 1916,
+                  "end_byte": 1988
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/userProfile.ts",
                   "start_line": 62,
@@ -142787,6 +144866,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -148324,8 +150414,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 27,
+                  "end_line": 32,
+                  "start_byte": 855,
+                  "end_byte": 998
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 35,
+                  "end_line": 37,
+                  "start_byte": 1080,
+                  "end_byte": 1195
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/userProfile.ts",
                   "start_line": 35,
@@ -148346,8 +150458,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 40,
+                  "end_line": 45,
+                  "start_byte": 1232,
+                  "end_byte": 1356
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 47,
+                  "end_line": 50,
+                  "start_byte": 1362,
+                  "end_byte": 1474
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/userProfile.ts",
                   "start_line": 47,
@@ -148392,6 +150526,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 62,
+                  "end_line": 64,
+                  "start_byte": 1916,
+                  "end_byte": 1988
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/userProfile.ts",
                   "start_line": 62,
@@ -149742,8 +151887,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 27,
+                  "end_line": 32,
+                  "start_byte": 855,
+                  "end_byte": 998
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 35,
+                  "end_line": 37,
+                  "start_byte": 1080,
+                  "end_byte": 1195
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/userProfile.ts",
                   "start_line": 35,
@@ -149764,8 +151931,30 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 40,
+                  "end_line": 45,
+                  "start_byte": 1232,
+                  "end_byte": 1356
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 47,
+                  "end_line": 50,
+                  "start_byte": 1362,
+                  "end_byte": 1474
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/userProfile.ts",
                   "start_line": 47,
@@ -149810,6 +151999,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/userProfile.ts",
+                  "start_line": 62,
+                  "end_line": 64,
+                  "start_byte": 1916,
+                  "end_byte": 1988
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/userProfile.ts",
                   "start_line": 62,
@@ -150376,6 +152576,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/updateUserProfile.ts",
+                  "start_line": 19,
+                  "end_line": 22,
+                  "start_byte": 644,
+                  "end_byte": 764
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -150389,6 +152600,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/updateUserProfile.ts",
+                  "start_line": 26,
+                  "end_line": 29,
+                  "start_byte": 848,
+                  "end_byte": 925
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/updateUserProfile.ts",
                   "start_line": 26,
@@ -150510,6 +152732,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -151603,6 +153836,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/updateUserProfile.ts",
+                  "start_line": 19,
+                  "end_line": 22,
+                  "start_byte": 644,
+                  "end_byte": 764
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -151616,6 +153860,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/updateUserProfile.ts",
+                  "start_line": 26,
+                  "end_line": 29,
+                  "start_byte": 848,
+                  "end_byte": 925
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/updateUserProfile.ts",
                   "start_line": 26,
@@ -152093,6 +154348,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/updateUserProfile.ts",
+                  "start_line": 19,
+                  "end_line": 22,
+                  "start_byte": 644,
+                  "end_byte": 764
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: try_statement",
                 "at": {
@@ -152106,6 +154372,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/updateUserProfile.ts",
+                  "start_line": 26,
+                  "end_line": 29,
+                  "start_byte": 848,
+                  "end_byte": 925
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/updateUserProfile.ts",
                   "start_line": 26,
@@ -153250,6 +155527,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/vulnCodeSnippet.ts",
+                  "start_line": 45,
+                  "end_line": 48,
+                  "start_byte": 1287,
+                  "end_byte": 1451
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/vulnCodeSnippet.ts",
                   "start_line": 45,
@@ -155935,6 +158223,28 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/vulnCodeSnippet.ts",
+                  "start_line": 75,
+                  "end_line": 78,
+                  "start_byte": 2532,
+                  "end_byte": 2679
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/vulnCodeSnippet.ts",
+                  "start_line": 73,
+                  "end_line": 83,
+                  "start_byte": 2473,
+                  "end_byte": 2848
+                }
+              },
+              {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
                 "at": {
@@ -156475,6 +158785,28 @@
                   "end_line": 78,
                   "start_byte": 2532,
                   "end_byte": 2679
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/vulnCodeSnippet.ts",
+                  "start_line": 75,
+                  "end_line": 78,
+                  "start_byte": 2532,
+                  "end_byte": 2679
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "routes/vulnCodeSnippet.ts",
+                  "start_line": 73,
+                  "end_line": 83,
+                  "start_byte": 2473,
+                  "end_byte": 2848
                 }
               },
               {
@@ -157328,6 +159660,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "routes/vulnCodeFixes.ts",
+                  "start_line": 61,
+                  "end_line": 66,
+                  "start_byte": 1584,
+                  "end_byte": 1713
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "routes/vulnCodeFixes.ts",
                   "start_line": 61,
@@ -159489,6 +161832,17 @@
                 }
               },
               {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
                 "kind": "helper_call_limit",
                 "detail": "helper call expansion reached its depth or count limit: totalCheatScore",
                 "at": {
@@ -160531,6 +162885,17 @@
               {
                 "kind": "unsupported_control_flow",
                 "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "lib/webhook.ts",
+                  "start_line": 15,
+                  "end_line": 17,
+                  "start_byte": 487,
+                  "end_byte": 517
+                }
+              },
+              {
+                "kind": "branch_exit",
+                "detail": "a branch returns or throws; its condition may guard later code",
                 "at": {
                   "file": "lib/webhook.ts",
                   "start_line": 15,
@@ -172195,6 +174560,21 @@
                   "startLine": 91
                 }
               }
+            },
+            {
+              "id": 15,
+              "message": {
+                "text": "http_consumer"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "frontend/src/app/administration/administration.component.ts"
+                },
+                "region": {
+                  "endLine": 106,
+                  "startLine": 106
+                }
+              }
             }
           ],
           "ruleId": "scan/xss-output-protection",
@@ -172340,7 +174720,7 @@
             }
           ],
           "message": {
-            "text": "DataExportComponent: API response reaches browser output; origin link needs review [needs_review]. A client HTTP response reaches rendering. Link the producing route, response field and source/write origin before judging cross-tier XSS. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence."
+            "text": "DataExportComponent: API response reaches browser output; origin link needs review [needs_review]. A client HTTP response reaches rendering. Link the producing route, response field and source/write origin before judging cross-tier XSS. A verified Angular trust bypass for this context reaches the binding on a source path without modeled sanitization; other paths remain in the evidence."
           },
           "properties": {
             "scan.assessment": {
@@ -172407,7 +174787,7 @@
               "title": "API response reaches browser output; origin link needs review",
               "summary": "A client HTTP response reaches rendering. Link the producing route, response field and source/write origin before judging cross-tier XSS.",
               "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
-              "use_protection": "A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+              "use_protection": "A verified Angular trust bypass for this context reaches the binding on a source path without modeled sanitization; other paths remain in the evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
                 "title": "Protect the specific browser rendering context",
@@ -172729,7 +175109,7 @@
             }
           ],
           "message": {
-            "text": "LastLoginIpComponent: HTML rendering protection needs review [needs_review]. A source value reaches a rendering operation. Resolve its output context and every transformation before judging XSS. Output context: html_text. The value source and transfer into rendering are not established."
+            "text": "LastLoginIpComponent: HTML rendering protection needs review [needs_review]. A source value reaches a rendering operation. Resolve its output context and every transformation before judging XSS. Output context: html_text. Default Angular sanitization is expected for plain values, but the return type/transformations of this value are not established; a trusted wrapper cannot be excluded."
           },
           "properties": {
             "scan.assessment": {
@@ -172738,7 +175118,7 @@
             "scan.blockingGaps": [
               {
                 "kind": "render_protection_unresolved",
-                "detail": "The value source and transfer into rendering are not established.",
+                "detail": "Default Angular sanitization is expected for plain values, but the return type/transformations of this value are not established; a trusted wrapper cannot be excluded.",
                 "at": {
                   "file": "frontend/src/app/last-login-ip/last-login-ip.component.html",
                   "start_line": 10,
@@ -172950,7 +175330,7 @@
               "title": "HTML rendering protection needs review",
               "summary": "A source value reaches a rendering operation. Resolve its output context and every transformation before judging XSS.",
               "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
-              "use_protection": "Output context: html_text. The value source and transfer into rendering are not established.",
+              "use_protection": "Output context: html_text. Default Angular sanitization is expected for plain values, but the return type/transformations of this value are not established; a trusted wrapper cannot be excluded.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
                 "title": "Protect the specific browser rendering context",
@@ -176183,6 +178563,57 @@
                       "executionOrder": 0,
                       "location": {
                         "message": {
+                          "text": "unresolved_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "frontend/src/app/search-result/search-result.component.ts"
+                          },
+                          "region": {
+                            "endLine": 113,
+                            "startLine": 113
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "d39a84c9802c82814a6c126f16e28685e42bc074478a3d8053df28fa10ca1127"
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "trust_bypass"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "frontend/src/app/search-result/search-result.component.ts"
+                          },
+                          "region": {
+                            "endLine": 113,
+                            "startLine": 113
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "d39a84c9802c82814a6c126f16e28685e42bc074478a3d8053df28fa10ca1127"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
                           "text": "api_response"
                         },
                         "physicalLocation": {
@@ -176310,7 +178741,7 @@
             }
           ],
           "message": {
-            "text": "SearchResultComponent: API response reaches browser output; origin link needs review [needs_review]. A client HTTP response reaches rendering. Link the producing route, response field and source/write origin before judging cross-tier XSS. Rendering context is not established for every value."
+            "text": "SearchResultComponent: HTML rendering protection needs review [needs_review]. A source value reaches a rendering operation. Resolve its output context and every transformation before judging XSS. Output context: unknown. The value source and transfer into rendering are not established."
           },
           "properties": {
             "scan.assessment": {
@@ -176319,18 +178750,7 @@
             "scan.blockingGaps": [
               {
                 "kind": "render_protection_unresolved",
-                "detail": "Rendering context is not established for every value.",
-                "at": {
-                  "file": "frontend/src/app/search-result/search-result.component.ts",
-                  "start_line": 113,
-                  "end_line": 113,
-                  "start_byte": 5131,
-                  "end_byte": 5195
-                }
-              },
-              {
-                "kind": "storage_origin_unresolved",
-                "detail": "No complete source-to-storage write link is established.",
+                "detail": "The value source and transfer into rendering are not established.",
                 "at": {
                   "file": "frontend/src/app/search-result/search-result.component.ts",
                   "start_line": 113,
@@ -176363,6 +178783,17 @@
                   "start_byte": 5180,
                   "end_byte": 5181
                 }
+              },
+              {
+                "kind": "cross_tier_sibling_unresolved",
+                "detail": "Another path to this sink starts at an unlinked API response: GET /rest/products/search",
+                "at": {
+                  "file": "frontend/src/app/search-result/search-result.component.ts",
+                  "start_line": 113,
+                  "end_line": 113,
+                  "start_byte": 5131,
+                  "end_byte": 5195
+                }
               }
             ],
             "scan.finding": {
@@ -176374,10 +178805,10 @@
               "client_id": "client:frontend/src/app/search-result/search-result.component.ts:SearchResultComponent:1752",
               "record_type": "analysis",
               "status": "needs_review",
-              "title": "API response reaches browser output; origin link needs review",
-              "summary": "A client HTTP response reaches rendering. Link the producing route, response field and source/write origin before judging cross-tier XSS.",
+              "title": "HTML rendering protection needs review",
+              "summary": "A source value reaches a rendering operation. Resolve its output context and every transformation before judging XSS.",
               "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
-              "use_protection": "Rendering context is not established for every value.",
+              "use_protection": "Output context: unknown. The value source and transfer into rendering are not established.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
                 "title": "Protect the specific browser rendering context",
@@ -176688,6 +179119,21 @@
             {
               "id": 18,
               "message": {
+                "text": "control_statement"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "frontend/src/app/search-result/search-result.component.ts"
+                },
+                "region": {
+                  "endLine": 114,
+                  "startLine": 112
+                }
+              }
+            },
+            {
+              "id": 19,
+              "message": {
                 "text": "http_client_binding"
               },
               "physicalLocation": {
@@ -176701,7 +179147,7 @@
               }
             },
             {
-              "id": 19,
+              "id": 20,
               "message": {
                 "text": "http_consumer"
               },
@@ -176716,7 +179162,7 @@
               }
             },
             {
-              "id": 20,
+              "id": 21,
               "message": {
                 "text": "http_client_binding"
               },
@@ -176731,7 +179177,7 @@
               }
             },
             {
-              "id": 21,
+              "id": 22,
               "message": {
                 "text": "http_consumer"
               },
@@ -176742,21 +179188,6 @@
                 "region": {
                   "endLine": 64,
                   "startLine": 64
-                }
-              }
-            },
-            {
-              "id": 22,
-              "message": {
-                "text": "control_statement"
-              },
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "frontend/src/app/search-result/search-result.component.ts"
-                },
-                "region": {
-                  "endLine": 114,
-                  "startLine": 112
                 }
               }
             }
@@ -176964,7 +179395,7 @@
             }
           ],
           "message": {
-            "text": "SearchResultComponent: Untrusted data reaches raw HTML output [poor_practice]. A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate. Output context: html_text. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence."
+            "text": "SearchResultComponent: Untrusted data reaches raw HTML output [poor_practice]. A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate. Output context: html_text. A verified Angular trust bypass for this context reaches the binding on a source path without modeled sanitization; other paths remain in the evidence."
           },
           "properties": {
             "scan.assessment": {
@@ -177371,7 +179802,7 @@
               "title": "Untrusted data reaches raw HTML output",
               "summary": "A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate.",
               "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
-              "use_protection": "Output context: html_text. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+              "use_protection": "Output context: html_text. A verified Angular trust bypass for this context reaches the binding on a source path without modeled sanitization; other paths remain in the evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
               "recommendations": {
                 "title": "Protect the specific browser rendering context",
@@ -177903,7 +180334,7 @@
             }
           ],
           "message": {
-            "text": "TrackResultComponent: API response reaches browser output; origin link needs review [needs_review]. A client HTTP response reaches rendering. Link the producing route, response field and source/write origin before judging cross-tier XSS. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence."
+            "text": "TrackResultComponent: API response reaches browser output; origin link needs review [needs_review]. A client HTTP response reaches rendering. Link the producing route, response field and source/write origin before judging cross-tier XSS. A verified Angular trust bypass for this context reaches the binding on a source path without modeled sanitization; other paths remain in the evidence."
           },
           "properties": {
             "scan.assessment": {
@@ -177970,7 +180401,7 @@
               "title": "API response reaches browser output; origin link needs review",
               "summary": "A client HTTP response reaches rendering. Link the producing route, response field and source/write origin before judging cross-tier XSS.",
               "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
-              "use_protection": "A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+              "use_protection": "A verified Angular trust bypass for this context reaches the binding on a source path without modeled sanitization; other paths remain in the evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
                 "title": "Protect the specific browser rendering context",

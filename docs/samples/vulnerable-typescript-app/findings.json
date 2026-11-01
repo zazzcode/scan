@@ -2223,6 +2223,17 @@
             "start_byte": 8588,
             "end_byte": 8855
           }
+        },
+        {
+          "kind": "branch_exit",
+          "detail": "a branch returns or throws; its condition may guard later code",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 252,
+            "end_line": 257,
+            "start_byte": 8588,
+            "end_byte": 8855
+          }
         }
       ]
     },

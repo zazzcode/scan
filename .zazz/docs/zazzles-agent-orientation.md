@@ -47,6 +47,18 @@ are complete and saved for offline inspection/replay. They authorize no addition
 Changed evidence MUST NOT reuse old model answers. Python vulnerable-app support follows XSS;
 shared graph/judgment/report facts remain language-neutral. No merge or integration push is authorized.
 
+**Sample applications are read-only scan targets.** Zazzles detects vulnerabilities; agents do not
+fix them in the sample apps. Agents MUST NOT edit, fix, reformat, install dependencies into, check out
+another revision of, or write any file inside the pinned sample checkouts under `<DEV_ROOT>` (for
+example `<DEV_ROOT>/nodejs-goof`, `<DEV_ROOT>/juice-shop`, `<DEV_ROOT>/vulnerable-typescript-app`).
+Hardening changes belong in the scanner, never in a target to make a result appear. Code changes to an
+application are allowed only in an independent copy created to test whether a scan detects the
+remediation, following [remediation copies](../../docs/samples/reference-policy.md#remediate-a-copy).
+Scan output goes to `<DEV_ROOT>/zazzcode/zazzles/_test-findings/<app>/run-<id>/` via `--output-dir`,
+never into the target. Before and after a session, `git -C <target> status --porcelain --ignored` MUST
+be empty and `HEAD` MUST match the pinned revision. If a checkout was changed, stop and re-clone it
+from upstream at the pinned revision before trusting any further result.
+
 The long-term objective is source-backed vulnerability and protection analysis across languages,
 with accuracy evaluated independently of model confidence or scanner agreement. Independent Findings
 Review remains distinct from the semantic judge. See the [project objectives](../project.md#long-term-objectives)

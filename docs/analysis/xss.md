@@ -33,7 +33,9 @@ for HTML text and quoted non-active attributes. It does not establish URL scheme
 encoding, safe CSS or protection in an unquoted attribute.
 
 Verified imports for `entities`/`he` HTML encoders, `escape-html`, `sanitize-html` and DOMPurify
-sanitization supply bounded protection contracts for appropriate contexts. Unknown functions,
+sanitization supply bounded protection contracts for appropriate contexts. Plain `dompurify` is trusted only in
+browser code (without a window it returns its input); a verified Handlebars `SafeString` disables
+`{{…}}` escaping. Unknown functions,
 same-name fake libraries, shadowed imports and custom sanitizer options are not trusted. Every
 modeled path must be protected; protection on one branch does not protect a raw sibling branch.
 
@@ -48,6 +50,10 @@ Every branch body that can fall through is explored, including `else`, `catch` a
 branch-only path records its condition as a precondition. When paths at one sink differ, `xss.paths`
 gives each one's protection and writing entry. A raw path stays a finding beside unknown siblings,
 and an unknown sibling keeps an otherwise escaped sink out of Protected.
+Local helpers whose branch conditions are content-neutral (lengths, `typeof`, literal-token tests without
+HTML-significant characters) and that never return early are followed precisely; other branching
+helpers stay unknown, because their conditions may guard content. `a += b` string building keeps both
+operands, including DOM `innerHTML +=` sinks.
 
 Browser entries have their own identity, component/source location and sink context. Supported
 bounded patterns include location/URL parameters, message/input events, verified DOM nodes and HTML,

@@ -141,21 +141,98 @@ func addClientUses(report *graph.StringReport, client *clientContext, uses []gra
 	if len(uses) == 0 {
 		return
 	}
-	seen := map[string]bool{}
+	// The same sink can be reached from module, function and class flows. Records
+	// are merged so an earlier weak candidate never hides a later stronger one.
+	index := map[string]int{}
+	var merged []graph.StringUse
 	for _, u := range uses {
 		if u.XSS == nil {
 			continue
 		}
-		key := u.ID
-		if seen[key] {
+		if i, ok := index[u.ID]; ok {
+			merged[i] = mergeXSSUse(merged[i], u)
 			continue
 		}
-		seen[key] = true
-		report.Uses = append(report.Uses, u)
+		index[u.ID] = len(merged)
+		merged = append(merged, u)
 	}
-	if len(seen) > 0 {
+	report.Uses = append(report.Uses, merged...)
+	if len(merged) > 0 {
 		report.ClientEntries = append(report.ClientEntries, client.entry)
 	}
+}
+
+func xssRank(x *graph.XSSFacts) int {
+	switch x.Protection {
+	case "raw", "ineffective":
+		return 2
+	case "encoded", "sanitized":
+		return 0
+	}
+	return 1
+}
+
+// xssDependencyProtections gives each dependency's protection within its own record.
+// Origin resolution stays a separate record fact and gap, not a path protection.
+func xssDependencyProtections(u graph.StringUse) []string {
+	out := make([]string, len(u.Dependencies))
+	for i := range out {
+		out[i] = u.XSS.Protection
+		if i < len(u.XSS.Paths) {
+			out[i] = u.XSS.Paths[i].Protection
+		}
+	}
+	return out
+}
+
+// mergeXSSUse keeps the strongest supported claim (unsafe, then unknown, then
+// protected; a resolved origin breaks ties) and retains every other record's paths,
+// context and gaps as siblings. Protection is never raised by a merge.
+func mergeXSSUse(a, b graph.StringUse) graph.StringUse {
+	first, second := a, b
+	if xssRank(b.XSS) > xssRank(a.XSS) || (xssRank(b.XSS) == xssRank(a.XSS) && b.XSS.OriginResolved && !a.XSS.OriginResolved) {
+		first, second = b, a
+	}
+	out := first
+	facts := *first.XSS
+	out.XSS = &facts
+	protections := xssDependencyProtections(first)
+	seen := map[string]bool{}
+	out.Dependencies = nil
+	for _, d := range first.Dependencies {
+		seen[dependencyKey(d)] = true
+		out.Dependencies = append(out.Dependencies, d)
+	}
+	for i, d := range second.Dependencies {
+		if k := dependencyKey(d); !seen[k] {
+			seen[k] = true
+			out.Dependencies = append(out.Dependencies, d)
+			protections = append(protections, xssDependencyProtections(second)[i])
+		}
+	}
+	out.XSS.Paths = xssPaths(protections, nil)
+	evidence := map[string]bool{}
+	out.Context = nil
+	for _, e := range append(append([]graph.Evidence{}, first.Context...), second.Context...) {
+		k := fmt.Sprintf("%s:%s:%d:%d", e.Kind, e.Span.File, e.Span.StartByte, e.Span.EndByte)
+		if !evidence[k] {
+			evidence[k] = true
+			out.Context = append(out.Context, e)
+		}
+	}
+	gaps := map[string]bool{}
+	out.Gaps = nil
+	for _, g := range append(append([]graph.Gap{}, first.Gaps...), second.Gaps...) {
+		k := fmt.Sprintf("%s:%s:%s:%d:%d", g.Kind, g.Detail, g.At.File, g.At.StartByte, g.At.EndByte)
+		if !gaps[k] {
+			gaps[k] = true
+			out.Gaps = append(out.Gaps, g)
+		}
+	}
+	if second.XSS.Type == "cross_tier" && out.XSS.ResponsePath == "" {
+		out.Gaps = append(out.Gaps, graph.Gap{Kind: "cross_tier_sibling_unresolved", Detail: "Another path to this sink starts at an unlinked API response: " + second.XSS.ResponseMethod + " " + second.XSS.ResponsePath, At: second.Sink.Span})
+	}
+	return out
 }
 
 func clientKey(text string) string {
