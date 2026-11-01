@@ -195,6 +195,14 @@ work. A Go binary embedding a native parser does not automatically meet a no-cgo
 Project Owner and Deliverable Owner assignments remain for the human to declare in future specs. A
 phase grouping does not appoint an owner or authorize a live API experiment.
 
+## Current provider decision
+
+**2026-10-31 user clarification:** GPT Decisions and Jev are alternative semantic judge providers;
+OpenAI is the first integration target. Future decision-model adapters are allowed. The [architecture](../architecture.md#current-provider-decision) owns the
+current contract; [setup](../docs/openai-decisions-setup.md) owns credentials. Earlier Jev-specific
+rationale, API examples, and questions in this proposal are historical context. Evaluation principles
+remain useful; provider schemas, quality, availability, and performance MUST be verified separately.
+
 ## Decision lifecycle
 
 Refine this proposal and the durable product/architecture docs first. Record choices and rationale

@@ -23,6 +23,7 @@ automatic context bundle. Orientation is the session entry point, execution disc
 work, and worktree setup owns layout/operations. The cheat sheet is for Worktrunk commands only.
 
 - [scan-agent-orientation.md](scan-agent-orientation.md) — **first-read** agent orientation: repo layout, branch model, routing (repo-specific)
+- [openai-decisions-setup.md](openai-decisions-setup.md) — current GPT decision API key and Go setup
 - [agent-execution-discipline.md](agent-execution-discipline.md) — agent execution discipline (vendored)
 - [worktree-setup.md](worktree-setup.md) — worktree operating model setup (adapted: stage integration branch)
 - [wt-cheat-sheet.md](wt-cheat-sheet.md) — Worktrunk cheat sheet (adapted for this container)

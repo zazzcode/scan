@@ -1,7 +1,7 @@
 // Package parse turns a JavaScript or TypeScript tree into a route graph.
 //
-// It records Express-style registrations and the handler chain written at the
-// call. It does not resolve imports or decide whether a value is sanitized.
+// Routes records syntactic registrations. Strings adds bounded handler resolution
+// and local dependency evidence. Neither mode decides validation adequacy locally.
 package parse
 
 import (
@@ -32,7 +32,7 @@ var methods = map[string]string{
 	"use":    "USE",
 }
 
-// Routes scans root and returns the execution graph.
+// Routes scans root and returns a syntactic route inventory.
 func Routes(root string) (*graph.Graph, error) {
 	parsed, err := walk.Walk(root, walk.Options{})
 	if err != nil {

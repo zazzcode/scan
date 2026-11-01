@@ -1,13 +1,14 @@
 # scan
 
-`scan` reads a local JavaScript or TypeScript tree and writes a JSON graph of Express-style
-route registrations. Each route records the method, the path literal, and the handler names
-written at that call. It does not follow those names into Express, into `node_modules`, or
-into other files of the application.
+`scan` analyzes a local JavaScript or TypeScript target repository. `--routes` inventories syntactic
+Express-style registrations. `--strings` resolves a bounded subset of handlers and request-value
+dependencies into candidate SQL/outbound HTTP uses, retaining source evidence and uncertainty.
+Optional GPT Decisions or Jev judging assesses validation and protection from that evidence.
 
 - [Project overview](.zazz/project.md) — purpose, current state, product direction
 - [Route graph spec](.zazz/specifications/tree-sitter-route-identification-mvp.md) — contract for this slice
 - [Agent orientation](.zazz/docs/scan-agent-orientation.md) — workspace conventions, branches, commands, documentation map
+- [OpenAI Decisions setup](.zazz/docs/openai-decisions-setup.md) — API key and Go access example
 - [Architecture](.zazz/architecture.md) — technical proposal and analysis boundaries
 - [Phased plan](.zazz/project/implementation-plan.md) — future spec slices, dependencies, acceptance targets
 
@@ -83,3 +84,61 @@ trace.
 - `app.use(someMiddleware())` with no string path is not a route.
 - A path that is not a string literal is a `dynamic_path` gap and creates no route.
 - The graph does not decide whether a value was validated or sanitized.
+
+## Route-to-string-use analysis
+
+```bash
+go run ./cmd/scan --strings --json --entry server.ts <target-root>
+```
+
+Entry paths are relative to the target repository. Use `server.ts` for Juice Shop and
+`src/server.ts` for the vulnerable TypeScript sample. Omit `--entry` to consider all selected JS/TS
+registration files. Explicit selection avoids conflating training snippets with production scope.
+
+The separate schema-v1 evidence report contains `entries`, `uses`, `files`, `gaps` and `limitations`.
+Each use identifies its route, source fields, ordered local transfer evidence, candidate sink,
+snapshot hashes and assessment state. Direct named relative ESM imports, imported handler factories,
+local assignment, string expressions and simple object destructuring are supported. Branches,
+unknown transformations, middleware, receiver ambiguity, unverified library bindings and external
+response continuations remain explicit gaps. A SQL-shaped string logged to the console is not
+reported as an SQL call. HTTP client registrations are excluded by the new receiver filter.
+
+Use `--route /rest/user/login` to select an exact path pattern before model requests.
+Offline assessment is `not_run`. For provider selection and key instructions, including personal-key
+ownership and Jev configuration, see [decision API setup](.zazz/docs/openai-decisions-setup.md).
+`--judge openai|jev` explicitly transmits bounded evidence; `--judge-limit` caps requests (default 10,
+no retries). A requested judge failure, skipped oversized payload or exhausted request cap exits 1
+with its report retained. Neither a successful judge call nor offline exit 0 certifies the target.
+The graph design and full CFG/interprocedural analysis exceed this first implementation slice.
+
+## Explicit route validation checks
+
+Use a requirements file to declare the method, path, fields and separate validation/protection
+constraints. This avoids guessing business requirements from a helper's name or a missing regex.
+The phase's two known target cases are tracked in `.zazz/evaluation/juice-shop/validation-checks.json`:
+
+```bash
+go run ./cmd/scan --strings --json --entry server.ts \
+  --checks .zazz/evaluation/juice-shop/validation-checks.json <target-root>
+```
+
+Add `--judge openai --judge-model gpt-6-luna --judge-limit 2` for a capped live run. Checked output adds
+relevant middleware/helpers/model context, local registration control edges, required evidence roles,
+blocking vs coverage gaps, and a scoped finding status. `supported_potential` is an advisory finding
+under the declared models, not runtime confirmation or completed independent review. See the
+[evidence design](.zazz/architecture/evidence-and-claims.md) and
+[results](.zazz/evaluation/juice-shop/results.md). SCA remains planned. Automatic claim assembly for
+novel repositories remains incomplete; see [discovery design](.zazz/architecture/evidence-and-claims.md#discovery-on-novel-target-repositories).
+
+## SARIF output
+
+```bash
+go run ./cmd/scan --strings --sarif --entry server.ts <target-root> > findings.sarif
+go run ./cmd/scan --export-sarif saved-evidence.json > findings.sarif
+```
+
+The second command converts saved scanner JSON offline without a judge request. SARIF retains
+route identity, scoped status, source evidence, gaps and illustrative remediation templates. Examples
+are unverified suggestions, not applied fixes. `--sarif` and `--json` are mutually exclusive.
+See [report design](.zazz/architecture/reporting-and-sarif.md) and
+[comparison results](.zazz/evaluation/corpus/README.md).

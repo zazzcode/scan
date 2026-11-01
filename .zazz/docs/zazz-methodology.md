@@ -1,5 +1,11 @@
 # The Zazz Methodology
 
+**Scan authorization override, 2026-10-31:** an explicit user implementation request is sufficient
+approval in the assigned isolated worktree. No separate Deliverable Owner greenlight ceremony is
+required. Related documentation, design, implementation and tests may share that worktree. See
+[AGENTS.md](../../AGENTS.md#authorization-and-delivery), which takes precedence over the historical
+lifecycle/topology wording below. Human review and merge authority remain unchanged.
+
 Zazz is an operating model for the agentic software delivery lifecycle. It helps teams use agents to move faster while keeping product direction, engineering quality, review discipline, and merge authority in human hands.
 
 This document is the methodology entry point and executive overview. Scan vendors the entry-point guide and selected workflow skills; the [section guide](#section-guide)
@@ -13,9 +19,10 @@ exception is declared in [AGENTS.md](../../AGENTS.md#branch-model). Workspace/se
 methodology refinement live in the [orientation](scan-agent-orientation.md).
 
 The [project plan](../project/implementation-plan.md) groups future specs into phases. Those groupings
-are neither execution approval nor scheduled milestones; the greenlight and review lifecycle below
-still applies. Each scan spec is authored, refined, and implemented in its own feature worktree and
-PR into `stage`, as declared in [AGENTS.md](../../AGENTS.md#definition-and-spec-driven-delivery).
+are neither execution approval nor scheduled milestones. Explicit user implementation requests
+supply authorization; related contract, design and implementation stay in the assigned feature
+worktree under [AGENTS.md](../../AGENTS.md#authorization-and-delivery). The evidence and human review
+lifecycle below still applies with that local override.
 
 ## Executive Overview
 

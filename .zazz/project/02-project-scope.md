@@ -4,11 +4,21 @@
 the [architecture](../architecture.md), and the [phased plan](implementation-plan.md) are inputs to
 future specifications; none is permission to implement.
 
+**Provider clarification, 2026-10-31:** the [current architecture](../architecture.md#current-provider-decision)
+defines a provider-neutral semantic judge: GPT Decisions or Jev, with future adapters allowed.
+OpenAI is the first integration target; Jev-specific research does not establish OpenAI behavior.
+
 ## Objective
 
-Establish whether a Go + Tree-sitter + bounded dataflow + Jev scanner can produce useful, reviewable
-findings for selected OWASP-related source-code risks at acceptable cost. Prove a small JS/TS slice
-before committing to broad language or vulnerability coverage.
+Establish whether a Go + Tree-sitter + bounded dataflow + semantic judge scanner can produce useful, reviewable
+findings for selected OWASP-related source-code risks at acceptable cost. The long-term product
+objective is **equal-or-better SAST detection and code analysis than Bearer with fewer false positives,
+with equivalent coverage
+of its capabilities across CLI and Pro**. For each route, report where protection is sufficient,
+where it is lacking, and the poor code-practice findings an agent can fix with the dataflow fixes.
+The [project objectives](../project.md#long-term-objectives)
+own this ambition and its measurement criteria. Prove a small JS/TS slice first, then expand through
+an explicit capability-parity inventory and measured contracts; current capability is not broad parity.
 
 ## Current work
 
@@ -23,7 +33,7 @@ session and routes to its operating rules.
 - Named rules for a small set of input-to-sink risks and deterministic patterns.
 - Local CFG/dataflow followed by bounded resolved argument/return propagation.
 - Guard-use and branch context sufficient to distinguish validation from mere validator presence.
-- Traceable string candidates and evidence bundles; experiments with Jev validation/sanitization
+- Traceable string candidates and evidence bundles; experiments with judge validation/sanitization
   assessment, followed by an LLM Findings Reviewer for identified issues and uncertain candidates.
 - Explicit unknown/uncertain/unexamined outcomes and coverage accounting.
 - JSON/Markdown output, stable identity, reviewable baselines, and measured CI policy.
@@ -32,13 +42,16 @@ session and routes to its operating rules.
 ## Proposed later scope
 
 - Python, then Go and Java adapters with language-specific analysis semantics.
-- Additional frameworks, rule families, optional sensitive-data impact tags, and SARIF.
+- Additional frameworks, rule families and optional sensitive-data impact tags.
+- Route-oriented reports with a bounded SARIF export; see [report design](../architecture/reporting-and-sarif.md).
+- SCA dependency auditing after the code-path foundation, using ecosystem adapters; see
+  [SCA design](../architecture/sca-design.md).
 - Explicit bounded scope checks for authorization/logic risks (the former Track C idea).
 
 These require separate scope review, corpus evidence, and approved specs. There is no fixed promise
 that all target languages or tracks are in the first release.
 
-## Exclusions and limits
+## Current delivery exclusions and limits
 
 - Exhaustive whole-program analysis or a general solver for arbitrary aliases, reflection, dynamic
   dispatch, heap mutation, stored/second-order flows, or all asynchronous behavior.
@@ -48,6 +61,8 @@ that all target languages or tracks are in the first release.
 - Hosted multi-tenant service, database-backed execution engine, or external tracking integration.
 - A claim that clean output certifies security or covers every risk in an OWASP edition.
 
+These are exclusions from the current delivery scope, not permanent exclusions from the long-term
+Bearer capability-parity objective. Broader coverage needs explicit design, implementation and evidence.
 Some excluded constructs occur inside otherwise supported programs. Report them as limitations;
 do not silently treat them as absent dataflow or expand scope without a contract change.
 
@@ -63,12 +78,12 @@ phase-specific acceptance criteria must become bounded, human-greenlit contracts
 |---|---|---|
 | Correctness | Separate structural facts, approximations, predictions, and gaps | Labeled safe/vulnerable pairs and unsupported-construct fixtures |
 | Determinism | Stable graphs, candidates, and rule output for fixed inputs/versions | Serial/parallel and repeated-run comparisons |
-| Jev and reviewer quality | Identify validation/sanitization gaps with evidence-backed findings review | Human labels, held-out cases, diagnostic baselines, false-safe/errors, reviewer disagreement and completeness |
+| Judge and reviewer quality | Equal-or-better detection than Bearer with lower false positives, using graph-grounded assessment of actual protection. Per route, report sufficient protection, lacking protection, and poor code-practice findings as separate results | Independent labels, matched held-out cases, recall/precision and false-positive denominators, false-safe/errors, abstentions, reviewer disagreement and completeness |
 | Latency | Suitable for developer/CI use; exact budgets unset | Hardware/fixture-defined cold/warm timings and per-request p50/p95 |
 | Cost | Bounded requests and run spend; exact ceiling unset | Candidate/question counts, usage, rate-limit behavior, measured billing basis |
 | Resources | Bounded workers, traversal, source retention, and payload size | Peak RSS, cancellation/backpressure, adversarial large inputs |
 | Local-only mode | Deterministic operation with zero external requests | No-key/offline end-to-end evidence |
-| Source handling | Send only enabled, necessary evidence to Jev and the configured LLM Findings Reviewer | Payload inspection, logging/redaction tests, owner decision on allowed transmission to each provider |
+| Source handling | Send only enabled, necessary evidence to the selected judge and the configured LLM Findings Reviewer | Payload inspection, logging/redaction tests, owner decision on allowed transmission to each provider |
 | Portability | Predictable supported binaries/platforms | Binding/cgo/build matrix; static linking is a goal to assess, not a guarantee |
 | Rescans | Cached and uncached outputs agree | Dependency and model/question/rule/policy version invalidation tests |
 

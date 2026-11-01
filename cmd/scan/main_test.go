@@ -163,3 +163,115 @@ func TestRunMissingPath(t *testing.T) {
 		t.Errorf("stderr = %q, want a scan:-prefixed error", stderr.String())
 	}
 }
+
+func TestStringsCLI(t *testing.T) {
+	root := filepath.Join("..", "..", "internal", "parse", "testdata", "string-flow")
+	var out, errOut bytes.Buffer
+	if code := run([]string{"--strings", "--json", "--entry", "server.ts", root}, &out, &errOut); code != exitOK {
+		t.Fatalf("code=%d stderr=%s", code, errOut.String())
+	}
+	var report struct {
+		Uses []struct {
+			Assessment struct {
+				Status string `json:"status"`
+			} `json:"assessment"`
+		} `json:"uses"`
+	}
+	if err := json.Unmarshal(out.Bytes(), &report); err != nil {
+		t.Fatal(err)
+	}
+	if len(report.Uses) != 1 || report.Uses[0].Assessment.Status != "not_run" {
+		t.Fatalf("report=%s", out.String())
+	}
+	for _, args := range [][]string{{"--strings", "--routes", root}, {"--routes", "--entry", "server.ts", root}, {"--strings", "--judge-model", "m", root}, {"--strings", "--judge-limit", "0", root}} {
+		if code := run(args, &out, &errOut); code != exitUsage {
+			t.Errorf("%v: code=%d", args, code)
+		}
+	}
+	t.Setenv("OPENAI_API_KEY", "")
+	if code := run([]string{"--strings", "--judge", "openai", root}, &out, &errOut); code != exitError {
+		t.Fatal("missing key accepted")
+	}
+	if code := run([]string{"--strings", "--entry", "../outside.ts", root}, &out, &errOut); code != exitError {
+		t.Fatal("outside entry accepted")
+	}
+}
+
+func TestStringsRouteFilter(t *testing.T) {
+	root := filepath.Join("..", "..", "internal", "parse", "testdata", "string-flow")
+	var out, errOut bytes.Buffer
+	if code := run([]string{"--strings", "--json", "--entry", "server.ts", "--route", "/login", root}, &out, &errOut); code != exitOK {
+		t.Fatalf("code %d: %s", code, errOut.String())
+	}
+	if !strings.Contains(out.String(), `"selected_route": "/login"`) {
+		t.Fatal("selection scope is not reported")
+	}
+	if code := run([]string{"--strings", "--route", "/absent", root}, &out, &errOut); code != exitError {
+		t.Fatal("absent selection silently accepted")
+	}
+}
+
+func TestCheckFileValidation(t *testing.T) {
+	for _, tt := range []struct {
+		name, text string
+		valid      bool
+	}{
+		{"valid", `[{"id":"x","method":"POST","path":"/x","kind":"sql_query","fields":["handle"],"validation":"valid handle","protection":"separate SQL data"}]`, true},
+		{"missing requirement", `[{"id":"x","method":"POST","path":"/x","kind":"sql_query","fields":["handle"]}]`, false},
+		{"unknown property", `[{"id":"x","expectedAnswer":"vulnerable"}]`, false},
+		{"empty", "[]", false},
+		{"trailing", "[] true", false},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			file := filepath.Join(t.TempDir(), "checks.json")
+			if err := os.WriteFile(file, []byte(tt.text), 0600); err != nil {
+				t.Fatal(err)
+			}
+			_, err := loadChecks(file)
+			if (err == nil) != tt.valid {
+				t.Fatalf("error=%v valid=%v", err, tt.valid)
+			}
+		})
+	}
+}
+
+func TestSARIFCLI(t *testing.T) {
+	root := filepath.Join("..", "..", "internal", "parse", "testdata", "string-flow")
+	var out, errOut bytes.Buffer
+	if code := run([]string{"--strings", "--sarif", "--entry", "server.ts", root}, &out, &errOut); code != exitOK {
+		t.Fatalf("code=%d stderr=%s", code, errOut.String())
+	}
+	var doc struct {
+		Version string            `json:"version"`
+		Runs    []json.RawMessage `json:"runs"`
+	}
+	if err := json.Unmarshal(out.Bytes(), &doc); err != nil {
+		t.Fatal(err)
+	}
+	if doc.Version != "2.1.0" || len(doc.Runs) != 1 {
+		t.Fatal("invalid SARIF envelope")
+	}
+	for _, args := range [][]string{{"--strings", "--json", "--sarif", root}, {"--routes", "--sarif", root}} {
+		if code := run(args, &out, &errOut); code != exitUsage {
+			t.Fatalf("invalid flags accepted: %v", args)
+		}
+	}
+}
+
+func TestSavedSARIFExportMakesNoJudgeRequest(t *testing.T) {
+	t.Setenv("OPENAI_API_KEY", "")
+	file := filepath.Join(t.TempDir(), "report.json")
+	if err := os.WriteFile(file, []byte(`{"schema_version":1,"uses":[],"files":[],"gaps":[]}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	var out, errOut bytes.Buffer
+	if code := run([]string{"--export-sarif", file}, &out, &errOut); code != exitOK {
+		t.Fatalf("code=%d: %s", code, errOut.String())
+	}
+	if !strings.Contains(out.String(), `"version": "2.1.0"`) {
+		t.Fatal("missing SARIF")
+	}
+	if code := run([]string{"--export-sarif", file, "--judge", "openai"}, &out, &errOut); code != exitUsage {
+		t.Fatal("API flags accepted for offline conversion")
+	}
+}

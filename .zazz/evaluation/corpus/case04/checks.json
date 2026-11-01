@@ -1,0 +1,13 @@
+[
+  {
+    "id": "field-query",
+    "method": "POST",
+    "path": "/session",
+    "kind": "sql_query",
+    "fields": [
+      "handle"
+    ],
+    "validation": "The handle must be a nonempty string.",
+    "protection": "The handle must not alter executable SQL structure. Evaluate any actual enforced allow-list for this use; parameter binding is an independent protection. A length limit alone is not SQL protection."
+  }
+]

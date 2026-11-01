@@ -109,6 +109,14 @@ revision/challenge mapping, safe counterparts, exclusions, and label-leakage con
 [orientation](../docs/scan-agent-orientation.md#portable-workspace-and-dev_root) owns local clone lookup;
 [worktree setup](../docs/worktree-setup.md#reference-application-checkout) owns reference-clone handling. Evaluate only the selected source-analysis cases when measuring model capability.
 
+## Current integration direction
+
+GPT Decisions and Jev are alternative judge providers; OpenAI is the first integration target.
+This file preserves TypeSafe-specific research and setup; it does not establish OpenAI behavior. Use
+[OpenAI Decisions setup](../docs/openai-decisions-setup.md) and the
+[current architecture](../architecture.md#current-provider-decision). No live OpenAI evaluation was
+performed in the 2026-10-31 assessment; no key or account status was inspected.
+
 ## What can happen before a key exists
 
 Jev signup and key setup are pending; no live scan evaluation has been run.

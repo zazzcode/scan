@@ -1,0 +1,44 @@
+[
+  {
+    "case": "case01",
+    "expected_protection": "insufficient",
+    "expected_policy": "supported_potential",
+    "rationale": "Request value interpolates SQL text."
+  },
+  {
+    "case": "case02",
+    "expected_protection": "sufficient",
+    "expected_policy": "protected_for_claim",
+    "rationale": "Request value is a bound parameter."
+  },
+  {
+    "case": "case03",
+    "expected_protection": "sufficient",
+    "expected_policy": "protected_for_claim",
+    "rationale": "A runtime allow-list is enforced before this particular SQL use."
+  },
+  {
+    "case": "case04",
+    "expected_protection": "insufficient",
+    "expected_policy": "supported_potential",
+    "rationale": "Length restriction still allows SQL syntax."
+  },
+  {
+    "case": "case05",
+    "expected_protection": "insufficient",
+    "expected_policy": "supported_potential",
+    "rationale": "Optional confirmation gates the required-field check."
+  },
+  {
+    "case": "case06",
+    "expected_protection": "sufficient",
+    "expected_policy": "protected_for_claim",
+    "rationale": "An enforced runtime type and normalized nonempty guard precedes persistence."
+  },
+  {
+    "case": "case07",
+    "expected_protection": "uncertain",
+    "expected_policy": "needs_evidence",
+    "rationale": "Unknown applicable middleware can change validation behavior."
+  }
+]

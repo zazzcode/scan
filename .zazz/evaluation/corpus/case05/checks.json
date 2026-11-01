@@ -1,0 +1,13 @@
+[
+  {
+    "id": "account-field",
+    "method": "POST",
+    "path": "/accounts",
+    "kind": "account_creation",
+    "fields": [
+      "handle"
+    ],
+    "validation": "The handle must be a nonempty string after whitespace normalization, independently of optional confirm.",
+    "protection": "An account must not be created with an empty or whitespace-only handle; inspect the actual guards and model constraints before creation."
+  }
+]

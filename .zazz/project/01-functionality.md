@@ -4,9 +4,13 @@
 Technical context: [architecture](../architecture.md). Delivery boundaries:
 [scope](02-project-scope.md) and [implementation plan](implementation-plan.md).
 
+**Provider clarification, 2026-10-31:** the [current architecture](../architecture.md#current-provider-decision)
+defines a provider-neutral semantic judge: GPT Decisions or Jev, with future adapters allowed.
+OpenAI is the first integration target; Jev-specific research does not establish OpenAI behavior.
+
 ## Purpose and users
 
-Given a source repository, produce a ranked list of potential security issues with source evidence,
+Given a target repository, produce a ranked list of potential security issues with source evidence,
 analysis limits, and a clear account of how each result was reached. Developers inspect the evidence;
 security engineers triage it; CI applies an explicitly configured policy.
 
@@ -14,15 +18,15 @@ security engineers triage it; CI applies an explicitly configured policy.
 
 | Mode | Proposed behavior | Evidence and limits |
 |---|---|---|
-| Track A: deterministic rules | Match explicit known-risk conditions without Jev | Rule ID, supported constructs, source spans; reproducible does not mean certainly exploitable |
-| Track B: flow plus Jev | Trace supported string dependencies to a sink; assess validation/sanitization adequacy | Witnesses, guard facts, separate validation/sanitization facets, typed assessments |
-| Findings Review | LLM reviews every identified rule/Jev issue and uncertain candidate against source evidence | Supported, disputed, or needs more evidence; separate review status and cited evidence IDs |
+| Track A: deterministic rules | Match explicit known-risk conditions without a semantic judge | Rule ID, supported constructs, source spans; reproducible does not mean certainly exploitable |
+| Track B: flow plus semantic judge | Trace supported string dependencies to a sink; assess validation/sanitization adequacy | Witnesses, guard facts, separate validation/sanitization facets, typed assessments |
+| Findings Review | LLM reviews every identified rule/judge issue and uncertain candidate against source evidence | Supported, disputed, or needs more evidence; separate review status and cited evidence IDs |
 | Structural-only operation | Run local analysis without credentials or external calls | Pattern findings and path candidates; semantic evaluation explicitly `not_run` |
 | Track C: future bounded scope checks | Assess explicitly enumerated authorization/logic questions | Deferred; separate evidence contract, corpus, and specs required |
 
-Jev is the primary semantic assessor; the LLM Findings Reviewer is the planned review stage for
+The configured judge (GPT Decisions or Jev) is the primary semantic assessor; the LLM Findings Reviewer is the planned review stage for
 identified issues. No mode claims complete OWASP Top 10 coverage. Reports preserve source evidence,
-Jev Assessments, and reviewer conclusions separately. A skipped/failed review stays explicit.
+Decision Assessments, and reviewer conclusions separately. A skipped/failed review stays explicit.
 
 ## Functional domains
 
@@ -38,9 +42,9 @@ Jev Assessments, and reviewer conclusions separately. A skipped/failed review st
 | FD-8: deterministic rules | Detect tested patterns and rule-specific mitigation facts without inference calls |
 | FD-9: path candidates | Produce bounded source-to-sink witnesses; deduplicate and account for unexamined candidates |
 | FD-10: evidence preparation | Bundle snippets, spans, bindings, guards, sink semantics, and completeness markers |
-| FD-11: Jev Assessment | Experiment with versioned Noul/Choice questions about string validation and sanitization; validate typed responses |
+| FD-11: Decision Assessment | Use provider-specific typed questions about validation/protection; normalize responses and preserve uncertainty |
 | FD-12: findings review and policy | LLM reviews identified issues and uncertain candidates; Go reconciles separate assessments, exposes disputes/incomplete review, and applies policy |
-| FD-13: reporting | Versioned JSON and readable Markdown; possible later SARIF export |
+| FD-13: reporting | Route-oriented canonical JSON and human reports; bounded SARIF findings/code-flow export; stable baselines remain planned |
 | FD-14: finding identity | Stable identity independent of model predictions; group related source traces |
 | FD-15: comparison and baseline | New/persisting/changed assessments, reviewable suppressions, explicit incomplete-scan semantics |
 | FD-16: incremental rescan | Reuse unchanged artifacts with dependency- and version-aware invalidation |
@@ -74,10 +78,11 @@ forward as a release commitment. Dependency vulnerability scanning is excluded.
 
 ## Language sequence
 
-JS/TS first, then Python, then Go and Java. The sequence and first release set remain proposed.
-Each adapter includes extraction, resolution, lowering/flow semantics, library models, and a coverage
-matrix. Recognizing a file extension is not analysis support. Additional languages may expose core IR
-changes that need a reviewed contract revision.
+The committed language sequence is JavaScript, TypeScript, Python, and Go. JavaScript and
+TypeScript are the current analysis target. Python is the next adapter, then Go. Each adapter
+includes extraction, resolution, lowering/flow semantics, library models, and a coverage matrix.
+Recognizing a file extension is not analysis support. A new language may expose core IR changes
+that need a contract revision before that adapter claims the same query and validation findings.
 
 ## Interfaces and report semantics
 
@@ -100,3 +105,10 @@ The [proposal register](03-jev-design-proposal.md#open-decision-register) tracks
 semantic-policy requirements, CI behavior, and allowed source transmission. The
 [evaluation protocol](04-jev-validation-research.md#proposed-corpus-and-evaluation-protocol) defines
 how to assess the resulting capability choices.
+
+## Follow-on dependency auditing
+
+After the code-path foundation, add SCA through ecosystem audit adapters: npm/pnpm audit and
+pip-audit initially. Preserve package/version/advisory evidence independently of route reachability.
+The [SCA design](../architecture/sca-design.md) owns milestones and adapter boundaries. Source and
+SCA findings share route/context-aware reporting without equating their evidence or coverage.
