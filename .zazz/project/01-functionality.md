@@ -4,9 +4,8 @@
 Technical context: [architecture](../architecture.md). Delivery boundaries:
 [scope](02-project-scope.md) and [implementation plan](implementation-plan.md).
 
-**Provider clarification, 2026-10-31:** the [current architecture](../architecture.md#current-provider-decision)
-defines a provider-neutral semantic judge: GPT Decisions or Jev, with future adapters allowed.
-OpenAI is the first integration target; Jev-specific research does not establish OpenAI behavior.
+**Provider decision (2026-10-31):** the [architecture](../architecture.md#current-provider-decision)
+owns the current provider decision; this document defers to it.
 
 ## Purpose and users
 
@@ -86,9 +85,11 @@ that need a contract revision before that adapter claims the same query and vali
 
 ## Interfaces and report semantics
 
-The only source-level CLI foundation currently present is `scan --list [--json] <path>`. All analysis
-interfaces are future spec work. Inspection of graph, classifications, witnesses, and explanation bundles
-is desirable, but exact flags/subcommands are not decided by this document.
+The source-level CLI foundation currently present is `scan --list [--json] <path>`, `scan --routes [--json]`,
+and `scan --strings [--json]` with entry/route selectors, checked-mode requirement files, and bounded
+JSON/HTML/SARIF export. All further analysis interfaces are future spec work. Inspection of graph,
+classifications, witnesses, and explanation bundles is desirable, but exact flags/subcommands beyond
+these are not decided by this document.
 
 Security reports should include detection mode, source/sink evidence, rule/CWE/OWASP metadata,
 severity policy, assessment status, model/question versions when used, and coverage gaps. Evaluation

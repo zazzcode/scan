@@ -1,9 +1,9 @@
 # XSS detection scope (`xss-response`)
 
 **Status: planned.** Chosen by the user on 2026-11-01 as the next capability. All XSS work below is
-delivered in one new worktree from `stage`, after `logger-leak` merges and the project is renamed to
-Zazzles, in the order of [delivery increments](#delivery-increments): backend/API first, browser
-last. This document records scope, targets and rules for the future contract; it does not authorize
+delivered in one worktree from `stage` (created after `logger-leak` merged and the project was
+renamed to Zazzles), in the order of [delivery increments](#delivery-increments): backend/API first,
+browser last. This document records scope, targets and rules for the future contract; it does not authorize
 implementation. When implemented, the product rules move to a root `docs/analysis/` guide, as for
 [logging](../../docs/analysis/sensitive-data-logging.md).
 

@@ -167,7 +167,7 @@ would require a concrete benefit over that small adapter.
 
 The [spec backlog](implementation-plan.md#ordered-specification-backlog) assigns parser selection to
 `parser-binding-evaluation`, graph representation to `analysis-ir-contract` / `local-cfg`, experimental
-adapter validation to `semantic-feasibility-eval`, and production integration to `jev-typed-adapter`.
+adapter validation to `semantic-feasibility-eval`, and production integration to `decision-judge-adapters`.
 The experiment records its API/schema versions for production integration. Each owning
 spec records exact module/version or revision, license, maintenance/API fit, Go/native toolchain and
 platform constraints, alternatives, and scoped verification. Recheck these facts at selection time;
@@ -197,11 +197,10 @@ phase grouping does not appoint an owner or authorize a live API experiment.
 
 ## Current provider decision
 
-**2026-10-31 user clarification:** GPT Decisions and Jev are alternative semantic judge providers;
-OpenAI is the first integration target. Future decision-model adapters are allowed. The [architecture](../architecture.md#current-provider-decision) owns the
-current contract; [setup](../docs/openai-decisions-setup.md) owns credentials. Earlier Jev-specific
-rationale, API examples, and questions in this proposal are historical context. Evaluation principles
-remain useful; provider schemas, quality, availability, and performance MUST be verified separately.
+The [architecture](../architecture.md#current-provider-decision) owns the 2026-10-31 provider
+decision (GPT Decisions or Jev, OpenAI first, future adapters allowed); [setup](../docs/openai-decisions-setup.md)
+owns credentials. Earlier Jev-specific rationale, API examples, and questions in this proposal are
+historical context; provider schemas, quality, availability, and performance MUST be verified separately.
 
 ## Decision lifecycle
 

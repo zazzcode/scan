@@ -90,7 +90,7 @@ finding. Preserve Review for unresolved requirements or evidence. Extend the exi
 completeness machinery instead of promoting every observed pattern to a true-positive finding.
 
 These are follow-on analysis increments to scope deliberately. They do not authorize a broad engine
-rewrite during logger-leak work, paid evaluations, or target execution. Reduce Review by resolving
+rewrite during other assigned work, paid evaluations, or target execution. Reduce Review by resolving
 its questions correctly, measuring false findings and false protection alongside coverage.
 
 ## Human report UI and packaged demonstration
@@ -135,13 +135,13 @@ This branch's exit is input validation plus string-built SQL and NoSQL query, up
 findings. The comparison is [query and validation results](../evaluation/query-validation-comparison.md).
 Each row below is a later worktree and its own coding session. Do not implement that row on this branch.
 
-**Delivered in `logger-leak` (pending merge into `stage`):** the
+**Delivered in `logger-leak` (merged into `stage`):** the
 [sensitive-data logging contract](../specifications/sensitive-data-logging.md) — explicit logger calls,
 morgan access logs of URL query credentials, and the `log-use-v1` judgment protocol. Live calibration
 of that protocol and the three re-judgments it made necessary remain follow-up work.
 
-**Next, chosen by the user on 2026-11-01:** `xss-response`, in a new worktree from `stage` after
-`logger-leak` merges and the project is renamed to Zazzles. The [XSS detection scope](xss-detection-scope.md)
+**Next, chosen by the user on 2026-11-01:** `xss-response`, in its new worktree from `stage`, created
+after `logger-leak` merged and the project was renamed to Zazzles. The [XSS detection scope](xss-detection-scope.md)
 records the four XSS types, sinks, protections, evidence rules, Juice Shop and TypeScript targets, and
 delivery increments. Rows are listed in the intended order.
 
@@ -301,8 +301,8 @@ reference, not Bearer output. This study does not change the chosen Decision Ass
 | 9 | 4, 6–8 | Unified reporting, identity, baseline, CI behavior |
 | 10 | 9 | Correct incremental caches and resource/performance evidence |
 | 11 | 10 + release-scope decision | Python adapter with its declared analysis coverage |
-| 12 | 11 + separate language decisions | Go, then Java adapters in separate contracts |
-| 13 | Separate proposal + relevant foundation | Optional narrow scope checks / coverage expansion |
+| 12 | 11 + Go-scope decision | Go adapter in a separate contract |
+| 13 | Separate proposal + relevant foundation | Optional scope checks, coverage expansion, and additional languages such as Java |
 
 Phases 4 and 5 are independent after their prerequisites. Offline phases 0–7 can progress after their
 own authorization without a judge key. Phase 1 live feasibility and Phase 8 need credentials; absence of a
@@ -351,8 +351,8 @@ separate worktrees when authorized. An explicit user implementation request is s
 | S30 | 11 | `python-flow-and-rules` | S29 | Python flow, rules, and assessment/review evaluation |
 | S31 | 12 | `go-resolution-and-lowering` | S30; Go-scope decision | Go receiver/interface/lowering subset |
 | S32 | 12 | `go-flow-and-rules` | S31 | Go flow, rules, and assessment/review evaluation |
-| S33 | 12 | `java-resolution-and-lowering` | S32; Java-scope decision | Java types, annotations, overloads, lowering |
-| S34 | 12 | `java-flow-and-rules` | S33 | Java flow, rules, and assessment/review evaluation |
+| S33 | 13 | `java-resolution-and-lowering` | S32; Java-scope decision | Java types, annotations, overloads, lowering |
+| S34 | 13 | `java-flow-and-rules` | S33 | Java flow, rules, and assessment/review evaluation |
 
 S05's live experiment can remain pending while S06–S19 progress after their own authorization. S12 and
 S13 start independent rule/flow lanes after shared prerequisites. The initial release is evaluated at
