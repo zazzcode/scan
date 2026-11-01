@@ -23,4 +23,15 @@ type XSSFacts struct {
 	OriginResolved   bool     `json:"origin_resolved"`
 	ResponsePath     string   `json:"response_path,omitempty"`
 	ResponseMethod   string   `json:"response_method,omitempty"`
+	// Paths is present only when sibling source paths differ in protection, so a
+	// protected or unknown path is never read as covering an unsafe one.
+	Paths []XSSPath `json:"paths,omitempty"`
+}
+
+// XSSPath is the protection of one dependency (by index) of a rendering claim.
+// Entry names the writing entry of a stored path when it is known.
+type XSSPath struct {
+	Dependency int    `json:"dependency"`
+	Entry      string `json:"entry,omitempty"`
+	Protection string `json:"protection"`
 }

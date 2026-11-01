@@ -13,11 +13,13 @@ func (s *moduleSet) linkStoredXSS(report *graph.StringReport) {
 			continue
 		}
 		var dependencies []graph.Dependency
+		var entries []string
 		related := map[string]bool{}
 		resolved := true
 		for _, read := range u.Dependencies {
 			if read.StorageKey == "" {
 				dependencies = append(dependencies, read)
+				entries = append(entries, "")
 				continue
 			}
 			writes := append([]storageWrite{}, s.storageWrites[read.StorageKey]...)
@@ -30,6 +32,7 @@ func (s *moduleSet) linkStoredXSS(report *graph.StringReport) {
 			if len(writes) == 0 {
 				resolved = false
 				dependencies = append(dependencies, read)
+				entries = append(entries, "")
 				continue
 			}
 			u.XSS.StorageKey = read.StorageKey
@@ -43,6 +46,7 @@ func (s *moduleSet) linkStoredXSS(report *graph.StringReport) {
 					origin.Transfers = append(append([]graph.Evidence{}, origin.Transfers...), write.sink, read.Source)
 					origin.Transfers = append(origin.Transfers, read.Transfers...)
 					dependencies = append(dependencies, origin)
+					entries = append(entries, write.route)
 				}
 			}
 		}
@@ -54,7 +58,9 @@ func (s *moduleSet) linkStoredXSS(report *graph.StringReport) {
 		sort.Strings(u.XSS.RelatedEntries)
 		f := flow{set: s}
 		if u.XSS.Protection != "encoded" {
-			u.XSS.Protection, u.XSS.ProtectionReason = f.xssProtection(value{deps: dependencies}, u.XSS.OutputContext, false)
+			var protections []string
+			u.XSS.Protection, u.XSS.ProtectionReason, protections = f.xssPathProtection(value{deps: dependencies}, u.XSS.OutputContext, false)
+			u.XSS.Paths = xssPaths(protections, entries)
 		}
 	}
 }

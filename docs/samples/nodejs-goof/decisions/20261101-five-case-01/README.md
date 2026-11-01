@@ -24,5 +24,7 @@ Scores are uncalibrated provider metadata and never replace evidence or required
 
 These decisions are replayed into the [current report](../../findings.html) only where the complete
 request still matches: source/evidence, model, rules, questions and protocol. Replay/decoding is
-offline. The [independent answer key](../../xss-answer-key.md) supplies expected source properties;
+offline. Since hardening 08, the stored Markdown request carries separate create/update path
+evidence. It no longer matches its saved trace, so that answer is not applied to the current report.
+The [independent answer key](../../xss-answer-key.md) supplies expected source properties;
 the [hardening handoff](../../../../../.zazz/ephemeral/xss-analysis-handoff.md) records the remaining gaps.

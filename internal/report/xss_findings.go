@@ -1,6 +1,11 @@
 package report
 
-import "github.com/zazzcode/zazzles/internal/graph"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/zazzcode/zazzles/internal/graph"
+)
 
 func describeXSS(u graph.StringUse, f *graph.Finding) {
 	if u.Kind == "xss_data_candidate" {
@@ -28,7 +33,7 @@ func describeXSS(u graph.StringUse, f *graph.Finding) {
 		f.Protection = x.ProtectionReason
 		return
 	}
-	f.Protection = "Output context: " + x.OutputContext + ". " + x.ProtectionReason
+	f.Protection = "Output context: " + x.OutputContext + ". " + x.ProtectionReason + xssPathSummary(x.Paths)
 	if x.Type == "stored" && !x.OriginResolved {
 		f.Title = "Stored value reaches HTML output; write origin needs review"
 		f.Summary = "A verified storage read reaches rendering, but no matching request-to-storage write is established. Resolve that origin and storage protections before judging stored XSS."
@@ -44,4 +49,24 @@ func describeXSS(u graph.StringUse, f *graph.Finding) {
 		f.Title = "Context-appropriate rendering protection is present"
 		f.Summary = "The modeled output uses escaping or a verified sanitizer appropriate to this context. This protects the named rendering claim; other contexts and uses require separate assessment."
 	}
+}
+
+// xssPathSummary names each differing source path, so an unsafe path stays
+// visible beside unresolved or protected siblings at the same sink.
+func xssPathSummary(paths []graph.XSSPath) string {
+	if len(paths) == 0 {
+		return ""
+	}
+	var parts []string
+	for _, p := range paths {
+		part := fmt.Sprintf("path %d %s", p.Dependency+1, p.Protection)
+		// Server entry IDs end in METHOD:path; other entries are shown as recorded.
+		if fields := strings.SplitN(p.Entry, ":", 5); len(fields) == 5 && fields[0] == "route" {
+			part += " (written by " + fields[3] + " " + fields[4] + ")"
+		} else if p.Entry != "" {
+			part += " (written by " + p.Entry + ")"
+		}
+		parts = append(parts, part)
+	}
+	return " Per-path protection: " + strings.Join(parts, "; ") + "."
 }

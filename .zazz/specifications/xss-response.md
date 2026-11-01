@@ -92,3 +92,14 @@ request rendering stays Review despite escaped field syntax. Five specifically a
 requests completed; confidence/probability metadata and request/response bodies are now retained,
 with exact-request offline replay. Deeper analysis/judgment hardening remains next-session work in
 the same branch; no additional paid requests are authorized by that completed batch.
+
+### 2026-11-01 — Hardening 08: stored write-path separation
+
+Source: handoff's first bounded task. Unsupported-statement traversal now explores every fall-through
+branch exit, so `else`/`catch`/`finally` bodies are no longer skipped. Exact duplicate dependencies are
+merged, branch-only paths carry their condition, and per-path protection with writing entries is
+exported when paths differ. Paired fixtures cover a supported unsafe path beside an unknown sibling, an
+unknown sibling beside encoded paths, an all-path-protected control, and returning and single-statement
+branches. Goof create/update remain one orange Markdown sink with three separate paths. The changed
+stored request no longer replays its saved answer. Results and blockers:
+[evaluation](../evaluation/xss-implementation-results.md#hardening-08-stored-write-path-separation).

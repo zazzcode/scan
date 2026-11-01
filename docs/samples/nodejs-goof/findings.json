@@ -129,8 +129,8 @@
       "title": "Untrusted data reaches raw HTML output",
       "summary": "A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate.",
       "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
-      "use_protection": "Decision XSS exposure: Inconclusive. Scanner policy: XSS assessment is inconclusive; absence of a positive answer is not protection.",
-      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
+      "use_protection": "Output context: html_text. A source path reaches raw HTML through marked 0.3.5, whose sanitize option has a documented entity/URL bypass (upstream marked PR 592). Per-path protection: path 1 ineffective (written by POST /create); path 2 unknown (written by POST /create); path 3 ineffective (written by POST /update/:id).",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
       "recommendations": {
         "title": "Protect the specific browser rendering context",
         "actions": [
@@ -784,7 +784,7 @@
           "If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
           "Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
         ],
-        "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' && password.length > 0 });",
+        "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' \u0026\u0026 password.length \u003e 0 });",
         "example_status": "illustrative_template; not a verified application patch"
       }
     },
@@ -1120,7 +1120,7 @@
       },
       "resolved_handler": {
         "kind": "handler",
-        "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+        "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
         "span": {
           "file": "routes/index.js",
           "start_line": 50,
@@ -1332,7 +1332,7 @@
       },
       "resolved_handler": {
         "kind": "handler",
-        "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+        "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
         "span": {
           "file": "routes/index.js",
           "start_line": 102,
@@ -1477,7 +1477,7 @@
       },
       "resolved_handler": {
         "kind": "handler",
-        "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
+        "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' \u0026\u0026 item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
         "span": {
           "file": "routes/index.js",
           "start_line": 165,
@@ -1756,7 +1756,7 @@
       },
       "resolved_handler": {
         "kind": "handler",
-        "text": "{\n  if (!req.files) {\n    res.send('No files were uploaded.');\n    return;\n  }\n\n  var importFile = req.files.importFile;\n  var data;\n  var importedFileType = fileType(importFile.data);\n  var zipFileExt = { ext: \"zip\", mime: \"application/zip\" };\n  if (importedFileType === null) {\n    importedFileType = { ext: \"txt\", mime: \"text/plain\" };\n  }\n  if (importedFileType[\"mime\"] === zipFileExt[\"mime\"]) {\n    var zip = AdmZip(importFile.data);\n    var extracted_path = \"/tmp/extracted_files\";\n    zip.extractAllTo(extracted_path, true);\n    data = \"No backup.txt file found\";\n    fs.readFile('backup.txt', 'ascii', function (err, data) {\n      if (!err) {\n        data = data;\n      }\n    });\n  } else {\n    data = importFile.data.toString('ascii');\n  }\n  var lines = data.split('\\n');\n  lines.forEach(function (line) {\n    var parts = line.split(',');\n    var what = parts[0];\n    console.log('importing ' + what);\n    var when = parts[1];\n    var locale = parts[2];\n    var format = parts[3];\n    var item = what;\n    if (!isBlank(what)) {\n      if (!isBlank(when) && !isBlank(locale) && !isBlank(format)) {\n        console.log('setting locale ' + parts[1]);\n        moment.locale(locale);\n        var d = moment(when);\n        console.log('formatting ' + d);\n        item += ' [' + d.format(format) + ']';\n      }\n\n      new Todo({\n        content: item,\n        updated_at: Date.now(),\n      }).save(function (err, todo, count) {\n        if (err) return next(err);\n        console.log('added ' + todo);\n      });\n    }\n  });\n\n  res.redirect('/');\n}",
+        "text": "{\n  if (!req.files) {\n    res.send('No files were uploaded.');\n    return;\n  }\n\n  var importFile = req.files.importFile;\n  var data;\n  var importedFileType = fileType(importFile.data);\n  var zipFileExt = { ext: \"zip\", mime: \"application/zip\" };\n  if (importedFileType === null) {\n    importedFileType = { ext: \"txt\", mime: \"text/plain\" };\n  }\n  if (importedFileType[\"mime\"] === zipFileExt[\"mime\"]) {\n    var zip = AdmZip(importFile.data);\n    var extracted_path = \"/tmp/extracted_files\";\n    zip.extractAllTo(extracted_path, true);\n    data = \"No backup.txt file found\";\n    fs.readFile('backup.txt', 'ascii', function (err, data) {\n      if (!err) {\n        data = data;\n      }\n    });\n  } else {\n    data = importFile.data.toString('ascii');\n  }\n  var lines = data.split('\\n');\n  lines.forEach(function (line) {\n    var parts = line.split(',');\n    var what = parts[0];\n    console.log('importing ' + what);\n    var when = parts[1];\n    var locale = parts[2];\n    var format = parts[3];\n    var item = what;\n    if (!isBlank(what)) {\n      if (!isBlank(when) \u0026\u0026 !isBlank(locale) \u0026\u0026 !isBlank(format)) {\n        console.log('setting locale ' + parts[1]);\n        moment.locale(locale);\n        var d = moment(when);\n        console.log('formatting ' + d);\n        item += ' [' + d.format(format) + ']';\n      }\n\n      new Todo({\n        content: item,\n        updated_at: Date.now(),\n      }).save(function (err, todo, count) {\n        if (err) return next(err);\n        console.log('added ' + todo);\n      });\n    }\n  });\n\n  res.redirect('/');\n}",
         "span": {
           "file": "routes/index.js",
           "start_line": 254,
@@ -2363,7 +2363,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "<%= todo._id %>",
+              "text": "\u003c%= todo._id %\u003e",
               "span": {
                 "file": "views/index.ejs",
                 "start_line": 20,
@@ -2433,7 +2433,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "<%= todo._id %>",
+        "text": "\u003c%= todo._id %\u003e",
         "span": {
           "file": "views/index.ejs",
           "start_line": 20,
@@ -2697,7 +2697,24 @@
           "route:app.js:1877:POST:/update/:id"
         ],
         "storage_key": "mongoose:Todo.content",
-        "origin_resolved": true
+        "origin_resolved": true,
+        "paths": [
+          {
+            "dependency": 0,
+            "entry": "route:app.js:1765:POST:/create",
+            "protection": "ineffective"
+          },
+          {
+            "dependency": 1,
+            "entry": "route:app.js:1765:POST:/create",
+            "protection": "unknown"
+          },
+          {
+            "dependency": 2,
+            "entry": "route:app.js:1877:POST:/update/:id",
+            "protection": "ineffective"
+          }
+        ]
       },
       "api_model": {
         "id": "html-output-v1",
@@ -2735,7 +2752,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "<%- marked(new String(todo.content)) %>",
+              "text": "\u003c%- marked(new String(todo.content)) %\u003e",
               "span": {
                 "file": "views/index.ejs",
                 "start_line": 20,
@@ -2828,7 +2845,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "<%- marked(new String(todo.content)) %>",
+        "text": "\u003c%- marked(new String(todo.content)) %\u003e",
         "span": {
           "file": "views/index.ejs",
           "start_line": 20,
@@ -2862,6 +2879,18 @@
                 "end_line": 168,
                 "start_byte": 4355,
                 "end_byte": 4378
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "branch_consequence",
+              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 170,
+                "end_line": 170,
+                "start_byte": 4436,
+                "end_byte": 4487
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             },
@@ -2962,6 +2991,42 @@
                 "end_line": 168,
                 "start_byte": 4355,
                 "end_byte": 4378
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "parse(item)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 182,
+                "end_line": 182,
+                "start_byte": 4772,
+                "end_byte": 4783
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "item = parse(item)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 182,
+                "end_line": 182,
+                "start_byte": 4765,
+                "end_byte": 4783
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "branch_alternative",
+              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 170,
+                "end_line": 170,
+                "start_byte": 4436,
+                "end_byte": 4487
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             },
@@ -3346,156 +3411,8 @@
         }
       ],
       "assessment": {
-        "answer_details": {
-          "encoding_adequacy": {
-            "choice": "inadequate",
-            "confidence": 0.51,
-            "probabilities": [
-              {
-                "value": "adequate",
-                "probability": 0.01
-              },
-              {
-                "value": "inadequate",
-                "probability": 0.63
-              },
-              {
-                "value": "not_present",
-                "probability": 0.22
-              },
-              {
-                "value": "unknown",
-                "probability": 0.14
-              }
-            ]
-          },
-          "output_context": {
-            "choice": "html_text",
-            "confidence": 0.92,
-            "probabilities": [
-              {
-                "value": "html_text",
-                "probability": 0.93
-              },
-              {
-                "value": "html_attribute",
-                "probability": 0
-              },
-              {
-                "value": "url",
-                "probability": 0
-              },
-              {
-                "value": "script",
-                "probability": 0
-              },
-              {
-                "value": "style",
-                "probability": 0
-              },
-              {
-                "value": "unquoted_attribute",
-                "probability": 0
-              },
-              {
-                "value": "active_attribute",
-                "probability": 0
-              },
-              {
-                "value": "html_tag",
-                "probability": 0
-              },
-              {
-                "value": "template_code",
-                "probability": 0
-              },
-              {
-                "value": "unknown",
-                "probability": 0.07
-              }
-            ]
-          },
-          "sanitizer_effectiveness": {
-            "choice": "ineffective",
-            "confidence": 0.96,
-            "probabilities": [
-              {
-                "value": "effective",
-                "probability": 0.01
-              },
-              {
-                "value": "ineffective",
-                "probability": 0.97
-              },
-              {
-                "value": "absent",
-                "probability": 0
-              },
-              {
-                "value": "unknown",
-                "probability": 0.02
-              }
-            ]
-          },
-          "xss_all_paths_protected": {
-            "choice": "no",
-            "confidence": 0.77,
-            "probabilities": [
-              {
-                "value": "yes",
-                "probability": 0.01
-              },
-              {
-                "value": "no",
-                "probability": 0.85
-              },
-              {
-                "value": "unknown",
-                "probability": 0.14
-              }
-            ]
-          },
-          "xss_exposure": {
-            "choice": "unknown",
-            "confidence": 0.44,
-            "probabilities": [
-              {
-                "value": "vulnerable",
-                "probability": 0.42
-              },
-              {
-                "value": "protected",
-                "probability": 0
-              },
-              {
-                "value": "unknown",
-                "probability": 0.58
-              },
-              {
-                "value": "not_applicable",
-                "probability": 0
-              }
-            ]
-          }
-        },
-        "finding_status": "needs_evidence",
-        "answers": {
-          "encoding_adequacy": "inadequate",
-          "output_context": "html_text",
-          "sanitizer_effectiveness": "ineffective",
-          "xss_all_paths_protected": "no",
-          "xss_exposure": "unknown"
-        },
-        "usage": {
-          "input_tokens": 5238,
-          "output_tokens": 0
-        },
-        "status": "completed",
-        "provider": "openai",
-        "model": "gpt-6-luna",
-        "question_version": "xss-use-v1",
-        "protection": "uncertain",
-        "reason": "XSS assessment is inconclusive; absence of a positive answer is not protection."
+        "status": "not_run",
+        "reason": "The saved decision was made for earlier evidence; changed evidence does not inherit it, and a fresh judgment requires separate authorization."
       }
     },
     {
@@ -3544,7 +3461,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "<%= todo._id %>",
+              "text": "\u003c%= todo._id %\u003e",
               "span": {
                 "file": "views/index.ejs",
                 "start_line": 21,
@@ -3614,7 +3531,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "<%= todo._id %>",
+        "text": "\u003c%= todo._id %\u003e",
         "span": {
           "file": "views/index.ejs",
           "start_line": 21,
@@ -3911,7 +3828,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "<%- redirectPage %>",
+              "text": "\u003c%- redirectPage %\u003e",
               "span": {
                 "file": "views/admin.ejs",
                 "start_line": 17,
@@ -3958,7 +3875,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "<%- redirectPage %>",
+        "text": "\u003c%- redirectPage %\u003e",
         "span": {
           "file": "views/admin.ejs",
           "start_line": 17,
@@ -4347,7 +4264,7 @@
           },
           "to": {
             "kind": "statement",
-            "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });",
+            "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });",
             "span": {
               "file": "routes/index.js",
               "start_line": 52,
@@ -4412,7 +4329,7 @@
           "control_flow": [
             {
               "kind": "handler",
-              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 50,
@@ -4426,7 +4343,7 @@
           "control_statement": [
             {
               "kind": "control_statement",
-              "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
+              "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 51,
@@ -4440,7 +4357,7 @@
           "handler": [
             {
               "kind": "handler",
-              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 50,
@@ -4568,7 +4485,7 @@
           "nosql_query_candidate": [
             {
               "kind": "nosql_query_candidate",
-              "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    })",
+              "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    })",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 52,
@@ -4622,7 +4539,7 @@
           "route_handler": [
             {
               "kind": "route_handler",
-              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 50,
@@ -4823,7 +4740,7 @@
       "kind": "nosql_query_candidate",
       "sink": {
         "kind": "nosql_query_candidate",
-        "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    })",
+        "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    })",
         "span": {
           "file": "routes/index.js",
           "start_line": 52,
@@ -5002,7 +4919,7 @@
         },
         {
           "kind": "route_handler",
-          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 50,
@@ -5038,7 +4955,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 50,
@@ -5050,7 +4967,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
+          "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 51,
@@ -5464,7 +5381,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 50,
@@ -5476,7 +5393,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
+          "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 51,
@@ -5732,7 +5649,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -5744,7 +5661,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -6209,7 +6126,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -6221,7 +6138,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -6513,7 +6430,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -6525,7 +6442,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -6817,7 +6734,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -6829,7 +6746,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -7121,7 +7038,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -7133,7 +7050,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -7425,7 +7342,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -7437,7 +7354,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -7595,7 +7512,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -7607,7 +7524,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -7789,6 +7706,17 @@
             }
           },
           {
+            "kind": "unknown_transfer",
+            "detail": "call may transform or discard its arguments: parse",
+            "at": {
+              "file": "routes/index.js",
+              "start_line": 182,
+              "end_line": 182,
+              "start_byte": 4772,
+              "end_byte": 4783
+            }
+          },
+          {
             "kind": "unknown_control_effect",
             "detail": "value may change across unsupported control flow",
             "at": {
@@ -7845,6 +7773,18 @@
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             },
             {
+              "kind": "branch_consequence",
+              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 170,
+                "end_line": 170,
+                "start_byte": 4436,
+                "end_byte": 4487
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
               "kind": "expression",
               "text": "content: item",
               "span": {
@@ -7897,6 +7837,42 @@
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             },
             {
+              "kind": "call_argument_dependency",
+              "text": "parse(item)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 182,
+                "end_line": 182,
+                "start_byte": 4772,
+                "end_byte": 4783
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "item = parse(item)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 182,
+                "end_line": 182,
+                "start_byte": 4765,
+                "end_byte": 4783
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "branch_alternative",
+              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 170,
+                "end_line": 170,
+                "start_byte": 4436,
+                "end_byte": 4487
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
               "kind": "expression",
               "text": "content: item",
               "span": {
@@ -7938,7 +7914,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
+          "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' \u0026\u0026 item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 165,
@@ -7950,13 +7926,25 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }",
+          "text": "if (typeof (item) == 'string' \u0026\u0026 item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 170,
             "end_line": 183,
             "start_byte": 4433,
             "end_byte": 4788
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "helper_definition",
+          "text": "function parse(todo) {\n  var t = todo;\n\n  var remindToken = ' in ';\n  var reminder = t.toString().indexOf(remindToken);\n  if (reminder \u003e 0) {\n    var time = t.slice(reminder + remindToken.length);\n    time = time.replace(/\\n$/, '');\n\n    var period = hms(time);\n\n    console.log('period: ' + period);\n\n    // remove it\n    t = t.slice(0, reminder);\n    if (typeof period != 'undefined') {\n      t += ' [' + ms(period) + ']';\n    }\n  }\n  return t;\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 143,
+            "end_line": 163,
+            "start_byte": 3794,
+            "end_byte": 4242
           },
           "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
         },
@@ -8056,6 +8044,17 @@
           }
         },
         {
+          "kind": "unknown_transfer",
+          "detail": "call may transform or discard its arguments: parse",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 182,
+            "end_line": 182,
+            "start_byte": 4772,
+            "end_byte": 4783
+          }
+        },
+        {
           "kind": "unknown_control_effect",
           "detail": "value may change across unsupported control flow",
           "at": {
@@ -8119,7 +8118,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
+          "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' \u0026\u0026 item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 165,
@@ -8131,13 +8130,25 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }",
+          "text": "if (typeof (item) == 'string' \u0026\u0026 item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 170,
             "end_line": 183,
             "start_byte": 4433,
             "end_byte": 4788
+          },
+          "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+        },
+        {
+          "kind": "helper_definition",
+          "text": "function parse(todo) {\n  var t = todo;\n\n  var remindToken = ' in ';\n  var reminder = t.toString().indexOf(remindToken);\n  if (reminder \u003e 0) {\n    var time = t.slice(reminder + remindToken.length);\n    time = time.replace(/\\n$/, '');\n\n    var period = hms(time);\n\n    console.log('period: ' + period);\n\n    // remove it\n    t = t.slice(0, reminder);\n    if (typeof period != 'undefined') {\n      t += ' [' + ms(period) + ']';\n    }\n  }\n  return t;\n}",
+          "span": {
+            "file": "routes/index.js",
+            "start_line": 143,
+            "end_line": 163,
+            "start_byte": 3794,
+            "end_byte": 4242
           },
           "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
         },
@@ -8891,7 +8902,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "<%= todo._id %>",
+              "text": "\u003c%= todo._id %\u003e",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 19,
@@ -8961,7 +8972,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "<%= todo._id %>",
+        "text": "\u003c%= todo._id %\u003e",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 19,
@@ -9263,7 +9274,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "<%= todo.content %>",
+              "text": "\u003c%= todo.content %\u003e",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 20,
@@ -9345,7 +9356,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "<%= todo.content %>",
+        "text": "\u003c%= todo.content %\u003e",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 20,
@@ -9379,6 +9390,18 @@
                 "end_line": 168,
                 "start_byte": 4355,
                 "end_byte": 4378
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "branch_consequence",
+              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 170,
+                "end_line": 170,
+                "start_byte": 4436,
+                "end_byte": 4487
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             },
@@ -9455,6 +9478,42 @@
                 "end_line": 168,
                 "start_byte": 4355,
                 "end_byte": 4378
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "parse(item)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 182,
+                "end_line": 182,
+                "start_byte": 4772,
+                "end_byte": 4783
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "item = parse(item)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 182,
+                "end_line": 182,
+                "start_byte": 4765,
+                "end_byte": 4783
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "branch_alternative",
+              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 170,
+                "end_line": 170,
+                "start_byte": 4436,
+                "end_byte": 4487
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             },
@@ -9829,7 +9888,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "<%= todo._id %>",
+              "text": "\u003c%= todo._id %\u003e",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 23,
@@ -9899,7 +9958,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "<%= todo._id %>",
+        "text": "\u003c%= todo._id %\u003e",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 23,
@@ -10201,7 +10260,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "<%= todo.content %>",
+              "text": "\u003c%= todo.content %\u003e",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 23,
@@ -10283,7 +10342,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "<%= todo.content %>",
+        "text": "\u003c%= todo.content %\u003e",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 23,
@@ -10317,6 +10376,18 @@
                 "end_line": 168,
                 "start_byte": 4355,
                 "end_byte": 4378
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "branch_consequence",
+              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 170,
+                "end_line": 170,
+                "start_byte": 4436,
+                "end_byte": 4487
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             },
@@ -10393,6 +10464,42 @@
                 "end_line": 168,
                 "start_byte": 4355,
                 "end_byte": 4378
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "call_argument_dependency",
+              "text": "parse(item)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 182,
+                "end_line": 182,
+                "start_byte": 4772,
+                "end_byte": 4783
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "assignment",
+              "text": "item = parse(item)",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 182,
+                "end_line": 182,
+                "start_byte": 4765,
+                "end_byte": 4783
+              },
+              "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+            },
+            {
+              "kind": "branch_alternative",
+              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "span": {
+                "file": "routes/index.js",
+                "start_line": 170,
+                "end_line": 170,
+                "start_byte": 4436,
+                "end_byte": 4487
               },
               "sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
             },
@@ -10767,7 +10874,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "<%= todo._id %>",
+              "text": "\u003c%= todo._id %\u003e",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 27,
@@ -10837,7 +10944,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "<%= todo._id %>",
+        "text": "\u003c%= todo._id %\u003e",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 27,
@@ -11134,7 +11241,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "<%= todo._id %>",
+              "text": "\u003c%= todo._id %\u003e",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 29,
@@ -11204,7 +11311,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "<%= todo._id %>",
+        "text": "\u003c%= todo._id %\u003e",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 29,
@@ -13046,7 +13153,7 @@
       "context": [
         {
           "kind": "registration",
-          "text": "router.post('/', async (req, res, next) => {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
+          "text": "router.post('/', async (req, res, next) =\u003e {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
           "span": {
             "file": "routes/users.js",
             "start_line": 26,
@@ -13180,7 +13287,7 @@
       "context": [
         {
           "kind": "registration",
-          "text": "router.post('/', async (req, res, next) => {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
+          "text": "router.post('/', async (req, res, next) =\u003e {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
           "span": {
             "file": "routes/users.js",
             "start_line": 26,
@@ -13314,7 +13421,7 @@
       "context": [
         {
           "kind": "registration",
-          "text": "router.post('/', async (req, res, next) => {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
+          "text": "router.post('/', async (req, res, next) =\u003e {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
           "span": {
             "file": "routes/users.js",
             "start_line": 26,

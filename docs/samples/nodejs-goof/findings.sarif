@@ -151,6 +151,12 @@
             {
               "level": "note",
               "message": {
+                "text": "GET /: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
                 "text": "GET /login: semantic assessment not_run"
               }
             },
@@ -863,6 +869,26 @@
                       "executionOrder": 3,
                       "location": {
                         "message": {
+                          "text": "branch_consequence"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 170,
+                            "startLine": 170
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
                           "text": "expression"
                         },
                         "physicalLocation": {
@@ -880,7 +906,7 @@
                       }
                     },
                     {
-                      "executionOrder": 4,
+                      "executionOrder": 5,
                       "location": {
                         "message": {
                           "text": "storage_write"
@@ -900,7 +926,7 @@
                       }
                     },
                     {
-                      "executionOrder": 5,
+                      "executionOrder": 6,
                       "location": {
                         "message": {
                           "text": "storage_read"
@@ -920,7 +946,7 @@
                       }
                     },
                     {
-                      "executionOrder": 6,
+                      "executionOrder": 7,
                       "location": {
                         "message": {
                           "text": "storage_query"
@@ -940,7 +966,7 @@
                       }
                     },
                     {
-                      "executionOrder": 7,
+                      "executionOrder": 8,
                       "location": {
                         "message": {
                           "text": "string_conversion"
@@ -960,7 +986,7 @@
                       }
                     },
                     {
-                      "executionOrder": 8,
+                      "executionOrder": 9,
                       "location": {
                         "message": {
                           "text": "call_argument_dependency"
@@ -980,7 +1006,7 @@
                       }
                     },
                     {
-                      "executionOrder": 9,
+                      "executionOrder": 10,
                       "location": {
                         "message": {
                           "text": "template_output"
@@ -1074,6 +1100,66 @@
                       "executionOrder": 3,
                       "location": {
                         "message": {
+                          "text": "call_argument_dependency"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 182,
+                            "startLine": 182
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 182,
+                            "startLine": 182
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 5,
+                      "location": {
+                        "message": {
+                          "text": "branch_alternative"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 170,
+                            "startLine": 170
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 6,
+                      "location": {
+                        "message": {
                           "text": "expression"
                         },
                         "physicalLocation": {
@@ -1091,7 +1177,7 @@
                       }
                     },
                     {
-                      "executionOrder": 4,
+                      "executionOrder": 7,
                       "location": {
                         "message": {
                           "text": "storage_write"
@@ -1111,7 +1197,7 @@
                       }
                     },
                     {
-                      "executionOrder": 5,
+                      "executionOrder": 8,
                       "location": {
                         "message": {
                           "text": "storage_read"
@@ -1131,7 +1217,7 @@
                       }
                     },
                     {
-                      "executionOrder": 6,
+                      "executionOrder": 9,
                       "location": {
                         "message": {
                           "text": "storage_query"
@@ -1151,7 +1237,7 @@
                       }
                     },
                     {
-                      "executionOrder": 7,
+                      "executionOrder": 10,
                       "location": {
                         "message": {
                           "text": "string_conversion"
@@ -1171,7 +1257,7 @@
                       }
                     },
                     {
-                      "executionOrder": 8,
+                      "executionOrder": 11,
                       "location": {
                         "message": {
                           "text": "call_argument_dependency"
@@ -1191,7 +1277,7 @@
                       }
                     },
                     {
-                      "executionOrder": 9,
+                      "executionOrder": 12,
                       "location": {
                         "message": {
                           "text": "template_output"
@@ -1432,160 +1518,12 @@
             }
           ],
           "message": {
-            "text": "GET /: Untrusted data reaches raw HTML output [poor_practice]. A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate. Decision XSS exposure: Inconclusive. Scanner policy: XSS assessment is inconclusive; absence of a positive answer is not protection."
+            "text": "GET /: Untrusted data reaches raw HTML output [poor_practice]. A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate. Output context: html_text. A source path reaches raw HTML through marked 0.3.5, whose sanitize option has a documented entity/URL bypass (upstream marked PR 592). Per-path protection: path 1 ineffective (written by POST /create); path 2 unknown (written by POST /create); path 3 ineffective (written by POST /update/:id)."
           },
           "properties": {
             "scan.assessment": {
-              "answer_details": {
-                "encoding_adequacy": {
-                  "choice": "inadequate",
-                  "confidence": 0.51,
-                  "probabilities": [
-                    {
-                      "value": "adequate",
-                      "probability": 0.01
-                    },
-                    {
-                      "value": "inadequate",
-                      "probability": 0.63
-                    },
-                    {
-                      "value": "not_present",
-                      "probability": 0.22
-                    },
-                    {
-                      "value": "unknown",
-                      "probability": 0.14
-                    }
-                  ]
-                },
-                "output_context": {
-                  "choice": "html_text",
-                  "confidence": 0.92,
-                  "probabilities": [
-                    {
-                      "value": "html_text",
-                      "probability": 0.93
-                    },
-                    {
-                      "value": "html_attribute",
-                      "probability": 0
-                    },
-                    {
-                      "value": "url",
-                      "probability": 0
-                    },
-                    {
-                      "value": "script",
-                      "probability": 0
-                    },
-                    {
-                      "value": "style",
-                      "probability": 0
-                    },
-                    {
-                      "value": "unquoted_attribute",
-                      "probability": 0
-                    },
-                    {
-                      "value": "active_attribute",
-                      "probability": 0
-                    },
-                    {
-                      "value": "html_tag",
-                      "probability": 0
-                    },
-                    {
-                      "value": "template_code",
-                      "probability": 0
-                    },
-                    {
-                      "value": "unknown",
-                      "probability": 0.07
-                    }
-                  ]
-                },
-                "sanitizer_effectiveness": {
-                  "choice": "ineffective",
-                  "confidence": 0.96,
-                  "probabilities": [
-                    {
-                      "value": "effective",
-                      "probability": 0.01
-                    },
-                    {
-                      "value": "ineffective",
-                      "probability": 0.97
-                    },
-                    {
-                      "value": "absent",
-                      "probability": 0
-                    },
-                    {
-                      "value": "unknown",
-                      "probability": 0.02
-                    }
-                  ]
-                },
-                "xss_all_paths_protected": {
-                  "choice": "no",
-                  "confidence": 0.77,
-                  "probabilities": [
-                    {
-                      "value": "yes",
-                      "probability": 0.01
-                    },
-                    {
-                      "value": "no",
-                      "probability": 0.85
-                    },
-                    {
-                      "value": "unknown",
-                      "probability": 0.14
-                    }
-                  ]
-                },
-                "xss_exposure": {
-                  "choice": "unknown",
-                  "confidence": 0.44,
-                  "probabilities": [
-                    {
-                      "value": "vulnerable",
-                      "probability": 0.42
-                    },
-                    {
-                      "value": "protected",
-                      "probability": 0
-                    },
-                    {
-                      "value": "unknown",
-                      "probability": 0.58
-                    },
-                    {
-                      "value": "not_applicable",
-                      "probability": 0
-                    }
-                  ]
-                }
-              },
-              "finding_status": "needs_evidence",
-              "answers": {
-                "encoding_adequacy": "inadequate",
-                "output_context": "html_text",
-                "sanitizer_effectiveness": "ineffective",
-                "xss_all_paths_protected": "no",
-                "xss_exposure": "unknown"
-              },
-              "usage": {
-                "input_tokens": 5238,
-                "output_tokens": 0
-              },
-              "status": "completed",
-              "provider": "openai",
-              "model": "gpt-6-luna",
-              "question_version": "xss-use-v1",
-              "protection": "uncertain",
-              "reason": "XSS assessment is inconclusive; absence of a positive answer is not protection."
+              "status": "not_run",
+              "reason": "The saved decision was made for earlier evidence; changed evidence does not inherit it, and a fresh judgment requires separate authorization."
             },
             "scan.blockingGaps": [],
             "scan.coverageGaps": [
@@ -1635,8 +1573,8 @@
               "title": "Untrusted data reaches raw HTML output",
               "summary": "A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate.",
               "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
-              "use_protection": "Decision XSS exposure: Inconclusive. Scanner policy: XSS assessment is inconclusive; absence of a positive answer is not protection.",
-              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
+              "use_protection": "Output context: html_text. A source path reaches raw HTML through marked 0.3.5, whose sanitize option has a documented entity/URL bypass (upstream marked PR 592). Per-path protection: path 1 ineffective (written by POST /create); path 2 unknown (written by POST /create); path 3 ineffective (written by POST /update/:id).",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
               "recommendations": {
                 "title": "Protect the specific browser rendering context",
                 "actions": [
@@ -6533,6 +6471,26 @@
                       "executionOrder": 3,
                       "location": {
                         "message": {
+                          "text": "branch_consequence"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 170,
+                            "startLine": 170
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
                           "text": "expression"
                         },
                         "physicalLocation": {
@@ -6550,7 +6508,7 @@
                       }
                     },
                     {
-                      "executionOrder": 4,
+                      "executionOrder": 5,
                       "location": {
                         "message": {
                           "text": "string_conversion"
@@ -6570,7 +6528,7 @@
                       }
                     },
                     {
-                      "executionOrder": 5,
+                      "executionOrder": 6,
                       "location": {
                         "message": {
                           "text": "html_response"
@@ -6664,6 +6622,66 @@
                       "executionOrder": 3,
                       "location": {
                         "message": {
+                          "text": "call_argument_dependency"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 182,
+                            "startLine": 182
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 182,
+                            "startLine": 182
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 5,
+                      "location": {
+                        "message": {
+                          "text": "branch_alternative"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 170,
+                            "startLine": 170
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 6,
+                      "location": {
+                        "message": {
                           "text": "expression"
                         },
                         "physicalLocation": {
@@ -6681,7 +6699,7 @@
                       }
                     },
                     {
-                      "executionOrder": 4,
+                      "executionOrder": 7,
                       "location": {
                         "message": {
                           "text": "string_conversion"
@@ -6701,7 +6719,7 @@
                       }
                     },
                     {
-                      "executionOrder": 5,
+                      "executionOrder": 8,
                       "location": {
                         "message": {
                           "text": "html_response"
@@ -6802,6 +6820,17 @@
                   "end_line": 189,
                   "start_byte": 4894,
                   "end_byte": 4920
+                }
+              },
+              {
+                "kind": "unknown_transfer",
+                "detail": "call may transform or discard its arguments: parse",
+                "at": {
+                  "file": "routes/index.js",
+                  "start_line": 182,
+                  "end_line": 182,
+                  "start_byte": 4772,
+                  "end_byte": 4783
                 }
               },
               {
@@ -6914,6 +6943,21 @@
             {
               "id": 3,
               "message": {
+                "text": "helper_definition"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "routes/index.js"
+                },
+                "region": {
+                  "endLine": 163,
+                  "startLine": 143
+                }
+              }
+            },
+            {
+              "id": 4,
+              "message": {
                 "text": "storage_model_binding"
               },
               "physicalLocation": {
@@ -6927,7 +6971,7 @@
               }
             },
             {
-              "id": 4,
+              "id": 5,
               "message": {
                 "text": "storage_library_binding"
               },
@@ -6942,7 +6986,7 @@
               }
             },
             {
-              "id": 5,
+              "id": 6,
               "message": {
                 "text": "storage_callback"
               },
@@ -6957,7 +7001,7 @@
               }
             },
             {
-              "id": 6,
+              "id": 7,
               "message": {
                 "text": "control_statement"
               },
@@ -6972,7 +7016,7 @@
               }
             },
             {
-              "id": 7,
+              "id": 8,
               "message": {
                 "text": "render_binding"
               },
@@ -7201,6 +7245,21 @@
             {
               "id": 3,
               "message": {
+                "text": "helper_definition"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "routes/index.js"
+                },
+                "region": {
+                  "endLine": 163,
+                  "startLine": 143
+                }
+              }
+            },
+            {
+              "id": 4,
+              "message": {
                 "text": "storage_model_binding"
               },
               "physicalLocation": {
@@ -7214,7 +7273,7 @@
               }
             },
             {
-              "id": 4,
+              "id": 5,
               "message": {
                 "text": "storage_library_binding"
               },
@@ -8120,6 +8179,26 @@
                       "executionOrder": 3,
                       "location": {
                         "message": {
+                          "text": "branch_consequence"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 170,
+                            "startLine": 170
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
                           "text": "expression"
                         },
                         "physicalLocation": {
@@ -8137,7 +8216,7 @@
                       }
                     },
                     {
-                      "executionOrder": 4,
+                      "executionOrder": 5,
                       "location": {
                         "message": {
                           "text": "storage_write"
@@ -8157,7 +8236,7 @@
                       }
                     },
                     {
-                      "executionOrder": 5,
+                      "executionOrder": 6,
                       "location": {
                         "message": {
                           "text": "storage_read"
@@ -8177,7 +8256,7 @@
                       }
                     },
                     {
-                      "executionOrder": 6,
+                      "executionOrder": 7,
                       "location": {
                         "message": {
                           "text": "storage_query"
@@ -8197,7 +8276,7 @@
                       }
                     },
                     {
-                      "executionOrder": 7,
+                      "executionOrder": 8,
                       "location": {
                         "message": {
                           "text": "template_output"
@@ -8291,6 +8370,66 @@
                       "executionOrder": 3,
                       "location": {
                         "message": {
+                          "text": "call_argument_dependency"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 182,
+                            "startLine": 182
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 182,
+                            "startLine": 182
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 5,
+                      "location": {
+                        "message": {
+                          "text": "branch_alternative"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 170,
+                            "startLine": 170
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 6,
+                      "location": {
+                        "message": {
                           "text": "expression"
                         },
                         "physicalLocation": {
@@ -8308,7 +8447,7 @@
                       }
                     },
                     {
-                      "executionOrder": 4,
+                      "executionOrder": 7,
                       "location": {
                         "message": {
                           "text": "storage_write"
@@ -8328,7 +8467,7 @@
                       }
                     },
                     {
-                      "executionOrder": 5,
+                      "executionOrder": 8,
                       "location": {
                         "message": {
                           "text": "storage_read"
@@ -8348,7 +8487,7 @@
                       }
                     },
                     {
-                      "executionOrder": 6,
+                      "executionOrder": 9,
                       "location": {
                         "message": {
                           "text": "storage_query"
@@ -8368,7 +8507,7 @@
                       }
                     },
                     {
-                      "executionOrder": 7,
+                      "executionOrder": 10,
                       "location": {
                         "message": {
                           "text": "template_output"
@@ -9274,6 +9413,26 @@
                       "executionOrder": 3,
                       "location": {
                         "message": {
+                          "text": "branch_consequence"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 170,
+                            "startLine": 170
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
                           "text": "expression"
                         },
                         "physicalLocation": {
@@ -9291,7 +9450,7 @@
                       }
                     },
                     {
-                      "executionOrder": 4,
+                      "executionOrder": 5,
                       "location": {
                         "message": {
                           "text": "storage_write"
@@ -9311,7 +9470,7 @@
                       }
                     },
                     {
-                      "executionOrder": 5,
+                      "executionOrder": 6,
                       "location": {
                         "message": {
                           "text": "storage_read"
@@ -9331,7 +9490,7 @@
                       }
                     },
                     {
-                      "executionOrder": 6,
+                      "executionOrder": 7,
                       "location": {
                         "message": {
                           "text": "storage_query"
@@ -9351,7 +9510,7 @@
                       }
                     },
                     {
-                      "executionOrder": 7,
+                      "executionOrder": 8,
                       "location": {
                         "message": {
                           "text": "template_output"
@@ -9445,6 +9604,66 @@
                       "executionOrder": 3,
                       "location": {
                         "message": {
+                          "text": "call_argument_dependency"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 182,
+                            "startLine": 182
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 182,
+                            "startLine": 182
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 5,
+                      "location": {
+                        "message": {
+                          "text": "branch_alternative"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "routes/index.js"
+                          },
+                          "region": {
+                            "endLine": 170,
+                            "startLine": 170
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "a13d03f614346d07173ca0a4bb0917c35c8690ba5e14cdd3d091aa3810ea6d22"
+                      }
+                    },
+                    {
+                      "executionOrder": 6,
+                      "location": {
+                        "message": {
                           "text": "expression"
                         },
                         "physicalLocation": {
@@ -9462,7 +9681,7 @@
                       }
                     },
                     {
-                      "executionOrder": 4,
+                      "executionOrder": 7,
                       "location": {
                         "message": {
                           "text": "storage_write"
@@ -9482,7 +9701,7 @@
                       }
                     },
                     {
-                      "executionOrder": 5,
+                      "executionOrder": 8,
                       "location": {
                         "message": {
                           "text": "storage_read"
@@ -9502,7 +9721,7 @@
                       }
                     },
                     {
-                      "executionOrder": 6,
+                      "executionOrder": 9,
                       "location": {
                         "message": {
                           "text": "storage_query"
@@ -9522,7 +9741,7 @@
                       }
                     },
                     {
-                      "executionOrder": 7,
+                      "executionOrder": 10,
                       "location": {
                         "message": {
                           "text": "template_output"

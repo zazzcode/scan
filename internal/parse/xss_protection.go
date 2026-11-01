@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 var htmlAttribute = regexp.MustCompile(`(?i)([a-z_:][a-z0-9_:.-]*)\s*=\s*(["']?)[^"']*$`)
@@ -39,63 +40,107 @@ func htmlOutputContext(prefix string) string {
 }
 
 func (f *flow) xssProtection(v value, context string, escaped bool) (string, string) {
+	protection, reason, _ := f.xssPathProtection(v, context, escaped)
+	return protection, reason
+}
+
+// xssPathProtection also returns each dependency's own protection, in dependency
+// order. A path is classified by itself; a protected sibling never protects it.
+func (f *flow) xssPathProtection(v value, context string, escaped bool) (string, string, []string) {
 	if escaped {
 		if context == "html_text" || context == "html_attribute" {
-			return "encoded", "The template HTML-escapes this value in HTML text or a quoted non-active attribute."
+			return "encoded", "The template HTML-escapes this value in HTML text or a quoted non-active attribute.", nil
 		}
-		return "unknown", "Template HTML escaping does not establish protection in this output context."
+		return "unknown", "Template HTML escaping does not establish protection in this output context.", nil
 	}
+	paths := make([]string, len(v.deps))
 	allProtected := len(v.deps) > 0
 	hasRaw, hasUnknown, hasIneffective := false, false, false
-	for _, dependency := range v.deps {
-		protected, unknown, ineffective := false, false, false
-		for _, transfer := range dependency.Transfers {
-			if transfer.Kind != "call_argument_dependency" {
-				continue
-			}
-			m := f.set.modules[transfer.Span.File]
-			if m == nil {
-				unknown = true
-				continue
-			}
-			call := nodeAt(m.tree.RootNode(), transfer.Span.StartByte, transfer.Span.EndByte)
-			mode := verifiedOutputProtection(m, call)
-			if mode == "markdown" && f.set.packageVersion("marked") == "0.3.5" {
-				mode = "ineffective"
-			}
-			switch mode {
-			case "encode":
-				protected = context == "html_text" || context == "html_attribute"
-				unknown = !protected
-			case "sanitize":
-				protected = context == "html_text"
-				unknown = !protected
-			case "ineffective":
-				protected, ineffective = false, true
-			default:
-				unknown, protected = true, false
-			}
-		}
-		allProtected = allProtected && protected && !unknown
-		hasUnknown = hasUnknown || unknown
-		if !protected && !unknown {
-			hasRaw = true
-			hasIneffective = hasIneffective || ineffective
+	for i, dependency := range v.deps {
+		paths[i] = f.dependencyProtection(dependency, context)
+		switch paths[i] {
+		case "encoded", "sanitized":
+		case "unknown":
+			allProtected, hasUnknown = false, true
+		default:
+			allProtected, hasRaw = false, true
+			hasIneffective = hasIneffective || paths[i] == "ineffective"
 		}
 	}
 	if allProtected {
-		return "sanitized", "Every modeled source path passes through a verified encoder or sanitizer appropriate to this output context."
+		return "sanitized", "Every modeled source path passes through a verified encoder or sanitizer appropriate to this output context.", paths
 	}
 	if hasRaw {
 		if hasIneffective {
-			return "ineffective", "A source path reaches raw HTML through marked 0.3.5, whose sanitize option has a documented entity/URL bypass (upstream marked PR 592)."
+			return "ineffective", "A source path reaches raw HTML through marked 0.3.5, whose sanitize option has a documented entity/URL bypass (upstream marked PR 592).", paths
 		}
-		return "raw", "A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence."
+		return "raw", "A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.", paths
 	}
 	if hasUnknown {
-		return "unknown", "A transformation or its adequacy for this context is unresolved; no protection is assumed."
+		return "unknown", "A transformation or its adequacy for this context is unresolved; no protection is assumed.", paths
 	}
-	return "unknown", "No complete source-to-output path was established."
+	return "unknown", "No complete source-to-output path was established.", paths
+}
+
+// dependencyProtection classifies one path by its call transfers in order. A later
+// transformation of unknown effect leaves the path unknown even after an encoder.
+func (f *flow) dependencyProtection(dependency graph.Dependency, context string) string {
+	protection := "raw"
+	for _, transfer := range dependency.Transfers {
+		if transfer.Kind != "call_argument_dependency" {
+			continue
+		}
+		m := f.set.modules[transfer.Span.File]
+		if m == nil {
+			protection = "unknown"
+			continue
+		}
+		call := nodeAt(m.tree.RootNode(), transfer.Span.StartByte, transfer.Span.EndByte)
+		mode := verifiedOutputProtection(m, call)
+		if mode == "markdown" && f.set.packageVersion("marked") == "0.3.5" {
+			mode = "ineffective"
+		}
+		switch mode {
+		case "encode":
+			protection = "unknown"
+			if context == "html_text" || context == "html_attribute" {
+				protection = "encoded"
+			}
+		case "sanitize":
+			protection = "unknown"
+			if context == "html_text" {
+				protection = "sanitized"
+			}
+		case "ineffective":
+			// Bypassable rich-HTML conversion does not resolve an earlier unknown step.
+			if protection != "unknown" {
+				protection = "ineffective"
+			}
+		default:
+			protection = "unknown"
+		}
+	}
+	return protection
+}
+
+// xssPaths reports per-path protection only when paths differ. entries, when
+// present, has one writing entry per dependency.
+func xssPaths(protections, entries []string) []graph.XSSPath {
+	distinct := map[string]bool{}
+	for _, p := range protections {
+		distinct[p] = true
+	}
+	if len(distinct) < 2 {
+		return nil
+	}
+	paths := make([]graph.XSSPath, len(protections))
+	for i, p := range protections {
+		paths[i] = graph.XSSPath{Dependency: i, Protection: p}
+		if i < len(entries) {
+			paths[i].Entry = entries[i]
+		}
+	}
+	return paths
 }
 
 func verifiedOutputProtection(m *sourceModule, call *sitter.Node) string {

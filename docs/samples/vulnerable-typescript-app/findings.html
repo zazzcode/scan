@@ -18,7 +18,7 @@
 <p class="eyebrow">Local source analysis · presentation v3</p><h1>Understand the code.<br>Review the evidence.</h1>
 <p class="sub">Expand a source entry to review observations, analysis gaps, and recommended changes. Input validation and protection at a sensitive operation are reported separately.</p>
 <p class="root">vulnerable-typescript-app</p>
-<div class="stats"><div class="stat"><strong>19</strong><span>Source entries</span></div><div class="stat"><strong>1</strong><span>Findings · established problems to fix</span></div><div class="stat"><strong>18</strong><span>Review · unresolved questions</span></div><div class="stat"><strong>0</strong><span>Claims with supported protection</span></div></div>
+<div class="stats"><div class="stat"><strong>19</strong><span>Source entries</span></div><div class="stat"><strong>1</strong><span>Findings · established problems to fix</span></div><div class="stat"><strong>19</strong><span>Review · unresolved questions</span></div><div class="stat"><strong>0</strong><span>Claims with supported protection</span></div></div>
 <div class="note"><strong>Read the status with the finding.</strong> Findings include established vulnerabilities and poor practice to remediate or refactor. An exploit demonstration is not required for a poor-practice finding. Review means the evidence does not yet establish a problem or adequate protection. Protection applies only to the stated claim. No findings reported does not mean a route is safe. Counts are per use and route; shared helpers may appear more than once.</div>
 <div class="note"><label><input type="checkbox" id="hide-protected" disabled> Hide protected results · focus on open items</label><p id="filter-status" role="status" aria-live="polite">Showing all results. Filtering changes this view only; saved evidence and total counts remain intact.</p></div>
 <h2>Server / API routes</h2><p class="sub">Select a row to expand. Routes start sorted by Findings, Review, then Protected counts, highest first; blank rows appear last. Select Route signature or the grouped Findings / Review / Protected header to change the order; select again to reverse it. The Findings sort orders by Findings, Review, then Protected counts, with blank rows last and route path A–Z breaking ties. Entries without a resolved route appear last. Route location identifies where the route is declared; finding locations appear inside the expanded row. Select a type pill to see its definition. Categories can overlap; a category pill is not an additional finding. Read the status to distinguish poor practice from unresolved review. <a class="glossary-link" href="#finding-glossary">Browse the glossary</a>.</p>
@@ -121,7 +121,83 @@
     res.status(400).json({ error: error.message });
   }</pre></details></details>
 </article>
-<details class="evidence"><summary>Entry analysis gaps (2)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">src/server.ts:133</span></p><p><code>unsupported_control_flow</code> · statement not traversed: try_statement <span class="location">src/server.ts:135</span></p></details></div></details><details class="entry" id="route:src/server.ts:2186:POST:/api/login" data-path="/api/login" data-method="POST" data-findings="0" data-review="2" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">POST /api/login</span><span class="location" title="Source declaration">src/server.ts:69</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="2 analysis items to review">2 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Input Validation <span class="pill-status">· review (1)</span></button><button type="button" class="type-pill review" popovertarget="glossary-sensitive-data-logging" aria-label="Sensitive Data Logging glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Sensitive Data Logging <span class="pill-status">· review (1)</span></button></span></summary>
+<details class="evidence"><summary>Entry analysis gaps (2)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">src/server.ts:133</span></p><p><code>unsupported_control_flow</code> · statement not traversed: try_statement <span class="location">src/server.ts:135</span></p></details></div></details><details class="entry" id="route:src/server.ts:3417:GET:/api/files" data-path="/api/files" data-method="GET" data-findings="0" data-review="2" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /api/files</span><span class="location" title="Source declaration">src/server.ts:100</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="2 analysis items to review">2 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Input Validation <span class="pill-status">· review (1)</span></button><button type="button" class="type-pill review" popovertarget="glossary-stored-xss" aria-label="Stored XSS glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Stored XSS <span class="pill-status">· review (1)</span></button></span></summary>
+<div class="body"><article class="finding" data-record-type="analysis"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Stored value reaches HTML output; write origin needs review</h3><p>A verified storage read reaches rendering, but no matching request-to-storage write is established. Resolve that origin and storage protections before judging stored XSS.</p><p class="technical">Rendering: stored · context unknown · protection raw</p><p class="location"><span class="location-label">Finding location · </span>src/server.ts:108</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: unknown. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>res.send(data)</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">src/server.ts:104</p><pre>fs.readFile(filePath, &#39;utf8&#39;, (err: NodeJS.ErrnoException | null, data: string) =&gt; {
+    if (err) {
+      res.status(404).json({ error: &#39;File not found&#39; });
+    } else {
+      res.send(data);
+    }
+  })</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.</li><li>For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.</li><li>Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.</li><li>Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:src/server.ts:3417:GET:/api/files:src/server.ts:3828 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">src/server.ts:100</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">src/server.ts:105</span></p><h4>Claim blockers</h4><p>render_protection_unresolved · A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.</p><p>storage_origin_unresolved · No complete source-to-storage write link is established.</p><details><summary>Additional source context</summary><p class="location">src/server.ts:100</p><pre>app.get(&#39;/api/files&#39;, (req: Request, res: Response) =&gt; {
+  const filename: string = req.query.filename as string;
+  // Vulnerable: No sanitization of file path
+  const filePath: string = path.join(__dirname, &#39;../uploads&#39;, filename);
+  fs.readFile(filePath, &#39;utf8&#39;, (err: NodeJS.ErrnoException | null, data: string) =&gt; {
+    if (err) {
+      res.status(404).json({ error: &#39;File not found&#39; });
+    } else {
+      res.send(data);
+    }
+  });
+})</pre><p class="location">src/server.ts:100</p><pre>{
+  const filename: string = req.query.filename as string;
+  // Vulnerable: No sanitization of file path
+  const filePath: string = path.join(__dirname, &#39;../uploads&#39;, filename);
+  fs.readFile(filePath, &#39;utf8&#39;, (err: NodeJS.ErrnoException | null, data: string) =&gt; {
+    if (err) {
+      res.status(404).json({ error: &#39;File not found&#39; });
+    } else {
+      res.send(data);
+    }
+  });
+}</pre><p class="location">src/server.ts:104</p><pre>(err: NodeJS.ErrnoException | null, data: string) =&gt; {
+    if (err) {
+      res.status(404).json({ error: &#39;File not found&#39; });
+    } else {
+      res.send(data);
+    }
+  }</pre><p class="location">src/server.ts:105</p><pre>if (err) {
+      res.status(404).json({ error: &#39;File not found&#39; });
+    } else {
+      res.send(data);
+    }</pre><p class="location">src/server.ts:16</p><pre>import { Request, Response } from &#39;express&#39;;</pre><p class="location">src/server.ts:16</p><pre>import { Request, Response } from &#39;express&#39;;</pre><p class="location">src/server.ts:4</p><pre>import * as express from &#39;express&#39;;</pre></details></details>
+</article><article class="finding" data-record-type="analysis"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation needs review</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>src/server.ts:101</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.filename before the sink, and that call is not a proven validator</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
+<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
+<h4>Observed operation</h4><pre>req.query.filename</pre>
+<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">src/server.ts:101</p><pre>req.query.filename</pre></details>
+<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.</li><li>Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.</li><li>Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.</li></ul>
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use input:route:src/server.ts:3417:GET:/api/files:req.query.filename:3501 · input_validation_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">src/server.ts:100</span></p><p><code>input_validation_unresolved</code> · a call receives req.query.filename before the sink, and that call is not a proven validator <span class="location">src/server.ts:101</span></p><details><summary>Additional source context</summary><p class="location">src/server.ts:100</p><pre>app.get(&#39;/api/files&#39;, (req: Request, res: Response) =&gt; {
+  const filename: string = req.query.filename as string;
+  // Vulnerable: No sanitization of file path
+  const filePath: string = path.join(__dirname, &#39;../uploads&#39;, filename);
+  fs.readFile(filePath, &#39;utf8&#39;, (err: NodeJS.ErrnoException | null, data: string) =&gt; {
+    if (err) {
+      res.status(404).json({ error: &#39;File not found&#39; });
+    } else {
+      res.send(data);
+    }
+  });
+})</pre><p class="location">src/server.ts:100</p><pre>{
+  const filename: string = req.query.filename as string;
+  // Vulnerable: No sanitization of file path
+  const filePath: string = path.join(__dirname, &#39;../uploads&#39;, filename);
+  fs.readFile(filePath, &#39;utf8&#39;, (err: NodeJS.ErrnoException | null, data: string) =&gt; {
+    if (err) {
+      res.status(404).json({ error: &#39;File not found&#39; });
+    } else {
+      res.send(data);
+    }
+  });
+}</pre></details></details>
+</article>
+<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">src/server.ts:100</span></p></details></div></details><details class="entry" id="route:src/server.ts:2186:POST:/api/login" data-path="/api/login" data-method="POST" data-findings="0" data-review="2" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">POST /api/login</span><span class="location" title="Source declaration">src/server.ts:69</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="2 analysis items to review">2 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Input Validation <span class="pill-status">· review (1)</span></button><button type="button" class="type-pill review" popovertarget="glossary-sensitive-data-logging" aria-label="Sensitive Data Logging glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Sensitive Data Logging <span class="pill-status">· review (1)</span></button></span></summary>
 <div class="body"><article class="finding" data-record-type="analysis"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Possible sensitive data in a log entry</h3><p>A verified logging call receives a request value whose field name or container suggests credentials or personal data, or that passes through an unresolved transformation. Confirm what the value contains and whether redaction applies before changing behavior. A field name is a hint, not proof.</p><p class="location"><span class="location-label">Finding location · </span>src/server.ts:74</p>
 <div class="facets"><div class="facet"><h4>Input validation</h4><p>Field validation is reported separately; it does not change what this log line contains.</p></div><div class="facet"><h4>Protection at this use</h4><p>Logging evidence: request body field password has a credential field-name hint and its content is written to the log.</p></div></div>
 <h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
@@ -378,38 +454,7 @@ console.info(&#39;login attempt&#39;, { username, passwordProvided: typeof passw
     res.status(404).json({ error: &#39;User not found&#39; });
   }</pre></details></details>
 </article>
-<details class="evidence"><summary>Entry analysis gaps (2)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">src/server.ts:145</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">src/server.ts:149</span></p></details></div></details><details class="entry" id="route:src/server.ts:3417:GET:/api/files" data-path="/api/files" data-method="GET" data-findings="0" data-review="1" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /api/files</span><span class="location" title="Source declaration">src/server.ts:100</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="1 analysis items to review">1 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Input Validation <span class="pill-status">· review (1)</span></button></span></summary>
-<div class="body"><article class="finding" data-record-type="analysis"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation needs review</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>src/server.ts:101</p>
-<div class="facets"><div class="facet"><h4>Input validation</h4><p>The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.filename before the sink, and that call is not a proven validator</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
-<h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
-<h4>Observed operation</h4><pre>req.query.filename</pre>
-<details class="evidence"><summary>Source &amp; transfer evidence (1 inputs)</summary><p class="location">src/server.ts:101</p><pre>req.query.filename</pre></details>
-<h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.</li><li>Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.</li><li>Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.</li></ul>
-<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use input:route:src/server.ts:3417:GET:/api/files:req.query.filename:3501 · input_validation_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">src/server.ts:100</span></p><p><code>input_validation_unresolved</code> · a call receives req.query.filename before the sink, and that call is not a proven validator <span class="location">src/server.ts:101</span></p><details><summary>Additional source context</summary><p class="location">src/server.ts:100</p><pre>app.get(&#39;/api/files&#39;, (req: Request, res: Response) =&gt; {
-  const filename: string = req.query.filename as string;
-  // Vulnerable: No sanitization of file path
-  const filePath: string = path.join(__dirname, &#39;../uploads&#39;, filename);
-  fs.readFile(filePath, &#39;utf8&#39;, (err: NodeJS.ErrnoException | null, data: string) =&gt; {
-    if (err) {
-      res.status(404).json({ error: &#39;File not found&#39; });
-    } else {
-      res.send(data);
-    }
-  });
-})</pre><p class="location">src/server.ts:100</p><pre>{
-  const filename: string = req.query.filename as string;
-  // Vulnerable: No sanitization of file path
-  const filePath: string = path.join(__dirname, &#39;../uploads&#39;, filename);
-  fs.readFile(filePath, &#39;utf8&#39;, (err: NodeJS.ErrnoException | null, data: string) =&gt; {
-    if (err) {
-      res.status(404).json({ error: &#39;File not found&#39; });
-    } else {
-      res.send(data);
-    }
-  });
-}</pre></details></details>
-</article>
-<details class="evidence"><summary>Entry analysis gaps (1)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">src/server.ts:100</span></p></details></div></details><details class="entry" id="route:src/server.ts:5878:POST:/api/parse-xml" data-path="/api/parse-xml" data-method="POST" data-findings="0" data-review="1" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">POST /api/parse-xml</span><span class="location" title="Source declaration">src/server.ts:170</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="1 analysis items to review">1 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Input Validation <span class="pill-status">· review (1)</span></button></span></summary>
+<details class="evidence"><summary>Entry analysis gaps (2)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">src/server.ts:145</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">src/server.ts:149</span></p></details></div></details><details class="entry" id="route:src/server.ts:5878:POST:/api/parse-xml" data-path="/api/parse-xml" data-method="POST" data-findings="0" data-review="1" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">POST /api/parse-xml</span><span class="location" title="Source declaration">src/server.ts:170</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="1 analysis items to review">1 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">Input Validation <span class="pill-status">· review (1)</span></button></span></summary>
 <div class="body"><article class="finding" data-record-type="analysis"><span class="badge analysis status-needs_review">Analysis needs review</span><h3>Request-field validation needs review</h3><p>Scan identified a request field used by the handler. Review it against the route&#39;s actual business requirements, separately from database protection.</p><p class="location"><span class="location-label">Finding location · </span>src/server.ts:171</p>
 <div class="facets"><div class="facet"><h4>Input validation</h4><p>The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator</p></div><div class="facet"><h4>Protection at this use</h4><p>Not established from the supplied evidence.</p></div></div>
 <h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
@@ -629,3 +674,5 @@ console.info(&#39;login attempt&#39;, { username, passwordProvided: typeof passw
   }
 })();
 </script></body></html>
+
+

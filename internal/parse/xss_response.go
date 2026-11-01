@@ -165,9 +165,10 @@ func (f *flow) recordXSS(sink graph.Evidence, v value, context, contentType stri
 	if len(v.deps) == 0 {
 		return
 	}
-	protection, reason := f.xssProtection(v, context, escaped)
+	protection, reason, protections := f.xssPathProtection(v, context, escaped)
+	paths := xssPaths(protections, nil)
 	if context == "unknown" || context == "mixed" {
-		protection, reason = "unknown", "Rendering context is not established for every value."
+		protection, reason, paths = "unknown", "Rendering context is not established for every value.", nil
 	}
 	ctx := append(append([]graph.Evidence{}, f.context...), extra...)
 	if m := f.registration; m != nil {
@@ -190,7 +191,7 @@ func (f *flow) recordXSS(sink graph.Evidence, v value, context, contentType stri
 			kind = "stored"
 		}
 		if dependency.Source.Kind == "unresolved_source" && !escaped {
-			protection, reason = "unknown", "The value source and transfer into rendering are not established."
+			protection, reason, paths = "unknown", "The value source and transfer into rendering are not established.", nil
 		}
 	}
 	clientID := ""
@@ -203,7 +204,7 @@ func (f *flow) recordXSS(sink graph.Evidence, v value, context, contentType stri
 		ID: fmt.Sprintf("xss:%s:%s:%d", identity, sink.Span.File, sink.Span.StartByte), RouteID: f.route.ID, ClientID: clientID,
 		Kind: "xss_candidate", Sink: sink, Dependencies: v.deps, Context: ctx, Gaps: gaps,
 		XSS: &graph.XSSFacts{Type: kind, EntryKind: entryKind, OutputContext: context, OriginResolved: kind == "reflected" || kind == "dom",
-			ContentType: contentType, Protection: protection, ProtectionReason: reason},
+			ContentType: contentType, Protection: protection, ProtectionReason: reason, Paths: paths},
 		APIModel:   &graph.APIModel{ID: "html-output-v1", Library: "express", Semantics: "Request values reach an HTML rendering operation in the recorded output context.", Reference: "https://expressjs.com/en/api.html#res.send"},
 		Assessment: graph.Assessment{Status: "not_run"},
 	})

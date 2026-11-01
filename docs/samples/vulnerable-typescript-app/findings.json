@@ -170,6 +170,32 @@
     },
     {
       "type_ids": [
+        "stored-xss"
+      ],
+      "id": "finding:xss:route:src/server.ts:3417:GET:/api/files:src/server.ts:3828",
+      "use_id": "xss:route:src/server.ts:3417:GET:/api/files:src/server.ts:3828",
+      "route_id": "route:src/server.ts:3417:GET:/api/files",
+      "record_type": "analysis",
+      "status": "needs_review",
+      "title": "Stored value reaches HTML output; write origin needs review",
+      "summary": "A verified storage read reaches rendering, but no matching request-to-storage write is established. Resolve that origin and storage protections before judging stored XSS.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Output context: unknown. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
         "input-validation"
       ],
       "id": "finding:input:route:src/server.ts:3417:GET:/api/files:req.query.filename:3501",
@@ -2805,6 +2831,299 @@
             "end_line": 88,
             "start_byte": 3062,
             "end_byte": 3076
+          }
+        }
+      ],
+      "assessment": {
+        "status": "not_run"
+      }
+    },
+    {
+      "xss": {
+        "type": "stored",
+        "entry_kind": "server",
+        "output_context": "unknown",
+        "content_type": "",
+        "protection": "raw",
+        "protection_reason": "A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+        "origin_resolved": false
+      },
+      "api_model": {
+        "id": "html-output-v1",
+        "library": "express",
+        "semantics": "Request values reach an HTML rendering operation in the recorded output context.",
+        "reference": "https://expressjs.com/en/api.html#res.send"
+      },
+      "completeness": {
+        "model_facts": [
+          "output_context=unknown",
+          "protection=raw",
+          "origin_resolved=false"
+        ],
+        "claim_kind": "xss",
+        "required": [
+          "render_source",
+          "render_binding",
+          "render_context"
+        ],
+        "evidence": {
+          "render_binding": [
+            {
+              "kind": "render_binding",
+              "text": "import { Request, Response } from 'express';",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 16,
+                "end_line": 16,
+                "start_byte": 545,
+                "end_byte": 589
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "render_binding",
+              "text": "import { Request, Response } from 'express';",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 16,
+                "end_line": 16,
+                "start_byte": 545,
+                "end_byte": 589
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            },
+            {
+              "kind": "render_binding",
+              "text": "import * as express from 'express';",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 4,
+                "end_line": 4,
+                "start_byte": 116,
+                "end_byte": 151
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ],
+          "render_context": [
+            {
+              "kind": "html_response",
+              "text": "res.send(data)",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 108,
+                "end_line": 108,
+                "start_byte": 3828,
+                "end_byte": 3842
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ],
+          "render_source": [
+            {
+              "kind": "file_read",
+              "text": "fs.readFile(filePath, 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {\n    if (err) {\n      res.status(404).json({ error: 'File not found' });\n    } else {\n      res.send(data);\n    }\n  })",
+              "span": {
+                "file": "src/server.ts",
+                "start_line": 104,
+                "end_line": 110,
+                "start_byte": 3652,
+                "end_byte": 3854
+              },
+              "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+            }
+          ]
+        },
+        "blockers": [
+          {
+            "kind": "render_protection_unresolved",
+            "detail": "A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+            "at": {
+              "file": "src/server.ts",
+              "start_line": 108,
+              "end_line": 108,
+              "start_byte": 3828,
+              "end_byte": 3842
+            }
+          },
+          {
+            "kind": "storage_origin_unresolved",
+            "detail": "No complete source-to-storage write link is established.",
+            "at": {
+              "file": "src/server.ts",
+              "start_line": 108,
+              "end_line": 108,
+              "start_byte": 3828,
+              "end_byte": 3842
+            }
+          }
+        ],
+        "coverage": [
+          {
+            "kind": "middleware_unresolved",
+            "detail": "effective middleware/guard chain is not modeled",
+            "at": {
+              "file": "src/server.ts",
+              "start_line": 100,
+              "end_line": 111,
+              "start_byte": 3417,
+              "end_byte": 3858
+            }
+          },
+          {
+            "kind": "unsupported_control_flow",
+            "detail": "statement not traversed: if_statement",
+            "at": {
+              "file": "src/server.ts",
+              "start_line": 105,
+              "end_line": 109,
+              "start_byte": 3741,
+              "end_byte": 3849
+            }
+          }
+        ],
+        "scope": "Bounded source-to-rendering flow; output context and protections are scoped to this sink."
+      },
+      "id": "xss:route:src/server.ts:3417:GET:/api/files:src/server.ts:3828",
+      "route_id": "route:src/server.ts:3417:GET:/api/files",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "html_response",
+        "text": "res.send(data)",
+        "span": {
+          "file": "src/server.ts",
+          "start_line": 108,
+          "end_line": 108,
+          "start_byte": 3828,
+          "end_byte": 3842
+        },
+        "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+      },
+      "dependencies": [
+        {
+          "storage_key": "file:unresolved:src/server.ts",
+          "source": {
+            "kind": "file_read",
+            "text": "fs.readFile(filePath, 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {\n    if (err) {\n      res.status(404).json({ error: 'File not found' });\n    } else {\n      res.send(data);\n    }\n  })",
+            "span": {
+              "file": "src/server.ts",
+              "start_line": 104,
+              "end_line": 110,
+              "start_byte": 3652,
+              "end_byte": 3854
+            },
+            "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "registration",
+          "text": "app.get('/api/files', (req: Request, res: Response) => {\n  const filename: string = req.query.filename as string;\n  // Vulnerable: No sanitization of file path\n  const filePath: string = path.join(__dirname, '../uploads', filename);\n  fs.readFile(filePath, 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {\n    if (err) {\n      res.status(404).json({ error: 'File not found' });\n    } else {\n      res.send(data);\n    }\n  });\n})",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 100,
+            "end_line": 111,
+            "start_byte": 3417,
+            "end_byte": 3858
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "handler",
+          "text": "{\n  const filename: string = req.query.filename as string;\n  // Vulnerable: No sanitization of file path\n  const filePath: string = path.join(__dirname, '../uploads', filename);\n  fs.readFile(filePath, 'utf8', (err: NodeJS.ErrnoException | null, data: string) => {\n    if (err) {\n      res.status(404).json({ error: 'File not found' });\n    } else {\n      res.send(data);\n    }\n  });\n}",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 100,
+            "end_line": 111,
+            "start_byte": 3472,
+            "end_byte": 3857
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "storage_callback",
+          "text": "(err: NodeJS.ErrnoException | null, data: string) => {\n    if (err) {\n      res.status(404).json({ error: 'File not found' });\n    } else {\n      res.send(data);\n    }\n  }",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 104,
+            "end_line": 110,
+            "start_byte": 3682,
+            "end_byte": 3853
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "control_statement",
+          "text": "if (err) {\n      res.status(404).json({ error: 'File not found' });\n    } else {\n      res.send(data);\n    }",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 105,
+            "end_line": 109,
+            "start_byte": 3741,
+            "end_byte": 3849
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "render_binding",
+          "text": "import { Request, Response } from 'express';",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 16,
+            "end_line": 16,
+            "start_byte": 545,
+            "end_byte": 589
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "render_binding",
+          "text": "import { Request, Response } from 'express';",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 16,
+            "end_line": 16,
+            "start_byte": 545,
+            "end_byte": 589
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        },
+        {
+          "kind": "render_binding",
+          "text": "import * as express from 'express';",
+          "span": {
+            "file": "src/server.ts",
+            "start_line": 4,
+            "end_line": 4,
+            "start_byte": 116,
+            "end_byte": 151
+          },
+          "sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "middleware_unresolved",
+          "detail": "effective middleware/guard chain is not modeled",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 100,
+            "end_line": 111,
+            "start_byte": 3417,
+            "end_byte": 3858
+          }
+        },
+        {
+          "kind": "unsupported_control_flow",
+          "detail": "statement not traversed: if_statement",
+          "at": {
+            "file": "src/server.ts",
+            "start_line": 105,
+            "end_line": 109,
+            "start_byte": 3741,
+            "end_byte": 3849
           }
         }
       ],

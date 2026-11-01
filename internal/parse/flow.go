@@ -52,95 +52,179 @@ func (f *flow) gap(kind, detail string, n *sitter.Node) graph.Gap {
 	return g
 }
 
-func (f *flow) statements(body *sitter.Node) {
+// statements returns true when every path through body leaves by return or throw.
+func (f *flow) statements(body *sitter.Node) bool {
 	if body == nil {
-		return
+		return false
 	}
 	if body.Kind() != "statement_block" && body.Kind() != "program" {
 		// An expression-bodied function returns that expression. The route handler's
 		// own implicit return is recorded and then ignored by the caller.
 		f.returns = append(f.returns, f.transfer(f.eval(body), "return_value", body))
-		return
+		return true
 	}
 	for i := uint(0); i < body.NamedChildCount(); i++ {
-		n := body.NamedChild(i)
-		switch n.Kind() {
-		case "lexical_declaration", "variable_declaration":
-			for j := uint(0); j < n.NamedChildCount(); j++ {
-				d := n.NamedChild(j)
-				name := d.ChildByFieldName("name")
-				if name == nil {
-					continue
-				}
-				v := f.eval(d.ChildByFieldName("value"))
-				if name.Kind() == "identifier" {
-					f.env[name.Utf8Text(f.module.src)] = f.transfer(v, "assignment", d)
-					if name.Utf8Text(f.module.src) == f.request {
-						f.request = ""
-					}
-					if name.Utf8Text(f.module.src) == f.response {
-						f.response = ""
-					}
-				} else {
-					if name.Kind() == "object_pattern" {
-						for k := uint(0); k < name.NamedChildCount(); k++ {
-							binding := name.NamedChild(k)
-							if binding.Kind() == "shorthand_property_identifier_pattern" {
-								f.env[binding.Utf8Text(f.module.src)] = f.transfer(v, "field_projection", binding)
-							} else {
-								f.gaps = append(f.gaps, f.gap("unsupported_binding", "destructuring alias/default not modeled", binding))
-							}
-						}
-					} else {
-						f.gaps = append(f.gaps, f.gap("unsupported_binding", "binding not modeled", d))
-					}
-				}
-			}
-		case "return_statement":
-			var v value
-			if n.NamedChildCount() > 0 {
-				v = f.eval(n.NamedChild(0))
-			}
-			f.returns = append(f.returns, f.transfer(v, "return_value", n))
-			return
-		case "expression_statement", "throw_statement":
-			if n.NamedChildCount() > 0 {
-				f.eval(n.NamedChild(0))
-			}
-			if n.Kind() != "expression_statement" {
-				return
-			}
-		case "function_declaration", "comment", "empty_statement":
-		default:
-			// Preserve branch evidence without claiming a resolved control-flow path.
-			f.gaps = append(f.gaps, f.gap("unsupported_control_flow", "statement not traversed: "+n.Kind(), n))
-			// Explore branch bodies as possible paths, preserving the explicit gap.
-			f.context = append(f.context, f.module.evidence("control_statement", n))
-			if condition := n.ChildByFieldName("condition"); condition != nil {
-				f.noteWeakCondition(condition)
-				f.eval(condition)
-			}
-			saved := copyValues(f.env)
-			for j := uint(0); j < n.NamedChildCount(); j++ {
-				c := n.NamedChild(j)
-				if c.Kind() == "statement_block" {
-					f.env = copyValues(saved)
-					f.statements(c)
-				}
-			}
-			// Keep possible dependencies across unsupported control flow, explicitly
-			// uncertain. This is a may-depend relationship, not a proven witness.
-			merged := copyValues(saved)
-			for key, v := range f.env {
-				merged[key] = combine(merged[key], v)
-			}
-			for key, v := range merged {
-				v.gaps = append(v.gaps, f.gap("unknown_control_effect", "value may change across unsupported control flow", n))
-				merged[key] = v
-			}
-			f.env = merged
+		if f.statement(body.NamedChild(i)) {
+			return true
 		}
 	}
+	return false
+}
+
+func (f *flow) statement(n *sitter.Node) bool {
+	switch n.Kind() {
+	case "statement_block":
+		return f.statements(n)
+	case "lexical_declaration", "variable_declaration":
+		for j := uint(0); j < n.NamedChildCount(); j++ {
+			d := n.NamedChild(j)
+			name := d.ChildByFieldName("name")
+			if name == nil {
+				continue
+			}
+			v := f.eval(d.ChildByFieldName("value"))
+			if name.Kind() == "identifier" {
+				f.env[name.Utf8Text(f.module.src)] = f.transfer(v, "assignment", d)
+				if name.Utf8Text(f.module.src) == f.request {
+					f.request = ""
+				}
+				if name.Utf8Text(f.module.src) == f.response {
+					f.response = ""
+				}
+			} else {
+				if name.Kind() == "object_pattern" {
+					for k := uint(0); k < name.NamedChildCount(); k++ {
+						binding := name.NamedChild(k)
+						if binding.Kind() == "shorthand_property_identifier_pattern" {
+							f.env[binding.Utf8Text(f.module.src)] = f.transfer(v, "field_projection", binding)
+						} else {
+							f.gaps = append(f.gaps, f.gap("unsupported_binding", "destructuring alias/default not modeled", binding))
+						}
+					}
+				} else {
+					f.gaps = append(f.gaps, f.gap("unsupported_binding", "binding not modeled", d))
+				}
+			}
+		}
+	case "return_statement":
+		var v value
+		if n.NamedChildCount() > 0 {
+			v = f.eval(n.NamedChild(0))
+		}
+		f.returns = append(f.returns, f.transfer(v, "return_value", n))
+		return true
+	case "expression_statement", "throw_statement":
+		if n.NamedChildCount() > 0 {
+			f.eval(n.NamedChild(0))
+		}
+		return n.Kind() == "throw_statement"
+	case "function_declaration", "comment", "empty_statement":
+	default:
+		f.branches(n)
+	}
+	return false
+}
+
+// branches explores the bodies of a statement the flow does not model precisely.
+// Each body that can fall through contributes its exit environment; an if without
+// else, and every other construct, also keeps the path that skips all bodies.
+// This is a may-depend relationship, not a proven witness.
+func (f *flow) branches(n *sitter.Node) {
+	// Preserve branch evidence without claiming a resolved control-flow path.
+	f.gaps = append(f.gaps, f.gap("unsupported_control_flow", "statement not traversed: "+n.Kind(), n))
+	f.context = append(f.context, f.module.evidence("control_statement", n))
+	if condition := n.ChildByFieldName("condition"); condition != nil {
+		f.noteWeakCondition(condition)
+		f.eval(condition)
+	}
+	type exit struct {
+		env    map[string]value
+		branch *graph.Evidence
+	}
+	saved := copyValues(f.env)
+	var exits []exit
+	run := func(body *sitter.Node, branch *graph.Evidence) {
+		f.env = copyValues(saved)
+		if !f.statement(body) {
+			exits = append(exits, exit{f.env, branch})
+		}
+	}
+	complete := false
+	if n.Kind() == "if_statement" {
+		condition := n.ChildByFieldName("condition")
+		if body := n.ChildByFieldName("consequence"); body != nil {
+			e := f.module.evidence("branch_consequence", condition)
+			run(body, &e)
+		}
+		if alternative := n.ChildByFieldName("alternative"); alternative != nil {
+			complete = true
+			e := f.module.evidence("branch_alternative", condition)
+			for j := uint(0); j < alternative.NamedChildCount(); j++ {
+				if c := alternative.NamedChild(j); c.Kind() != "comment" {
+					run(c, &e)
+				}
+			}
+		}
+	} else {
+		for j := uint(0); j < n.NamedChildCount(); j++ {
+			c := n.NamedChild(j)
+			switch c.Kind() {
+			case "statement_block":
+				run(c, nil)
+			case "else_clause", "catch_clause", "finally_clause":
+				if body := c.ChildByFieldName("body"); body != nil {
+					run(body, nil)
+				} else if c.NamedChildCount() > 0 {
+					run(c.NamedChild(c.NamedChildCount()-1), nil)
+				}
+			}
+		}
+	}
+	if !complete {
+		exits = append(exits, exit{saved, nil})
+	}
+	merged := map[string]value{}
+	keys := map[string]bool{}
+	for _, e := range exits {
+		for key := range e.env {
+			keys[key] = true
+		}
+	}
+	for key := range keys {
+		// A dependency present on every exit is not specific to one branch. Others
+		// keep the branch condition as a precondition of that path.
+		count := map[string]int{}
+		for _, e := range exits {
+			seen := map[string]bool{}
+			for _, d := range e.env[key].deps {
+				if k := dependencyKey(d); !seen[k] {
+					seen[k] = true
+					count[k]++
+				}
+			}
+		}
+		var v value
+		for _, e := range exits {
+			branch := e.env[key]
+			if e.branch != nil {
+				branch.deps = append([]graph.Dependency{}, branch.deps...)
+				for i, d := range branch.deps {
+					if count[dependencyKey(d)] < len(exits) {
+						d.Transfers = append(append([]graph.Evidence{}, d.Transfers...), *e.branch)
+						branch.deps[i] = d
+					}
+				}
+			}
+			v = combine(v, branch)
+		}
+		v.gaps = append(v.gaps, f.gap("unknown_control_effect", "value may change across unsupported control flow", n))
+		merged[key] = v
+	}
+	if len(exits) == 0 {
+		// Every explored body leaves; keep the prior bindings for any later statements.
+		merged = saved
+	}
+	f.env = merged
 }
 
 func (f *flow) eval(n *sitter.Node) value {
@@ -354,7 +438,20 @@ func combine(a, b value) value {
 	if a.outputContext == "" {
 		a.outputContext = b.outputContext
 	}
-	a.deps = append(append([]graph.Dependency{}, a.deps...), b.deps...)
+	// An identical source path reached twice (for example an unchanged value on
+	// two merged branches) is one path; distinct transfer sequences stay separate.
+	deps := append([]graph.Dependency{}, a.deps...)
+	seen := map[string]bool{}
+	for _, d := range deps {
+		seen[dependencyKey(d)] = true
+	}
+	for _, d := range b.deps {
+		if k := dependencyKey(d); !seen[k] {
+			seen[k] = true
+			deps = append(deps, d)
+		}
+	}
+	a.deps = deps
 	a.gaps = append(append([]graph.Gap{}, a.gaps...), b.gaps...)
 	if len(a.deps) > 64 {
 		a.deps = a.deps[:64]
@@ -490,6 +587,19 @@ func (f *flow) call(n *sitter.Node) value {
 		v.gaps = append(v.gaps, f.gap("unknown_call_result", "call result is not modeled: "+name, n))
 	}
 	return f.transfer(v, "call_argument_dependency", n)
+}
+
+func dependencyKey(d graph.Dependency) string {
+	var b strings.Builder
+	key := func(e graph.Evidence) {
+		fmt.Fprintf(&b, "%s:%s:%d:%d;", e.Kind, e.Span.File, e.Span.StartByte, e.Span.EndByte)
+	}
+	b.WriteString(d.StorageKey + "|")
+	key(d.Source)
+	for _, e := range d.Transfers {
+		key(e)
+	}
+	return b.String()
 }
 
 func copyValues(in map[string]value) map[string]value {

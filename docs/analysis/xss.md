@@ -44,6 +44,10 @@ field, originating request and rendering evidence are retained; unresolved origi
 The marked 0.3.5 sanitize-option bypass is a versioned unsafe-rendering contract, supported by
 [upstream PR 592](https://github.com/markedjs/marked/pull/592). Unknown versions/configurations are
 not treated as protected. Each source path must retain its own transformations and blockers.
+Every branch body that can fall through is explored, including `else`, `catch` and `finally`; a
+branch-only path records its condition as a precondition. When paths at one sink differ, `xss.paths`
+gives each one's protection and writing entry. A raw path stays a finding beside unknown siblings,
+and an unknown sibling keeps an otherwise escaped sink out of Protected.
 
 Browser entries have their own identity, component/source location and sink context. Supported
 bounded patterns include location/URL parameters, message/input events, verified DOM nodes and HTML,

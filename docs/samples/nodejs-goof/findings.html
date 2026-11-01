@@ -27,10 +27,10 @@
 <section id="source-rows" aria-label="Sources and findings">
 <details class="entry" id="route:app.js:1422:GET:/" data-path="/" data-method="GET" data-findings="1" data-review="2" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">GET /</span><span class="location" title="Source declaration">app.js:53</span><span class="count" aria-label="1 findings">1 <small>findings</small></span><span class="count" aria-label="2 analysis items to review">2 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-stored-xss" aria-label="Stored XSS glossary: 3 records; 0 vulnerabilities, 1 poor practice, 0 potential issues, 2 to review, 0 protected">Stored XSS <span class="pill-status">· mixed status (3)</span></button></span></summary>
 <div class="body"><article class="finding" data-record-type="finding"><span class="badge finding status-poor_practice">Poor practice · remediate</span><h3>Untrusted data reaches raw HTML output</h3><p>A source-backed input flow reaches a verified rendering sink without established context-appropriate encoding or effective sanitization. Correct the output construction; runtime exploit confirmation is separate.</p><p class="technical">Rendering: stored · context html_text · protection ineffective</p><p class="location"><span class="location-label">Finding location · </span>views/index.ejs:20</p>
-<div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Decision XSS exposure: Inconclusive. Scanner policy: XSS assessment is inconclusive; absence of a positive answer is not protection.</p></div></div>
-<h4>Fix scope &amp; remaining questions</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.</p>
+<div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: html_text. A source path reaches raw HTML through marked 0.3.5, whose sanitize option has a documented entity/URL bypass (upstream marked PR 592). Per-path protection: path 1 ineffective (written by POST /create); path 2 unknown (written by POST /create); path 3 ineffective (written by POST /update/:id).</p></div></div>
+<h4>Fix scope &amp; remaining questions</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.</p>
 <h4>Observed operation</h4><pre>&lt;%- marked(new String(todo.content)) %&gt;</pre>
-<details class="evidence"><summary>Source &amp; transfer evidence (3 inputs)</summary><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
+<details class="evidence"><summary>Source &amp; transfer evidence (3 inputs)</summary><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">branch_consequence · routes/index.js:170</p><pre>(typeof (item) == &#39;string&#39; &amp;&amp; item.match(imgRegex))</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
     content: item,
     updated_at: Date.now(),
   }).save(function (err, todo, count) {
@@ -46,7 +46,7 @@
 
     // res.redirect(&#39;/#&#39; &#43; todo.content.toString(&#39;base64&#39;));
   })</pre><p class="technical">storage_read · views/index.ejs:20</p><pre>todo.content</pre><p class="technical">storage_query · routes/index.js:36</p><pre>Todo.
-    find({})</pre><p class="technical">string_conversion · views/index.ejs:20</p><pre>new String(todo.content)</pre><p class="technical">call_argument_dependency · views/index.ejs:20</p><pre>marked(new String(todo.content))</pre><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
+    find({})</pre><p class="technical">string_conversion · views/index.ejs:20</p><pre>new String(todo.content)</pre><p class="technical">call_argument_dependency · views/index.ejs:20</p><pre>marked(new String(todo.content))</pre><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">call_argument_dependency · routes/index.js:182</p><pre>parse(item)</pre><p class="technical">assignment · routes/index.js:182</p><pre>item = parse(item)</pre><p class="technical">branch_alternative · routes/index.js:170</p><pre>(typeof (item) == &#39;string&#39; &amp;&amp; item.match(imgRegex))</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
     content: item,
     updated_at: Date.now(),
   }).save(function (err, todo, count) {
@@ -69,7 +69,7 @@
     })</pre><p class="technical">storage_read · views/index.ejs:20</p><pre>todo.content</pre><p class="technical">storage_query · routes/index.js:36</p><pre>Todo.
     find({})</pre><p class="technical">string_conversion · views/index.ejs:20</p><pre>new String(todo.content)</pre><p class="technical">call_argument_dependency · views/index.ejs:20</p><pre>marked(new String(todo.content))</pre></details>
 <h4>Remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.</li><li>For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.</li><li>Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.</li><li>Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.</li></ul>
-<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><h4>Decision API answers</h4><p>Provider-reported scores are retained for audit. They are not calibrated correctness guarantees or evidence of safety.</p><p><code>encoding_adequacy</code>: inadequate · confidence 0.51</p><details><summary>Option probabilities</summary><p>adequate: 0.01</p><p>inadequate: 0.63</p><p>not_present: 0.22</p><p>unknown: 0.14</p></details><p><code>output_context</code>: html_text · confidence 0.92</p><details><summary>Option probabilities</summary><p>html_text: 0.93</p><p>html_attribute: 0</p><p>url: 0</p><p>script: 0</p><p>style: 0</p><p>unquoted_attribute: 0</p><p>active_attribute: 0</p><p>html_tag: 0</p><p>template_code: 0</p><p>unknown: 0.07</p></details><p><code>sanitizer_effectiveness</code>: ineffective · confidence 0.96</p><details><summary>Option probabilities</summary><p>effective: 0.01</p><p>ineffective: 0.97</p><p>absent: 0</p><p>unknown: 0.02</p></details><p><code>xss_all_paths_protected</code>: no · confidence 0.77</p><details><summary>Option probabilities</summary><p>yes: 0.01</p><p>no: 0.85</p><p>unknown: 0.14</p></details><p><code>xss_exposure</code>: unknown · confidence 0.44</p><details><summary>Option probabilities</summary><p>vulnerable: 0.42</p><p>protected: 0</p><p>unknown: 0.58</p><p>not_applicable: 0</p></details><p>Scanner policy: XSS assessment is inconclusive; absence of a positive answer is not protection.</p><p class="technical">Use xss:route:app.js:1422:GET:/:views/index.ejs:544 · xss_candidate · Assessment completed openai gpt-6-luna</p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:53</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:40</span></p><p><code>unknown_transfer</code> · call may transform or discard its arguments: marked <span class="location">views/index.ejs:20</span></p><h4>Claim blockers</h4><details><summary>Additional source context</summary><p class="location">app.js:53</p><pre>app.get(&#39;/&#39;, routes.index)</pre><p class="location">routes/index.js:35</p><pre>{
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:app.js:1422:GET:/:views/index.ejs:544 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:53</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:40</span></p><p><code>unknown_transfer</code> · call may transform or discard its arguments: marked <span class="location">views/index.ejs:20</span></p><h4>Claim blockers</h4><details><summary>Additional source context</summary><p class="location">app.js:53</p><pre>app.get(&#39;/&#39;, routes.index)</pre><p class="location">routes/index.js:35</p><pre>{
   Todo.
     find({}).
     sort(&#39;-updated_at&#39;).
@@ -703,7 +703,7 @@
 <div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.</p></div></div>
 <h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
 <h4>Observed operation</h4><pre>&lt;%= todo.content %&gt;</pre>
-<details class="evidence"><summary>Source &amp; transfer evidence (3 inputs)</summary><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
+<details class="evidence"><summary>Source &amp; transfer evidence (3 inputs)</summary><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">branch_consequence · routes/index.js:170</p><pre>(typeof (item) == &#39;string&#39; &amp;&amp; item.match(imgRegex))</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
     content: item,
     updated_at: Date.now(),
   }).save(function (err, todo, count) {
@@ -719,7 +719,7 @@
 
     // res.redirect(&#39;/#&#39; &#43; todo.content.toString(&#39;base64&#39;));
   })</pre><p class="technical">storage_read · views/edit.ejs:20</p><pre>todo.content</pre><p class="technical">storage_query · routes/index.js:217</p><pre>Todo.
-    find({})</pre><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
+    find({})</pre><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">call_argument_dependency · routes/index.js:182</p><pre>parse(item)</pre><p class="technical">assignment · routes/index.js:182</p><pre>item = parse(item)</pre><p class="technical">branch_alternative · routes/index.js:170</p><pre>(typeof (item) == &#39;string&#39; &amp;&amp; item.match(imgRegex))</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
     content: item,
     updated_at: Date.now(),
   }).save(function (err, todo, count) {
@@ -772,7 +772,7 @@
 <div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: html_text. The template HTML-escapes this value in HTML text or a quoted non-active attribute.</p></div></div>
 <h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
 <h4>Observed operation</h4><pre>&lt;%= todo.content %&gt;</pre>
-<details class="evidence"><summary>Source &amp; transfer evidence (3 inputs)</summary><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
+<details class="evidence"><summary>Source &amp; transfer evidence (3 inputs)</summary><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">branch_consequence · routes/index.js:170</p><pre>(typeof (item) == &#39;string&#39; &amp;&amp; item.match(imgRegex))</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
     content: item,
     updated_at: Date.now(),
   }).save(function (err, todo, count) {
@@ -788,7 +788,7 @@
 
     // res.redirect(&#39;/#&#39; &#43; todo.content.toString(&#39;base64&#39;));
   })</pre><p class="technical">storage_read · views/edit.ejs:23</p><pre>todo.content</pre><p class="technical">storage_query · routes/index.js:217</p><pre>Todo.
-    find({})</pre><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
+    find({})</pre><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">call_argument_dependency · routes/index.js:182</p><pre>parse(item)</pre><p class="technical">assignment · routes/index.js:182</p><pre>item = parse(item)</pre><p class="technical">branch_alternative · routes/index.js:170</p><pre>(typeof (item) == &#39;string&#39; &amp;&amp; item.match(imgRegex))</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">storage_write · routes/index.js:185</p><pre>new Todo({
     content: item,
     updated_at: Date.now(),
   }).save(function (err, todo, count) {
@@ -1099,9 +1099,9 @@ console.info(&#39;login attempt&#39;, { username, passwordProvided: typeof passw
 <div class="facets"><div class="facet"><h4>Input validation</h4><p>Input validation is separate from context-appropriate output encoding and sanitization.</p></div><div class="facet"><h4>Protection at this use</h4><p>Output context: unknown. Rendering context is not established for every value.</p></div></div>
 <h4>What remains unresolved</h4><p class="uncertainty">Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.</p>
 <h4>Observed operation</h4><pre>res.status(302).send(todo.content.toString(&#39;base64&#39;))</pre>
-<details class="evidence"><summary>Source &amp; transfer evidence (2 inputs)</summary><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">string_conversion · routes/index.js:197</p><pre>todo.content.toString(&#39;base64&#39;)</pre><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">string_conversion · routes/index.js:197</p><pre>todo.content.toString(&#39;base64&#39;)</pre></details>
+<details class="evidence"><summary>Source &amp; transfer evidence (2 inputs)</summary><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">branch_consequence · routes/index.js:170</p><pre>(typeof (item) == &#39;string&#39; &amp;&amp; item.match(imgRegex))</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">string_conversion · routes/index.js:197</p><pre>todo.content.toString(&#39;base64&#39;)</pre><p class="location">routes/index.js:168</p><pre>req.body.content</pre><p class="technical">assignment · routes/index.js:168</p><pre>item = req.body.content</pre><p class="technical">call_argument_dependency · routes/index.js:182</p><pre>parse(item)</pre><p class="technical">assignment · routes/index.js:182</p><pre>item = parse(item)</pre><p class="technical">branch_alternative · routes/index.js:170</p><pre>(typeof (item) == &#39;string&#39; &amp;&amp; item.match(imgRegex))</pre><p class="technical">expression · routes/index.js:186</p><pre>content: item</pre><p class="technical">string_conversion · routes/index.js:197</p><pre>todo.content.toString(&#39;base64&#39;)</pre></details>
 <h4>Investigation and possible remediation</h4><ul><li>Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.</li><li>Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.</li><li>For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.</li><li>Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.</li><li>Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.</li></ul>
-<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:app.js:1765:POST:/create:routes/index.js:5060 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:60</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:170</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:189</span></p><p><code>unknown_control_effect</code> · value may change across unsupported control flow <span class="location">routes/index.js:170</span></p><h4>Claim blockers</h4><p>render_protection_unresolved · Rendering context is not established for every value.</p><details><summary>Additional source context</summary><p class="location">app.js:60</p><pre>app.post(&#39;/create&#39;, routes.create)</pre><p class="location">routes/index.js:165</p><pre>{
+<details class="evidence"><summary>Technical record &amp; analysis gaps</summary><p class="technical">Use xss:route:app.js:1765:POST:/create:routes/index.js:5060 · xss_candidate · Not assessed  </p><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:60</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:170</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:189</span></p><p><code>unknown_transfer</code> · call may transform or discard its arguments: parse <span class="location">routes/index.js:182</span></p><p><code>unknown_control_effect</code> · value may change across unsupported control flow <span class="location">routes/index.js:170</span></p><h4>Claim blockers</h4><p>render_protection_unresolved · Rendering context is not established for every value.</p><details><summary>Additional source context</summary><p class="location">app.js:60</p><pre>app.post(&#39;/create&#39;, routes.create)</pre><p class="location">routes/index.js:165</p><pre>{
   // console.log(&#39;req.body: &#39; &#43; JSON.stringify(req.body));
 
   var item = req.body.content;
@@ -1150,7 +1150,27 @@ console.info(&#39;login attempt&#39;, { username, passwordProvided: typeof passw
 
   } else {
     item = parse(item);
-  }</pre><p class="location">routes/index.js:3</p><pre>mongoose.model(&#39;Todo&#39;)</pre><p class="location">routes/index.js:2</p><pre>mongoose = require(&#39;mongoose&#39;)</pre><p class="location">routes/index.js:188</p><pre>function (err, todo, count) {
+  }</pre><p class="location">routes/index.js:143</p><pre>function parse(todo) {
+  var t = todo;
+
+  var remindToken = &#39; in &#39;;
+  var reminder = t.toString().indexOf(remindToken);
+  if (reminder &gt; 0) {
+    var time = t.slice(reminder &#43; remindToken.length);
+    time = time.replace(/\n$/, &#39;&#39;);
+
+    var period = hms(time);
+
+    console.log(&#39;period: &#39; &#43; period);
+
+    // remove it
+    t = t.slice(0, reminder);
+    if (typeof period != &#39;undefined&#39;) {
+      t &#43;= &#39; [&#39; &#43; ms(period) &#43; &#39;]&#39;;
+    }
+  }
+  return t;
+}</pre><p class="location">routes/index.js:3</p><pre>mongoose.model(&#39;Todo&#39;)</pre><p class="location">routes/index.js:2</p><pre>mongoose = require(&#39;mongoose&#39;)</pre><p class="location">routes/index.js:188</p><pre>function (err, todo, count) {
     if (err) return next(err);
 
     /*
@@ -1218,7 +1238,27 @@ console.info(&#39;login attempt&#39;, { username, passwordProvided: typeof passw
 
   } else {
     item = parse(item);
-  }</pre><p class="location">routes/index.js:3</p><pre>mongoose.model(&#39;Todo&#39;)</pre><p class="location">routes/index.js:2</p><pre>mongoose = require(&#39;mongoose&#39;)</pre></details></details>
+  }</pre><p class="location">routes/index.js:143</p><pre>function parse(todo) {
+  var t = todo;
+
+  var remindToken = &#39; in &#39;;
+  var reminder = t.toString().indexOf(remindToken);
+  if (reminder &gt; 0) {
+    var time = t.slice(reminder &#43; remindToken.length);
+    time = time.replace(/\n$/, &#39;&#39;);
+
+    var period = hms(time);
+
+    console.log(&#39;period: &#39; &#43; period);
+
+    // remove it
+    t = t.slice(0, reminder);
+    if (typeof period != &#39;undefined&#39;) {
+      t &#43;= &#39; [&#39; &#43; ms(period) &#43; &#39;]&#39;;
+    }
+  }
+  return t;
+}</pre><p class="location">routes/index.js:3</p><pre>mongoose.model(&#39;Todo&#39;)</pre><p class="location">routes/index.js:2</p><pre>mongoose = require(&#39;mongoose&#39;)</pre></details></details>
 </article>
 <details class="evidence"><summary>Entry analysis gaps (2)</summary><p><code>middleware_unresolved</code> · effective middleware/guard chain is not modeled <span class="location">app.js:60</span></p><p><code>unsupported_control_flow</code> · statement not traversed: if_statement <span class="location">routes/index.js:170</span></p></details></div></details><details class="entry" id="route:app.js:1483:POST:/login" data-path="/login" data-method="POST" data-findings="0" data-review="2" data-protected="0"><summary class="row-summary"><span class="source">HTTP route</span><span class="signature">POST /login</span><span class="location" title="Source declaration">app.js:55</span><span class="count" aria-label="0 findings">0 <small>findings</small></span><span class="count" aria-label="2 analysis items to review">2 <small>review</small></span><span class="count" aria-label="0 protected claims">0 <small>protected</small></span><span class="type-pills"><button type="button" class="type-pill review" popovertarget="glossary-input-validation" aria-label="Input Validation glossary: 2 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 2 to review, 0 protected">Input Validation <span class="pill-status">· review (2)</span></button><button type="button" class="type-pill review" popovertarget="glossary-nosql-injection" aria-label="NoSQL Injection glossary: 1 records; 0 vulnerabilities, 0 poor practice, 0 potential issues, 1 to review, 0 protected">NoSQL Injection <span class="pill-status">· review (1)</span></button></span></summary>
 <div class="body"><article class="finding" data-record-type="analysis"><span class="badge analysis status-needs_evidence">Inconclusive</span><h3>NoSQL document type constraints need review</h3><p>A request value reaches a query, update, or insert document. Scan has not established the scalar type or permitted keys/operators for that slot. A structured document is not automatically unsafe; verify the driver and field constraints.</p><p class="location"><span class="location-label">Finding location · </span>routes/index.js:52</p>
@@ -1534,3 +1574,5 @@ console.info(&#39;login attempt&#39;, { username, passwordProvided: typeof passw
   }
 })();
 </script></body></html>
+
+

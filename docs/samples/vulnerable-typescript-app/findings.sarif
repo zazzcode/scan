@@ -43,6 +43,12 @@
             {
               "level": "note",
               "message": {
+                "text": "GET /api/files: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
                 "text": "GET /api/search: semantic assessment not_run"
               }
             },
@@ -1098,6 +1104,304 @@
           ],
           "ruleId": "scan/input-validation",
           "ruleIndex": 1
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 111,
+                            "startLine": 100
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "file_read"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 110,
+                            "startLine": 104
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 2,
+                      "location": {
+                        "message": {
+                          "text": "html_response"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 108,
+                            "startLine": 108
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /api/files",
+                  "kind": "function",
+                  "name": "GET /api/files"
+                }
+              ],
+              "message": {
+                "text": "Protect the specific browser rendering context"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 108,
+                  "startLine": 108
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /api/files: Stored value reaches HTML output; write origin needs review [needs_review]. A verified storage read reaches rendering, but no matching request-to-storage write is established. Resolve that origin and storage protections before judging stored XSS. Output context: unknown. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.blockingGaps": [
+              {
+                "kind": "render_protection_unresolved",
+                "detail": "A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 108,
+                  "end_line": 108,
+                  "start_byte": 3828,
+                  "end_byte": 3842
+                }
+              },
+              {
+                "kind": "storage_origin_unresolved",
+                "detail": "No complete source-to-storage write link is established.",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 108,
+                  "end_line": 108,
+                  "start_byte": 3828,
+                  "end_byte": 3842
+                }
+              }
+            ],
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 100,
+                  "end_line": 111,
+                  "start_byte": 3417,
+                  "end_byte": 3858
+                }
+              },
+              {
+                "kind": "unsupported_control_flow",
+                "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 105,
+                  "end_line": 109,
+                  "start_byte": 3741,
+                  "end_byte": 3849
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "stored-xss"
+              ],
+              "id": "finding:xss:route:src/server.ts:3417:GET:/api/files:src/server.ts:3828",
+              "use_id": "xss:route:src/server.ts:3417:GET:/api/files:src/server.ts:3828",
+              "route_id": "route:src/server.ts:3417:GET:/api/files",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Stored value reaches HTML output; write origin needs review",
+              "summary": "A verified storage read reaches rendering, but no matching request-to-storage write is established. Resolve that origin and storage protections before judging stored XSS.",
+              "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+              "use_protection": "Output context: unknown. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Protect the specific browser rendering context",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                ],
+                "example_status": ""
+              }
+            },
+            "scan.kind": "xss_candidate",
+            "scan.recommendations": {
+              "title": "Protect the specific browser rendering context",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+              ],
+              "example_status": ""
+            },
+            "scan.requiredEvidence": [
+              "render_source",
+              "render_binding",
+              "render_context"
+            ],
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /api/files",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.scope": "Bounded source-to-rendering flow; output context and protections are scoped to this sink.",
+            "scan.useId": "xss:route:src/server.ts:3417:GET:/api/files:src/server.ts:3828"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 111,
+                  "startLine": 100
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 111,
+                  "startLine": 100
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "storage_callback"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 110,
+                  "startLine": 104
+                }
+              }
+            },
+            {
+              "id": 3,
+              "message": {
+                "text": "control_statement"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 109,
+                  "startLine": 105
+                }
+              }
+            },
+            {
+              "id": 4,
+              "message": {
+                "text": "render_binding"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 16,
+                  "startLine": 16
+                }
+              }
+            },
+            {
+              "id": 5,
+              "message": {
+                "text": "render_binding"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 4,
+                  "startLine": 4
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/xss-output-protection",
+          "ruleIndex": 2
         },
         {
           "codeFlows": [
