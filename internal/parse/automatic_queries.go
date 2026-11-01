@@ -1,0 +1,121 @@
+package parse
+
+import (
+	"github.com/zazzcode/scan/internal/graph"
+	"sort"
+	"strings"
+)
+
+// automaticQueries reuses claim-scoped assembly without benchmark answer files.
+func (s *moduleSet) automaticQueries(report *graph.StringReport) {
+	entries := map[string]graph.Entry{}
+	for _, e := range report.Entries {
+		entries[e.Route.ID] = e
+	}
+	for i, old := range report.Uses {
+		kind := ""
+		switch old.Kind {
+		case "sql_query_candidate":
+			kind = "sql_query"
+		case "nosql_query_candidate":
+			kind = "nosql_query"
+		default:
+			continue
+		}
+		entry, ok := entries[old.RouteID]
+		if !ok {
+			continue
+		}
+		fields := map[string]bool{}
+		for _, d := range old.Dependencies {
+			parts := strings.Split(d.Source.Text, ".")
+			if len(parts) > 2 {
+				fields[parts[len(parts)-1]] = true
+			}
+		}
+		names := []string{}
+		for name := range fields {
+			names = append(names, name)
+		}
+		sort.Strings(names)
+		check := graph.Check{ID: "automatic-query", Method: entry.Route.Method, Path: entry.Route.PathPattern, Kind: kind, Fields: names,
+			Validation: "Assess only field requirements established by the supplied code; missing business constraints remain uncertain.",
+			Protection: "Untrusted input must remain data and must not change executable query syntax or selector operators. Evaluate actual transformations and enforcing guards separately from construction practice."}
+		tmp := &graph.StringReport{Entries: []graph.Entry{entry}, Uses: []graph.StringUse{old}}
+		s.buildChecks(tmp, []graph.Check{check})
+		for _, assembled := range tmp.Uses {
+			if assembled.Kind == old.Kind {
+				assembled.ID = old.ID
+				report.Uses[i] = assembled
+				break
+			}
+		}
+	}
+}
+
+func (s *moduleSet) collectionBinding(use graph.StringUse) []graph.Evidence {
+	m := s.modules[use.Sink.Span.File]
+	if m == nil {
+		return nil
+	}
+	call := nodeAt(m.tree.RootNode(), use.Sink.Span.StartByte, use.Sink.Span.EndByte)
+	if call == nil {
+		return nil
+	}
+	fn := call.ChildByFieldName("function")
+	if fn == nil {
+		return nil
+	}
+	method := fn.ChildByFieldName("property")
+	if method == nil {
+		return nil
+	}
+	switch method.Utf8Text(m.src) {
+	case "find", "findOne", "update", "insert", "remove":
+	default:
+		return nil
+	}
+	obj := fn.ChildByFieldName("object")
+	if obj == nil {
+		return nil
+	}
+	if shadowed(call, strings.Split(obj.Utf8Text(m.src), ".")[0], m.src) {
+		return nil
+	}
+	parts := strings.Split(obj.Utf8Text(m.src), ".")
+	target := m
+	name := parts[0]
+	out := []graph.Evidence{}
+	if len(parts) == 2 {
+		imp, ok := m.imports[parts[0]]
+		if !ok || imp.name != "*" {
+			return nil
+		}
+		target = s.importModule(m, imp.module)
+		if target == nil || !exportedName(target, parts[1]) {
+			return nil
+		}
+		name = parts[1]
+		out = append(out, m.evidence("sink_binding", imp.declaration))
+	} else if len(parts) != 1 {
+		return nil
+	}
+	ctor := topVariable(target, name)
+	if ctor == nil || ctor.Kind() != "new_expression" {
+		return nil
+	}
+	constructor := ctor.ChildByFieldName("constructor")
+	if constructor == nil {
+		return nil
+	}
+	cp := strings.Split(constructor.Utf8Text(target.src), ".")
+	if len(cp) != 2 || cp[1] != "Collection" {
+		return nil
+	}
+	imp, ok := target.imports[cp[0]]
+	if !ok || imp.module != "marsdb" || imp.name != "*" {
+		return nil
+	}
+	out = append(out, target.evidence("sink_binding", imp.declaration), target.evidence("sink_binding", ctor.Parent()))
+	return out
+}

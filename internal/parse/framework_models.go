@@ -256,6 +256,15 @@ func exportedName(m *sourceModule, name string) bool {
 		}
 		decl := n.ChildByFieldName("declaration")
 		if decl != nil {
+			if decl.Kind() == "lexical_declaration" || decl.Kind() == "variable_declaration" {
+				for j := uint(0); j < decl.NamedChildCount(); j++ {
+					d := decl.NamedChild(j)
+					id := d.ChildByFieldName("name")
+					if id != nil && id.Utf8Text(m.src) == name {
+						return true
+					}
+				}
+			}
 			id := decl.ChildByFieldName("name")
 			if id != nil && id.Utf8Text(m.src) == name {
 				return true

@@ -36,6 +36,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 	flags.SetOutput(stderr)
 
 	var (
+		outputDir     = flags.String("output-dir", os.Getenv("SCAN_FINDINGS_DIR"), "write JSON, HTML and SARIF in a fresh run folder; defaults to SCAN_FINDINGS_DIR")
+		exportHTML    = flags.String("export-html", "", "render saved evidence JSON as a standalone HTML report without API calls")
 		exportFile    = flags.String("export-sarif", "", "convert a saved canonical JSON report to SARIF without API calls")
 		list          = flags.Bool("list", false, "list the source files under the target path and exit")
 		routes        = flags.Bool("routes", false, "emit the Express route execution graph and exit")
@@ -53,16 +55,31 @@ func run(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintln(stderr, "usage: scan --list [--json] <path>")
 		fmt.Fprintln(stderr, "       scan --routes [--json] <path>")
 		fmt.Fprintln(stderr, "       scan --strings [--json] [--entry file] [--judge openai|jev] <path>")
+		fmt.Fprintln(stderr, "       scan --export-html <saved-report.json>")
+		fmt.Fprintln(stderr, "       scan --export-sarif <saved-report.json>")
 		flags.PrintDefaults()
 	}
 
 	if err := flags.Parse(args); err != nil {
 		return exitUsage
 	}
-	if *exportFile != "" {
-		if flags.NArg() != 0 || *list || *routes || *stringsMode || *asJSON || *asSARIF || *entry != "" || *routeFilter != "" || *checksFile != "" || *judgeProvider != "" || *judgeModel != "" {
+	explicitOutputDir := false
+	flags.Visit(func(f *flag.Flag) {
+		if f.Name == "output-dir" {
+			explicitOutputDir = true
+		}
+	})
+	if explicitOutputDir && !*stringsMode {
+		flags.Usage()
+		return exitUsage
+	}
+	if *exportFile != "" || *exportHTML != "" {
+		if (*exportFile != "" && *exportHTML != "") || flags.NArg() != 0 || *list || *routes || *stringsMode || *asJSON || *asSARIF || *entry != "" || *routeFilter != "" || *checksFile != "" || *judgeProvider != "" || *judgeModel != "" {
 			flags.Usage()
 			return exitUsage
+		}
+		if *exportHTML != "" {
+			return runExport(*exportHTML, true, stdout, stderr)
 		}
 		return runExportSARIF(*exportFile, stdout, stderr)
 	}
@@ -78,7 +95,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	}
 
 	if *stringsMode {
-		return runStrings(flags.Arg(0), *entry, *routeFilter, *checksFile, *judgeProvider, *judgeModel, *judgeLimit, *asJSON, *asSARIF, stdout, stderr)
+		return runStrings(flags.Arg(0), *entry, *routeFilter, *checksFile, *judgeProvider, *judgeModel, *judgeLimit, *asJSON, *asSARIF, *outputDir, stdout, stderr)
 	}
 	if *routes {
 		return runRoutes(flags.Arg(0), *asJSON, stdout, stderr)

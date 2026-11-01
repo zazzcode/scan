@@ -37,7 +37,7 @@ func loadChecks(path string) ([]graph.Check, error) {
 	}
 	ids := map[string]bool{}
 	for _, c := range checks {
-		if c.ID == "" || ids[c.ID] || c.Method == "" || !strings.HasPrefix(c.Path, "/") || len(c.Fields) == 0 || c.Validation == "" || c.Protection == "" || (c.Kind != "sql_query" && c.Kind != "account_creation") {
+		if c.ID == "" || ids[c.ID] || c.Method == "" || !strings.HasPrefix(c.Path, "/") || len(c.Fields) == 0 || c.Validation == "" || c.Protection == "" || (c.Kind != "sql_query" && c.Kind != "nosql_query" && c.Kind != "account_creation") {
 			return nil, errors.New("invalid or duplicate check; require id, method, path, kind, fields and explicit requirements")
 		}
 		ids[c.ID] = true

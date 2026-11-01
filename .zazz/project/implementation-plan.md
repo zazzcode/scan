@@ -77,19 +77,80 @@ controls. Next extend automatic claim assembly to novel targets through the
 [Phase 3/5–8 sequence](../architecture/evidence-and-claims.md#discovery-on-novel-target-repositories);
 explicit check files are evaluation/business-policy inputs, not the final discovery strategy.
 
+## Reducing Review through stronger analysis
+
+The [analysis-certainty improvement plan](analysis-certainty-improvements.md) proposes atomic claims,
+claim-specific blockers, verified library/API models, callback/source provenance, enforcing guards and
+middleware, relevant helper summaries, and evidence-ready semantic assessment. It maps the HTML
+uncertainty text to concrete missing facts and gives acceptance targets and evaluation measures.
+
+Keep the AppSec headers **Findings**, **Review**, and **Protected**, with overlapping **Categories**.
+Count distinct supported issues independently of operation records; a type pill is not an additional
+finding. Preserve Review for unresolved requirements or evidence. Extend the existing checked-mode
+completeness machinery instead of promoting every observed pattern to a true-positive finding.
+
+These are follow-on analysis increments to scope deliberately. They do not authorize a broad engine
+rewrite during logger-leak work, paid evaluations, or target execution. Reduce Review by resolving
+its questions correctly, measuring false findings and false protection alongside coverage.
+
+## Human report UI and packaged demonstration
+
+The current [human-report contract](../specifications/human-readable-reports.md) adds clearer JSON
+finding explanations, standard SARIF output, and the [standalone HTML UI](../architecture/html-reporting.md).
+The UI was reviewed against the input-validation and SQL/NoSQL cases before logger-leak detection began.
+Local scan artifacts live outside worktrees under the configured
+`_test-finding/<repo-name>/run-<id>/` root; they are not committed as routine test output.
+
+### Curated public sample outputs
+
+**Implemented at the user's request:** root [docs/samples](../../docs/samples/README.md) contains
+Juice Shop and vulnerable TypeScript JSON/HTML/SARIF, with README links near the project introduction.
+This supersedes the earlier proposed demo/juice-shop directory. Samples are updated as reporting
+and analysis improve; they remain deliberate curated outputs rather than routine test artifacts.
+
+Each sample records the pinned upstream source revision, source attribution, actual scope and
+model-assessment coverage, scanner baseline/question versions, and limitations. Public project labels
+replace developer-specific absolute roots. HTML and SARIF are generated from matching canonical JSON;
+no model call is needed to view them or refresh their presentation. The offline refresh script is
+owned by the [sample guide](../../docs/samples/README.md#refresh-as-scan-improves).
+
+Keep examples honest: preserve incomplete/failed/unassessed states, source hashes and IDs. Do not
+invent a protected finding or vulnerability for visual effect. Input-validation and DB-protection
+claims remain distinct, and third-party comparisons never appear in product report content.
+Routine scans continue using the external _test-finding root; changes to bundled examples require
+an intentional refresh and review. Independent UI acceptance and broader held-out accuracy checks
+remain separate from publishing these illustrative samples.
+
+## User-agent workflow skills
+
+Planned: [user-agent scan and remediation skills](user-agent-skills.md) for running scan on a user's
+repository, interpreting canonical findings/evidence, and implementing tested remediation. These
+product skills are separate from scan's own development-agent orientation and SDLC skills. Publish
+consumer guidance through root docs and future skill packages; keep internal process out of the
+primary user introduction. No consumer skills are implemented by this planning update.
+
 ## Future capability branches
 
 This branch's exit is input validation plus string-built SQL and NoSQL query, update, and insert
 findings. The comparison is [query and validation results](../evaluation/query-validation-comparison.md).
 Each row below is a later worktree and its own coding session. Do not implement that row on this branch.
 
+**Delivered in `logger-leak` (pending merge into `stage`):** the
+[sensitive-data logging contract](../specifications/sensitive-data-logging.md) — explicit logger calls,
+morgan access logs of URL query credentials, and the `log-use-v1` judgment protocol. Live calibration
+of that protocol and the three re-judgments it made necessary remain follow-up work.
+
+**Next, chosen by the user on 2026-11-01:** `xss-response`, in a new worktree from `stage` after
+`logger-leak` merges and the project is renamed to Zazzles. The [XSS detection scope](xss-detection-scope.md)
+records the four XSS types, sinks, protections, evidence rules, Juice Shop and TypeScript targets, and
+delivery increments. Rows are listed in the intended order.
+
 | Future branch | First acceptance target |
 |---|---|
-| `logger-leak` | Request or secret values written to logs; constant startup messages stay negatives |
+| `xss-response` | All XSS in one worktree, backend first: (1) HTML responses on the vulnerable TypeScript app `/api/search`; (2) Juice Shop server templates; (3) API-side stored and echoed data; (4) judgment; (5) browser side last, including Angular template parsing. JSON responses and encoded output stay negatives. See the [scope](xss-detection-scope.md) |
 | `hardcoded-secrets` | Private material in source; public verification keys stay negatives |
 | `command-injection` | `exec` of request input on the vulnerable TypeScript app `/api/ping` |
 | `path-traversal` | `fs.readFile` of a request path on `/api/files` |
-| `xss-response` | Request data written into HTML on `/api/search` |
 | `code-injection` | `eval` of a request expression on `/api/calculate` |
 | `xxe` | XML parse of a request body on `/api/parse-xml` |
 | `open-redirect` | `res.redirect` of a request URL |

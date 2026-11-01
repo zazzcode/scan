@@ -40,14 +40,31 @@ func (s *moduleSet) resolveCall(m *sourceModule, call *sitter.Node) (*sourceModu
 
 func (s *moduleSet) inputHelperGaps(m *sourceModule, body *sitter.Node, req string, fields []string) []graph.Gap {
 	gaps := []graph.Gap{}
+	sinkStart := uint(0)
+	sinkEnd := uint(0)
 	walkCalls(body, func(call *sitter.Node) {
+		fn := call.ChildByFieldName("function")
+		if fn != nil && (strings.HasSuffix(fn.Utf8Text(m.src), ".query") || collectionWrite(fn.Utf8Text(m.src))) {
+			if sinkStart == 0 || call.StartByte() < sinkStart {
+				sinkStart = call.StartByte()
+				sinkEnd = call.EndByte()
+			}
+		}
+	})
+	walkCalls(body, func(call *sitter.Node) {
+		if sinkStart > 0 && (call.StartByte() > sinkStart || (call.StartByte() == sinkStart && call.EndByte() > sinkEnd)) {
+			return
+		}
 		fn := call.ChildByFieldName("function")
 		args := call.ChildByFieldName("arguments")
 		if fn == nil || args == nil {
 			return
 		}
 		name := fn.Utf8Text(m.src)
-		if strings.HasSuffix(name, ".query") {
+		if (name == "Number" || name == "String") && nativeStringOperation(m, call) {
+			return
+		}
+		if strings.HasSuffix(name, ".query") || collectionWrite(name) {
 			return
 		}
 		relevant := false

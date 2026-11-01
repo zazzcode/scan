@@ -26,6 +26,8 @@ type flow struct {
 	depth   int
 	helpers *helperExpansion
 	facts   *inputFacts
+	// parts maps destructured request-parameter names (query, body, ...) to their container.
+	parts map[string]string
 }
 
 func (f *flow) gap(kind, detail string, n *sitter.Node) graph.Gap {
@@ -142,16 +144,30 @@ func (f *flow) eval(n *sitter.Node) value {
 		if v, ok := f.env[n.Utf8Text(src)]; ok {
 			return v
 		}
+		if f.parts[n.Utf8Text(src)] != "" {
+			source := f.module.evidence("request_source", n)
+			f.rememberInput(source)
+			return value{deps: []graph.Dependency{{Source: source, Transfers: []graph.Evidence{}}}}
+		}
 		return value{gaps: []graph.Gap{f.gap("unknown_value", "unresolved local value: "+n.Utf8Text(src), n)}}
 	case "member_expression", "subscript_expression":
-		if isRequestField(n, src, f.request) {
+		partField := f.partField(n)
+		if partField != nil || isRequestField(n, src, f.request) {
 			sourceNode := n
-			if field := requestFieldNode(n, src, f.request); field != nil {
+			if partField != nil {
+				sourceNode = partField
+			} else if field := requestFieldNode(n, src, f.request); field != nil {
 				sourceNode = field
 			}
 			source := f.module.evidence("request_source", sourceNode)
 			f.rememberInput(source)
-			return value{deps: []graph.Dependency{{Source: source, Transfers: []graph.Evidence{}}}}
+			v := value{deps: []graph.Dependency{{Source: source, Transfers: []graph.Evidence{}}}}
+			// A length read directly on the field is a derived fact, not its content.
+			if obj, prop := n.ChildByFieldName("object"), n.ChildByFieldName("property"); n.Kind() == "member_expression" && obj != nil && prop != nil &&
+				prop.Utf8Text(src) == "length" && obj.StartByte() == sourceNode.StartByte() && obj.EndByte() == sourceNode.EndByte() {
+				return f.transfer(v, "property_read", n)
+			}
+			return v
 		}
 		v := f.children(n)
 		return f.transfer(v, "property_read", n)
@@ -169,6 +185,17 @@ func (f *flow) eval(n *sitter.Node) value {
 		return v
 	case "call_expression":
 		return f.call(n)
+	case "binary_expression":
+		// Same as any expression; a comparison against a credential-named property is destination evidence.
+		left, right := n.ChildByFieldName("left"), n.ChildByFieldName("right")
+		l, r := f.eval(left), f.eval(right)
+		f.noteCredentialComparison(n, left, l, right, r)
+		return f.transfer(combine(l, r), "expression", n)
+	case "pair":
+		// Same transfer as any expression; a credential-named property records where the value goes.
+		v := f.children(n)
+		f.noteCredentialDestination(n, v)
+		return f.transfer(v, "expression", n)
 	case "arrow_function", "function_expression", "function":
 		f.enterQueryCallback(n)
 		return value{gaps: []graph.Gap{f.gap("unsupported_callback", "callback/closure body not traversed", n)}}
@@ -262,10 +289,12 @@ func (f *flow) call(n *sitter.Node) value {
 	}
 	name := fn.Utf8Text(f.module.src)
 	// An outer chained call must still visit its receiver, including a query call.
+	// Its result is kept so a.b().c() still depends on what a.b() depended on.
+	var chained value
 	if fn.Kind() == "member_expression" {
 		obj := fn.ChildByFieldName("object")
 		if obj != nil && obj.Kind() == "call_expression" {
-			f.eval(obj)
+			chained = f.eval(obj)
 		}
 	}
 	var values []value
@@ -274,7 +303,18 @@ func (f *flow) call(n *sitter.Node) value {
 			values = append(values, f.eval(args.NamedChild(i)))
 		}
 	}
+	// A verified logger is an emission sink, not a validator of its arguments.
+	if binding, ok := f.logSink(n, fn); ok {
+		f.recordLogSink(n, binding, values)
+		return value{gaps: []graph.Gap{f.gap("unknown_call_result", "logger return value is not modeled", n)}}
+	}
 	kind := queryKind(name, args, f.module.src, values)
+	if kind == "" && collectionWrite(name) && requestDeps(values) && f.set != nil {
+		probe := graph.StringUse{Sink: f.module.evidence("nosql_query_candidate", n)}
+		if len(f.set.collectionBinding(probe)) > 0 {
+			kind = "nosql_query_candidate"
+		}
+	}
 	if name == "fetch" || name == "axios" || strings.HasPrefix(name, "axios.") {
 		kind = "outbound_http_candidate"
 	}
@@ -313,6 +353,8 @@ func (f *flow) call(n *sitter.Node) value {
 		obj := fn.ChildByFieldName("object")
 		if obj != nil && obj.Kind() != "call_expression" {
 			v = combine(v, f.eval(obj))
+		} else if obj != nil {
+			v = combine(v, chained)
 		}
 	}
 	if len(v.deps) > 0 {

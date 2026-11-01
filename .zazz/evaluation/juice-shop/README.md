@@ -16,6 +16,13 @@ Automatic reference/line matches are navigation aids, not correctness decisions.
 [Summary counts](inventory-summary.json) and [explicit review decisions](review-decisions.json) are
 versioned separately from the ignored raw reports.
 
+## External exercise report
+
+[Corisco pentest summary](coriscope-pentest-summary.md) summarizes all eleven categories in the
+user-selected 2024 report, preserves attributed scores/CWE IDs, and maps comparison candidates to
+our pinned inventory. Its claims are external evaluation evidence, not automatic scanner verdicts.
+SQL/NoSQL judgment against known-positive, protected, and unknown cases takes priority over logger-leak.
+
 ## Initial source review
 
 | Rule and location | Source-inspected disposition | Reason |
@@ -26,6 +33,13 @@ versioned separately from the ignored raw reports.
 | sql_injection, routes/login.ts:34 | Supported potential | Request email directly interpolates into SQL text |
 | sql_injection, routes/search.ts:23 | Supported potential | Request criteria interpolates after length restriction, which does not prevent SQL syntax |
 | SSRF and HTTP URL, routes/profileImageUrlUpload.ts:24 | Supported potential; one grouped concern | Request URL reaches fetch; authenticated-user requirement does not constrain destination |
+
+**Sensitive-data logging, 2026-11-01.** Juice Shop writes cleartext passwords to its access log:
+`GET /rest/user/change-password` carries `current`/`new`/`repeat` in the query string and
+`morgan('combined')` (`server.ts:366`) records the URL. None of Bearer's 278 logger findings covers
+this (false negative); its credential-looking logger lines log fixture keys, already-masked emails,
+or constant text. scan now reports the change-password case as a finding and the security-question
+email query as Review. The remaining Bearer logger rows were not individually adjudicated.
 
 These seven raw finding decisions contain three false positives and four supported potential rule
 results (three grouped source/sink concerns). They are agent source inspections, not independent
@@ -173,3 +187,6 @@ references live in JSONL. No unreviewed row asserts a scanner miss or a protecte
 | xxeFileDisclosureChallenge | XXE Data Access | XXE | [registry](https://github.com/juice-shop/juice-shop/blob/f189f521266f42c6bd05884468292000cee852ed/data/static/challenges.yml#L1264) |
 | yamlBombChallenge | Memory Bomb | Insecure Deserialization | [registry](https://github.com/juice-shop/juice-shop/blob/f189f521266f42c6bd05884468292000cee852ed/data/static/challenges.yml#L1297) |
 | zeroStarsChallenge | Zero Stars | Improper Input Validation | [registry](https://github.com/juice-shop/juice-shop/blob/f189f521266f42c6bd05884468292000cee852ed/data/static/challenges.yml#L1309) |
+
+Latest scanner work: [SQL/NoSQL judgment calibration](query-judgment-calibration.md), including
+conditional false-positive correction and remaining acceptance checks. Earlier tables are historical.

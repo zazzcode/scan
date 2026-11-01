@@ -1,144 +1,142 @@
 # scan
 
-`scan` analyzes a local JavaScript or TypeScript target repository. `--routes` inventories syntactic
-Express-style registrations. `--strings` resolves a bounded subset of handlers and request-value
-dependencies into candidate SQL/outbound HTTP uses, retaining source evidence and uncertainty.
-Optional GPT Decisions or Jev judging assesses validation and protection from that evidence.
+`scan` is a Go static application security scanner under active development. It aims to help
+developers and coding agents understand how request inputs reach security-sensitive operations,
+what validation and protection already hold, and where code needs hardening. Reports should give
+reviewers source evidence and explicit analysis gaps so they can judge each finding.
 
-- [Project overview](.zazz/project.md) — purpose, current state, product direction
-- [Route graph spec](.zazz/specifications/tree-sitter-route-identification-mvp.md) — contract for this slice
-- [Agent orientation](.zazz/docs/scan-agent-orientation.md) — workspace conventions, branches, commands, documentation map
-- [OpenAI Decisions setup](.zazz/docs/openai-decisions-setup.md) — API key and Go access example
-- [Architecture](.zazz/architecture.md) — technical proposal and analysis boundaries
-- [Phased plan](.zazz/project/implementation-plan.md) — future spec slices, dependencies, acceptance targets
+The approach combines Tree-sitter source extraction with code-flow analysis and optional decision-model
+assessment of relevant evidence. Field validation and sink protection are separate questions: a valid
+email address does not establish that a SQL query uses bound parameters. Unknown behavior stays
+unknown rather than becoming a safety claim or a vulnerability by assumption.
+
+## Explore sample findings
+
+See the expandable report UI and source evidence from two intentionally vulnerable applications:
+
+| Application | What the current sample shows | Output |
+|---|---|---|
+| **OWASP Juice Shop** | 152 route entries; 3 static injection findings, a credential written to access logs, and 3 query-construction findings | [View in browser](https://zazzcode.github.io/scan/juice-shop/findings.html) · [HTML file](docs/samples/juice-shop/findings.html) · [JSON](docs/samples/juice-shop/findings.json) · [SARIF](docs/samples/juice-shop/findings.sarif) |
+| **Vulnerable TypeScript app** | 19 route entries; a password logged in SQL text (Review) and other evidence and incomplete-analysis records | [View in browser](https://zazzcode.github.io/scan/vulnerable-typescript-app/findings.html) · [HTML file](docs/samples/vulnerable-typescript-app/findings.html) · [JSON](docs/samples/vulnerable-typescript-app/findings.json) · [SARIF](docs/samples/vulnerable-typescript-app/findings.sarif) |
+
+**View in browser** opens the hosted copy published by GitHub Pages ([all samples](https://zazzcode.github.io/scan/)). GitHub's
+file view shows HTML source rather than running it, so you can also download an HTML file and open
+it locally. Findings appear first; expand rows for evidence and remediation, or click a category pill for its
+glossary. No setup or model calls are needed. These [evolving samples](docs/samples/README.md) include
+coverage limits and refresh instructions; they will be updated as scan improves.
+
+## Goals and current scope
+
+The goal is to report vulnerabilities, weak security practices, and sufficient protection by route,
+with useful explanations and remediation guidance. Longer term, scan aims to match or exceed Bearer's
+SAST and developer-workflow capabilities with fewer false positives, measured at comparable detection
+coverage on independently labeled cases. That is a project objective; broad parity is not established.
+
+Today, scan analyzes local JavaScript and TypeScript source. It inventories Express-style route
+registrations, follows a bounded subset of handlers and request-value dependencies into candidate SQL
+and outbound HTTP uses, and exports source evidence as JSON, standalone HTML, or SARIF. Optional OpenAI Decisions or Jev
+judging assesses validation and protection from that evidence.
+
+Full control-flow and interprocedural analysis, independent findings review, Python and Go analysis,
+and dependency vulnerability scanning remain planned. Recognizing a file extension in the file list
+does not establish analysis support. A clean scan does not certify that an application is secure.
+
+## Agent-first philosophy
+
+Our goal is to help agents fix code correctly. Report established vulnerabilities **and poor
+practice worth remediating or refactoring**, even when an exploit has not been demonstrated.
+Preserve sufficient protection, explain uncertainty honestly, and provide evidence and targeted
+remediation. Validation and destination-specific protection can be separate improvements at the
+same operation. Read the [project philosophy](docs/philosophy.md).
+
+## Documentation
+
+Start with the [documentation index and introduction](docs/README.md):
+
+- [Philosophy](docs/philosophy.md) — why and when an agent should fix code
+- [Getting started](docs/getting-started.md) — prerequisites, compilation, and `.env`
+- [Running scans](docs/running-scans.md) — modes, entry selection, output folders, and exports
+- [Interpreting results](docs/interpreting-results.md) — Findings, Review, Protected, evidence, and remediation
+- [Finding categories](docs/glossary.md) — definitions and current coverage
+- [Decision-model setup](docs/decision-models.md) — optional assessment and provider credentials
+- [CI/CD](docs/ci.md) — JSON, HTML, and SARIF artifacts
+- [Contributing](docs/contributing.md) — development workflow and verification
 
 ## Setup
 
-1. Install Go 1.27.2 or newer. Check with `go version`.
-2. Install a C compiler and keep it on `PATH`. The Tree-sitter bindings use cgo. On macOS
-   that is the Xcode command line tools (`xcode-select --install`).
-3. Clone this repository and enter its root, the directory that contains `go.mod`.
-4. The first `go run` or `go test` downloads the modules in `go.mod`. No separate install step.
+Install the Go toolchain declared in `go.mod` and a C compiler for the Tree-sitter cgo bindings.
+Build from the checkout root:
 
-The program scans a directory you already have on disk. It does not clone, install, or start
-the target application.
+```bash
+go build -o bin/scan ./cmd/scan
+```
+
+For a new local setup, copy [.env.sample](.env.sample) to `.env`; merge settings if `.env` already
+exists so you preserve your keys. Scan does not auto-load `.env`. Offline scanning needs no API key.
+See the [setup guide](docs/getting-started.md) for full instructions.
+
+### Optional decision-model setup
+
+Use [decision-model setup](docs/decision-models.md) when explicitly enabling assessment. The scanner
+reads the selected provider's key from its process environment. Model requests transmit source
+evidence and need an explicit request cap; a key is not a reason to run paid assessment automatically.
 
 ## Run
 
 ```bash
-go run ./cmd/scan --list [--json] <path>
-go run ./cmd/scan --routes [--json] <path>
+export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/scan/_test-finding"
+./bin/scan --strings --entry server.ts /path/to/juice-shop
+./bin/scan --strings --entry src/server.ts /path/to/vulnerable-typescript-app
 ```
 
-`<path>` is the root of the application to scan. `--list` and `--routes` are separate modes.
-Passing both, or omitting `<path>`, exits `2`. A missing directory exits `1`. Success exits `0`.
+Each run creates `<output-root>/<repo-name>/run-<id>/` containing `findings.json`, `findings.html`, and
+`findings.sarif`. Open the printed HTML path to review expandable source rows and category definitions.
+`--output-dir` overrides the environment variable; `--output-dir ""` disables bundle output.
 
-`--list` prints the supported source files and language counts. `--routes` prints one
-`METHOD path file:line` line per route, then one gap line per gap. Add `--json` for indented
-JSON on stdout.
+You can regenerate views without rescanning or calling a model:
 
 ```bash
-go run ./cmd/scan --routes --json /path/to/app > graph.json
+./bin/scan --export-html /path/to/run/findings.json > /path/to/run/findings.html
+./bin/scan --export-sarif /path/to/run/findings.json > /path/to/run/findings.sarif
 ```
 
-Check the scanner itself with:
+The [running guide](docs/running-scans.md) covers inventory modes, route/check selection, output
+formats, and limitations. JSON retains evidence for agents, HTML supports human review, and SARIF
+provides standard security-tool interchange. Keep source-containing reports outside Git by default.
 
-```bash
-go test ./...
-go test -race ./...
-go vet ./...
-```
+## Interpret results
 
-## What the graph contains
+| Column | Meaning | Action |
+|---|---|---|
+| **Findings** | Established problems, including poor practice that merits correction without a demonstrated exploit | Remediate or refactor the named problem and verify the change |
+| **Review** | Evidence does not yet establish a problem or adequate protection | Resolve the named uncertainty before deciding on a fix |
+| **Protected** | Evidence supports protection for the named claim | Preserve it; assess other fields and uses independently |
 
-`scan --routes` parses `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.tsx`, `.mts`, and `.cts`.
-It skips `node_modules`, `vendor`, `dist`, `build`, and the other dependency and output
-directories listed in `internal/walk`. `--list` still counts Python, Go, and Java files.
-Those files are not mined for routes.
+**Poor practice** is a finding to fix, not a request to wait for an exploit. The current deterministic
+rules report string-built SQL and executable NoSQL `$where` constructions as poor practice.
+A missing modeled validator or document constraint alone remains Review. A model's potential
+vulnerability answer is retained for investigation; it does not automatically establish a finding.
 
-A route is a member call named `get`, `post`, `put`, `patch`, `delete`, `all`, or `use`
-whose path is a string literal starting with `/`, or an array of such strings.
-`receiver.route('/path').get(handler)` is one route per verb. Arguments after the path are
-recorded in order. A member call with one function argument is unwrapped once, so
-`wrapper(handler())` keeps both names. An inline function in the same file contributes its
-direct call statements. A name with no function body in that file stays on the route and
-adds an `unresolved_handler` gap.
+**Categories** are overlapping labels, not additional findings. Route location identifies a route's
+declaration; Finding location identifies the operation in the expanded record. The current report
+still groups several concerns within a use record; distinct claim-level counting is planned. Read the
+[results guide](docs/interpreting-results.md) for statuses, counts, and remediation examples.
 
-The JSON document is `schema_version` 1 with `root`, `routes`, and `gaps`. Each route has
-`id`, `method`, `path_pattern`, `framework` (`express`), `registration`, `handler`, and
-`steps`. Spans are the file, 1-based lines, and byte offsets. Gap kinds are `dynamic_path`,
-`unresolved_handler`, and `parse_error`.
+Exit `0` means the operation completed, not that the target is safe. Exit `1` signals execution or
+requested-assessment failure; exit `2` signals invalid usage. A finding-severity CI gate is not yet
+implemented.
 
-## What it does not follow
+## Contributing
 
-The graph is the registration written in the target's own source. It is not an execution
-trace.
+Developing scan: use the [contributor guide](docs/contributing.md), [AGENTS.md](AGENTS.md), and
+[developer agent orientation](.zazz/docs/scan-agent-orientation.md) for workspace conventions, branches,
+commands, and the internal documentation map. Run relevant scoped checks;
+CI verifies formatting, vet, build, and race tests. Work stays on feature branches, draft PRs target
+`stage`, and humans review and merge. Live model calls are separate from offline tests.
 
-- Express itself is not parsed. `node_modules` is skipped, so `app.post` stops at the call
-  in the application. Router dispatch, `next()`, and Express internals are not steps.
-- Imported middleware and handlers are names and source spans only. `login` imported from
-  another file is an `unresolved_handler` gap. The body of that file is not attached.
-- User middleware defined in the same file is followed only for direct call statements in
-  that function. Calls nested in `try`, `if`, `await`, or a `const` initializer are omitted.
-- A wrapper is unwrapped one level. The implementation of the wrapper is not opened.
-- `app.use(someMiddleware())` with no string path is not a route.
-- A path that is not a string literal is a `dynamic_path` gap and creates no route.
-- The graph does not decide whether a value was validated or sanitized.
+Internal engineering material lives under `.zazz/`: [architecture](.zazz/architecture.md),
+[implementation plan](.zazz/project/implementation-plan.md), [contracts](.zazz/specifications/README.md),
+and the [engineering documentation map](.zazz/docs/scan-agent-orientation.md#documentation-map).
 
-## Route-to-string-use analysis
-
-```bash
-go run ./cmd/scan --strings --json --entry server.ts <target-root>
-```
-
-Entry paths are relative to the target repository. Use `server.ts` for Juice Shop and
-`src/server.ts` for the vulnerable TypeScript sample. Omit `--entry` to consider all selected JS/TS
-registration files. Explicit selection avoids conflating training snippets with production scope.
-
-The separate schema-v1 evidence report contains `entries`, `uses`, `files`, `gaps` and `limitations`.
-Each use identifies its route, source fields, ordered local transfer evidence, candidate sink,
-snapshot hashes and assessment state. Direct named relative ESM imports, imported handler factories,
-local assignment, string expressions and simple object destructuring are supported. Branches,
-unknown transformations, middleware, receiver ambiguity, unverified library bindings and external
-response continuations remain explicit gaps. A SQL-shaped string logged to the console is not
-reported as an SQL call. HTTP client registrations are excluded by the new receiver filter.
-
-Use `--route /rest/user/login` to select an exact path pattern before model requests.
-Offline assessment is `not_run`. For provider selection and key instructions, including personal-key
-ownership and Jev configuration, see [decision API setup](.zazz/docs/openai-decisions-setup.md).
-`--judge openai|jev` explicitly transmits bounded evidence; `--judge-limit` caps requests (default 10,
-no retries). A requested judge failure, skipped oversized payload or exhausted request cap exits 1
-with its report retained. Neither a successful judge call nor offline exit 0 certifies the target.
-The graph design and full CFG/interprocedural analysis exceed this first implementation slice.
-
-## Explicit route validation checks
-
-Use a requirements file to declare the method, path, fields and separate validation/protection
-constraints. This avoids guessing business requirements from a helper's name or a missing regex.
-The phase's two known target cases are tracked in `.zazz/evaluation/juice-shop/validation-checks.json`:
-
-```bash
-go run ./cmd/scan --strings --json --entry server.ts \
-  --checks .zazz/evaluation/juice-shop/validation-checks.json <target-root>
-```
-
-Add `--judge openai --judge-model gpt-6-luna --judge-limit 2` for a capped live run. Checked output adds
-relevant middleware/helpers/model context, local registration control edges, required evidence roles,
-blocking vs coverage gaps, and a scoped finding status. `supported_potential` is an advisory finding
-under the declared models, not runtime confirmation or completed independent review. See the
-[evidence design](.zazz/architecture/evidence-and-claims.md) and
-[results](.zazz/evaluation/juice-shop/results.md). SCA remains planned. Automatic claim assembly for
-novel repositories remains incomplete; see [discovery design](.zazz/architecture/evidence-and-claims.md#discovery-on-novel-target-repositories).
-
-## SARIF output
-
-```bash
-go run ./cmd/scan --strings --sarif --entry server.ts <target-root> > findings.sarif
-go run ./cmd/scan --export-sarif saved-evidence.json > findings.sarif
-```
-
-The second command converts saved scanner JSON offline without a judge request. SARIF retains
-route identity, scoped status, source evidence, gaps and illustrative remediation templates. Examples
-are unverified suggestions, not applied fixes. `--sarif` and `--json` are mutually exclusive.
-See [report design](.zazz/architecture/reporting-and-sarif.md) and
-[comparison results](.zazz/evaluation/corpus/README.md).
+Analysis contributors: read the [scan analysis rules and guidelines](docs/analysis/README.md) for
+SQL/NoSQL judgment, input-validation policy, and calibration controls.

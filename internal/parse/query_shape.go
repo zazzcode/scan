@@ -18,10 +18,12 @@ type inputFacts struct {
 	middleware map[string]bool
 	weak       map[string]bool
 	sunk       map[string]bool
+	// credentialDest maps container+key to a request value written to a credential-named property.
+	credentialDest map[string]credentialDestination
 }
 
 func newInputFacts() *inputFacts {
-	return &inputFacts{inputs: map[string]graph.Evidence{}, touched: map[string]bool{}, middleware: map[string]bool{}, weak: map[string]bool{}, sunk: map[string]bool{}}
+	return &inputFacts{inputs: map[string]graph.Evidence{}, touched: map[string]bool{}, middleware: map[string]bool{}, weak: map[string]bool{}, sunk: map[string]bool{}, credentialDest: map[string]credentialDestination{}}
 }
 
 func (f *flow) rememberInput(source graph.Evidence) {
@@ -278,6 +280,7 @@ func (f *flow) enterQueryCallback(n *sitter.Node) {
 		set:     f.set,
 		route:   f.route,
 		request: f.request,
+		parts:   f.parts,
 		env:     copyValues(f.env),
 		context: append([]graph.Evidence{}, f.context...),
 		gaps:    append([]graph.Gap{}, f.gaps...),

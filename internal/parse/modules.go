@@ -159,6 +159,19 @@ func (m *sourceModule) readImport(n *sitter.Node) {
 }
 
 func (s *moduleSet) resolve(m *sourceModule, name string) (*sourceModule, *sitter.Node) {
+	parts := strings.Split(name, ".")
+	if len(parts) == 3 {
+		if imp, ok := m.imports[parts[0]]; ok && imp.name == "*" {
+			if target := s.importModule(m, imp.module); target != nil && exportedName(target, parts[1]) {
+				obj := topVariable(target, parts[1])
+				if obj != nil && obj.Kind() == "object" {
+					if method := property(obj, parts[2], target.src); method != nil && isFunction(method) {
+						return target, method
+					}
+				}
+			}
+		}
+	}
 	if parts := strings.Split(name, "."); len(parts) == 2 {
 		if imp, ok := m.imports[parts[0]]; ok && imp.name == "*" {
 			if target := s.importModule(m, imp.module); target != nil {

@@ -1,0 +1,33 @@
+name: Publish sample findings
+on:
+  workflow_dispatch:
+  # stage is the default branch and the only branch allowed by the github-pages environment.
+  push:
+    branches: [stage]
+    paths:
+      - docs/samples/**
+      - .github/workflows/sample-pages.yml
+permissions:
+  contents: read
+concurrency:
+  group: sample-pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/samples
+      - name: Deploy samples
+        id: deployment
+        uses: actions/deploy-pages@v4

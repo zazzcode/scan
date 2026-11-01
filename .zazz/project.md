@@ -10,22 +10,17 @@ to the detailed documents and defines their responsibilities.
 to give developers reviewable source evidence, security engineers useful triage context, and CI an
 explicit policy over findings and analysis limits. A clean run is not a security certification.
 
-## Tenets
+## Product philosophy and user documentation
 
-1. **Report more than proven exploits.** Surface confirmed vulnerabilities and weak or poor practice
-   on the same route. A missing check, a type-only check, an insecure default, and a string built
-   into a query are all findings. A practice finding is not, by itself, proof of exploitability.
-2. **Agents can harden code cheaply.** Do not drop a finding because a human would postpone it.
-   An agent can apply the tightest validation the business field allows, and can fix sink
-   construction, in the same pass. Silence is not a savings.
-3. **Defensive validation, and a correct sink.** Restrict each input as far as the business
-   requirement allows. A string or length check is not injection protection. A comment or other
-   free-text field may contain any character, so an allow-list is the wrong fix. That value has to
-   be bound in the query, update, or insert.
-4. **Say what is already sufficient.** A protected claim names the field, the check, and the sink
-   slot. It stays in the report so an agent does not redo it and so silence is not read as safety.
-5. **Unknown stays unknown.** A custom validator or middleware read whose effect is not shown does
-   not become a pass, and a missing graph edge does not become a vulnerability.
+The authoritative user-facing [agent-first philosophy](../docs/philosophy.md) lives in root `docs/`.
+Established vulnerabilities and poor practice are remediation tasks even without a demonstrated
+exploit; Review is reserved for uncertainty about the problem or protection. Preserve established
+protection and verify changes. The [user documentation index](../docs/README.md) owns setup, running,
+result interpretation, glossary, decision-model use, CI, and contributor guidance.
+
+This internal overview owns planning context, capability state, and product-direction decisions;
+engineering designs and SDLC records remain under `.zazz/`. User-facing guidance MUST NOT be
+maintained solely in internal project documents.
 
 ## Long-term objectives
 

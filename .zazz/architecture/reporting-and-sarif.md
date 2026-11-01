@@ -2,7 +2,20 @@
 
 **Design and bounded implementation, 2026-10-31.** Use one versioned internal
 model for route analysis, evidence and findings, with SARIF 2.1.0 as an implemented findings
-export. Avoid separate detection/policy implementations for JSON and SARIF.
+export and a [standalone HTML report](html-reporting.md) for human CLI review. Avoid separate
+detection/policy implementations for JSON, SARIF, and HTML.
+
+## Output responsibilities
+
+- **Canonical scan JSON:** full bounded source evidence, entries/uses, source hashes, assessment and
+  completeness context, plus human-readable finding records. This is the primary agent-readable artifact.
+- **SARIF 2.1.0:** standard security-tool interchange. Preserve extra scan context in namespaced
+  properties instead of dropping uncertainty to fit a consumer's default result display.
+- **Standalone HTML:** the core human-facing CLI report, generated offline from the canonical JSON.
+  Show only scan's results. Comparator/tool benchmarking belongs in evaluation documents.
+
+All three formats share the same use/route IDs, raw assessments, and report interpretation. None
+runs an additional detector, changes eligibility, or silently upgrades uncertainty to protection.
 
 ## Canonical report
 
@@ -33,6 +46,36 @@ Recommendations should be organized around a route and its relevant graph slice.
 appropriate set can include SQL parameter binding, server-side input type/format constraints, suitable
 password storage, and authentication regression tests. Each addresses a different property. Do not
 label email validation alone a sufficient SQL-injection fix or guarantee an impervious route.
+
+## Human-readable finding interpretation
+
+Schema-v1 evidence remains compatible. Additive `presentation_version` and `findings` fields describe
+one result record per use. A record includes `id`, `use_id`, `route_id`, `record_type`, `status`, `title`,
+`summary`, separate `input_validation` and `use_protection` explanations, `uncertainty`, and
+`recommendations`. Presentation version 2 adds `type_ids` and the report-level `finding_types`
+[glossary](finding-types.md); risk families remain separate from assessment status. Evidence stays in the referenced use; it is not replaced by generated prose.
+`internal/report/findings.go` owns interpretation; `guidance.go` owns reviewable remediation.
+
+The public semantics live in [philosophy](../../docs/philosophy.md) and
+[result interpretation](../../docs/interpreting-results.md). Presentation version 3 uses `record_type`
+`finding` for evidence-gated static vulnerabilities and established poor practice, `analysis` for unresolved behavior/potential model claims,
+and `protection` for an assessed protected claim. The Findings column is not limited to demonstrated
+exploits: an established practice violation is a remediation/refactoring task. `poor_practice`
+replaces the former broad `observed_pattern` presentation status for string-built executable queries.
+
+Unmodeled NoSQL document constraints and absent modeled validator calls alone remain Review. An
+advisory `supported_potential` model answer is retained as Review unless independent deterministic
+practice evidence already establishes a finding. Existing practice findings remain actionable when
+assessment is omitted, fails, is inconclusive, or supports protection for a separate injection claim.
+Raw assessment statuses and answers are never rewritten. A query-shape/library ambiguity such as
+ORM search values remains Review rather than being relabeled as a practice defect.
+
+Descriptions explain behavior and uncertainty in ordinary language. Internal names such as
+`query_text_interpolated` remain available as evidence identifiers, not the primary explanation.
+For example, an interpolated ORM `Op.like` value requires library review rather than an automatic
+SQL-injection finding. NoSQL document values require slot, type, key/operator and API review. NoSQL
+is one word. “No validator identified” applies only to the analyzed slice; unknown validation remains
+Inconclusive in the human view; raw values remain compatible. Shared uses count per route and must not be described as unique confirmed vulnerabilities.
 
 ## SARIF mapping
 
@@ -65,10 +108,13 @@ additional assessment, not the advisory's existence.
 
 `--strings --sarif` exports a current scan. `--export-sarif <saved-report.json>` converts a canonical
 JSON report offline with no new judge request. These flags are mutually exclusive with `--json`.
-The exporter does not recompute or upgrade saved assessments.
+The exporter does not recompute or upgrade saved assessments. It rebuilds deterministic human-readable
+presentation from saved raw uses, including for older schema-v1 reports. `scan.finding` preserves the
+human-readable finding alongside `scan.assessment`, source evidence, gaps, and recommendations.
 
-Results map supported_potential to fail/warning, protected_for_claim to pass/none, needs_evidence
-and incomplete assessments to review/note, and not_applicable to notApplicable/none. A pass applies
+SARIF maps presentation Findings (including poor practice) to fail/warning, Protected to pass/none,
+Review to review/note, and not_applicable to notApplicable/none. This uses the shared presentation
+classification rather than raw model status; `scan.assessment` retains the original status. A pass applies
 only to the declared claim. Validation and use-protection answers remain separate in messages and
 properties: safe SQL parameterization can coexist with missing domain validation.
 
@@ -91,3 +137,6 @@ registration value paths or unverified fixes. No GitHub/IDE ingestion test has b
 Phase 9 still owns the stable normalized finding contract, identity/baselines, CI policy and consumer
 integration. This bounded adapter does not complete that phase. Neither JSON nor SARIF changes
 finding eligibility, runtime-confirmation state or independent-review policy.
+
+The [query judgment design](query-judgment.md) owns automatic injection evidence and policy gates.
+Public [analysis rules](../../docs/analysis/README.md) describe SQL/NoSQL and validation semantics.

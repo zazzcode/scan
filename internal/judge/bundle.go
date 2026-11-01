@@ -75,5 +75,21 @@ func wireBundle(use graph.StringUse) any {
 		Scope        string              `json:"scope"`
 		Evidence     []graph.Evidence    `json:"evidence"`
 		ControlEdges []map[string]string `json:"control_edges"`
-	}{use.ID, use.Kind, use.Check, sink, context, dependencies, required, roles, blockers, coverage, scope, table, edges}
+		ModelFacts   []string            `json:"model_facts,omitempty"`
+		Resolved     []graph.Gap         `json:"resolved_gaps,omitempty"`
+		APIModel     *graph.APIModel     `json:"api_model,omitempty"`
+	}{use.ID, use.Kind, use.Check, sink, context, dependencies, required, roles, blockers, coverage, scope, table, edges, modelFacts(use), resolvedGaps(use), use.APIModel}
+}
+
+func modelFacts(use graph.StringUse) []string {
+	if use.Completeness == nil {
+		return nil
+	}
+	return use.Completeness.ModelFacts
+}
+func resolvedGaps(use graph.StringUse) []graph.Gap {
+	if use.Completeness == nil {
+		return nil
+	}
+	return use.Completeness.Resolved
 }

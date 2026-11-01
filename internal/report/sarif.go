@@ -14,12 +14,13 @@ const SchemaURI = "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/sc
 // SARIF returns an interoperable view of the canonical evidence report. Advisory
 // findings, protected claims and incomplete analysis remain distinct.
 func SARIF(report *graph.StringReport) map[string]any {
+	Enrich(report)
 	rules := []any{}
 	results := []any{}
 	indexes := map[string]int{}
 	notifications := []any{}
 	successful := true
-	for _, use := range report.Uses {
+	for i, use := range report.Uses {
 		id, cwe := ruleIdentity(use)
 		index, ok := indexes[id]
 		g := guidance(use)
@@ -39,13 +40,11 @@ func SARIF(report *graph.StringReport) map[string]any {
 			}
 			rules = append(rules, map[string]any{"id": id, "shortDescription": map[string]string{"text": g.Title}, "help": map[string]string{"text": g.Title + ". " + strings.Join(g.Actions, " "), "markdown": markdown}, "properties": map[string]any{"tags": tags}})
 		}
-		kind, level := resultKind(use.Assessment)
+		kind, level := resultKind(report.Findings[i])
 		route := routeName(report, use)
-		message := fmt.Sprintf("%s: %s; finding=%s; validation=%s; use protection=%s. %s", route, g.Title, use.Assessment.FindingStatus, use.Assessment.Answers["validation"], use.Assessment.Protection, use.Assessment.Reason)
-		if use.Assessment.FindingStatus == "" {
-			message = route + ": candidate needs semantic assessment; no vulnerability verdict is established."
-		}
-		props := map[string]any{"scan.route": route, "scan.useId": use.ID, "scan.kind": use.Kind, "scan.assessment": use.Assessment, "scan.reviewStatus": "not_run", "scan.runtimeConfirmation": "not_run", "scan.recommendations": g, "scan.coverageGaps": use.Gaps}
+		finding := report.Findings[i]
+		message := fmt.Sprintf("%s: %s [%s]. %s %s", route, finding.Title, finding.Status, finding.Summary, finding.Protection)
+		props := map[string]any{"scan.finding": report.Findings[i], "scan.route": route, "scan.useId": use.ID, "scan.kind": use.Kind, "scan.assessment": use.Assessment, "scan.reviewStatus": "not_run", "scan.runtimeConfirmation": "not_run", "scan.recommendations": g, "scan.coverageGaps": use.Gaps}
 		if use.Check != nil {
 			props["scan.check"] = use.Check
 		}
@@ -105,7 +104,7 @@ func SARIF(report *graph.StringReport) map[string]any {
 	for _, e := range report.Files {
 		artifacts = append(artifacts, map[string]any{"location": map[string]string{"uri": relativeURI(e.Span.File)}, "hashes": map[string]string{"sha-256": e.SHA256}})
 	}
-	run := map[string]any{"tool": map[string]any{"driver": map[string]any{"name": "scan", "informationUri": "https://github.com/zazzcode/scan", "rules": rules}}, "results": results, "artifacts": artifacts, "invocations": []any{invocation}, "properties": map[string]any{"scan.limitations": report.Limitations, "scan.selectedRoute": report.SelectedRoute, "scan.identityPolicy": "snapshot-local use IDs; edit-stable baseline identity is not implemented"}}
+	run := map[string]any{"tool": map[string]any{"driver": map[string]any{"name": "scan", "informationUri": "https://github.com/zazzcode/scan", "rules": rules}}, "results": results, "artifacts": artifacts, "invocations": []any{invocation}, "properties": map[string]any{"scan.findingTypes": report.FindingTypes, "scan.limitations": report.Limitations, "scan.selectedRoute": report.SelectedRoute, "scan.identityPolicy": "snapshot-local use IDs; edit-stable baseline identity is not implemented"}}
 	return map[string]any{"$schema": SchemaURI, "version": "2.1.0", "runs": []any{run}}
 }
 
@@ -123,22 +122,26 @@ func ruleIdentity(use graph.StringUse) (string, string) {
 		return "scan/input-validation", "CWE-20"
 	case "account_creation", "account_creation_candidate":
 		return "scan/required-field-validation", "CWE-20"
+	case "log_sink", "log_sink_candidate":
+		return "scan/sensitive-data-logging", "CWE-532"
 	default:
 		return "scan/unresolved-string-use", ""
 	}
 }
-func resultKind(a graph.Assessment) (string, string) {
-	switch a.FindingStatus {
-	case "supported_potential":
-		return "fail", "warning"
-	case "protected_for_claim":
-		return "pass", "none"
-	case "not_applicable":
+func resultKind(f graph.Finding) (string, string) {
+	if f.Status == "not_applicable" {
 		return "notApplicable", "none"
+	}
+	switch f.RecordType {
+	case "finding":
+		return "fail", "warning"
+	case "protection":
+		return "pass", "none"
 	default:
 		return "review", "note"
 	}
 }
+
 func routeName(report *graph.StringReport, use graph.StringUse) string {
 	if use.Check != nil {
 		return use.Check.Method + " " + use.Check.Path

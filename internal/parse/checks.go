@@ -17,10 +17,14 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 			report.Gaps = append(report.Gaps, graph.Gap{Kind: "check_route_missing", Detail: check.ID + ": declared method/path was not resolved"})
 			continue
 		}
-		if check.Kind == "sql_query" {
+		if check.Kind == "sql_query" || check.Kind == "nosql_query" {
+			candidateKind := "sql_query_candidate"
+			if check.Kind == "nosql_query" {
+				candidateKind = "nosql_query_candidate"
+			}
 			matched := 0
 			for _, old := range report.Uses {
-				if old.Kind != "sql_query_candidate" || !checkRoute(report, old.RouteID, check) {
+				if old.Kind != candidateKind || !checkRoute(report, old.RouteID, check) {
 					continue
 				}
 				matched++
@@ -28,8 +32,8 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 				use.ID += "/" + check.ID
 				use.Check = &check
 				use.Context = append(context, use.Context...)
-				use.Completeness = &graph.Completeness{Required: []string{"request_source", "sql_query_candidate", "route_handler", "sink_binding"}, Evidence: evidenceRoles(use.Context), Blockers: append([]graph.Gap{}, chainGaps...), Coverage: []graph.Gap{}, Scope: "declared check over the supplied route and local source-to-SQL evidence"}
-				use.Completeness.Evidence["sql_query_candidate"] = []graph.Evidence{use.Sink}
+				use.Completeness = &graph.Completeness{ClaimKind: "injection", Required: []string{"request_source", candidateKind, "route_handler", "sink_binding"}, Evidence: evidenceRoles(use.Context), Blockers: append([]graph.Gap{}, chainGaps...), Coverage: []graph.Gap{}, Scope: "injection claim over the supplied route, relevant request values, verified operation contract and guard/transfer context"}
+				use.Completeness.Evidence[candidateKind] = []graph.Evidence{use.Sink}
 				for _, d := range use.Dependencies {
 					if fieldDependency(d, check.Fields) {
 						use.Completeness.Evidence["request_source"] = append(use.Completeness.Evidence["request_source"], d.Source)
@@ -55,7 +59,15 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 					use.Completeness.Evidence["control_flow"] = []graph.Evidence{e}
 				}
 				binding := s.queryBinding(use)
+				if check.Kind == "nosql_query" {
+					binding = s.collectionBinding(use)
+				}
 				if len(binding) > 0 {
+					if check.Kind == "nosql_query" {
+						use.APIModel = &graph.APIModel{ID: "marsdb-collection-v1", Library: "marsdb", Semantics: "MarsDB Collection uses Mongo-style selector matching. $where string values are executable JavaScript predicates, not bound data. A request object in a selector field can introduce matching operators such as $ne. Ordinary scalar values in document data slots are not executable expressions. Review each selector versus update-value slot and constraints separately.", Reference: "https://github.com/c58/marsdb/blob/master/lib/DocumentMatcher.js"}
+					} else {
+						use.APIModel = &graph.APIModel{ID: "sequelize-raw-query-v1", Library: "sequelize", Semantics: "Sequelize query takes executable SQL text as its first argument. bind and replacements supply separated data values according to their API. model, plain and result-format options do not parameterize an already-interpolated SQL string.", Reference: "https://sequelize.org/docs/v6/core-concepts/raw-queries/"}
+					}
 					use.Context = append(use.Context, binding...)
 					use.Completeness.Evidence["sink_binding"] = binding
 				}
@@ -96,6 +108,7 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 					}
 				}
 				use.Completeness.Blockers = append(use.Completeness.Blockers, s.contextLimits...)
+				s.refineQueryEvidence(&use)
 				selected = append(selected, use)
 			}
 			if matched == 0 {
@@ -237,6 +250,9 @@ func (s *moduleSet) queryBinding(use graph.StringUse) []graph.Evidence {
 	}
 	name := obj.Utf8Text(m.src)
 	parts := strings.Split(name, ".")
+	if shadowed(call, parts[0], m.src) {
+		return nil
+	}
 	target := m
 	if len(parts) == 2 {
 		imp, ok := m.imports[parts[0]]

@@ -17,6 +17,7 @@ type Dependency struct {
 
 // StringUse is a candidate use needing context-specific assessment.
 type StringUse struct {
+	APIModel     *APIModel     `json:"api_model,omitempty"`
 	ControlEdges []ControlEdge `json:"control_edges,omitempty"`
 	Check        *Check        `json:"check,omitempty"`
 	Completeness *Completeness `json:"completeness,omitempty"`
@@ -53,15 +54,18 @@ type Entry struct {
 
 // StringReport is the bounded analysis artifact, separate from route-v1 JSON.
 type StringReport struct {
-	SelectedRoute string        `json:"selected_route,omitempty"`
-	SchemaVersion int           `json:"schema_version"`
-	Root          string        `json:"root"`
-	Entries       []Entry       `json:"entries"`
-	Uses          []StringUse   `json:"uses"`
-	Gaps          []Gap         `json:"gaps"`
-	Files         []Evidence    `json:"files"`
-	Limitations   []string      `json:"limitations"`
-	Practice      []PracticeRef `json:"practice,omitempty"`
+	FindingTypes        []FindingType `json:"finding_types,omitempty"`
+	PresentationVersion int           `json:"presentation_version,omitempty"`
+	Findings            []Finding     `json:"findings,omitempty"`
+	SelectedRoute       string        `json:"selected_route,omitempty"`
+	SchemaVersion       int           `json:"schema_version"`
+	Root                string        `json:"root"`
+	Entries             []Entry       `json:"entries"`
+	Uses                []StringUse   `json:"uses"`
+	Gaps                []Gap         `json:"gaps"`
+	Files               []Evidence    `json:"files"`
+	Limitations         []string      `json:"limitations"`
+	Practice            []PracticeRef `json:"practice,omitempty"`
 }
 
 // PracticeRef names the embedded language rule applied to this report.
@@ -85,11 +89,14 @@ type Check struct {
 
 // Completeness separates claim blockers from unrelated coverage limitations.
 type Completeness struct {
-	Required []string              `json:"required"`
-	Evidence map[string][]Evidence `json:"evidence"`
-	Blockers []Gap                 `json:"blockers"`
-	Coverage []Gap                 `json:"coverage"`
-	Scope    string                `json:"scope"`
+	ModelFacts []string              `json:"model_facts,omitempty"`
+	Resolved   []Gap                 `json:"resolved_gaps,omitempty"`
+	ClaimKind  string                `json:"claim_kind,omitempty"`
+	Required   []string              `json:"required"`
+	Evidence   map[string][]Evidence `json:"evidence"`
+	Blockers   []Gap                 `json:"blockers"`
+	Coverage   []Gap                 `json:"coverage"`
+	Scope      string                `json:"scope"`
 }
 
 // ControlEdge records a source-backed local successor, including both guard outcomes.
@@ -97,4 +104,12 @@ type ControlEdge struct {
 	From Evidence `json:"from"`
 	To   Evidence `json:"to"`
 	Kind string   `json:"kind"`
+}
+
+// APIModel describes a versioned library contract separately from source evidence.
+type APIModel struct {
+	ID        string `json:"id"`
+	Library   string `json:"library"`
+	Semantics string `json:"semantics"`
+	Reference string `json:"reference"`
 }

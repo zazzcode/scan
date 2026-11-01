@@ -9,7 +9,7 @@ import (
 
 func TestPracticePack(t *testing.T) {
 	js, ok := Body(lang.TypeScript)
-	if !ok || js.ID != "javascript" || js.Version != "1" || !strings.Contains(js.Body, "Free text") {
+	if !ok || js.ID != "javascript" || js.Version != "3" || !strings.Contains(js.Body, "Free text") || !strings.Contains(js.Body, "## Logging") {
 		t.Fatalf("javascript practice=%+v", js)
 	}
 	if _, ok := Body(lang.JavaScript); !ok {
