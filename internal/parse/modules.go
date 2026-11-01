@@ -28,12 +28,17 @@ type sourceModule struct {
 }
 
 type moduleSet struct {
-	contextLimits []graph.Gap
-	contextFields []string
-	root          string
-	parsers       *parsers
-	modules       map[string]*sourceModule
-	allowed       map[string]bool
+	storageWrites  map[string][]storageWrite
+	producers      []jsonProducer
+	modelEvidence  map[string][]graph.Evidence
+	mountedOrigins map[string]bool
+	textSources    map[string]graph.Evidence
+	contextLimits  []graph.Gap
+	contextFields  []string
+	root           string
+	parsers        *parsers
+	modules        map[string]*sourceModule
+	allowed        map[string]bool
 }
 
 func (s *moduleSet) close() {
@@ -58,7 +63,13 @@ func (s *moduleSet) load(file string) (*sourceModule, error) {
 	if len(src) > 2<<20 {
 		return nil, fmt.Errorf("source exceeds 2 MiB limit: %s", file)
 	}
-	tree := s.parsers.forPath(file).Parse(src, nil)
+	parseSource := src
+	parser := s.parsers.forPath(file)
+	if filepath.Ext(file) == ".vue" {
+		parseSource = vueScriptSource(src)
+		parser = s.parsers.forPath("component.ts")
+	}
+	tree := parser.Parse(parseSource, nil)
 	if tree == nil {
 		return nil, fmt.Errorf("no syntax tree: %s", file)
 	}
@@ -72,6 +83,7 @@ func (s *moduleSet) load(file string) (*sourceModule, error) {
 			m.readImport(n)
 			continue
 		}
+		m.readCommonJSExport(n)
 		exported := n.Kind() == "export_statement"
 		if exported {
 			n = n.ChildByFieldName("declaration")
@@ -96,6 +108,7 @@ func (s *moduleSet) load(file string) (*sourceModule, error) {
 					continue
 				}
 				key := name.Utf8Text(src)
+				m.readRequire(key, v, d)
 				if isFunction(v) {
 					m.funcs[key] = v
 					if exported {
@@ -104,7 +117,7 @@ func (s *moduleSet) load(file string) (*sourceModule, error) {
 				}
 				if v.Kind() == "call_expression" {
 					fn := v.ChildByFieldName("function")
-					if fn != nil && m.express[fn.Utf8Text(src)] {
+					if fn != nil && expressConstructor(m, fn) && !bindingReassigned(m, key) {
 						m.receivers[key] = true
 					}
 				}
@@ -170,12 +183,24 @@ func (s *moduleSet) resolve(m *sourceModule, name string) (*sourceModule, *sitte
 					}
 				}
 			}
+			if target := s.importModule(m, imp.module); target != nil {
+				if obj := target.exports[parts[1]]; obj != nil && obj.Kind() == "object" {
+					if method := property(obj, parts[2], target.src); method != nil && isFunction(method) {
+						return target, method
+					}
+				}
+			}
 		}
 	}
 	if parts := strings.Split(name, "."); len(parts) == 2 {
 		if imp, ok := m.imports[parts[0]]; ok && imp.name == "*" {
 			if target := s.importModule(m, imp.module); target != nil {
-				return target, target.exports[parts[1]]
+				if exported := target.exports[parts[1]]; exported != nil {
+					return target, exported
+				}
+				if obj := target.exports["default"]; obj != nil && obj.Kind() == "object" {
+					return target, property(obj, parts[1], target.src)
+				}
 			}
 		}
 	}
@@ -196,7 +221,11 @@ func (s *moduleSet) resolve(m *sourceModule, name string) (*sourceModule, *sitte
 		if err != nil {
 			return nil, nil
 		}
-		return target, target.exports[imp.name]
+		key := imp.name
+		if key == "*" {
+			key = "default"
+		}
+		return target, target.exports[key]
 	}
 	return nil, nil
 }

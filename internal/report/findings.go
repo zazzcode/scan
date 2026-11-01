@@ -19,6 +19,7 @@ func Enrich(r *graph.StringReport) {
 
 func describe(u graph.StringUse) graph.Finding {
 	f := graph.Finding{ID: "finding:" + u.ID, TypeIDs: findingTypeIDs(u), UseID: u.ID, RouteID: u.RouteID,
+		ClientID:   u.ClientID,
 		RecordType: "analysis", Status: "needs_review", Title: "Sensitive operation needs review",
 		Summary:    "Scan recorded a possible sensitive operation. Its security behavior has not been established.",
 		Validation: "Not established from the supplied evidence.", Protection: "Not established from the supplied evidence.",
@@ -87,6 +88,8 @@ func describe(u graph.StringUse) graph.Finding {
 		f.Summary = "Check required fields and enforcing guards before persistence. A modeled account-creation operation is not proof of a validation bypass."
 	case "log_sink_candidate":
 		describeLog(u, &f)
+	case "xss_candidate", "xss_data_candidate":
+		describeXSS(u, &f)
 	case "outbound_http_candidate":
 		f.Title = "Outbound request needs destination review"
 		f.Summary = "Scan recorded a possible outbound HTTP use. Verify the destination, request-value handling, and applicable restrictions; this is not a confirmed SSRF finding."
@@ -104,13 +107,20 @@ func describe(u graph.StringUse) graph.Finding {
 		if answer := a.Answers["validation"]; answer != "" {
 			f.Validation += " Model validation answer: " + displayLabel(answer) + "."
 		}
-		if u.Kind == "log_sink_candidate" {
+		if u.Kind == "xss_candidate" {
+			f.Protection = "Decision XSS exposure: " + displayLabel(a.Answers["xss_exposure"]) + ". Scanner policy: " + a.Reason
+		} else if u.Kind == "log_sink_candidate" {
 			f.Protection += " Assessed logging exposure: " + displayLabel(a.Answers["log_exposure"]) + " (data class " + displayLabel(a.Answers["data_class"]) + ", content " + displayLabel(a.Answers["content_exposure"]) + ", redaction " + displayLabel(a.Answers["redaction"]) + "). " + a.Reason
 		} else {
 			f.Protection = "Assessed injection/use protection: " + displayLabel(a.Protection) + ". " + a.Reason
 		}
 		switch a.FindingStatus {
 		case "confirmed_vulnerability":
+			if u.Kind == "xss_candidate" && a.QuestionVersion == "xss-use-v1" && len(a.BlockingGaps) == 0 && a.Answers["xss_exposure"] == "vulnerable" && u.XSS != nil && u.XSS.Protection != "unknown" {
+				f.RecordType, f.Status = "finding", "confirmed_vulnerability"
+				f.Title = "Cross-site scripting supported by source analysis"
+				f.Summary = "A complete rendering claim and consistent XSS-specific assessment establish an unsafe source-to-sink path. This is a static judgment; independent runtime confirmation remains separate."
+			}
 			if u.Kind == "log_sink_candidate" && len(a.BlockingGaps) == 0 && a.Answers["log_exposure"] == "vulnerable" {
 				f.RecordType = "finding"
 				f.Status = "confirmed_vulnerability"

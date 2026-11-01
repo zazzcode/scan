@@ -1,0 +1,124 @@
+package parse
+
+import (
+	"net/url"
+	"strings"
+
+	sitter "github.com/tree-sitter/go-tree-sitter"
+	"github.com/zazzcode/zazzles/internal/graph"
+)
+
+func (f *flow) clientHTTPValue(m *sourceModule, call, endpoint *sitter.Node, method string, fields map[string]*sitter.Node) value {
+	path := f.set.clientURL(m, endpoint, fields, 0)
+	if path == "" {
+		path = "<unresolved>"
+	}
+	if parsed, err := url.Parse(path); err == nil {
+		if parsed.Host == "" || parsed.Hostname() == "localhost" || parsed.Hostname() == "127.0.0.1" {
+			path = parsed.Path
+		}
+	}
+	evidence := m.evidence("api_response", call)
+	return value{apiPath: strings.Split(path, "?")[0], apiMethod: method, deps: []graph.Dependency{{Source: evidence, Transfers: []graph.Evidence{}}}}
+}
+
+func (f *flow) clientServiceCall(call *sitter.Node, object, method string) (value, bool) {
+	injection := f.client.injected[strings.TrimPrefix(object, "this.")]
+	if !strings.HasPrefix(injection.module, ".") {
+		return value{}, false
+	}
+	m := f.set.importModule(f.module, injection.module)
+	if m == nil {
+		return value{}, false
+	}
+	root := m.tree.RootNode()
+	for i := uint(0); i < root.NamedChildCount(); i++ {
+		n := root.NamedChild(i)
+		if n.Kind() == "export_statement" {
+			n = n.ChildByFieldName("declaration")
+		}
+		if n == nil || n.Kind() != "class_declaration" {
+			continue
+		}
+		name := n.ChildByFieldName("name")
+		if name == nil || name.Utf8Text(m.src) != injection.name {
+			continue
+		}
+		context := f.set.clientClass(m, n)
+		fn := context.methods[method]
+		if fn == nil {
+			continue
+		}
+		var result value
+		found := false
+		walkCalls(fn.ChildByFieldName("body"), func(http *sitter.Node) {
+			callee, args := http.ChildByFieldName("function"), http.ChildByFieldName("arguments")
+			if callee == nil || callee.Kind() != "member_expression" || args == nil || args.NamedChildCount() == 0 {
+				return
+			}
+			obj, prop := callee.ChildByFieldName("object"), callee.ChildByFieldName("property")
+			if obj == nil || prop == nil {
+				return
+			}
+			binding := context.injected[strings.TrimPrefix(obj.Utf8Text(m.src), "this.")]
+			verb := strings.ToUpper(prop.Utf8Text(m.src))
+			if binding.module != "@angular/common/http" || binding.name != "HttpClient" || (verb != "GET" && verb != "POST" && verb != "PUT" && verb != "DELETE" && verb != "PATCH") {
+				return
+			}
+			result = combine(result, f.clientHTTPValue(m, http, args.NamedChild(0), verb, context.fields))
+			f.context = append(f.context, m.evidence("http_client_binding", binding.node), f.module.evidence("http_consumer", call))
+			found = true
+		})
+		return result, found
+	}
+	return value{}, false
+}
+
+func (s *moduleSet) clientURL(m *sourceModule, n *sitter.Node, fields map[string]*sitter.Node, depth int) string {
+	if n == nil || depth > 6 {
+		return ""
+	}
+	if literal, ok := stringLiteral(n, m.src); ok {
+		return literal
+	}
+	switch n.Kind() {
+	case "member_expression":
+		obj, prop := n.ChildByFieldName("object"), n.ChildByFieldName("property")
+		if obj == nil || prop == nil {
+			return ""
+		}
+		if obj.Kind() == "this" {
+			return s.clientURL(m, fields[prop.Utf8Text(m.src)], fields, depth+1)
+		}
+		if imp, ok := m.imports[obj.Utf8Text(m.src)]; ok {
+			if target := s.importModule(m, imp.module); target != nil {
+				if value := topVariable(target, imp.name); value != nil {
+					return s.clientURL(target, property(value, prop.Utf8Text(m.src), target.src), nil, depth+1)
+				}
+			}
+		}
+	case "binary_expression":
+		left := s.clientURL(m, n.ChildByFieldName("left"), fields, depth+1)
+		right := s.clientURL(m, n.ChildByFieldName("right"), fields, depth+1)
+		if left != "" && right == "" {
+			right = ":value"
+		}
+		return left + right
+	case "template_string":
+		var out strings.Builder
+		for i := uint(0); i < n.NamedChildCount(); i++ {
+			child := n.NamedChild(i)
+			if child.Kind() == "string_fragment" {
+				out.WriteString(child.Utf8Text(m.src))
+			} else if child.Kind() == "template_substitution" && child.NamedChildCount() == 1 {
+				part := s.clientURL(m, child.NamedChild(0), fields, depth+1)
+				if part == "" {
+					part = ":value"
+				}
+				out.WriteString(part)
+			}
+		}
+		return out.String()
+	}
+	return ""
+}

@@ -46,8 +46,8 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 		selected = []string{entry}
 	}
 	out := &graph.StringReport{SchemaVersion: 1, Root: root, Entries: []graph.Entry{}, Uses: []graph.StringUse{}, Gaps: []graph.Gap{}, Files: []graph.Evidence{}, Limitations: []string{
-		"ESM named relative imports and direct returned handler factories only; no re-exports or CommonJS resolution",
-		"ESM Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
+		"ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain",
+		"Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
 		"Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
 		"SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities",
 	}}
@@ -73,40 +73,17 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 			}
 			routes, _ := routesFromCall(file, m.src, call, locals)
 			for _, r := range routes {
-				e := graph.Entry{Route: r, Gaps: []graph.Gap{}}
-				if shadowed(call, obj.Utf8Text(m.src), m.src) && !parameterReceiver(m, call, obj.Utf8Text(m.src)) {
-					e.Gaps = append(e.Gaps, graph.Gap{Kind: "ambiguous_receiver", Detail: "receiver is shadowed in enclosing scope", At: r.Registration})
-					out.Entries = append(out.Entries, e)
-					continue
-				}
-				args := call.ChildByFieldName("arguments")
-				var h *sitter.Node
-				if args != nil && args.NamedChildCount() > 1 {
-					h = args.NamedChild(args.NamedChildCount() - 1)
-				}
-				hm, body, req, gaps := set.handler(m, h)
-				var parts map[string]string
-				if body != nil && req == "" {
-					parts, gaps = requestParts(hm, body, gaps)
-				}
-				e.Gaps = append(e.Gaps, gaps...)
-				if body != nil {
-					evidence := hm.evidence("handler", body)
-					e.Handler = &evidence
-					f := flow{module: hm, set: set, route: r, request: req, env: map[string]value{}, context: []graph.Evidence{m.evidence("registration", call), evidence}, gaps: append([]graph.Gap{}, e.Gaps...), helpers: &helperExpansion{budget: 24, stack: map[string]bool{}}, facts: newInputFacts(), parts: parts}
-					// Effective middleware is not modeled; an offline candidate cannot be called safe.
-					f.gaps = append(f.gaps, graph.Gap{Kind: "middleware_unresolved", Detail: "effective middleware/guard chain is not modeled", At: r.Registration})
-					set.noteMiddlewareFields(&f, m, call)
-					f.statements(body)
-					f.finishValidation()
-					set.requestLineLogs(&f, m, call, obj.Utf8Text(m.src))
-					out.Uses = append(out.Uses, f.uses...)
-					e.Gaps = append(e.Gaps, f.gaps[len(e.Gaps):]...)
-				}
-				out.Entries = append(out.Entries, e)
+				set.analyzeRoute(out, m, m, r, call, obj.Utf8Text(m.src), nil)
 			}
 		})
 	}
+	set.mountedRoutes(out, selected)
+	if err := set.browser(out); err != nil {
+		return nil, err
+	}
+	set.linkStoredXSS(out)
+	set.linkCrossTierXSS(out)
+	assembleXSSClaims(out)
 	if len(checks) > 0 {
 		set.buildChecks(out, checks)
 	} else {
@@ -120,6 +97,18 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 	for _, k := range keys {
 		m := set.modules[k]
 		out.Files = append(out.Files, m.evidence("file", m.tree.RootNode()))
+	}
+	textKeys := make([]string, 0, len(set.textSources))
+	for key := range set.textSources {
+		if set.modules[key] == nil {
+			textKeys = append(textKeys, key)
+		}
+	}
+	sort.Strings(textKeys)
+	for _, key := range textKeys {
+		e := set.textSources[key]
+		e.Kind, e.Text = "file", ""
+		out.Files = append(out.Files, e)
 	}
 	for _, item := range rules.ForPaths(keys) {
 		out.Practice = append(out.Practice, graph.PracticeRef{ID: item.ID, Version: item.Version, Languages: item.Languages})

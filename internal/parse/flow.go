@@ -9,23 +9,39 @@ import (
 )
 
 type value struct {
-	deps []graph.Dependency
-	gaps []graph.Gap
+	domNode            bool
+	urlParams          bool
+	trustedContext     string
+	apiPath, apiMethod string
+	// responseField is the JSON path read from an API response ("data[].id"); "*" when ambiguous.
+	responseField string
+	model         string
+	read          *graph.Evidence
+	fields        map[string]value
+	templateFile  string
+	outputHTML    bool
+	outputContext string
+	deps          []graph.Dependency
+	gaps          []graph.Gap
 }
 type flow struct {
-	module  *sourceModule
-	set     *moduleSet
-	route   graph.Route
-	request string
-	env     map[string]value
-	context []graph.Evidence
-	gaps    []graph.Gap
-	uses    []graph.StringUse
-	returns []value
-	work    int
-	depth   int
-	helpers *helperExpansion
-	facts   *inputFacts
+	client       *clientContext
+	response     string
+	responseType string
+	registration *sourceModule
+	module       *sourceModule
+	set          *moduleSet
+	route        graph.Route
+	request      string
+	env          map[string]value
+	context      []graph.Evidence
+	gaps         []graph.Gap
+	uses         []graph.StringUse
+	returns      []value
+	work         int
+	depth        int
+	helpers      *helperExpansion
+	facts        *inputFacts
 	// parts maps destructured request-parameter names (query, body, ...) to their container.
 	parts map[string]string
 }
@@ -38,92 +54,178 @@ func (f *flow) gap(kind, detail string, n *sitter.Node) graph.Gap {
 	return g
 }
 
-func (f *flow) statements(body *sitter.Node) {
+// statements returns true when every path through body leaves by return or throw.
+func (f *flow) statements(body *sitter.Node) bool {
 	if body == nil {
-		return
+		return false
 	}
-	if body.Kind() != "statement_block" {
+	if body.Kind() != "statement_block" && body.Kind() != "program" {
 		// An expression-bodied function returns that expression. The route handler's
 		// own implicit return is recorded and then ignored by the caller.
 		f.returns = append(f.returns, f.transfer(f.eval(body), "return_value", body))
-		return
+		return true
 	}
 	for i := uint(0); i < body.NamedChildCount(); i++ {
-		n := body.NamedChild(i)
-		switch n.Kind() {
-		case "lexical_declaration", "variable_declaration":
-			for j := uint(0); j < n.NamedChildCount(); j++ {
-				d := n.NamedChild(j)
-				name := d.ChildByFieldName("name")
-				if name == nil {
-					continue
-				}
-				v := f.eval(d.ChildByFieldName("value"))
-				if name.Kind() == "identifier" {
-					f.env[name.Utf8Text(f.module.src)] = f.transfer(v, "assignment", d)
-					if name.Utf8Text(f.module.src) == f.request {
-						f.request = ""
-					}
-				} else {
-					if name.Kind() == "object_pattern" {
-						for k := uint(0); k < name.NamedChildCount(); k++ {
-							binding := name.NamedChild(k)
-							if binding.Kind() == "shorthand_property_identifier_pattern" {
-								f.env[binding.Utf8Text(f.module.src)] = f.transfer(v, "field_projection", binding)
-							} else {
-								f.gaps = append(f.gaps, f.gap("unsupported_binding", "destructuring alias/default not modeled", binding))
-							}
-						}
-					} else {
-						f.gaps = append(f.gaps, f.gap("unsupported_binding", "binding not modeled", d))
-					}
-				}
-			}
-		case "return_statement":
-			var v value
-			if n.NamedChildCount() > 0 {
-				v = f.eval(n.NamedChild(0))
-			}
-			f.returns = append(f.returns, f.transfer(v, "return_value", n))
-			return
-		case "expression_statement", "throw_statement":
-			if n.NamedChildCount() > 0 {
-				f.eval(n.NamedChild(0))
-			}
-			if n.Kind() != "expression_statement" {
-				return
-			}
-		case "function_declaration", "comment", "empty_statement":
-		default:
-			// Preserve branch evidence without claiming a resolved control-flow path.
-			f.gaps = append(f.gaps, f.gap("unsupported_control_flow", "statement not traversed: "+n.Kind(), n))
-			// Explore branch bodies as possible paths, preserving the explicit gap.
-			f.context = append(f.context, f.module.evidence("control_statement", n))
-			if condition := n.ChildByFieldName("condition"); condition != nil {
-				f.noteWeakCondition(condition)
-				f.eval(condition)
-			}
-			saved := copyValues(f.env)
-			for j := uint(0); j < n.NamedChildCount(); j++ {
-				c := n.NamedChild(j)
-				if c.Kind() == "statement_block" {
-					f.env = copyValues(saved)
-					f.statements(c)
-				}
-			}
-			// Keep possible dependencies across unsupported control flow, explicitly
-			// uncertain. This is a may-depend relationship, not a proven witness.
-			merged := copyValues(saved)
-			for key, v := range f.env {
-				merged[key] = combine(merged[key], v)
-			}
-			for key, v := range merged {
-				v.gaps = append(v.gaps, f.gap("unknown_control_effect", "value may change across unsupported control flow", n))
-				merged[key] = v
-			}
-			f.env = merged
+		if f.statement(body.NamedChild(i)) {
+			return true
 		}
 	}
+	return false
+}
+
+func (f *flow) statement(n *sitter.Node) bool {
+	switch n.Kind() {
+	case "statement_block":
+		return f.statements(n)
+	case "lexical_declaration", "variable_declaration":
+		for j := uint(0); j < n.NamedChildCount(); j++ {
+			d := n.NamedChild(j)
+			name := d.ChildByFieldName("name")
+			if name == nil {
+				continue
+			}
+			v := f.eval(d.ChildByFieldName("value"))
+			if name.Kind() == "identifier" {
+				f.env[name.Utf8Text(f.module.src)] = f.transfer(v, "assignment", d)
+				if name.Utf8Text(f.module.src) == f.request {
+					f.request = ""
+				}
+				if name.Utf8Text(f.module.src) == f.response {
+					f.response = ""
+				}
+			} else {
+				if name.Kind() == "object_pattern" {
+					for k := uint(0); k < name.NamedChildCount(); k++ {
+						binding := name.NamedChild(k)
+						if binding.Kind() == "shorthand_property_identifier_pattern" {
+							f.env[binding.Utf8Text(f.module.src)] = f.transfer(v, "field_projection", binding)
+						} else {
+							f.gaps = append(f.gaps, f.gap("unsupported_binding", "destructuring alias/default not modeled", binding))
+						}
+					}
+				} else {
+					f.gaps = append(f.gaps, f.gap("unsupported_binding", "binding not modeled", d))
+				}
+			}
+		}
+	case "return_statement":
+		var v value
+		if n.NamedChildCount() > 0 {
+			v = f.eval(n.NamedChild(0))
+		}
+		f.returns = append(f.returns, f.transfer(v, "return_value", n))
+		return true
+	case "expression_statement", "throw_statement":
+		if n.NamedChildCount() > 0 {
+			f.eval(n.NamedChild(0))
+		}
+		return n.Kind() == "throw_statement"
+	case "function_declaration", "comment", "empty_statement":
+	default:
+		f.branches(n)
+	}
+	return false
+}
+
+// branches explores the bodies of a statement the flow does not model precisely.
+// Each body that can fall through contributes its exit environment; an if without
+// else, and every other construct, also keeps the path that skips all bodies.
+// This is a may-depend relationship, not a proven witness.
+func (f *flow) branches(n *sitter.Node) {
+	// Preserve branch evidence without claiming a resolved control-flow path.
+	f.gaps = append(f.gaps, f.gap("unsupported_control_flow", "statement not traversed: "+n.Kind(), n))
+	f.context = append(f.context, f.module.evidence("control_statement", n))
+	if condition := n.ChildByFieldName("condition"); condition != nil {
+		f.noteWeakCondition(condition)
+		f.eval(condition)
+	}
+	type exit struct {
+		env    map[string]value
+		branch *graph.Evidence
+	}
+	saved := copyValues(f.env)
+	var exits []exit
+	runs := 0
+	run := func(body *sitter.Node, branch *graph.Evidence) {
+		runs++
+		f.env = copyValues(saved)
+		if !f.statement(body) {
+			exits = append(exits, exit{f.env, branch})
+		}
+	}
+	complete := false
+	if n.Kind() == "if_statement" {
+		condition := n.ChildByFieldName("condition")
+		if body := n.ChildByFieldName("consequence"); body != nil {
+			e := f.module.evidence("branch_consequence", condition)
+			run(body, &e)
+		}
+		if alternative := n.ChildByFieldName("alternative"); alternative != nil {
+			complete = true
+			e := f.module.evidence("branch_alternative", condition)
+			for j := uint(0); j < alternative.NamedChildCount(); j++ {
+				if c := alternative.NamedChild(j); c.Kind() != "comment" {
+					run(c, &e)
+				}
+			}
+		}
+	} else {
+		for j := uint(0); j < n.NamedChildCount(); j++ {
+			c := n.NamedChild(j)
+			switch c.Kind() {
+			case "statement_block":
+				run(c, nil)
+			case "else_clause", "catch_clause", "finally_clause":
+				if body := c.ChildByFieldName("body"); body != nil {
+					run(body, nil)
+				} else if c.NamedChildCount() > 0 {
+					run(c.NamedChild(c.NamedChildCount()-1), nil)
+				}
+			}
+		}
+	}
+	if bodies := len(exits); bodies < runs {
+		f.gaps = append(f.gaps, f.gap("branch_exit", "a branch returns or throws; its condition may guard later code", n))
+	}
+	if !complete {
+		exits = append(exits, exit{saved, nil})
+	}
+	merged := map[string]value{}
+	keys := map[string]bool{}
+	for _, e := range exits {
+		for key := range e.env {
+			keys[key] = true
+		}
+	}
+	for key := range keys {
+		// A dependency present on every exit is not specific to one branch. Others
+		// keep the branch condition as a precondition of that path.
+		count := map[string]int{}
+		for _, e := range exits {
+			seen := map[string]bool{}
+			for _, d := range e.env[key].deps {
+				if k := dependencyKey(d); !seen[k] {
+					seen[k] = true
+					count[k]++
+				}
+			}
+		}
+		var v value
+		for _, e := range exits {
+			branch := e.env[key]
+			if e.branch != nil {
+				branch = tagBranch(branch, *e.branch, func(d graph.Dependency) bool { return count[dependencyKey(d)] < len(exits) }, 0)
+			}
+			v = combine(v, branch)
+		}
+		v.gaps = append(v.gaps, f.gap("unknown_control_effect", "value may change across unsupported control flow", n))
+		merged[key] = v
+	}
+	if len(exits) == 0 {
+		// Every explored body leaves; keep the prior bindings for any later statements.
+		merged = saved
+	}
+	f.env = merged
 }
 
 func (f *flow) eval(n *sitter.Node) value {
@@ -139,8 +241,16 @@ func (f *flow) eval(n *sitter.Node) value {
 		return value{gaps: []graph.Gap{gap}}
 	}
 	src := f.module.src
+	if f.client != nil {
+		if v, ok := f.clientValue(n); ok {
+			return v
+		}
+		if v, ok := f.clientJSX(n); ok {
+			return v
+		}
+	}
 	switch n.Kind() {
-	case "identifier":
+	case "identifier", "shorthand_property_identifier":
 		if v, ok := f.env[n.Utf8Text(src)]; ok {
 			return v
 		}
@@ -169,20 +279,91 @@ func (f *flow) eval(n *sitter.Node) value {
 			}
 			return v
 		}
-		v := f.children(n)
+		if v, ok := f.storedProperty(n); ok {
+			return v
+		}
+		obj := n.ChildByFieldName("object")
+		base := f.eval(obj)
+		v := base
+		segment := "[]"
+		if n.Kind() == "member_expression" {
+			if prop := n.ChildByFieldName("property"); prop != nil {
+				segment = prop.Utf8Text(src)
+			}
+		} else {
+			v = combine(v, f.eval(n.ChildByFieldName("index")))
+		}
+		if base.apiPath != "" && base.responseField != "*" {
+			v.responseField = joinField(base.responseField, segment)
+		}
 		return f.transfer(v, "property_read", n)
 	case "assignment_expression":
 		left := n.ChildByFieldName("left")
 		v := f.transfer(f.eval(n.ChildByFieldName("right")), "assignment", n)
+		if f.client != nil && f.clientAssignment(n, left, v) {
+			return v
+		}
 		if left != nil && left.Kind() == "identifier" {
 			f.env[left.Utf8Text(src)] = v
 			if left.Utf8Text(src) == f.request {
 				f.request = ""
 			}
-		} else {
+			if left.Utf8Text(src) == f.response {
+				f.response = ""
+			}
+		} else if !f.assignLocalField(left, v) {
+			f.assignStoredField(left, v)
 			v.gaps = append(v.gaps, f.gap("unsupported_write", "heap/property assignment is not modeled", n))
 		}
 		return v
+	case "augmented_assignment_expression":
+		// a += b keeps a's prior dependencies and adds b's (string building).
+		left := n.ChildByFieldName("left")
+		prior := value{}
+		if left != nil && left.Kind() == "identifier" {
+			prior = f.env[left.Utf8Text(src)]
+		} else if left != nil {
+			prior = f.eval(left)
+		}
+		v := f.transfer(combine(prior, f.eval(n.ChildByFieldName("right"))), "assignment", n)
+		if f.client != nil && f.clientAssignment(n, left, v) {
+			return v
+		}
+		if left != nil && left.Kind() == "identifier" {
+			if _, known := f.env[left.Utf8Text(src)]; known {
+				f.env[left.Utf8Text(src)] = v
+			}
+		} else if left != nil {
+			v.gaps = append(v.gaps, f.gap("unsupported_write", "heap/property assignment is not modeled", n))
+		}
+		return v
+	case "object":
+		v := value{fields: map[string]value{}}
+		for i := uint(0); i < n.NamedChildCount(); i++ {
+			p := n.NamedChild(i)
+			key, child := p.ChildByFieldName("key"), p.ChildByFieldName("value")
+			if key != nil && child != nil {
+				field := f.eval(p)
+				v = combine(v, field)
+				v.model, v.read = "", nil
+				v.fields[key.Utf8Text(src)] = field
+			} else if p.Kind() == "shorthand_property_identifier" {
+				field := f.eval(p)
+				v = combine(v, field)
+				v.fields[p.Utf8Text(src)] = field
+			}
+		}
+		return v
+	case "new_expression":
+		if f.client != nil {
+			if v, ok := f.clientConstructor(n); ok {
+				return v
+			}
+		}
+		if v, ok := f.xssConstructor(n); ok {
+			return v
+		}
+		return f.transfer(f.children(n), "expression", n)
 	case "call_expression":
 		return f.call(n)
 	case "binary_expression":
@@ -255,7 +436,9 @@ func (f *flow) children(n *sitter.Node) value {
 }
 
 func (f *flow) transfer(v value, kind string, n *sitter.Node) value {
-	out := value{gaps: append([]graph.Gap{}, v.gaps...)}
+	out := v
+	out.deps = nil
+	out.gaps = append([]graph.Gap{}, v.gaps...)
 	for _, d := range v.deps {
 		if len(d.Transfers) >= 64 {
 			out.gaps = append(out.gaps, f.gap("transfer_limit", "dependency exceeds 64 transfer steps", n))
@@ -269,7 +452,43 @@ func (f *flow) transfer(v value, kind string, n *sitter.Node) value {
 }
 
 func combine(a, b value) value {
-	a.deps = append(append([]graph.Dependency{}, a.deps...), b.deps...)
+	if a.model == "" {
+		a.model, a.read = b.model, b.read
+	}
+	if a.fields == nil && b.fields != nil {
+		a.fields = b.fields
+	}
+	if a.templateFile == "" {
+		a.templateFile = b.templateFile
+	}
+	a.outputHTML = a.outputHTML || b.outputHTML
+	a.domNode = a.domNode || b.domNode
+	a.urlParams = a.urlParams || b.urlParams
+	if a.trustedContext == "" {
+		a.trustedContext = b.trustedContext
+	}
+	if a.apiPath == "" {
+		a.apiPath, a.apiMethod, a.responseField = b.apiPath, b.apiMethod, b.responseField
+	} else if b.apiPath != "" && (b.apiPath != a.apiPath || b.responseField != a.responseField) {
+		a.responseField = "*"
+	}
+	if a.outputContext == "" {
+		a.outputContext = b.outputContext
+	}
+	// An identical source path reached twice (for example an unchanged value on
+	// two merged branches) is one path; distinct transfer sequences stay separate.
+	deps := append([]graph.Dependency{}, a.deps...)
+	seen := map[string]bool{}
+	for _, d := range deps {
+		seen[dependencyKey(d)] = true
+	}
+	for _, d := range b.deps {
+		if k := dependencyKey(d); !seen[k] {
+			seen[k] = true
+			deps = append(deps, d)
+		}
+	}
+	a.deps = deps
 	a.gaps = append(append([]graph.Gap{}, a.gaps...), b.gaps...)
 	if len(a.deps) > 64 {
 		a.deps = a.deps[:64]
@@ -288,20 +507,44 @@ func (f *flow) call(n *sitter.Node) value {
 		return value{}
 	}
 	name := fn.Utf8Text(f.module.src)
+	if f.client != nil {
+		if v, handled := f.clientCall(n, fn, args); handled {
+			return v
+		}
+	}
+	if modeled, handled := f.templateCall(n, fn, args); handled {
+		return modeled
+	}
 	// An outer chained call must still visit its receiver, including a query call.
 	// Its result is kept so a.b().c() still depends on what a.b() depended on.
 	var chained value
 	if fn.Kind() == "member_expression" {
 		obj := fn.ChildByFieldName("object")
-		if obj != nil && obj.Kind() == "call_expression" {
+		if obj != nil && (obj.Kind() == "call_expression" || obj.Kind() == "new_expression") {
 			chained = f.eval(obj)
 		}
 	}
+	modelValue, modelCall := f.modelCallValue(n, fn, chained)
 	var values []value
 	if args != nil {
 		for i := uint(0); i < args.NamedChildCount(); i++ {
-			values = append(values, f.eval(args.NamedChild(i)))
+			arg := args.NamedChild(i)
+			if isFunction(arg) && modelCall {
+				f.modelCallback(arg, modelValue, name)
+				values = append(values, value{})
+			} else if isFunction(arg) && f.client == nil && continuationCall(fn, f.module.src) {
+				f.enterContinuation(arg)
+				values = append(values, value{})
+			} else {
+				values = append(values, f.eval(arg))
+			}
 		}
+	}
+	if f.responseCall(n, fn, args, values) {
+		return value{}
+	}
+	if modelCall {
+		f.recordStorageWrite(n, fn, args, values, modelValue)
 	}
 	// A verified logger is an emission sink, not a validator of its arguments.
 	if binding, ok := f.logSink(n, fn); ok {
@@ -309,6 +552,14 @@ func (f *flow) call(n *sitter.Node) value {
 		return value{gaps: []graph.Gap{f.gap("unknown_call_result", "logger return value is not modeled", n)}}
 	}
 	kind := queryKind(name, args, f.module.src, values)
+	if kind == "" && modelCall && strings.HasPrefix(modelValue.model, "mongoose:") && requestDeps(values) {
+		if prop := fn.ChildByFieldName("property"); prop != nil {
+			switch prop.Utf8Text(f.module.src) {
+			case "find", "findOne", "findById", "update", "updateOne", "deleteOne":
+				kind = "nosql_query_candidate"
+			}
+		}
+	}
 	if kind == "" && collectionWrite(name) && requestDeps(values) && f.set != nil {
 		probe := graph.StringUse{Sink: f.module.evidence("nosql_query_candidate", n)}
 		if len(f.set.collectionBinding(probe)) > 0 {
@@ -334,7 +585,13 @@ func (f *flow) call(n *sitter.Node) value {
 			f.uses = append(f.uses, graph.StringUse{ID: fmt.Sprintf("use:%s:%s:%d", f.route.ID, f.module.file, n.StartByte()), RouteID: f.route.ID, Kind: kind, Sink: f.module.evidence(kind, n), Dependencies: v.deps, Context: context, Gaps: gaps, Assessment: graph.Assessment{Status: "not_run"}})
 		}
 		// Response values are new external sources, never aliases of request arguments.
+		if modelCall {
+			return modelValue
+		}
 		return value{gaps: []graph.Gap{f.gap("unknown_call_result", "sink/transport return value is not modeled", n)}}
+	}
+	if modelCall {
+		return modelValue
 	}
 	ret, entered, precise := f.enterHelper(n, name, values)
 	if entered && precise {
@@ -372,10 +629,166 @@ func (f *flow) call(n *sitter.Node) value {
 	return f.transfer(v, "call_argument_dependency", n)
 }
 
+// tagBranch appends a branch condition to the selected dependencies of a value
+// and of its nested fields, so a field read later keeps the same precondition.
+func tagBranch(v value, branch graph.Evidence, selected func(graph.Dependency) bool, depth int) value {
+	v.deps = append([]graph.Dependency{}, v.deps...)
+	for i, d := range v.deps {
+		if selected(d) {
+			d.Transfers = append(append([]graph.Evidence{}, d.Transfers...), branch)
+			v.deps[i] = d
+		}
+	}
+	if len(v.fields) > 0 && depth < 8 {
+		fields := map[string]value{}
+		for k, field := range v.fields {
+			fields[k] = tagBranch(field, branch, selected, depth+1)
+		}
+		v.fields = fields
+	}
+	return v
+}
+
+func dependencyKey(d graph.Dependency) string {
+	var b strings.Builder
+	key := func(e graph.Evidence) {
+		fmt.Fprintf(&b, "%s:%s:%d:%d;", e.Kind, e.Span.File, e.Span.StartByte, e.Span.EndByte)
+	}
+	b.WriteString(d.StorageKey + "|")
+	key(d.Source)
+	for _, e := range d.Transfers {
+		key(e)
+	}
+	return b.String()
+}
+
 func copyValues(in map[string]value) map[string]value {
 	out := map[string]value{}
 	for k, v := range in {
 		out[k] = v
 	}
 	return out
+}
+
+func joinField(base, segment string) string {
+	switch {
+	case base == "":
+		return segment
+	case segment == "[]":
+		return base + "[]"
+	}
+	return base + "." + segment
+}
+
+// assignLocalField records a write such as result.data[0] = v into the fields of
+// a local object value. Model instances keep their storage semantics instead.
+func (f *flow) assignLocalField(left *sitter.Node, v value) bool {
+	var path []string
+	n := left
+	for n != nil && (n.Kind() == "member_expression" || n.Kind() == "subscript_expression") {
+		segment := "[]"
+		if n.Kind() == "member_expression" {
+			prop := n.ChildByFieldName("property")
+			if prop == nil {
+				return false
+			}
+			segment = prop.Utf8Text(f.module.src)
+		}
+		path = append([]string{segment}, path...)
+		n = n.ChildByFieldName("object")
+	}
+	if n == nil || n.Kind() != "identifier" || len(path) == 0 {
+		return false
+	}
+	name := n.Utf8Text(f.module.src)
+	base, ok := f.env[name]
+	if !ok || base.model != "" || base.domNode || f.client != nil {
+		return false
+	}
+	f.env[name] = withField(base, path, v)
+	return true
+}
+
+func withField(base value, path []string, v value) value {
+	fields := map[string]value{}
+	for k, old := range base.fields {
+		fields[k] = old
+	}
+	child := v
+	if len(path) > 1 {
+		child = withField(fields[path[0]], path[1:], v)
+	}
+	fields[path[0]] = child
+	out := combine(base, v)
+	out.fields = fields
+	return out
+}
+
+// fieldValue resolves a JSON path (as produced by joinField) in a value's fields.
+func fieldValue(v value, path string) (value, bool) {
+	if path == "" {
+		return v, true
+	}
+	for _, segment := range strings.Split(strings.ReplaceAll(path, "[]", ".[]"), ".") {
+		if segment == "" {
+			continue
+		}
+		next, ok := v.fields[segment]
+		if !ok {
+			return value{}, false
+		}
+		v = next
+	}
+	return v, true
+}
+
+func continuationCall(fn *sitter.Node, src []byte) bool {
+	if fn.Kind() != "member_expression" {
+		return false
+	}
+	prop := fn.ChildByFieldName("property")
+	if prop == nil {
+		return false
+	}
+	switch prop.Utf8Text(src) {
+	case "then", "catch", "finally":
+		return true
+	}
+	return false
+}
+
+// enterContinuation follows a promise continuation with the handler's request,
+// response and closure bindings. Its parameters are external results, not request
+// data; scheduling and rejection ordering remain unmodeled.
+func (f *flow) enterContinuation(fn *sitter.Node) {
+	if f.depth >= 3 {
+		f.gaps = append(f.gaps, f.gap("unsupported_callback", "promise continuation depth limit reached", fn))
+		return
+	}
+	child := *f
+	child.env = copyValues(f.env)
+	child.context = append(append([]graph.Evidence{}, f.context...), f.module.evidence("async_continuation", fn))
+	child.gaps = append(append([]graph.Gap{}, f.gaps...), f.gap("async_continuation", "promise continuation traversed; scheduling and rejection paths are not modeled", fn))
+	child.uses, child.returns = nil, nil
+	child.depth = f.depth + 1
+	if params, ok := functionParameters(fn, f.module.src); ok {
+		for _, p := range params {
+			child.env[p.name] = value{gaps: []graph.Gap{{Kind: "async_result_unresolved", Detail: "continuation argument is an external result: " + p.name, At: spanOf(f.module.file, p.node)}}}
+			if p.name == child.request {
+				child.request = ""
+			}
+			if p.name == child.response {
+				child.response = ""
+			}
+		}
+	}
+	child.statements(fn.ChildByFieldName("body"))
+	f.uses = append(f.uses, child.uses...)
+	for _, g := range child.gaps[len(f.gaps)+1:] {
+		switch g.Kind {
+		case "work_limit", "helper_call_limit", "recursive_helper":
+			f.gaps = append(f.gaps, g)
+		}
+	}
+	f.work = child.work
 }

@@ -10,6 +10,7 @@ should improve its analysis. They belong outside `.zazz/`, alongside user docume
 | [Database injection](database-injection.md) | SQL/NoSQL library contracts, source flow, branch constraints, and verdicts |
 | [Input validation](input-validation.md) | Business requirements, enforcing checks, and separate destination protection |
 | [Sensitive-data logging](sensitive-data-logging.md) | Logger bindings, data classes, content versus derived facts, and outcomes |
+| [Cross-site scripting](xss.md) | Source-to-rendering evidence, HTML contexts, template escaping, sanitization and XSS outcomes |
 | [Analysis changes and calibration](calibration.md) | General rules, positive/negative controls, and acceptance evidence |
 
 The current scanner implements these rules in Go evidence assembly, question construction, and

@@ -1,0 +1,16 @@
+{
+  "command": [
+    "<ZAZZLES_BINARY>",
+    "--strings",
+    "--json",
+    "--output-dir",
+    "",
+    "--entry",
+    "app.js",
+    "<TARGET_SNAPSHOT>"
+  ],
+  "exit_code": 0,
+  "seconds": 0.021,
+  "valid_execution": true,
+  "errors": []
+}

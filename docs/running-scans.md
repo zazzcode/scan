@@ -10,7 +10,7 @@ it is not cloned, installed, or started by zazzles.
 After compiling, configure a results root outside the worktree and run a local scan:
 
 ```bash
-export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-finding"
+export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-findings"
 ./bin/scan --strings --entry server.ts /path/to/juice-shop
 ./bin/scan --strings --entry src/server.ts /path/to/vulnerable-typescript-app
 ```
@@ -18,7 +18,7 @@ export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-finding"
 Each command prints a new run folder. The layout keeps repositories and successive runs separate:
 
 ```text
-_test-finding/
+_test-findings/
   juice-shop/
     run-<id>/
       findings.json
@@ -180,3 +180,15 @@ The second command converts saved scanner JSON offline without a judge request. 
 route identity, scoped status, source evidence, gaps and illustrative remediation templates. Examples
 are unverified suggestions, not applied fixes. `--sarif` and `--json` are mutually exclusive.
 The same source JSON can be exported as [standalone HTML](interpreting-results.md).
+
+## XSS and remediation view
+
+Current reports include bounded server response/template, stored-rendering and browser XSS analysis.
+Server/API routes and Browser/client-side sources use separate headings; client rows identify
+components/source files and output locations rather than HTTP methods/routes. Selecting an API entry
+file limits server registrations; browser discovery still inspects supported scripts in the target.
+See [the XSS analysis guide](analysis/xss.md) for protection gates and current limits.
+
+Use **Hide protected results** to focus on Findings and Review. It hides protected records and
+protected-only source entries; saved JSON/SARIF and total counts remain unchanged. A Protected result
+is scoped to its exact output and evidence, never the entire route/application.

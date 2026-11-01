@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-01",
+  "tool": "Semgrep Community Edition",
+  "version": "1.183.0",
+  "target_revision": "7f8b240a2f02beba099da3632d1ba679ff8bc32f",
+  "rules": {
+    "snapshot": "<TEST_FINDINGS>/semgrep-rules/20261101",
+    "packs": [
+      "p/javascript",
+      "p/typescript",
+      "p/xss",
+      "p/owasp-top-ten"
+    ],
+    "sha256": {
+      "javascript.yaml": "98c30ae17a2cc160a68800963d5fdabe989ddb2e59b9588063b493b25972a3f1",
+      "owasp-top-ten.yaml": "0d91a3e6bfcc3f182694a4db21f134c9d88280ec84b13e4a51cc6449d7283efb",
+      "typescript.yaml": "967e551f37a9f27ce8b396ed121e5e127bf9ea60148e10589b794bd4ffe73395",
+      "xss.yaml": "bb7a06e34359671b164c31d53c8ccd98784799e15ab4669bcc3c5d04a93d4027"
+    },
+    "rule_count": 563,
+    "license": "Semgrep Rules License v1.0"
+  },
+  "command": [
+    "semgrep",
+    "scan",
+    "--metrics=off",
+    "--config",
+    "semgrep-rules/20261101",
+    "--exclude",
+    "node_modules",
+    "--exclude",
+    ".github",
+    "--exclude",
+    "exploits",
+    "--exclude",
+    "dist",
+    "--exclude",
+    "build",
+    "--exclude",
+    "*.min.js",
+    "--exclude",
+    "public/js/bundle.js",
+    "--exclude",
+    "frontend/src/assets/private/three.js",
+    "--timeout",
+    "30",
+    "--json-output",
+    "results.json",
+    "--sarif-output",
+    "results.sarif",
+    "--text-output",
+    "results.txt",
+    "--dataflow-traces",
+    "<TARGET_ROOT>"
+  ],
+  "working_directory": "<TEST_FINDINGS>",
+  "normalization": "Absolute target paths made target-relative and the local rules-directory prefix removed from rule IDs; content otherwise unchanged.",
+  "counts": {
+    "results": 7,
+    "errors": 0,
+    "files_scanned": 7
+  },
+  "target_state": "git status --porcelain --ignored empty before and after"
+}

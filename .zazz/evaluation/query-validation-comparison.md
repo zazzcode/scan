@@ -63,7 +63,7 @@ vulnerabilities or proof of superior accuracy. No assessed protection or support
 is fabricated from this offline run.
 
 Artifacts are generated locally under the configured
-`_test-finding/<repo-name>/run-<id>/` output root, outside the checkout. Each run contains matching
+`_test-findings/<repo-name>/run-<id>/` output root, outside the checkout. Each run contains matching
 JSON, standalone HTML, and SARIF. These generated reports are not committed. HTML contains scan results
 only; this evaluation document owns comparisons. Browser-tool access to local file URLs was denied,
 so interactive visual sign-off remains pending human review; automated escaping, grouping, export,

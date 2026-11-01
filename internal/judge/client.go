@@ -63,15 +63,31 @@ var choices = []map[string]string{
 
 // Assess evaluates a candidate but never lets model agreement close static gaps.
 func (c *Client) Assess(ctx context.Context, use graph.StringUse) graph.Assessment {
+	return c.assess(ctx, use, nil)
+}
+
+func (c *Client) assess(ctx context.Context, use graph.StringUse, trace *DecisionTrace) graph.Assessment {
 	version := questionVersion
 	if logUse(use) {
 		version = logQuestionVersion
 	}
+	if use.Kind == "xss_candidate" {
+		version = xssQuestionVersion
+	}
 	a := graph.Assessment{Status: "failed", Provider: c.provider, Model: c.model, QuestionVersion: version}
+	if use.Kind == "xss_data_candidate" {
+		a.Status, a.Reason = "not_run", "API data has no linked rendering claim to assess."
+		return a
+	}
 	payload, err := c.payload(use)
 	if err != nil {
 		a.Reason = err.Error()
 		return a
+	}
+	if trace != nil {
+		trace.QuestionVersion = version
+		trace.Request = append(json.RawMessage{}, payload...)
+		trace.RequestBytes = len(payload)
 	}
 	if len(payload) > 64<<10 {
 		a.Status = "not_run"
@@ -91,7 +107,17 @@ func (c *Client) Assess(ctx context.Context, use graph.StringUse) graph.Assessme
 		return a
 	}
 	defer res.Body.Close()
+	if trace != nil {
+		trace.HTTPStatus = res.StatusCode
+	}
 	if res.StatusCode != http.StatusOK {
+		if trace != nil {
+			body, _ := io.ReadAll(io.LimitReader(res.Body, 1<<20))
+			trace.ResponseBytes = len(body)
+			if json.Valid(body) {
+				trace.Response = append(json.RawMessage{}, body...)
+			}
+		}
 		a.Reason = fmt.Sprintf("judge HTTP %d", res.StatusCode)
 		return a
 	}
@@ -100,6 +126,12 @@ func (c *Client) Assess(ctx context.Context, use graph.StringUse) graph.Assessme
 		a.Reason = "response read failed or exceeded 1 MiB limit"
 		return a
 	}
+	if trace != nil {
+		trace.ResponseBytes = len(data)
+		if json.Valid(data) {
+			trace.Response = append(json.RawMessage{}, data...)
+		}
+	}
 	answers, model, usage, err := c.decodeQuestions(data, questionsFor(use))
 	if err != nil {
 		a.Reason = err.Error()
@@ -107,6 +139,11 @@ func (c *Client) Assess(ctx context.Context, use graph.StringUse) graph.Assessme
 	}
 	a.Status = "completed"
 	a.Answers = answers
+	a.AnswerDetails, err = answerDetails(data, answers, questionsFor(use))
+	if err != nil {
+		a.Status, a.Reason = "failed", err.Error()
+		return a
+	}
 	a.Model = model
 	a.Usage = usage
 	applyPolicy(use, &a)
@@ -118,6 +155,16 @@ func (c *Client) payload(use graph.StringUse) ([]byte, error) {
 	if language, ok := lang.Detect(use.Sink.Span.File); ok {
 		if item, found := rules.Body(language); found {
 			practice = &item
+		}
+	}
+	if practice == nil {
+		for _, evidence := range use.Context {
+			if language, ok := lang.Detect(evidence.Span.File); ok {
+				if item, found := rules.Body(language); found {
+					practice = &item
+					break
+				}
+			}
 		}
 	}
 	evidence, err := json.Marshal(struct {

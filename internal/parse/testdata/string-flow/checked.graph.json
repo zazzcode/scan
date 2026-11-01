@@ -529,15 +529,15 @@
     }
   ],
   "limitations": [
-    "ESM named relative imports and direct returned handler factories only; no re-exports or CommonJS resolution",
-    "ESM Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
+    "ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain",
+    "Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
     "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
     "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities"
   ],
   "practice": [
     {
       "id": "javascript",
-      "version": "3",
+      "version": "4",
       "languages": [
         "javascript",
         "typescript"

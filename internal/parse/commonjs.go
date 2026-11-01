@@ -1,0 +1,117 @@
+package parse
+
+import (
+	"strings"
+
+	sitter "github.com/tree-sitter/go-tree-sitter"
+)
+
+// requireBinding recognizes only the unshadowed CommonJS loader with a literal
+// module argument. No source is executed to discover imports or exports.
+func requireBinding(m *sourceModule, n *sitter.Node) (string, string, bool) {
+	member := "*"
+	if n != nil && n.Kind() == "member_expression" {
+		p := n.ChildByFieldName("property")
+		if p == nil {
+			return "", "", false
+		}
+		member = p.Utf8Text(m.src)
+		n = n.ChildByFieldName("object")
+	}
+	if n == nil || n.Kind() != "call_expression" || topLevelBinding(m, "require") {
+		return "", "", false
+	}
+	fn, args := n.ChildByFieldName("function"), n.ChildByFieldName("arguments")
+	if fn == nil || fn.Utf8Text(m.src) != "require" || args == nil || args.NamedChildCount() != 1 {
+		return "", "", false
+	}
+	path, ok := stringLiteral(args.NamedChild(0), m.src)
+	return path, member, ok
+}
+
+func (m *sourceModule) readRequire(name string, v, declaration *sitter.Node) {
+	path, member, ok := requireBinding(m, v)
+	if !ok || bindingReassigned(m, name) {
+		return
+	}
+	m.imports[name] = importBinding{path, member, declaration}
+	if path == "express" && (member == "*" || member == "Router") {
+		m.express[name] = true
+	}
+}
+
+func (m *sourceModule) readCommonJSExport(n *sitter.Node) {
+	if n.Kind() != "expression_statement" || n.NamedChildCount() != 1 {
+		return
+	}
+	a := n.NamedChild(0)
+	if a.Kind() != "assignment_expression" {
+		return
+	}
+	left, right := a.ChildByFieldName("left"), a.ChildByFieldName("right")
+	if left == nil || right == nil {
+		return
+	}
+	name := left.Utf8Text(m.src)
+	key := ""
+	switch {
+	case strings.HasPrefix(name, "exports.") && !topLevelBinding(m, "exports"):
+		key = strings.TrimPrefix(name, "exports.")
+	case strings.HasPrefix(name, "module.exports.") && !topLevelBinding(m, "module"):
+		key = strings.TrimPrefix(name, "module.exports.")
+	case name == "module.exports" && !topLevelBinding(m, "module"):
+		key = "default"
+	}
+	if key == "" {
+		return
+	}
+	delete(m.exports, key)
+	if key == "default" {
+		m.exports = map[string]*sitter.Node{}
+	}
+	if isFunction(right) || right.Kind() == "object" {
+		m.exports[key] = right
+	} else if right.Kind() == "identifier" {
+		root := m.tree.RootNode()
+		for i := uint(0); i < root.NamedChildCount(); i++ {
+			candidate := root.NamedChild(i)
+			id := candidate.ChildByFieldName("name")
+			if candidate.Kind() == "function_declaration" && id != nil && id.Utf8Text(m.src) == right.Utf8Text(m.src) {
+				m.exports[key] = candidate
+			}
+		}
+	}
+}
+
+func topLevelBinding(m *sourceModule, name string) bool {
+	if _, ok := m.imports[name]; ok {
+		return true
+	}
+	if topVariable(m, name) != nil {
+		return true
+	}
+	root := m.tree.RootNode()
+	for i := uint(0); i < root.NamedChildCount(); i++ {
+		n := root.NamedChild(i)
+		if id := n.ChildByFieldName("name"); n.Kind() == "function_declaration" && id != nil && id.Utf8Text(m.src) == name {
+			return true
+		}
+	}
+	return false
+}
+
+func bindingReassigned(m *sourceModule, name string) bool {
+	found := false
+	var visit func(*sitter.Node)
+	visit = func(n *sitter.Node) {
+		if n.Kind() == "assignment_expression" || n.Kind() == "augmented_assignment_expression" {
+			left := n.ChildByFieldName("left")
+			found = found || (left != nil && left.Kind() == "identifier" && left.Utf8Text(m.src) == name)
+		}
+		for i := uint(0); i < n.NamedChildCount() && !found; i++ {
+			visit(n.NamedChild(i))
+		}
+	}
+	visit(m.tree.RootNode())
+	return found
+}

@@ -32,6 +32,8 @@ Independent future deliverables may use separate feature worktrees/PRs targeting
   Start from the [near-term sequence](../project/implementation-plan.md#route-string-validation-delivery-sequence).
 - [Sensitive-data logging](sensitive-data-logging.md) — requested by the user on 2026-11-01 in the
   `logger-leak` worktree; increment 1 (explicit logger calls) in progress.
+- [XSS response analysis](xss-response.md) — authorized sequential implementation on 2026-11-01;
+  backend responses/templates/storage first, browser results separately, Python adapter boundary preserved.
 - Remaining specs are not authored yet. Their proposed slices live in the
   [implementation plan](../project/implementation-plan.md); each needs a bounded contract and user authorization.
 

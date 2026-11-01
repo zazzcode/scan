@@ -1,0 +1,21 @@
+{
+  "target_revision": "add14ba59e98240d9e00a235dd7d42cd61ae9912",
+  "bearer_revision": "e3753de6347988bed15bdba80b9ff731bf028c80",
+  "bearer_sha256": "ca0964352fd4b2e2cb1288e9718b205b69bd7de9032abc5faa59d8acd1c4a1b0",
+  "rules_revision": "82c335f781a61a6d8b052394f84fd1d93edec467",
+  "zazzles_revision": "602387063816838b7a56bac96dc911e4502d7023",
+  "environment_keys": [
+    "PATH",
+    "TMPDIR"
+  ],
+  "rules_mode": "pinned external rules; default rules disabled",
+  "date": "2026-11-01",
+  "run_id": "20261101-goof-baseline-02",
+  "zazzles_binary_sha256": "9c96a032bdae272fbb8435b14ee5367d23dc8ca1208e9436d12cd9404c03ad35",
+  "zazzles_build_command": "GOTOOLCHAIN=local GOPROXY=off GOCACHE=<WORKTREE>/.zazz/ephemeral/go-cache go build -mod=readonly -o bin/scan ./cmd/scan",
+  "zazzles_toolchain": "go version go1.27.3 darwin/arm64",
+  "zazzles_source_changes_from_revision": "",
+  "bearer_binary_matches_previous_pinned_comparison": true,
+  "assessment_mode": "offline; no model calls",
+  "publication_normalization": "Absolute paths replaced with tokens; canonical zazzles root is nodejs-goof; source evidence, relative locations and fingerprints preserved."
+}

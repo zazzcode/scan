@@ -1,5 +1,10 @@
 # Sensitive-data logging analysis
 
+A sensitive-data leak requires source evidence identifying a sensitive value (credential or personal
+data) and its revealing transfer into a verified log call. Whole-container logging alone is an
+observed operation for Review, not an established leak. Evidence MUST distinguish the logging fact
+from missing data classification; field names remain hints until their meaning is established.
+
 [Analysis index](README.md) · [Input validation](input-validation.md) · [Calibration](calibration.md)
 
 ## What the claim means

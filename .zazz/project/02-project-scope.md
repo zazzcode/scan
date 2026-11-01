@@ -4,9 +4,8 @@
 the [architecture](../architecture.md), and the [phased plan](implementation-plan.md) are inputs to
 future specifications; none is permission to implement.
 
-**Provider clarification, 2026-10-31:** the [current architecture](../architecture.md#current-provider-decision)
-defines a provider-neutral semantic judge: GPT Decisions or Jev, with future adapters allowed.
-OpenAI is the first integration target; Jev-specific research does not establish OpenAI behavior.
+**Provider decision (2026-10-31):** the [architecture](../architecture.md#current-provider-decision)
+owns the current provider decision; this document defers to it.
 
 ## Objective
 
@@ -36,14 +35,18 @@ session and routes to its operating rules.
 - Traceable string candidates and evidence bundles; experiments with judge validation/sanitization
   assessment, followed by an LLM Findings Reviewer for identified issues and uncertain candidates.
 - Explicit unknown/uncertain/unexamined outcomes and coverage accounting.
-- JSON/Markdown output, stable identity, reviewable baselines, and measured CI policy.
-- Dependency-aware caching after correctness is established.
+- JSON/Markdown output.
 
 ## Proposed later scope
 
-- Python, then Go and Java adapters with language-specific analysis semantics.
+- Python adapter next (2026-11-01 decision), then the remaining OWASP vulnerability types and SCA for
+  JS/TS and Python; Go, Java and other languages only after those. See the
+  [sequence decision](implementation-plan.md#future-capability-branches).
 - Additional frameworks, rule families and optional sensitive-data impact tags.
 - Route-oriented reports with a bounded SARIF export; see [report design](../architecture/reporting-and-sarif.md).
+- Stable finding identity, reviewable baselines, and measured CI policy after the first slices
+  (backlog phases 9–10).
+- Dependency-aware caching after correctness is established (backlog phase 10).
 - SCA dependency auditing after the code-path foundation, using ecosystem adapters; see
   [SCA design](../architecture/sca-design.md).
 - Explicit bounded scope checks for authorization/logic risks (the former Track C idea).

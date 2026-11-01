@@ -3,6 +3,7 @@ package parse
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -197,9 +198,10 @@ func TestHandlerImportShadowing(t *testing.T) {
 
 func TestDependencyLimit(t *testing.T) {
 	root := t.TempDir()
+	// Identical paths are merged, so the limit needs distinct request sources.
 	body := "let v=req.query.q;"
-	for i := 0; i < 8; i++ {
-		body += "v=v+v;"
+	for i := 0; i < 70; i++ {
+		body += fmt.Sprintf("v=v+req.query.p%d;", i)
 	}
 	body += "db.query(v)"
 	writeSource(t, root, "server.ts", "import express from 'express';const app=express();app.get('/x',(req,res)=>{"+body+"})")
@@ -207,11 +209,18 @@ func TestDependencyLimit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(report.Uses) != 1 || len(report.Uses[0].Dependencies) > 64 {
+	// Inputs beyond the limit are reported as their own input-validation records.
+	var query *graph.StringUse
+	for i := range report.Uses {
+		if report.Uses[i].Kind == "sql_query_candidate" {
+			query = &report.Uses[i]
+		}
+	}
+	if query == nil || len(query.Dependencies) > 64 {
 		t.Fatal("dependency work was not bounded")
 	}
 	found := false
-	for _, g := range report.Uses[0].Gaps {
+	for _, g := range query.Gaps {
 		if g.Kind == "dependency_limit" || g.Kind == "gap_limit" {
 			found = true
 		}

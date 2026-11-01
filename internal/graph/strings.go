@@ -11,18 +11,21 @@ type Evidence struct {
 // Dependency records a local value relationship; use-level gaps distinguish
 // supported expression dependencies from uncertain transfers. It is not a runtime trace.
 type Dependency struct {
-	Source    Evidence   `json:"source"`
-	Transfers []Evidence `json:"transfers"`
+	StorageKey string     `json:"storage_key,omitempty"`
+	Source     Evidence   `json:"source"`
+	Transfers  []Evidence `json:"transfers"`
 }
 
 // StringUse is a candidate use needing context-specific assessment.
 type StringUse struct {
+	XSS          *XSSFacts     `json:"xss,omitempty"`
 	APIModel     *APIModel     `json:"api_model,omitempty"`
 	ControlEdges []ControlEdge `json:"control_edges,omitempty"`
 	Check        *Check        `json:"check,omitempty"`
 	Completeness *Completeness `json:"completeness,omitempty"`
 	ID           string        `json:"id"`
-	RouteID      string        `json:"route_id"`
+	RouteID      string        `json:"route_id,omitempty"`
+	ClientID     string        `json:"client_id,omitempty"`
 	Kind         string        `json:"kind"`
 	Sink         Evidence      `json:"sink"`
 	Dependencies []Dependency  `json:"dependencies"`
@@ -33,16 +36,17 @@ type StringUse struct {
 
 // Assessment preserves the judge's result independently from structural evidence.
 type Assessment struct {
-	FindingStatus   string            `json:"finding_status,omitempty"`
-	BlockingGaps    []Gap             `json:"blocking_gaps,omitempty"`
-	Answers         map[string]string `json:"answers,omitempty"`
-	Usage           map[string]int64  `json:"usage,omitempty"`
-	Status          string            `json:"status"`
-	Provider        string            `json:"provider,omitempty"`
-	Model           string            `json:"model,omitempty"`
-	QuestionVersion string            `json:"question_version,omitempty"`
-	Protection      string            `json:"protection,omitempty"`
-	Reason          string            `json:"reason,omitempty"`
+	AnswerDetails   map[string]AnswerDetail `json:"answer_details,omitempty"`
+	FindingStatus   string                  `json:"finding_status,omitempty"`
+	BlockingGaps    []Gap                   `json:"blocking_gaps,omitempty"`
+	Answers         map[string]string       `json:"answers,omitempty"`
+	Usage           map[string]int64        `json:"usage,omitempty"`
+	Status          string                  `json:"status"`
+	Provider        string                  `json:"provider,omitempty"`
+	Model           string                  `json:"model,omitempty"`
+	QuestionVersion string                  `json:"question_version,omitempty"`
+	Protection      string                  `json:"protection,omitempty"`
+	Reason          string                  `json:"reason,omitempty"`
 }
 
 // Entry links a syntactic route registration to a selected handler body.
@@ -54,6 +58,7 @@ type Entry struct {
 
 // StringReport is the bounded analysis artifact, separate from route-v1 JSON.
 type StringReport struct {
+	ClientEntries       []ClientEntry `json:"client_entries,omitempty"`
 	FindingTypes        []FindingType `json:"finding_types,omitempty"`
 	PresentationVersion int           `json:"presentation_version,omitempty"`
 	Findings            []Finding     `json:"findings,omitempty"`

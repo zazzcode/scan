@@ -1,0 +1,860 @@
+[
+  {
+    "case": "reflected",
+    "use_id": "xss:route:app.js:1450:GET:/login:views/admin.ejs:513",
+    "assessment": {
+      "answer_details": {
+        "encoding_adequacy": {
+          "choice": "not_present",
+          "confidence": 0.88,
+          "probabilities": [
+            {
+              "value": "adequate",
+              "probability": 0.01
+            },
+            {
+              "value": "inadequate",
+              "probability": 0.07
+            },
+            {
+              "value": "not_present",
+              "probability": 0.91
+            },
+            {
+              "value": "unknown",
+              "probability": 0.01
+            }
+          ]
+        },
+        "output_context": {
+          "choice": "html_attribute",
+          "confidence": 0.8,
+          "probabilities": [
+            {
+              "value": "html_text",
+              "probability": 0.01
+            },
+            {
+              "value": "html_attribute",
+              "probability": 0.82
+            },
+            {
+              "value": "url",
+              "probability": 0
+            },
+            {
+              "value": "script",
+              "probability": 0
+            },
+            {
+              "value": "style",
+              "probability": 0
+            },
+            {
+              "value": "unquoted_attribute",
+              "probability": 0.03
+            },
+            {
+              "value": "active_attribute",
+              "probability": 0
+            },
+            {
+              "value": "html_tag",
+              "probability": 0.01
+            },
+            {
+              "value": "template_code",
+              "probability": 0.01
+            },
+            {
+              "value": "unknown",
+              "probability": 0.12
+            }
+          ]
+        },
+        "sanitizer_effectiveness": {
+          "choice": "ineffective",
+          "confidence": 0.72,
+          "probabilities": [
+            {
+              "value": "effective",
+              "probability": 0.01
+            },
+            {
+              "value": "ineffective",
+              "probability": 0.79
+            },
+            {
+              "value": "absent",
+              "probability": 0.19
+            },
+            {
+              "value": "unknown",
+              "probability": 0.01
+            }
+          ]
+        },
+        "xss_all_paths_protected": {
+          "choice": "no",
+          "confidence": 0.93,
+          "probabilities": [
+            {
+              "value": "yes",
+              "probability": 0.01
+            },
+            {
+              "value": "no",
+              "probability": 0.95
+            },
+            {
+              "value": "unknown",
+              "probability": 0.04
+            }
+          ]
+        },
+        "xss_exposure": {
+          "choice": "vulnerable",
+          "confidence": 0.79,
+          "probabilities": [
+            {
+              "value": "vulnerable",
+              "probability": 0.84
+            },
+            {
+              "value": "protected",
+              "probability": 0
+            },
+            {
+              "value": "unknown",
+              "probability": 0.16
+            },
+            {
+              "value": "not_applicable",
+              "probability": 0
+            }
+          ]
+        }
+      },
+      "finding_status": "confirmed_vulnerability",
+      "answers": {
+        "encoding_adequacy": "not_present",
+        "output_context": "html_attribute",
+        "sanitizer_effectiveness": "ineffective",
+        "xss_all_paths_protected": "no",
+        "xss_exposure": "vulnerable"
+      },
+      "usage": {
+        "input_tokens": 3542,
+        "output_tokens": 0
+      },
+      "status": "completed",
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "question_version": "xss-use-v1",
+      "protection": "insufficient",
+      "reason": "Complete source-backed rendering claim and consistent XSS-specific answers establish an unsafe supported path; this is static analysis, not runtime confirmation."
+    },
+    "http_status": 200,
+    "request_bytes": 15016,
+    "seconds": 0.000646917
+  },
+  {
+    "case": "stored",
+    "use_id": "xss:route:app.js:1422:GET:/:views/index.ejs:544",
+    "assessment": {
+      "answer_details": {
+        "encoding_adequacy": {
+          "choice": "inadequate",
+          "confidence": 0.51,
+          "probabilities": [
+            {
+              "value": "adequate",
+              "probability": 0.01
+            },
+            {
+              "value": "inadequate",
+              "probability": 0.63
+            },
+            {
+              "value": "not_present",
+              "probability": 0.22
+            },
+            {
+              "value": "unknown",
+              "probability": 0.14
+            }
+          ]
+        },
+        "output_context": {
+          "choice": "html_text",
+          "confidence": 0.92,
+          "probabilities": [
+            {
+              "value": "html_text",
+              "probability": 0.93
+            },
+            {
+              "value": "html_attribute",
+              "probability": 0
+            },
+            {
+              "value": "url",
+              "probability": 0
+            },
+            {
+              "value": "script",
+              "probability": 0
+            },
+            {
+              "value": "style",
+              "probability": 0
+            },
+            {
+              "value": "unquoted_attribute",
+              "probability": 0
+            },
+            {
+              "value": "active_attribute",
+              "probability": 0
+            },
+            {
+              "value": "html_tag",
+              "probability": 0
+            },
+            {
+              "value": "template_code",
+              "probability": 0
+            },
+            {
+              "value": "unknown",
+              "probability": 0.07
+            }
+          ]
+        },
+        "sanitizer_effectiveness": {
+          "choice": "ineffective",
+          "confidence": 0.96,
+          "probabilities": [
+            {
+              "value": "effective",
+              "probability": 0.01
+            },
+            {
+              "value": "ineffective",
+              "probability": 0.97
+            },
+            {
+              "value": "absent",
+              "probability": 0
+            },
+            {
+              "value": "unknown",
+              "probability": 0.02
+            }
+          ]
+        },
+        "xss_all_paths_protected": {
+          "choice": "no",
+          "confidence": 0.77,
+          "probabilities": [
+            {
+              "value": "yes",
+              "probability": 0.01
+            },
+            {
+              "value": "no",
+              "probability": 0.85
+            },
+            {
+              "value": "unknown",
+              "probability": 0.14
+            }
+          ]
+        },
+        "xss_exposure": {
+          "choice": "unknown",
+          "confidence": 0.44,
+          "probabilities": [
+            {
+              "value": "vulnerable",
+              "probability": 0.42
+            },
+            {
+              "value": "protected",
+              "probability": 0
+            },
+            {
+              "value": "unknown",
+              "probability": 0.58
+            },
+            {
+              "value": "not_applicable",
+              "probability": 0
+            }
+          ]
+        }
+      },
+      "finding_status": "needs_evidence",
+      "answers": {
+        "encoding_adequacy": "inadequate",
+        "output_context": "html_text",
+        "sanitizer_effectiveness": "ineffective",
+        "xss_all_paths_protected": "no",
+        "xss_exposure": "unknown"
+      },
+      "usage": {
+        "input_tokens": 5238,
+        "output_tokens": 0
+      },
+      "status": "completed",
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "question_version": "xss-use-v1",
+      "protection": "uncertain",
+      "reason": "XSS assessment is inconclusive; absence of a positive answer is not protection."
+    },
+    "http_status": 200,
+    "request_bytes": 20366,
+    "seconds": 0.000601625
+  },
+  {
+    "case": "render-options",
+    "use_id": "xss:route:app.js:1652:POST:/account_details:views/account.hbs:108",
+    "assessment": {
+      "answer_details": {
+        "encoding_adequacy": {
+          "choice": "unknown",
+          "confidence": 0.45,
+          "probabilities": [
+            {
+              "value": "adequate",
+              "probability": 0.27
+            },
+            {
+              "value": "inadequate",
+              "probability": 0.11
+            },
+            {
+              "value": "not_present",
+              "probability": 0.03
+            },
+            {
+              "value": "unknown",
+              "probability": 0.59
+            }
+          ]
+        },
+        "output_context": {
+          "choice": "html_text",
+          "confidence": 0.52,
+          "probabilities": [
+            {
+              "value": "html_text",
+              "probability": 0.57
+            },
+            {
+              "value": "html_attribute",
+              "probability": 0.01
+            },
+            {
+              "value": "url",
+              "probability": 0
+            },
+            {
+              "value": "script",
+              "probability": 0
+            },
+            {
+              "value": "style",
+              "probability": 0
+            },
+            {
+              "value": "unquoted_attribute",
+              "probability": 0
+            },
+            {
+              "value": "active_attribute",
+              "probability": 0
+            },
+            {
+              "value": "html_tag",
+              "probability": 0
+            },
+            {
+              "value": "template_code",
+              "probability": 0
+            },
+            {
+              "value": "unknown",
+              "probability": 0.42
+            }
+          ]
+        },
+        "sanitizer_effectiveness": {
+          "choice": "unknown",
+          "confidence": 0.6,
+          "probabilities": [
+            {
+              "value": "effective",
+              "probability": 0.04
+            },
+            {
+              "value": "ineffective",
+              "probability": 0.09
+            },
+            {
+              "value": "absent",
+              "probability": 0.17
+            },
+            {
+              "value": "unknown",
+              "probability": 0.7
+            }
+          ]
+        },
+        "xss_all_paths_protected": {
+          "choice": "unknown",
+          "confidence": 0.96,
+          "probabilities": [
+            {
+              "value": "yes",
+              "probability": 0.01
+            },
+            {
+              "value": "no",
+              "probability": 0.02
+            },
+            {
+              "value": "unknown",
+              "probability": 0.97
+            }
+          ]
+        },
+        "xss_exposure": {
+          "choice": "unknown",
+          "confidence": 0.99,
+          "probabilities": [
+            {
+              "value": "vulnerable",
+              "probability": 0
+            },
+            {
+              "value": "protected",
+              "probability": 0.01
+            },
+            {
+              "value": "unknown",
+              "probability": 0.99
+            },
+            {
+              "value": "not_applicable",
+              "probability": 0
+            }
+          ]
+        }
+      },
+      "finding_status": "needs_evidence",
+      "blocking_gaps": [
+        {
+          "kind": "render_protection_unresolved",
+          "detail": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
+          "at": {
+            "file": "views/account.hbs",
+            "start_line": 6,
+            "end_line": 6,
+            "start_byte": 108,
+            "end_byte": 121
+          }
+        },
+        {
+          "kind": "xss_context_unresolved",
+          "detail": "Answers must agree with the established rendering context and protection facts.",
+          "at": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        }
+      ],
+      "answers": {
+        "encoding_adequacy": "unknown",
+        "output_context": "html_text",
+        "sanitizer_effectiveness": "unknown",
+        "xss_all_paths_protected": "unknown",
+        "xss_exposure": "unknown"
+      },
+      "usage": {
+        "input_tokens": 4288,
+        "output_tokens": 0
+      },
+      "status": "completed",
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "question_version": "xss-use-v1",
+      "protection": "uncertain",
+      "reason": "The XSS claim has missing or unresolved source-backed evidence."
+    },
+    "http_status": 200,
+    "request_bytes": 17991,
+    "seconds": 0.000583542
+  },
+  {
+    "case": "logging",
+    "use_id": "use:route:app.js:1953:GET:/about_new:routes/index.js:7844",
+    "assessment": {
+      "answer_details": {
+        "content_exposure": {
+          "choice": "unknown",
+          "confidence": 0.48,
+          "probabilities": [
+            {
+              "value": "yes",
+              "probability": 0.32
+            },
+            {
+              "value": "no",
+              "probability": 0.03
+            },
+            {
+              "value": "unknown",
+              "probability": 0.65
+            }
+          ]
+        },
+        "data_class": {
+          "choice": "unknown",
+          "confidence": 0.52,
+          "probabilities": [
+            {
+              "value": "credential",
+              "probability": 0.01
+            },
+            {
+              "value": "personal_data",
+              "probability": 0.13
+            },
+            {
+              "value": "other",
+              "probability": 0.22
+            },
+            {
+              "value": "unknown",
+              "probability": 0.64
+            }
+          ]
+        },
+        "log_exposure": {
+          "choice": "unknown",
+          "confidence": 0.87,
+          "probabilities": [
+            {
+              "value": "vulnerable",
+              "probability": 0.07
+            },
+            {
+              "value": "protected",
+              "probability": 0.03
+            },
+            {
+              "value": "unknown",
+              "probability": 0.9
+            },
+            {
+              "value": "not_applicable",
+              "probability": 0
+            }
+          ]
+        },
+        "redaction": {
+          "choice": "no",
+          "confidence": 0.96,
+          "probabilities": [
+            {
+              "value": "yes",
+              "probability": 0
+            },
+            {
+              "value": "no",
+              "probability": 0.97
+            },
+            {
+              "value": "unknown",
+              "probability": 0.03
+            },
+            {
+              "value": "not_applicable",
+              "probability": 0
+            }
+          ]
+        }
+      },
+      "finding_status": "needs_evidence",
+      "answers": {
+        "content_exposure": "unknown",
+        "data_class": "unknown",
+        "log_exposure": "unknown",
+        "redaction": "no"
+      },
+      "usage": {
+        "input_tokens": 3057,
+        "output_tokens": 0
+      },
+      "status": "completed",
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "question_version": "log-use-v1",
+      "protection": "uncertain",
+      "reason": "Logging exposure assessment is missing or inconclusive."
+    },
+    "http_status": 200,
+    "request_bytes": 12792,
+    "seconds": 0.000644541
+  },
+  {
+    "case": "nosql-login",
+    "use_id": "use:route:app.js:1483:POST:/login:routes/index.js:1265",
+    "assessment": {
+      "answer_details": {
+        "all_paths_protected": {
+          "choice": "unknown",
+          "confidence": 0.35,
+          "probabilities": [
+            {
+              "value": "yes",
+              "probability": 0.11
+            },
+            {
+              "value": "no",
+              "probability": 0.32
+            },
+            {
+              "value": "unknown",
+              "probability": 0.57
+            }
+          ]
+        },
+        "guard_coverage": {
+          "choice": "no",
+          "confidence": 0.28,
+          "probabilities": [
+            {
+              "value": "yes",
+              "probability": 0.01
+            },
+            {
+              "value": "no",
+              "probability": 0.52
+            },
+            {
+              "value": "unknown",
+              "probability": 0.47
+            }
+          ]
+        },
+        "injection_protection": {
+          "choice": "unknown",
+          "confidence": 0.92,
+          "probabilities": [
+            {
+              "value": "vulnerable",
+              "probability": 0.01
+            },
+            {
+              "value": "protected",
+              "probability": 0.05
+            },
+            {
+              "value": "unknown",
+              "probability": 0.94
+            },
+            {
+              "value": "not_applicable",
+              "probability": 0
+            }
+          ]
+        },
+        "library_coverage": {
+          "choice": "yes",
+          "confidence": 0.58,
+          "probabilities": [
+            {
+              "value": "yes",
+              "probability": 0.72
+            },
+            {
+              "value": "no",
+              "probability": 0.06
+            },
+            {
+              "value": "unknown",
+              "probability": 0.22
+            }
+          ]
+        },
+        "path_coverage": {
+          "choice": "yes",
+          "confidence": 0.64,
+          "probabilities": [
+            {
+              "value": "yes",
+              "probability": 0.76
+            },
+            {
+              "value": "no",
+              "probability": 0.03
+            },
+            {
+              "value": "unknown",
+              "probability": 0.21
+            }
+          ]
+        },
+        "protection": {
+          "choice": "uncertain",
+          "confidence": 0.51,
+          "probabilities": [
+            {
+              "value": "sufficient",
+              "probability": 0
+            },
+            {
+              "value": "insufficient",
+              "probability": 0.37
+            },
+            {
+              "value": "uncertain",
+              "probability": 0.63
+            },
+            {
+              "value": "not_applicable",
+              "probability": 0
+            }
+          ]
+        },
+        "source_coverage": {
+          "choice": "yes",
+          "confidence": 1,
+          "probabilities": [
+            {
+              "value": "yes",
+              "probability": 1
+            },
+            {
+              "value": "no",
+              "probability": 0
+            },
+            {
+              "value": "unknown",
+              "probability": 0
+            }
+          ]
+        },
+        "validation": {
+          "choice": "insufficient",
+          "confidence": 0.76,
+          "probabilities": [
+            {
+              "value": "sufficient",
+              "probability": 0
+            },
+            {
+              "value": "insufficient",
+              "probability": 0.82
+            },
+            {
+              "value": "uncertain",
+              "probability": 0.18
+            },
+            {
+              "value": "not_applicable",
+              "probability": 0
+            }
+          ]
+        }
+      },
+      "finding_status": "needs_evidence",
+      "blocking_gaps": [
+        {
+          "kind": "applicable_middleware_unresolved",
+          "detail": "handler is not a directly resolved function",
+          "at": {
+            "file": "app.js",
+            "start_line": 1,
+            "end_line": 89,
+            "start_byte": 0,
+            "end_byte": 2642
+          }
+        },
+        {
+          "kind": "applicable_middleware_unresolved",
+          "detail": "factory arguments require parameter binding",
+          "at": {
+            "file": "app.js",
+            "start_line": 42,
+            "end_line": 46,
+            "start_byte": 1190,
+            "end_byte": 1275
+          }
+        },
+        {
+          "kind": "applicable_middleware_unresolved",
+          "detail": "handler is not a directly resolved function",
+          "at": {
+            "file": "app.js",
+            "start_line": 1,
+            "end_line": 89,
+            "start_byte": 0,
+            "end_byte": 2642
+          }
+        },
+        {
+          "kind": "input_helper_unresolved",
+          "detail": "call receiving checked input lacks a definition: validator.isEmail",
+          "at": {
+            "file": "routes/index.js",
+            "start_line": 51,
+            "end_line": 51,
+            "start_byte": 1221,
+            "end_byte": 1257
+          }
+        },
+        {
+          "kind": "injection_semantic_coverage",
+          "detail": "guard_coverage: no",
+          "at": {
+            "file": "",
+            "start_line": 0,
+            "end_line": 0,
+            "start_byte": 0,
+            "end_byte": 0
+          }
+        }
+      ],
+      "answers": {
+        "all_paths_protected": "unknown",
+        "guard_coverage": "no",
+        "injection_protection": "unknown",
+        "library_coverage": "yes",
+        "path_coverage": "yes",
+        "protection": "uncertain",
+        "source_coverage": "yes",
+        "validation": "insufficient"
+      },
+      "usage": {
+        "input_tokens": 7311,
+        "output_tokens": 0
+      },
+      "status": "completed",
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "question_version": "string-use-v8",
+      "protection": "uncertain",
+      "reason": "claim-relevant evidence is incomplete; model answers and unrelated coverage gaps are retained"
+    },
+    "http_status": 200,
+    "request_bytes": 29756,
+    "seconds": 0.000491209
+  }
+]

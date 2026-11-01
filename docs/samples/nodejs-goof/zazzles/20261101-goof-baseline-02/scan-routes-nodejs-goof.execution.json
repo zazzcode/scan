@@ -1,0 +1,12 @@
+{
+  "command": [
+    "<ZAZZLES_BINARY>",
+    "--routes",
+    "--json",
+    "<TARGET_SNAPSHOT>"
+  ],
+  "exit_code": 0,
+  "seconds": 0.01,
+  "valid_execution": true,
+  "errors": []
+}

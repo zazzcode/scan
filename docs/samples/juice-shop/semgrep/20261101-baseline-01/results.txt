@@ -1,0 +1,614 @@
+                    
+                    
+┌──────────────────┐
+│ 30 Code Findings │
+└──────────────────┘
+                                        
+    .npmrc
+    ❯❱ package_managers.npm.npm-missing-minimum-release-age.npm-missing-minimum-release-age
+          ❰❰ Blocking ❱❱
+          This .npmrc does not set a minimum release age or sets it too low. Newly published packages can be
+          malicious or unstable. Add `min-release-age = 7` to wait 7 days before resolving newly published  
+          package versions. Added in: v11.10 Reference: https://github.blog/changelog/2026-02-18-npm-bulk-  
+          trusted-publishing-config-and-script-security-now-generally-available/                            
+          Details: https://sg.run/GRo1z                                                                     
+                                                                                                            
+            1┆ package-lock=false
+                                                                              
+    data/static/codefixes/dbSchemaChallenge_1.ts
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-
+       injection                                                                                                
+          ❰❰ Blocking ❱❱
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+            5┆ models.sequelize.query("SELECT * FROM Products WHERE ((name LIKE '%"+criteria+"%' OR
+               description LIKE '%"+criteria+"%') AND deletedAt IS NULL) ORDER BY name")           
+    
+    
+          Taint comes from:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+            5┆ models.sequelize.query("SELECT * FROM Products WHERE ((name LIKE '%"+criteria+"%' OR
+               description LIKE '%"+criteria+"%') AND deletedAt IS NULL) ORDER BY name")           
+    
+                                                                              
+    data/static/codefixes/dbSchemaChallenge_3.ts
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-
+       injection                                                                                                
+          ❰❰ Blocking ❱❱
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+           11┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+          Taint comes from:
+    
+            5┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            5┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+           11┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+                                                                                  
+    data/static/codefixes/iacLeakedKeyChallenge_1.tf
+    ❯❱ terraform.aws.security.aws-subnet-has-public-ip-address.aws-subnet-has-public-ip-address
+          ❰❰ Blocking ❱❱
+          Resources in the AWS subnet are assigned a public IP address. Resources should not be exposed on the
+          public internet, but should have access limited to consumers required for the function of your      
+          application. Set `map_public_ip_on_launch` to false so that resources are not publicly-accessible.  
+          Details: https://sg.run/XJZw                                                                        
+                                                                                                              
+           17┆ resource "aws_subnet" "public" {
+           18┆   count                   = length(var.public_subnet_cidrs)
+           19┆   vpc_id                  = aws_vpc.main.id
+           20┆   cidr_block              = var.public_subnet_cidrs[count.index]
+           21┆   availability_zone       = data.aws_availability_zones.available.names[count.index]
+           22┆   map_public_ip_on_launch = true
+           23┆
+           24┆   tags = {
+           25┆     Name        = "${var.project_name}-public-${count.index}"
+           26┆     Project     = var.project_name
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+   
+    ❯❱ terraform.aws.security.insecure-load-balancer-tls-version.insecure-load-balancer-tls-
+       version                                                                                                     
+          ❰❰ Blocking ❱❱
+          Detected an AWS load balancer with an insecure TLS version. TLS versions less than 1.2 are    
+          considered insecure because they can be broken. To fix this, set your `ssl_policy` to         
+          `"ELBSecurityPolicy-TLS13-1-2-Res-2021-06"`, or include a default action to redirect to HTTPS.
+          Details: https://sg.run/187G                                                                  
+                                                                                                        
+          159┆ protocol          = "HTTP"
+                                                                                  
+    data/static/codefixes/iacLeakedKeyChallenge_2.tf
+    ❯❱ terraform.aws.security.aws-subnet-has-public-ip-address.aws-subnet-has-public-ip-address
+          ❰❰ Blocking ❱❱
+          Resources in the AWS subnet are assigned a public IP address. Resources should not be exposed on the
+          public internet, but should have access limited to consumers required for the function of your      
+          application. Set `map_public_ip_on_launch` to false so that resources are not publicly-accessible.  
+          Details: https://sg.run/XJZw                                                                        
+                                                                                                              
+           17┆ resource "aws_subnet" "public" {
+           18┆   count                   = length(var.public_subnet_cidrs)
+           19┆   vpc_id                  = aws_vpc.main.id
+           20┆   cidr_block              = var.public_subnet_cidrs[count.index]
+           21┆   availability_zone       = data.aws_availability_zones.available.names[count.index]
+           22┆   map_public_ip_on_launch = true
+           23┆
+           24┆   tags = {
+           25┆     Name        = "${var.project_name}-public-${count.index}"
+           26┆     Project     = var.project_name
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+   
+    ❯❱ terraform.aws.security.insecure-load-balancer-tls-version.insecure-load-balancer-tls-
+       version                                                                                                     
+          ❰❰ Blocking ❱❱
+          Detected an AWS load balancer with an insecure TLS version. TLS versions less than 1.2 are    
+          considered insecure because they can be broken. To fix this, set your `ssl_policy` to         
+          `"ELBSecurityPolicy-TLS13-1-2-Res-2021-06"`, or include a default action to redirect to HTTPS.
+          Details: https://sg.run/187G                                                                  
+                                                                                                        
+          159┆ protocol          = "HTTP"
+                                                                                          
+    data/static/codefixes/iacLeakedKeyChallenge_3_correct.tf
+    ❯❱ terraform.aws.security.aws-subnet-has-public-ip-address.aws-subnet-has-public-ip-address
+          ❰❰ Blocking ❱❱
+          Resources in the AWS subnet are assigned a public IP address. Resources should not be exposed on the
+          public internet, but should have access limited to consumers required for the function of your      
+          application. Set `map_public_ip_on_launch` to false so that resources are not publicly-accessible.  
+          Details: https://sg.run/XJZw                                                                        
+                                                                                                              
+           17┆ resource "aws_subnet" "public" {
+           18┆   count                   = length(var.public_subnet_cidrs)
+           19┆   vpc_id                  = aws_vpc.main.id
+           20┆   cidr_block              = var.public_subnet_cidrs[count.index]
+           21┆   availability_zone       = data.aws_availability_zones.available.names[count.index]
+           22┆   map_public_ip_on_launch = true
+           23┆
+           24┆   tags = {
+           25┆     Name        = "${var.project_name}-public-${count.index}"
+           26┆     Project     = var.project_name
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+   
+    ❯❱ terraform.aws.security.insecure-load-balancer-tls-version.insecure-load-balancer-tls-
+       version                                                                                                     
+          ❰❰ Blocking ❱❱
+          Detected an AWS load balancer with an insecure TLS version. TLS versions less than 1.2 are    
+          considered insecure because they can be broken. To fix this, set your `ssl_policy` to         
+          `"ELBSecurityPolicy-TLS13-1-2-Res-2021-06"`, or include a default action to redirect to HTTPS.
+          Details: https://sg.run/187G                                                                  
+                                                                                                        
+          159┆ protocol          = "HTTP"
+                                                                                       
+    data/static/codefixes/unionSqlInjectionChallenge_1.ts
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-
+       injection                                                                                                
+          ❰❰ Blocking ❱❱
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+            6┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+          Taint comes from:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+            6┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+                                                                                       
+    data/static/codefixes/unionSqlInjectionChallenge_3.ts
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-
+       injection                                                                                                
+          ❰❰ Blocking ❱❱
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+           10┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+    
+          Taint comes from:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+            3┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+           10┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+    
+                                                 
+    frontend/.npmrc
+    ❯❱ package_managers.npm.npm-missing-minimum-release-age.npm-missing-minimum-release-age
+          ❰❰ Blocking ❱❱
+          This .npmrc does not set a minimum release age or sets it too low. Newly published packages can be
+          malicious or unstable. Add `min-release-age = 7` to wait 7 days before resolving newly published  
+          package versions. Added in: v11.10 Reference: https://github.blog/changelog/2026-02-18-npm-bulk-  
+          trusted-publishing-config-and-script-security-now-generally-available/                            
+          Details: https://sg.run/GRo1z                                                                     
+                                                                                                            
+            1┆ package-lock=false
+                                                                        
+    infrastructure/terraform/networking.tf
+    ❯❱ terraform.aws.security.aws-subnet-has-public-ip-address.aws-subnet-has-public-ip-address
+          ❰❰ Blocking ❱❱
+          Resources in the AWS subnet are assigned a public IP address. Resources should not be exposed on the
+          public internet, but should have access limited to consumers required for the function of your      
+          application. Set `map_public_ip_on_launch` to false so that resources are not publicly-accessible.  
+          Details: https://sg.run/XJZw                                                                        
+                                                                                                              
+           18┆ resource "aws_subnet" "public" {
+           19┆   count                   = length(var.public_subnet_cidrs)
+           20┆   vpc_id                  = aws_vpc.main.id
+           21┆   cidr_block              = var.public_subnet_cidrs[count.index]
+           22┆   availability_zone       = data.aws_availability_zones.available.names[count.index]
+           23┆   map_public_ip_on_launch = true
+           24┆
+           25┆   tags = {
+           26┆     Name        = "${var.project_name}-public-${count.index}"
+           27┆     Project     = var.project_name
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+   
+    ❯❱ terraform.aws.security.insecure-load-balancer-tls-version.insecure-load-balancer-tls-
+       version                                                                                                     
+          ❰❰ Blocking ❱❱
+          Detected an AWS load balancer with an insecure TLS version. TLS versions less than 1.2 are    
+          considered insecure because they can be broken. To fix this, set your `ssl_policy` to         
+          `"ELBSecurityPolicy-TLS13-1-2-Res-2021-06"`, or include a default action to redirect to HTTPS.
+          Details: https://sg.run/187G                                                                  
+                                                                                                        
+          160┆ protocol          = "HTTP"
+                                                   
+    lib/insecurity.ts
+    ❯❱ javascript.jsonwebtoken.security.jwt-hardcode.hardcoded-jwt-secret
+          ❰❰ Blocking ❱❱
+          A hard-coded credential was detected. It is not recommended to store credentials in source-code, as
+          this risks secrets being leaked and used by either an internal or external malicious adversary. It 
+          is recommended to use environment variables to securely provide credentials or retrieve credentials
+          from a secure vault or HSM (Hardware Security Module).                                             
+          Details: https://sg.run/4xN9                                                                       
+                                                                                                             
+           54┆ export const authorize = (user = {}) => jwt.sign(user, privateKey, { expiresIn: '6h',
+               algorithm: 'RS256' })                                                                
+    
+    
+          Taint comes from:
+    
+           21┆ const privateKey = '-----BEGIN RSA PRIVATE KEY-----                                        
+               \r\nMIICXAIBAAKBgQDNwqLEe9wgTXCbC7+RPdDbBbeqjdbs4kOPOIGzqLpXvJXlxxW8iMz0EaM4BKUqYsIa+ndv3NA
+               n2RxCd5ubVdJJcX43zO6Ko0TFEZx/65gY3BE0O6syCEmUP4qbSd6exou/F+WTISzbQ5FBVPVmhnYhG/kpwt/cIxK5iU
+               n5hm+4tQIDAQABAoGBAI+8xiPoOrA+KMnG/T4jJsG6TsHQcDHvJi7o1IKC/hnIXha0atTX5AUkRRce95qSfvKFweXdJ
+               XSQ0JMGJyfuXgU6dI0TcseFRfewXAa/ssxAC+iUVR6KUMh1PE2wXLitfeI6JLvVtrBYswm2I7CtY0q8n5AGimHWVXJP
+               LfGV7m0BAkEA+fqFt2LXbLtyg6wZyxMA/cnmt5Nt3U2dAu77MzFJvibANUNHE4HPLZxjGNXN+a6m0K6TD4kDdh5HfUY
+               LWWRBYQJBANK3carmulBwqzcDBjsJ0YrIONBpCAsXxk8idXb8jL9aNIg15Wumm2enqqObahDHB5jnGOLmbasizvSVqy
+               pfM9UCQCQl8xIqy+YgURXzXCN+kwUgHinrutZms87Jyi+D8Br8NY0+Nlf+zHvXAomD2W5CsEK7C+8SLBr3k/TsnRWHJ
+               uECQHFE9RA2OP8WoaLPuGCyFXaxzICThSRZYluVnWkZtxsBhW2W8z1b8PvWUE7kMy7TnkzeJS2LSnaNHoyxi7IaPQUC
+               QCwWU4U+v4lD7uYBw00Ga/xt+7+UqFPlPVdz1yyr4q24Zxaw0LgmuEvgU5dycq8N7JxjTubX0MIRR+G9fmDBBl8=\r\
+               n-----END RSA PRIVATE KEY-----'                                                            
+    
+    
+          Taint flows through these intermediate variables:
+    
+           21┆ const privateKey = '-----BEGIN RSA PRIVATE KEY-----                                        
+               \r\nMIICXAIBAAKBgQDNwqLEe9wgTXCbC7+RPdDbBbeqjdbs4kOPOIGzqLpXvJXlxxW8iMz0EaM4BKUqYsIa+ndv3NA
+               n2RxCd5ubVdJJcX43zO6Ko0TFEZx/65gY3BE0O6syCEmUP4qbSd6exou/F+WTISzbQ5FBVPVmhnYhG/kpwt/cIxK5iU
+               n5hm+4tQIDAQABAoGBAI+8xiPoOrA+KMnG/T4jJsG6TsHQcDHvJi7o1IKC/hnIXha0atTX5AUkRRce95qSfvKFweXdJ
+               XSQ0JMGJyfuXgU6dI0TcseFRfewXAa/ssxAC+iUVR6KUMh1PE2wXLitfeI6JLvVtrBYswm2I7CtY0q8n5AGimHWVXJP
+               LfGV7m0BAkEA+fqFt2LXbLtyg6wZyxMA/cnmt5Nt3U2dAu77MzFJvibANUNHE4HPLZxjGNXN+a6m0K6TD4kDdh5HfUY
+               LWWRBYQJBANK3carmulBwqzcDBjsJ0YrIONBpCAsXxk8idXb8jL9aNIg15Wumm2enqqObahDHB5jnGOLmbasizvSVqy
+               pfM9UCQCQl8xIqy+YgURXzXCN+kwUgHinrutZms87Jyi+D8Br8NY0+Nlf+zHvXAomD2W5CsEK7C+8SLBr3k/TsnRWHJ
+               uECQHFE9RA2OP8WoaLPuGCyFXaxzICThSRZYluVnWkZtxsBhW2W8z1b8PvWUE7kMy7TnkzeJS2LSnaNHoyxi7IaPQUC
+               QCwWU4U+v4lD7uYBw00Ga/xt+7+UqFPlPVdz1yyr4q24Zxaw0LgmuEvgU5dycq8N7JxjTubX0MIRR+G9fmDBBl8=\r\
+               n-----END RSA PRIVATE KEY-----'                                                            
+    
+    
+                This is how taint reaches the sink:
+    
+           54┆ export const authorize = (user = {}) => jwt.sign(user, privateKey, { expiresIn: '6h',
+               algorithm: 'RS256' })                                                                
+    
+                                                      
+    routes/fileServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          ❰❰ Blocking ❱❱
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           32┆ res.sendFile(path.resolve('ftp/', file))
+    
+    
+          Taint comes from:
+    
+           25┆ function verify (file: string, res: Response, next: NextFunction) {
+    
+           26┆   if (file && (endsWithAllowlistedFileType(file) || (file === 'incident-support.kdbx'))) {
+    
+           27┆     file = security.cutOffPoisonNullByte(file)
+    
+           28┆
+    
+           29┆     challengeUtils.solveIf(challenges.directoryListingChallenge, () => { return
+               file.toLowerCase() === 'acquisitions.md' })                                    
+    
+           30┆     verifySuccessfulPoisonNullByteExploit(file)
+    
+           31┆
+    
+           32┆     res.sendFile(path.resolve('ftp/', file))
+    
+           33┆   } else {
+    
+           34┆     res.status(403)
+    
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+    
+    
+                This is how taint reaches the sink:
+    
+           32┆ res.sendFile(path.resolve('ftp/', file))
+    
+                                                     
+    routes/keyServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          ❰❰ Blocking ❱❱
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           14┆ res.sendFile(path.resolve('encryptionkeys/', file))
+    
+    
+          Taint comes from:
+    
+           11┆ const file = params.file
+    
+    
+          Taint flows through these intermediate variables:
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('encryptionkeys/', file))
+    
+                                                         
+    routes/logfileServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          ❰❰ Blocking ❱❱
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           14┆ res.sendFile(path.resolve('logs/', file))
+    
+    
+          Taint comes from:
+    
+           11┆ const file = params.file
+    
+    
+          Taint flows through these intermediate variables:
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('logs/', file))
+    
+                                                 
+    routes/login.ts
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-
+       injection                                                                                                
+          ❰❰ Blocking ❱❱
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+           34┆ models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND
+               password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model:
+               UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge           
+               loginBenderChallenge loginJimChallenge                                                 
+    
+    
+          Taint comes from:
+    
+           34┆ models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND
+               password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model:
+               UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge           
+               loginBenderChallenge loginJimChallenge                                                 
+    
+    
+                This is how taint reaches the sink:
+    
+           34┆ models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND
+               password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model:
+               UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge           
+               loginBenderChallenge loginJimChallenge                                                 
+    
+                                                            
+    routes/quarantineServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          ❰❰ Blocking ❱❱
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           14┆ res.sendFile(path.resolve('ftp/quarantine/', file))
+    
+    
+          Taint comes from:
+    
+           11┆ const file = params.file
+    
+    
+          Taint flows through these intermediate variables:
+    
+           11┆ const file = params.file
+    
+    
+                This is how taint reaches the sink:
+    
+           14┆ res.sendFile(path.resolve('ftp/quarantine/', file))
+    
+                                                    
+    routes/redirect.ts
+    ❯❱ javascript.express.security.audit.express-open-redirect.express-open-redirect
+          ❰❰ Blocking ❱❱
+          The application redirects to a URL specified by user-supplied input `query` that is not validated. 
+          This could redirect users to malicious locations. Consider using an allow-list approach to validate
+          URLs, or warn users they are being redirected to a third-party website.                            
+          Details: https://sg.run/EpoP                                                                       
+                                                                                                             
+           18┆ res.redirect(toUrl)
+    
+    
+          Taint comes from:
+    
+           13┆ return ({ query }: Request, res: Response, next: NextFunction) => {
+    
+    
+          Taint flows through these intermediate variables:
+    
+           13┆ return ({ query }: Request, res: Response, next: NextFunction) => {
+    
+           14┆ const toUrl: string = query.to as string
+    
+    
+                This is how taint reaches the sink:
+    
+           18┆ res.redirect(toUrl)
+    
+                                                  
+    routes/search.ts
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-
+       injection                                                                                                
+          ❰❰ Blocking ❱❱
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+           23┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR   
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-
+               snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge                        
+    
+    
+          Taint comes from:
+    
+           21┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+          Taint flows through these intermediate variables:
+    
+           21┆ let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    
+    
+                This is how taint reaches the sink:
+    
+           23┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR   
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-
+               snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge                        
+    
+                                                       
+    routes/userProfile.ts
+   ❯❯❱ javascript.lang.security.audit.code-string-concat.code-string-concat
+          ❰❰ Blocking ❱❱
+          Found data from an Express or Next web request flowing to `eval`. If this data is user-controllable
+          this can lead to execution of arbitrary system commands in the context of your application process.
+          Avoid `eval` whenever possible.                                                                    
+          Details: https://sg.run/96Yk                                                                       
+                                                                                                             
+           65┆ username = eval(code) // eslint-disable-line no-eval
+    
+    
+          Taint comes from:
+    
+           34┆ const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
+    
+    
+          Taint flows through these intermediate variables:
+    
+           34┆ const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
+    
+           41┆ user = await UserModel.findByPk(loggedInUser.data.id)
+    
+           41┆ user = await UserModel.findByPk(loggedInUser.data.id)
+    
+           52┆ let username = user.username
+    
+           60┆ const code = username?.substring(2, username.length - 1)
+    
+    
+                This is how taint reaches the sink:
+    
+           65┆ username = eval(code) // eslint-disable-line no-eval
+    
+                                           
+    server.ts
+    ❯❱ javascript.express.security.audit.express-check-directory-listing.express-check-
+       directory-listing                                                                                      
+          ❰❰ Blocking ❱❱
+          Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and 
+          files. It is recommended to disable directory listing unless it is a public resource. If you need
+          directory listing, ensure that sensitive files are inaccessible when querying the resource.      
+          Details: https://sg.run/DX2G                                                                     
+                                                                                                           
+          269┆ app.use('/infrastructure', serveIndexMiddleware, serveIndex('infrastructure', { icons:
+               true, view: 'details', filter: (filename) => filename !== 'README.md' }))             
+            ⋮┆----------------------------------------
+          290┆ app.use('/ftp', serveIndexMiddleware, serveIndex('ftp', { icons: true })) // vuln-code-
+               snippet vuln-line directoryListingChallenge                                            
+            ⋮┆----------------------------------------
+          294┆ app.use('/.well-known', serveIndexMiddleware, serveIndex('.well-known', { icons: true,
+               view: 'details' }))                                                                   
+            ⋮┆----------------------------------------
+          298┆ app.use('/encryptionkeys', serveIndexMiddleware, serveIndex('encryptionkeys', { icons:
+               true, view: 'details' }))                                                             
+            ⋮┆----------------------------------------
+          302┆ app.use('/support/logs', serveIndexMiddleware, serveIndex('logs', { icons: true, view:
+               'details' })) // vuln-code-snippet vuln-line accessLogDisclosureChallenge             
+                                                         
+    terraform/networking.tf
+    ❯❱ terraform.aws.security.aws-subnet-has-public-ip-address.aws-subnet-has-public-ip-address
+          ❰❰ Blocking ❱❱
+          Resources in the AWS subnet are assigned a public IP address. Resources should not be exposed on the
+          public internet, but should have access limited to consumers required for the function of your      
+          application. Set `map_public_ip_on_launch` to false so that resources are not publicly-accessible.  
+          Details: https://sg.run/XJZw                                                                        
+                                                                                                              
+           18┆ resource "aws_subnet" "public" {
+           19┆   count                   = length(var.public_subnet_cidrs)
+           20┆   vpc_id                  = aws_vpc.main.id
+           21┆   cidr_block              = var.public_subnet_cidrs[count.index]
+           22┆   availability_zone       = data.aws_availability_zones.available.names[count.index]
+           23┆   map_public_ip_on_launch = true
+           24┆
+           25┆   tags = {
+           26┆     Name        = "${var.project_name}-public-${count.index}"
+           27┆     Project     = var.project_name
+             [hid 3 additional lines, adjust with --max-lines-per-finding] 
+   
+    ❯❱ terraform.aws.security.insecure-load-balancer-tls-version.insecure-load-balancer-tls-
+       version                                                                                                     
+          ❰❰ Blocking ❱❱
+          Detected an AWS load balancer with an insecure TLS version. TLS versions less than 1.2 are    
+          considered insecure because they can be broken. To fix this, set your `ssl_policy` to         
+          `"ELBSecurityPolicy-TLS13-1-2-Res-2021-06"`, or include a default action to redirect to HTTPS.
+          Details: https://sg.run/187G                                                                  
+                                                                                                        
+          160┆ protocol          = "HTTP"

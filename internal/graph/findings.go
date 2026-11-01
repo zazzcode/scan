@@ -5,7 +5,8 @@ type Finding struct {
 	TypeIDs         []string       `json:"type_ids"`
 	ID              string         `json:"id"`
 	UseID           string         `json:"use_id"`
-	RouteID         string         `json:"route_id"`
+	RouteID         string         `json:"route_id,omitempty"`
+	ClientID        string         `json:"client_id,omitempty"`
 	RecordType      string         `json:"record_type"`
 	Status          string         `json:"status"`
 	Title           string         `json:"title"`

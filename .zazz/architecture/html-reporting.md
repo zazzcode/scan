@@ -36,7 +36,7 @@ saved report. `--strings --output-dir <base>` or `SCAN_FINDINGS_DIR` writes all 
 output. Repository names come from the target basename; clones with equal basenames share a repository
 folder but never a run folder. Run directories use private permissions, and output files are created
 exclusively with mode 0600. Existing runs are never overwritten. The output base is configurable,
-without a machine-specific default. The local workspace convention is a sibling `_test-finding/`.
+without a machine-specific default. The local workspace convention is a sibling `_test-findings/`.
 
 The CLI keeps stdout JSON/SARIF redirectable while reporting the bundle path on stderr. Text mode
 prints bundle paths instead of the full text report when file output is active. Without file output,

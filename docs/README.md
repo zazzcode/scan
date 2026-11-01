@@ -13,7 +13,7 @@ and intended behavior visible so an agent can apply and verify an appropriate ch
 
 | Guide | What you will learn |
 |---|---|
-| [Sample reports](samples/README.md) | Ready-to-open Juice Shop and TypeScript HTML, JSON, and SARIF examples |
+| [Sample reports](samples/README.md) | Juice Shop and TypeScript reports; Node.js Goof evaluation setup and Bearer baseline runbook |
 | [Philosophy](philosophy.md) | Remediation-first decisions, supported findings, uncertainty, and preserving protection |
 | [Getting started](getting-started.md) | Go/C prerequisites, compilation, `.env.sample`, and environment loading |
 | [Running scans](running-scans.md) | CLI modes, route scope, report folders, JSON/HTML/SARIF, and current limitations |
@@ -22,6 +22,7 @@ and intended behavior visible so an agent can apply and verify an appropriate ch
 | [Category glossary](glossary.md) | SQL/NoSQL, validation, outbound requests, and planned categories |
 | [Decision-model setup](decision-models.md) | Optional provider keys, model selection, capped assessment, and failures |
 | [CI/CD artifacts](ci.md) | Saving and consuming reports in build pipelines |
+| [Semgrep CE cheat sheet](semgrep-ce-cheat-sheet.md) | Running Semgrep Community Edition locally as a comparison scanner |
 | [Contributing](contributing.md) | Development checks, feature branches, review, and documentation ownership |
 
 ## First steps

@@ -2,8 +2,8 @@
 
 **Planning update, 2026-11-01.** User feedback asks how to resolve the HTML report's uncertainty and
 reduce **Review** as analysis improves. These are proposed increments, not implemented capabilities
-or authorization for additional paid calls. Continue the assigned logger-leak work separately; select
-an analysis increment deliberately rather than expanding that detector into a general engine rewrite.
+or authorization for additional paid calls. Select an analysis increment deliberately rather than
+expanding that detector into a general engine rewrite.
 
 ## Target behavior
 

@@ -1,0 +1,31 @@
+{
+  "command": [
+    "<BEARER_BINARY>",
+    "scan",
+    "--disable-version-check",
+    "--disable-default-rules",
+    "--external-rule-dir",
+    "<RULES_ROOT>/rules",
+    "--config-file",
+    "<RUN_ROOT>/empty.yml",
+    "--ignore-file",
+    "<RUN_ROOT>/empty.ignore",
+    "--disable-domain-resolution",
+    "--skip-test=false",
+    "--skip-git-ignore",
+    "--ignore-git",
+    "--force",
+    "--parallel",
+    "2",
+    "--hide-progress-bar",
+    "--no-color",
+    "--format",
+    "json",
+    "--debug",
+    "<TARGET_SNAPSHOT>"
+  ],
+  "exit_code": 1,
+  "seconds": 1.579,
+  "valid_execution": true,
+  "errors": []
+}

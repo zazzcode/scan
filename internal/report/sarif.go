@@ -45,6 +45,11 @@ func SARIF(report *graph.StringReport) map[string]any {
 		finding := report.Findings[i]
 		message := fmt.Sprintf("%s: %s [%s]. %s %s", route, finding.Title, finding.Status, finding.Summary, finding.Protection)
 		props := map[string]any{"scan.finding": report.Findings[i], "scan.route": route, "scan.useId": use.ID, "scan.kind": use.Kind, "scan.assessment": use.Assessment, "scan.reviewStatus": "not_run", "scan.runtimeConfirmation": "not_run", "scan.recommendations": g, "scan.coverageGaps": use.Gaps}
+		if use.ClientID != "" {
+			delete(props, "scan.route")
+			props["scan.clientEntry"] = use.ClientID
+			props["scan.sourceKind"] = "client"
+		}
 		if use.Check != nil {
 			props["scan.check"] = use.Check
 		}
@@ -114,6 +119,10 @@ func ruleIdentity(use graph.StringUse) (string, string) {
 		kind = use.Check.Kind
 	}
 	switch kind {
+	case "xss_data_candidate":
+		return "scan/rendering-flow-review", ""
+	case "xss_candidate":
+		return "scan/xss-output-protection", "CWE-79"
 	case "sql_query", "sql_query_candidate":
 		return "scan/sql-input-protection", "CWE-89"
 	case "nosql_query", "nosql_query_candidate":
@@ -143,6 +152,14 @@ func resultKind(f graph.Finding) (string, string) {
 }
 
 func routeName(report *graph.StringReport, use graph.StringUse) string {
+	if use.ClientID != "" {
+		for _, entry := range report.ClientEntries {
+			if entry.ID == use.ClientID {
+				return entry.Name
+			}
+		}
+		return use.ClientID
+	}
 	if use.Check != nil {
 		return use.Check.Method + " " + use.Check.Path
 	}

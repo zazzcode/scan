@@ -2,6 +2,7 @@ package parse
 
 import (
 	"fmt"
+	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	"github.com/zazzcode/zazzles/internal/graph"
@@ -51,15 +52,17 @@ func (f *flow) enterHelper(call *sitter.Node, name string, args []value) (ret va
 	f.context = append(f.context, hm.evidence("helper_definition", helper))
 	before := len(f.gaps)
 	child := flow{
-		module:  hm,
-		set:     f.set,
-		route:   f.route,
-		env:     map[string]value{},
-		context: append(append([]graph.Evidence{}, f.context...), f.module.evidence("helper_call", call)),
-		gaps:    append([]graph.Gap{}, f.gaps...),
-		depth:   f.depth + 1,
-		helpers: f.helpers,
-		facts:   f.facts,
+		client:       f.client,
+		registration: f.registration,
+		module:       hm,
+		set:          f.set,
+		route:        f.route,
+		env:          map[string]value{},
+		context:      append(append([]graph.Evidence{}, f.context...), f.module.evidence("helper_call", call)),
+		gaps:         append([]graph.Gap{}, f.gaps...),
+		depth:        f.depth + 1,
+		helpers:      f.helpers,
+		facts:        f.facts,
 	}
 	unbound := false
 	for i, p := range params {
@@ -82,7 +85,14 @@ func (f *flow) enterHelper(call *sitter.Node, name string, args []value) (ret va
 	precise = len(child.returns) > 0 && !unbound
 	for _, g := range child.gaps[before:] {
 		switch g.Kind {
-		case "unsupported_control_flow", "work_limit", "unsupported_binding", "helper_call_limit", "recursive_helper":
+		case "unsupported_control_flow":
+			// Branches merge as may-paths. They stay precise only when no condition
+			// can act as a content guard for the values returned.
+			if n := nodeAt(hm.tree.RootNode(), g.At.StartByte, g.At.EndByte); n == nil || n.Kind() != "if_statement" ||
+				!contentNeutral(n.ChildByFieldName("condition"), helper, hm.src, 0) {
+				precise = false
+			}
+		case "branch_exit", "work_limit", "unsupported_binding", "helper_call_limit", "recursive_helper":
 			precise = false
 		}
 	}
@@ -139,4 +149,98 @@ func callHasSpread(call *sitter.Node) bool {
 		}
 	}
 	return false
+}
+
+// htmlSignificant characters make a literal substring test a possible XSS guard.
+const htmlSignificant = "<>\"'&`=/:"
+
+// contentNeutral reports whether a branch condition only tests facts that cannot
+// guard browser markup: literal presence/position of a string without HTML-significant
+// characters, lengths, typeof, literals and comparisons/logic over those. Local names
+// resolve to a single unreassigned declaration in scope. Anything else may be a guard.
+func contentNeutral(n, scope *sitter.Node, src []byte, depth int) bool {
+	if n == nil || depth > 8 {
+		return false
+	}
+	switch n.Kind() {
+	case "parenthesized_expression":
+		return n.NamedChildCount() == 1 && contentNeutral(n.NamedChild(0), scope, src, depth+1)
+	case "number", "true", "false", "null", "undefined", "string":
+		return true
+	case "unary_expression":
+		op := n.ChildByFieldName("operator")
+		if op != nil && op.Utf8Text(src) == "typeof" {
+			return true
+		}
+		return op != nil && op.Utf8Text(src) == "!" && contentNeutral(n.ChildByFieldName("argument"), scope, src, depth+1)
+	case "binary_expression":
+		op := n.ChildByFieldName("operator")
+		if op == nil {
+			return false
+		}
+		switch op.Utf8Text(src) {
+		case "&&", "||", ">", "<", ">=", "<=", "==", "===", "!=", "!==":
+			return contentNeutral(n.ChildByFieldName("left"), scope, src, depth+1) && contentNeutral(n.ChildByFieldName("right"), scope, src, depth+1)
+		}
+		return false
+	case "member_expression":
+		prop := n.ChildByFieldName("property")
+		return prop != nil && prop.Utf8Text(src) == "length"
+	case "call_expression":
+		fn, args := n.ChildByFieldName("function"), n.ChildByFieldName("arguments")
+		if fn == nil || fn.Kind() != "member_expression" || args == nil || args.NamedChildCount() != 1 {
+			return false
+		}
+		switch fn.ChildByFieldName("property").Utf8Text(src) {
+		case "indexOf", "lastIndexOf", "includes", "startsWith", "endsWith":
+		default:
+			return false
+		}
+		lit := args.NamedChild(0)
+		if lit.Kind() == "identifier" {
+			lit = singleDeclaration(lit.Utf8Text(src), scope, src)
+		}
+		if lit == nil || lit.Kind() != "string" {
+			return false
+		}
+		text := lit.Utf8Text(src)
+		return len(text) >= 2 && !strings.ContainsAny(text[1:len(text)-1], htmlSignificant)
+	case "identifier":
+		decl := singleDeclaration(n.Utf8Text(src), scope, src)
+		return decl != nil && contentNeutral(decl, scope, src, depth+1)
+	}
+	return false
+}
+
+// singleDeclaration returns the initializer of a name declared once in scope and
+// never reassigned; otherwise nil.
+func singleDeclaration(name string, scope *sitter.Node, src []byte) *sitter.Node {
+	var decl *sitter.Node
+	count := 0
+	var walk func(*sitter.Node)
+	walk = func(c *sitter.Node) {
+		switch c.Kind() {
+		case "variable_declarator":
+			if id := c.ChildByFieldName("name"); id != nil && id.Utf8Text(src) == name {
+				decl = c.ChildByFieldName("value")
+				count++
+			}
+		case "assignment_expression", "augmented_assignment_expression", "update_expression":
+			target := c.ChildByFieldName("left")
+			if target == nil {
+				target = c.ChildByFieldName("argument")
+			}
+			if target != nil && target.Utf8Text(src) == name {
+				count += 2
+			}
+		}
+		for i := uint(0); i < c.NamedChildCount(); i++ {
+			walk(c.NamedChild(i))
+		}
+	}
+	walk(scope)
+	if count != 1 {
+		return nil
+	}
+	return decl
 }
