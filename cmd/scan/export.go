@@ -6,8 +6,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/zazzcode/scan/internal/graph"
-	"github.com/zazzcode/scan/internal/report"
+	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/report"
 )
 
 func runExportSARIF(path string, stdout, stderr io.Writer) int {

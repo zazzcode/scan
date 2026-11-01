@@ -3,7 +3,7 @@ package report
 import (
 	"strings"
 
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 // Enrich adds deterministic display records while preserving raw evidence and assessments.

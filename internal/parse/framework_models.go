@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 func property(n *sitter.Node, key string, src []byte) *sitter.Node {

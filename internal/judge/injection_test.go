@@ -2,7 +2,7 @@ package judge
 
 import (
 	"encoding/json"
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 	"strings"
 	"testing"
 )

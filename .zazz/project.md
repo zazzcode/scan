@@ -108,7 +108,7 @@ evidence and the evaluation needed to measure the chosen assessment-and-review p
 
 ## Concept-stage repository state
 
-The module is `github.com/zazzcode/scan`, declaring Go `1.27.2`. `scan --list` walks a tree.
+The module is `github.com/zazzcode/zazzles`, declaring Go `1.27.2`. `scan --list` walks a tree.
 `scan --routes` parses JS/TS with Tree-sitter and emits the route index from the
 [route-identification spec](specifications/tree-sitter-route-identification-mvp.md). There is no
 complete CFG/interprocedural analysis, independent Findings Reviewer, or reviewed findings report yet.

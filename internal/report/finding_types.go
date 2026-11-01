@@ -1,6 +1,6 @@
 package report
 
-import "github.com/zazzcode/scan/internal/graph"
+import "github.com/zazzcode/zazzles/internal/graph"
 
 // findingTypes is the shared terminology registry, independent of detector verdicts.
 var findingTypes = []graph.FindingType{

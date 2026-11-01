@@ -1,4 +1,4 @@
-module github.com/zazzcode/scan
+module github.com/zazzcode/zazzles
 
 go 1.27.2
 

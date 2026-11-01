@@ -1,6 +1,6 @@
 package judge
 
-import "github.com/zazzcode/scan/internal/graph"
+import "github.com/zazzcode/zazzles/internal/graph"
 
 // logQuestionVersion is versioned separately so query assessments keep their protocol.
 const logQuestionVersion = "log-use-v1"

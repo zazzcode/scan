@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 // inputFacts records which request fields were read, passed to some other call,

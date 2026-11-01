@@ -1,6 +1,6 @@
 package report
 
-import "github.com/zazzcode/scan/internal/graph"
+import "github.com/zazzcode/zazzles/internal/graph"
 
 // Guidance is evidence-scoped help, not a generated or verified patch.
 // Every result includes the hardening posture: report proven vulnerabilities and

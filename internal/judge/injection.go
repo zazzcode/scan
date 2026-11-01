@@ -1,6 +1,6 @@
 package judge
 
-import "github.com/zazzcode/scan/internal/graph"
+import "github.com/zazzcode/zazzles/internal/graph"
 
 func questionsFor(use graph.StringUse) []question {
 	if logUse(use) {

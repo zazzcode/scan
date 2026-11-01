@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/zazzcode/scan/internal/lang"
+	"github.com/zazzcode/zazzles/internal/lang"
 )
 
 // tree writes a repository fixture and returns its root. Paths use forward

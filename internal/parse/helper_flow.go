@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 // helperExpansion bounds one handler's helper-call traversal. The stack stops

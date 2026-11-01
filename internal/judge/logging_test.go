@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 func logClaim(gaps ...string) graph.StringUse {

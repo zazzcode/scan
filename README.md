@@ -84,7 +84,7 @@ evidence and need an explicit request cap; a key is not a reason to run paid ass
 ## Run
 
 ```bash
-export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/scan/_test-finding"
+export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-finding"
 ./bin/scan --strings --entry server.ts /path/to/juice-shop
 ./bin/scan --strings --entry src/server.ts /path/to/vulnerable-typescript-app
 ```

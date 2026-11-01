@@ -8,10 +8,10 @@ import (
 	"os"
 	"sort"
 
-	"github.com/zazzcode/scan/internal/graph"
-	"github.com/zazzcode/scan/internal/judge"
-	"github.com/zazzcode/scan/internal/parse"
-	reportpkg "github.com/zazzcode/scan/internal/report"
+	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/judge"
+	"github.com/zazzcode/zazzles/internal/parse"
+	reportpkg "github.com/zazzcode/zazzles/internal/report"
 )
 
 func runStrings(root, entry, routeFilter, checksFile, provider, model string, limit int, asJSON, asSARIF bool, outputDir string, stdout, stderr io.Writer) int {

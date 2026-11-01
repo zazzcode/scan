@@ -16,9 +16,9 @@ import (
 	js "github.com/tree-sitter/tree-sitter-javascript/bindings/go"
 	ts "github.com/tree-sitter/tree-sitter-typescript/bindings/go"
 
-	"github.com/zazzcode/scan/internal/graph"
-	"github.com/zazzcode/scan/internal/lang"
-	"github.com/zazzcode/scan/internal/walk"
+	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/lang"
+	"github.com/zazzcode/zazzles/internal/walk"
 )
 
 // methods are Express router methods this slice understands.

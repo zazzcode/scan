@@ -10,7 +10,7 @@ it is not cloned, installed, or started by scan.
 After compiling, configure a results root outside the worktree and run a local scan:
 
 ```bash
-export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/scan/_test-finding"
+export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-finding"
 ./bin/scan --strings --entry server.ts /path/to/juice-shop
 ./bin/scan --strings --entry src/server.ts /path/to/vulnerable-typescript-app
 ```

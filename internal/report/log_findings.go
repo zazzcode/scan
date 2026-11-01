@@ -3,7 +3,7 @@ package report
 import (
 	"strings"
 
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 // describeLog applies the sensitive-data logging outcome rules: an established

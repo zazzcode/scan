@@ -8,7 +8,7 @@ import (
 	"io"
 	"sort"
 
-	"github.com/zazzcode/scan/internal/graph"
+	"github.com/zazzcode/zazzles/internal/graph"
 )
 
 //go:embed report.html
