@@ -1,0 +1,3069 @@
+{
+  "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "artifacts": [
+        {
+          "hashes": {
+            "sha-256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+          },
+          "location": {
+            "uri": "src/server.ts"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "toolExecutionNotifications": [
+            {
+              "level": "note",
+              "message": {
+                "text": "POST /api/login: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "GET /api/ping: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "GET /api/files: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "GET /api/search: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "GET /api/proxy: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "POST /api/calculate: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "DELETE /api/admin/users/:id: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "GET /api/users/:id: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "POST /api/parse-xml: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "POST /api/parse-yaml: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "POST /api/register: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "POST /api/validate-email: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "GET /redirect: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "POST /api/merge: semantic assessment not_run"
+              }
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "scan.findingTypes": [
+          {
+            "id": "sql-injection",
+            "label": "SQL Injection",
+            "description": "Input changes executable SQL structure instead of remaining a data value, potentially changing what the database reads or writes.",
+            "interpretation": "An SQL Injection pill identifies the risk family being reviewed. String-built executable SQL is poor practice to remediate even without a proven exploit; a library-managed search value may remain unresolved. The finding status and evidence determine the actual claim. The pill alone does not confirm injection.",
+            "remediation": "Use the verified driver's parameter-binding API for values. Review dynamic identifiers separately. Keep business-field validation independent of query-structure protection.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "nosql-injection",
+            "label": "NoSQL Injection",
+            "description": "Untrusted input changes a NoSQL query's operators, selector structure, or executable expression rather than remaining an allowed data value.",
+            "interpretation": "Executable $where string construction is poor practice to refactor even without a proven exploit. An unmodeled document constraint alone is Review, not an established defect. Inspect actual value types, keys, transformations, library behavior, and the named status.",
+            "remediation": "Prefer data-only query APIs, constrain scalar slots and permitted keys/operators, and avoid building executable $where strings from input.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "input-validation",
+            "label": "Input Validation",
+            "description": "Server-side checks enforce the business requirements for a field, such as required presence, runtime type, permitted format, range, or length.",
+            "interpretation": "Poor input validation means an applicable requirement is not adequately enforced. This neutral family label also covers unresolved checks and supported protection: no validator identified in an analyzed slice is not proof that every execution path lacks validation. Free-text punctuation is not itself a defect.",
+            "remediation": "Define field-specific requirements and enforce them before use on all applicable paths. Verify guard behavior and middleware. Apply destination-specific protection separately.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "account-creation-validation",
+            "label": "Account Creation Validation",
+            "description": "Required account fields and enforcing guards must be checked before an account is persisted.",
+            "interpretation": "Review field requirements, conditional bypasses, and generated persistence behavior. A modeled create operation alone does not prove a registration bypass.",
+            "remediation": "Enforce required fields before persistence, terminate rejected paths, add appropriate database constraints, and test the persisted result.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "outbound-request-safety",
+            "label": "Outbound Request Safety",
+            "description": "Input used in an outbound request may affect its destination, headers, or other request values. Unrestricted destination control can lead to server-side request forgery (SSRF).",
+            "interpretation": "The current scanner records bounded outbound-use evidence. A pill does not establish SSRF, destination reachability, or complete response-flow analysis.",
+            "remediation": "Verify allowed destinations and protocols, redirect handling, network boundaries, and sensitive request values for the specific HTTP client.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "reflected-xss",
+            "label": "Reflected XSS",
+            "description": "Request-controlled content is reflected into a browser response in a context that allows it to execute as script.",
+            "interpretation": "XSS means cross-site scripting. This glossary entry is vocabulary for a planned detector; the current reporting increment does not detect or assign Reflected XSS findings.",
+            "remediation": "Use context-appropriate output encoding and safe template or DOM APIs. Input validation alone does not replace correct output handling.",
+            "coverage": "planned"
+          },
+          {
+            "id": "sensitive-data-logging",
+            "label": "Sensitive Data Logging",
+            "description": "Logs expose credentials, tokens, personal information, or other sensitive values to readers or storage that should not receive them.",
+            "interpretation": "This glossary entry prepares terminology for logger-leak detection. A constant startup message is not itself a sensitive-data leak. This detector is not implemented by the glossary update.",
+            "remediation": "Avoid logging secrets; minimize sensitive fields and apply verified redaction before emission. Review log access and retention.",
+            "coverage": "planned"
+          },
+          {
+            "id": "sensitive-operation-review",
+            "label": "Sensitive Operation Review",
+            "description": "A possible sensitive use was recorded but does not yet map to a more specific supported risk family.",
+            "interpretation": "This is an analysis category. Inspect the evidence and missing operation semantics before making a security claim.",
+            "remediation": "Resolve the source, operation, API behavior, and required protection before selecting a fix.",
+            "coverage": "bounded analysis"
+          }
+        ],
+        "scan.identityPolicy": "snapshot-local use IDs; edit-stable baseline identity is not implemented",
+        "scan.limitations": [
+          "ESM named relative imports and direct returned handler factories only; no re-exports or CommonJS resolution",
+          "ESM Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
+          "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
+          "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities"
+        ],
+        "scan.selectedRoute": ""
+      },
+      "results": [
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 84,
+                            "startLine": 69
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 70,
+                            "startLine": 70
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "POST /api/login",
+                  "kind": "function",
+                  "name": "POST /api/login"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 70,
+                  "startLine": 70
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "POST /api/login: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 69,
+                  "end_line": 84,
+                  "start_byte": 2186,
+                  "end_byte": 2935
+                }
+              },
+              {
+                "kind": "unsupported_control_flow",
+                "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 77,
+                  "end_line": 83,
+                  "start_byte": 2605,
+                  "end_byte": 2932
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 70,
+                  "end_line": 70,
+                  "start_byte": 2277,
+                  "end_byte": 2285
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:2186:POST:/api/login:req.body:2277",
+              "use_id": "input:route:src/server.ts:2186:POST:/api/login:req.body:2277",
+              "route_id": "route:src/server.ts:2186:POST:/api/login",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "POST /api/login",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:2186:POST:/api/login:req.body:2277"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 84,
+                  "startLine": 69
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 84,
+                  "startLine": 69
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "control_statement"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 83,
+                  "startLine": 77
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 97,
+                            "startLine": 87
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 88,
+                            "startLine": 88
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /api/ping",
+                  "kind": "function",
+                  "name": "GET /api/ping"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 88,
+                  "startLine": 88
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /api/ping: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 87,
+                  "end_line": 97,
+                  "start_byte": 2983,
+                  "end_byte": 3372
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "a call receives req.query.host before the sink, and that call is not a proven validator",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 88,
+                  "end_line": 88,
+                  "start_byte": 3062,
+                  "end_byte": 3076
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:2983:GET:/api/ping:req.query.host:3062",
+              "use_id": "input:route:src/server.ts:2983:GET:/api/ping:req.query.host:3062",
+              "route_id": "route:src/server.ts:2983:GET:/api/ping",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.host before the sink, and that call is not a proven validator",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /api/ping",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:2983:GET:/api/ping:req.query.host:3062"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 97,
+                  "startLine": 87
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 97,
+                  "startLine": 87
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 111,
+                            "startLine": 100
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 101,
+                            "startLine": 101
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /api/files",
+                  "kind": "function",
+                  "name": "GET /api/files"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 101,
+                  "startLine": 101
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /api/files: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 100,
+                  "end_line": 111,
+                  "start_byte": 3417,
+                  "end_byte": 3858
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "a call receives req.query.filename before the sink, and that call is not a proven validator",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 101,
+                  "end_line": 101,
+                  "start_byte": 3501,
+                  "end_byte": 3519
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:3417:GET:/api/files:req.query.filename:3501",
+              "use_id": "input:route:src/server.ts:3417:GET:/api/files:req.query.filename:3501",
+              "route_id": "route:src/server.ts:3417:GET:/api/files",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.filename before the sink, and that call is not a proven validator",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /api/files",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:3417:GET:/api/files:req.query.filename:3501"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 111,
+                  "startLine": 100
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 111,
+                  "startLine": 100
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 118,
+                            "startLine": 114
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 115,
+                            "startLine": 115
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /api/search",
+                  "kind": "function",
+                  "name": "GET /api/search"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 115,
+                  "startLine": 115
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /api/search: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 114,
+                  "end_line": 118,
+                  "start_byte": 3915,
+                  "end_byte": 4137
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "a call receives req.query.query before the sink, and that call is not a proven validator",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 115,
+                  "end_line": 115,
+                  "start_byte": 3997,
+                  "end_byte": 4012
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:3915:GET:/api/search:req.query.query:3997",
+              "use_id": "input:route:src/server.ts:3915:GET:/api/search:req.query.query:3997",
+              "route_id": "route:src/server.ts:3915:GET:/api/search",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.query before the sink, and that call is not a proven validator",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /api/search",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:3915:GET:/api/search:req.query.query:3997"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 118,
+                  "startLine": 114
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 118,
+                  "startLine": 114
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 130,
+                            "startLine": 121
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 122,
+                            "startLine": 122
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 2,
+                      "location": {
+                        "message": {
+                          "text": "expression"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 122,
+                            "startLine": 122
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 3,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 122,
+                            "startLine": 122
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "outbound_http_candidate"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 125,
+                            "startLine": 125
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /api/proxy",
+                  "kind": "function",
+                  "name": "GET /api/proxy"
+                }
+              ],
+              "message": {
+                "text": "Review protection for the named use"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 125,
+                  "startLine": 125
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /api/proxy: Outbound request needs destination review [needs_review]. Scan recorded a possible outbound HTTP use. Verify the destination, request-value handling, and applicable restrictions; this is not a confirmed SSRF finding. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 121,
+                  "end_line": 130,
+                  "start_byte": 4203,
+                  "end_byte": 4551
+                }
+              },
+              {
+                "kind": "unsupported_control_flow",
+                "detail": "statement not traversed: try_statement",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 124,
+                  "end_line": 129,
+                  "start_byte": 4382,
+                  "end_byte": 4548
+                }
+              },
+              {
+                "kind": "input_validation_absent",
+                "detail": "req.query.url reaches a sensitive use with no validator call in the handler or applicable middleware",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 125,
+                  "end_line": 125,
+                  "start_byte": 4415,
+                  "end_byte": 4437
+                }
+              },
+              {
+                "kind": "sink_binding_unverified",
+                "detail": "candidate API shape; library binding/argument roles require review",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 125,
+                  "end_line": 125,
+                  "start_byte": 4415,
+                  "end_byte": 4437
+                }
+              },
+              {
+                "kind": "external_response_unresolved",
+                "detail": "remote response and asynchronous continuation are not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 125,
+                  "end_line": 125,
+                  "start_byte": 4415,
+                  "end_byte": 4437
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "outbound-request-safety",
+                "input-validation"
+              ],
+              "id": "finding:use:route:src/server.ts:4203:GET:/api/proxy:src/server.ts:4415",
+              "use_id": "use:route:src/server.ts:4203:GET:/api/proxy:src/server.ts:4415",
+              "route_id": "route:src/server.ts:4203:GET:/api/proxy",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Outbound request needs destination review",
+              "summary": "Scan recorded a possible outbound HTTP use. Verify the destination, request-value handling, and applicable restrictions; this is not a confirmed SSRF finding.",
+              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.url reaches a sensitive use with no validator call in the handler or applicable middleware",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Review protection for the named use",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Resolve the source-to-use relationship and applicable guards.",
+                  "Apply the destination/API-specific protection and the route's declared field requirements.",
+                  "Add vulnerable, protected and inconclusive regression cases."
+                ],
+                "example_status": "no code example for an unverified library model"
+              }
+            },
+            "scan.kind": "outbound_http_candidate",
+            "scan.recommendations": {
+              "title": "Review protection for the named use",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Resolve the source-to-use relationship and applicable guards.",
+                "Apply the destination/API-specific protection and the route's declared field requirements.",
+                "Add vulnerable, protected and inconclusive regression cases."
+              ],
+              "example_status": "no code example for an unverified library model"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /api/proxy",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "use:route:src/server.ts:4203:GET:/api/proxy:src/server.ts:4415"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 130,
+                  "startLine": 121
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 130,
+                  "startLine": 121
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "control_statement"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 129,
+                  "startLine": 124
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/unresolved-string-use",
+          "ruleIndex": 1
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 142,
+                            "startLine": 133
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 134,
+                            "startLine": 134
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "POST /api/calculate",
+                  "kind": "function",
+                  "name": "POST /api/calculate"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 134,
+                  "startLine": 134
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "POST /api/calculate: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 133,
+                  "end_line": 142,
+                  "start_byte": 4614,
+                  "end_byte": 4910
+                }
+              },
+              {
+                "kind": "unsupported_control_flow",
+                "detail": "statement not traversed: try_statement",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 135,
+                  "end_line": 141,
+                  "start_byte": 4713,
+                  "end_byte": 4907
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 134,
+                  "end_line": 134,
+                  "start_byte": 4701,
+                  "end_byte": 4709
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:4614:POST:/api/calculate:req.body:4701",
+              "use_id": "input:route:src/server.ts:4614:POST:/api/calculate:req.body:4701",
+              "route_id": "route:src/server.ts:4614:POST:/api/calculate",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "POST /api/calculate",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:4614:POST:/api/calculate:req.body:4701"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 142,
+                  "startLine": 133
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 142,
+                  "startLine": 133
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "control_statement"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 141,
+                  "startLine": 135
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 155,
+                            "startLine": 145
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 146,
+                            "startLine": 146
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "DELETE /api/admin/users/:id",
+                  "kind": "function",
+                  "name": "DELETE /api/admin/users/:id"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 146,
+                  "startLine": 146
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "DELETE /api/admin/users/:id: Request-field validation evidence is incomplete [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 145,
+                  "end_line": 155,
+                  "start_byte": 4964,
+                  "end_byte": 5388
+                }
+              },
+              {
+                "kind": "unsupported_control_flow",
+                "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 149,
+                  "end_line": 154,
+                  "start_byte": 5210,
+                  "end_byte": 5385
+                }
+              },
+              {
+                "kind": "input_validation_absent",
+                "detail": "req.params.id is read and no handler or applicable middleware validator handles it",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 146,
+                  "end_line": 146,
+                  "start_byte": 5055,
+                  "end_byte": 5068
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:4964:DELETE:/api/admin/users/:id:req.params.id:5055",
+              "use_id": "input:route:src/server.ts:4964:DELETE:/api/admin/users/:id:req.params.id:5055",
+              "route_id": "route:src/server.ts:4964:DELETE:/api/admin/users/:id",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation evidence is incomplete",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "DELETE /api/admin/users/:id",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:4964:DELETE:/api/admin/users/:id:req.params.id:5055"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 155,
+                  "startLine": 145
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 155,
+                  "startLine": 145
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "control_statement"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 154,
+                  "startLine": 149
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 167,
+                            "startLine": 158
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 159,
+                            "startLine": 159
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /api/users/:id",
+                  "kind": "function",
+                  "name": "GET /api/users/:id"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 159,
+                  "startLine": 159
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /api/users/:id: Request-field validation evidence is incomplete [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 158,
+                  "end_line": 167,
+                  "start_byte": 5459,
+                  "end_byte": 5811
+                }
+              },
+              {
+                "kind": "unsupported_control_flow",
+                "detail": "statement not traversed: if_statement",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 162,
+                  "end_line": 166,
+                  "start_byte": 5707,
+                  "end_byte": 5808
+                }
+              },
+              {
+                "kind": "input_validation_absent",
+                "detail": "req.params.id is read and no handler or applicable middleware validator handles it",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 159,
+                  "end_line": 159,
+                  "start_byte": 5541,
+                  "end_byte": 5554
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:5459:GET:/api/users/:id:req.params.id:5541",
+              "use_id": "input:route:src/server.ts:5459:GET:/api/users/:id:req.params.id:5541",
+              "route_id": "route:src/server.ts:5459:GET:/api/users/:id",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation evidence is incomplete",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /api/users/:id",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:5459:GET:/api/users/:id:req.params.id:5541"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 167,
+                  "startLine": 158
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 167,
+                  "startLine": 158
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "control_statement"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 166,
+                  "startLine": 162
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 180,
+                            "startLine": 170
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 171,
+                            "startLine": 171
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "POST /api/parse-xml",
+                  "kind": "function",
+                  "name": "POST /api/parse-xml"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 171,
+                  "startLine": 171
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "POST /api/parse-xml: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 170,
+                  "end_line": 180,
+                  "start_byte": 5878,
+                  "end_byte": 6220
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 171,
+                  "end_line": 171,
+                  "start_byte": 5958,
+                  "end_byte": 5966
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:5878:POST:/api/parse-xml:req.body:5958",
+              "use_id": "input:route:src/server.ts:5878:POST:/api/parse-xml:req.body:5958",
+              "route_id": "route:src/server.ts:5878:POST:/api/parse-xml",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "POST /api/parse-xml",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:5878:POST:/api/parse-xml:req.body:5958"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 180,
+                  "startLine": 170
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 180,
+                  "startLine": 170
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 192,
+                            "startLine": 183
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 184,
+                            "startLine": 184
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "POST /api/parse-yaml",
+                  "kind": "function",
+                  "name": "POST /api/parse-yaml"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 184,
+                  "startLine": 184
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "POST /api/parse-yaml: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 183,
+                  "end_line": 192,
+                  "start_byte": 6272,
+                  "end_byte": 6590
+                }
+              },
+              {
+                "kind": "unsupported_control_flow",
+                "detail": "statement not traversed: try_statement",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 185,
+                  "end_line": 191,
+                  "start_byte": 6373,
+                  "end_byte": 6587
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 184,
+                  "end_line": 184,
+                  "start_byte": 6361,
+                  "end_byte": 6369
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:6272:POST:/api/parse-yaml:req.body:6361",
+              "use_id": "input:route:src/server.ts:6272:POST:/api/parse-yaml:req.body:6361",
+              "route_id": "route:src/server.ts:6272:POST:/api/parse-yaml",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "POST /api/parse-yaml",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:6272:POST:/api/parse-yaml:req.body:6361"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 192,
+                  "startLine": 183
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 192,
+                  "startLine": 183
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "control_statement"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 191,
+                  "startLine": 185
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 203,
+                            "startLine": 195
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 199,
+                            "startLine": 199
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "POST /api/register",
+                  "kind": "function",
+                  "name": "POST /api/register"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 199,
+                  "startLine": 199
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "POST /api/register: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 195,
+                  "end_line": 203,
+                  "start_byte": 6637,
+                  "end_byte": 6946
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 199,
+                  "end_line": 199,
+                  "start_byte": 6824,
+                  "end_byte": 6832
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:6637:POST:/api/register:req.body:6824",
+              "use_id": "input:route:src/server.ts:6637:POST:/api/register:req.body:6824",
+              "route_id": "route:src/server.ts:6637:POST:/api/register",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "POST /api/register",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:6637:POST:/api/register:req.body:6824"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 203,
+                  "startLine": 195
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 203,
+                  "startLine": 195
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 226,
+                            "startLine": 220
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 221,
+                            "startLine": 221
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "POST /api/validate-email",
+                  "kind": "function",
+                  "name": "POST /api/validate-email"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 221,
+                  "startLine": 221
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "POST /api/validate-email: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 220,
+                  "end_line": 226,
+                  "start_byte": 7357,
+                  "end_byte": 7679
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 221,
+                  "end_line": 221,
+                  "start_byte": 7444,
+                  "end_byte": 7452
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:7357:POST:/api/validate-email:req.body:7444",
+              "use_id": "input:route:src/server.ts:7357:POST:/api/validate-email:req.body:7444",
+              "route_id": "route:src/server.ts:7357:POST:/api/validate-email",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "POST /api/validate-email",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:7357:POST:/api/validate-email:req.body:7444"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 226,
+                  "startLine": 220
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 226,
+                  "startLine": 220
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 240,
+                            "startLine": 236
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 237,
+                            "startLine": 237
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /redirect",
+                  "kind": "function",
+                  "name": "GET /redirect"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 237,
+                  "startLine": 237
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /redirect: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 236,
+                  "end_line": 240,
+                  "start_byte": 7985,
+                  "end_byte": 8158
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "a call receives req.query.url before the sink, and that call is not a proven validator",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 237,
+                  "end_line": 237,
+                  "start_byte": 8063,
+                  "end_byte": 8076
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:7985:GET:/redirect:req.query.url:8063",
+              "use_id": "input:route:src/server.ts:7985:GET:/redirect:req.query.url:8063",
+              "route_id": "route:src/server.ts:7985:GET:/redirect",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.query.url before the sink, and that call is not a proven validator",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /redirect",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:7985:GET:/redirect:req.query.url:8063"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 240,
+                  "startLine": 236
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 240,
+                  "startLine": 236
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 248,
+                            "startLine": 243
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "src/server.ts"
+                          },
+                          "region": {
+                            "endLine": 244,
+                            "startLine": 244
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "14c7e1e0189e4688edaa48ad1d777943d667d9d8040c74baafd7b7c2b81ac9bb"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "POST /api/merge",
+                  "kind": "function",
+                  "name": "POST /api/merge"
+                }
+              ],
+              "message": {
+                "text": "Validate and sanitize each request input"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 244,
+                  "startLine": 244
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "POST /api/merge: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "middleware_unresolved",
+                "detail": "effective middleware/guard chain is not modeled",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 243,
+                  "end_line": 248,
+                  "start_byte": 8210,
+                  "end_byte": 8447
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "a call receives req.body before the sink, and that call is not a proven validator",
+                "at": {
+                  "file": "src/server.ts",
+                  "start_line": 244,
+                  "end_line": 244,
+                  "start_byte": 8297,
+                  "end_byte": 8305
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:src/server.ts:8210:POST:/api/merge:req.body:8297",
+              "use_id": "input:route:src/server.ts:8210:POST:/api/merge:req.body:8297",
+              "route_id": "route:src/server.ts:8210:POST:/api/merge",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body before the sink, and that call is not a proven validator",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Validate and sanitize each request input",
+                "actions": [
+                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                ],
+                "example_status": "not_generated; field policy is route-specific"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Validate and sanitize each request input",
+              "actions": [
+                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              ],
+              "example_status": "not_generated; field policy is route-specific"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "POST /api/merge",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:src/server.ts:8210:POST:/api/merge:req.body:8297"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 248,
+                  "startLine": 243
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/server.ts"
+                },
+                "region": {
+                  "endLine": 248,
+                  "startLine": 243
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        }
+      ],
+      "tool": {
+        "driver": {
+          "informationUri": "https://github.com/zazzcode/scan",
+          "name": "scan",
+          "rules": [
+            {
+              "help": {
+                "markdown": "Validate and sanitize each request input\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.\n- Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.\n- Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.\n",
+                "text": "Validate and sanitize each request input. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose. Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute. Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+              },
+              "id": "scan/input-validation",
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-20"
+                ]
+              },
+              "shortDescription": {
+                "text": "Validate and sanitize each request input"
+              }
+            },
+            {
+              "help": {
+                "markdown": "Review protection for the named use\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Resolve the source-to-use relationship and applicable guards.\n- Apply the destination/API-specific protection and the route's declared field requirements.\n- Add vulnerable, protected and inconclusive regression cases.\n",
+                "text": "Review protection for the named use. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Resolve the source-to-use relationship and applicable guards. Apply the destination/API-specific protection and the route's declared field requirements. Add vulnerable, protected and inconclusive regression cases."
+              },
+              "id": "scan/unresolved-string-use",
+              "properties": {
+                "tags": [
+                  "security"
+                ]
+              },
+              "shortDescription": {
+                "text": "Review protection for the named use"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

@@ -101,33 +101,25 @@ Review the UI against the input-validation and SQL/NoSQL cases before beginning 
 Local scan artifacts live outside worktrees under the configured
 `_test-finding/<repo-name>/run-<id>/` root; they are not committed as routine test output.
 
-### Follow-on feature: bundled Juice Shop findings demo
+### Curated public sample outputs
 
-**Dependency:** finalize and accept the human report UI first. This item records future scope, not
-permission to package an unfinished UI or add the demo during the current reporting increment.
+**Implemented at the user's request:** root [docs/samples](../../docs/samples/README.md) contains
+Juice Shop and vulnerable TypeScript JSON/HTML/SARIF, with README links near the project introduction.
+This supersedes the earlier proposed demo/juice-shop directory. Samples are updated as reporting
+and analysis improve; they remain deliberate curated outputs rather than routine test artifacts.
 
-Add a tracked `demo/juice-shop/` directory so a new user can inspect the report experience immediately,
-without cloning Juice Shop, compiling scan, configuring keys, or running a model. Include a matching
-`findings.json`, `findings.html`, and `findings.sarif`, plus a short README describing the pinned target
-revision, scan command and scope, scanner/report versions, regeneration steps, and limitations.
-The repository README should link to this demonstration.
+Each sample records the pinned upstream source revision, source attribution, actual scope and
+model-assessment coverage, scanner baseline/question versions, and limitations. Public project labels
+replace developer-specific absolute roots. HTML and SARIF are generated from matching canonical JSON;
+no model call is needed to view them or refresh their presentation. The offline refresh script is
+owned by the [sample guide](../../docs/samples/README.md#refresh-as-scan-improves).
 
-Acceptance expectations:
-
-- Opening the HTML directly shows expandable route/source rows, finding evidence, separate input
-  validation and database-protection explanations, analysis uncertainty, and remediation recommendations.
-- Include representative SQL, NoSQL, unresolved-analysis, and zero-finding route records as available;
-  label any selection as an excerpt and preserve original IDs and evidence. Do not invent a protected
-  claim or model verdict merely to showcase a badge.
-- Generate the HTML and SARIF from the packaged JSON with scan's normal exporters. Demonstration
-  output contains only scan results, without comparator-tool content.
-- Remove machine-specific paths and real credentials; use clearly documented reproducible substitutions
-  where needed. Preserve source provenance, hashes as applicable, and required upstream attribution.
-  Example secrets in intentionally vulnerable source must be identified as fixtures, not active keys.
-- Keep the example bounded in repository size and include a regeneration check to prevent JSON/HTML/
-  SARIF drift. Pin source and tool versions; new paid evaluation is not required to view or export it.
-- Add the packaged demo through its own scoped follow-on change after UI acceptance. Routine scan runs
-  continue to use the external findings root rather than overwriting the tracked demonstration.
+Keep examples honest: preserve incomplete/failed/unassessed states, source hashes and IDs. Do not
+invent a protected finding or vulnerability for visual effect. Input-validation and DB-protection
+claims remain distinct, and third-party comparisons never appear in product report content.
+Routine scans continue using the external _test-finding root; changes to bundled examples require
+an intentional refresh and review. Independent UI acceptance and broader held-out accuracy checks
+remain separate from publishing these illustrative samples.
 
 ## Future capability branches
 

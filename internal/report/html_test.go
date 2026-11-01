@@ -2,11 +2,41 @@ package report
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"github.com/zazzcode/scan/internal/graph"
+	htmlstd "html"
 	"strings"
 	"testing"
 )
+
+func TestHTMLPinsOnlyBundledSortingScript(t *testing.T) {
+	r := &graph.StringReport{Entries: []graph.Entry{{Route: graph.Route{ID: "r", Method: "GET", PathPattern: `/path/"<script>bad()</script>`}}}}
+	var out bytes.Buffer
+	if err := HTML(&out, r); err != nil {
+		t.Fatal(err)
+	}
+	html := out.String()
+	start := strings.Index(html, "<script>")
+	end := strings.Index(html, "</script>")
+	if start < 0 || end < start || strings.Count(html, "<script>") != 1 {
+		t.Fatal("expected one bundled script")
+	}
+	actual := html[start+len("<script>") : end]
+	hash := sha256.Sum256([]byte(actual))
+	if actual != sortSource || !strings.Contains(htmlstd.UnescapeString(html), "script-src 'sha256-"+base64.StdEncoding.EncodeToString(hash[:])+"'") {
+		t.Fatal("script differs from the bundled source or CSP hash")
+	}
+	for _, want := range []string{`data-sort="path"`, `class="sort-button status-sort" data-sort="findings"`, `data-review="0" data-protected="0"`, `class="categories-heading"`, `data-path="/path/&#34;&lt;script&gt;bad()&lt;/script&gt;"`} {
+		if !strings.Contains(html, want) {
+			t.Fatalf("missing sort structure or escaped attribute: %s", want)
+		}
+	}
+	if strings.Count(html, "data-sort=") != 2 || strings.Contains(html, "background:#f0f2f2") {
+		t.Fatal("unexpected independent sort controls or shaded empty category")
+	}
+}
 
 func TestInconclusiveDisplayPreservesRawAssessment(t *testing.T) {
 	for _, value := range []string{"unknown", "uncertain", "needs_evidence"} {
@@ -102,10 +132,13 @@ func TestStandaloneHTMLGroupsAndEscapesSavedEvidence(t *testing.T) {
 	if strings.Count(html, `<details class="entry`) != 4 || strings.Count(html, `<article class="finding">`) != 3 {
 		t.Fatal("lost or duplicated rows/findings")
 	}
-	for _, bad := range []string{"<script", "<img", "<link", "fetch(", "XMLHttpRequest"} {
+	for _, bad := range []string{"<img", "<link", "fetch(", "XMLHttpRequest"} {
 		if strings.Contains(html, bad) {
 			t.Fatalf("active or external content: %s", bad)
 		}
+	}
+	if strings.Count(html, "<script>") != 1 || !strings.Contains(html, "<script>"+sortSource+"</script>") {
+		t.Fatal("report included a script other than the bundled sorter")
 	}
 	if !strings.Contains(html, "&lt;script&gt;") {
 		t.Fatal("hostile source was not escaped")
@@ -142,7 +175,7 @@ func TestPoorPracticeRemainsActionableAcrossModelOutcomes(t *testing.T) {
 	}
 }
 
-func TestHTMLSortsByRoutePathBeforeMethodAndFindingStatus(t *testing.T) {
+func TestHTMLDefaultsToGroupedCountsThenRoutePath(t *testing.T) {
 	r := &graph.StringReport{Entries: []graph.Entry{
 		{Route: graph.Route{ID: "z", Method: "DELETE", PathPattern: "/z"}},
 		{Route: graph.Route{ID: "b", Method: "GET", PathPattern: "/b"}},
@@ -151,13 +184,15 @@ func TestHTMLSortsByRoutePathBeforeMethodAndFindingStatus(t *testing.T) {
 	}, Uses: []graph.StringUse{
 		{ID: "finding", RouteID: "z", Kind: "sql_query_candidate", Gaps: []graph.Gap{{Kind: "query_text_interpolated"}}},
 		{ID: "orphan", RouteID: "unresolved", Kind: "outbound_http_candidate"},
+		{ID: "review", RouteID: "a-post", Kind: "outbound_http_candidate"},
+		{ID: "protected", RouteID: "b", Kind: "outbound_http_candidate", Assessment: graph.Assessment{Status: "completed", FindingStatus: "protected_for_claim"}},
 	}}
 	var out bytes.Buffer
 	if err := HTML(&out, r); err != nil {
 		t.Fatal(err)
 	}
 	previous := -1
-	for _, id := range []string{"a-get", "a-post", "b", "z", "unresolved"} {
+	for _, id := range []string{"z", "a-post", "unresolved", "b", "a-get"} {
 		position := strings.Index(out.String(), `id="`+id+`"`)
 		if position <= previous {
 			t.Fatalf("route %s missing or out of order", id)

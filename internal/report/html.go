@@ -1,7 +1,9 @@
 package report
 
 import (
+	"crypto/sha256"
 	_ "embed"
+	"encoding/base64"
 	"html/template"
 	"io"
 	"sort"
@@ -11,6 +13,10 @@ import (
 
 //go:embed report.html
 var htmlSource string
+
+//go:embed report-sort.js
+var sortSource string
+
 var htmlReport = template.Must(template.New("report").Funcs(template.FuncMap{
 	"label": displayLabel,
 }).Parse(htmlSource))
@@ -29,6 +35,8 @@ type htmlRow struct {
 	Findings, Review, Protected int
 }
 type htmlView struct {
+	SortScript                  template.JS
+	ScriptHash                  string
 	Glossary                    []graph.FindingType
 	Root                        string
 	Rows                        []*htmlRow
@@ -41,6 +49,10 @@ type htmlView struct {
 func HTML(w io.Writer, r *graph.StringReport) error {
 	Enrich(r)
 	v := htmlView{Glossary: r.FindingTypes, Root: r.Root, Gaps: r.Gaps, Limitations: r.Limitations}
+	hash := sha256.Sum256([]byte(sortSource))
+	v.ScriptHash = base64.StdEncoding.EncodeToString(hash[:])
+	// Trust only the compiled-in script. Report/source values stay escaped in data attributes.
+	v.SortScript = template.JS(sortSource)
 	rows := map[string]*htmlRow{}
 	for _, e := range r.Entries {
 		row := &htmlRow{ID: e.Route.ID, SourceType: "HTTP route", Path: e.Route.PathPattern, Method: e.Route.Method, Signature: e.Route.Method + " " + e.Route.PathPattern, Location: e.Route.Registration, Gaps: e.Gaps}
@@ -73,6 +85,15 @@ func HTML(w io.Writer, r *graph.StringReport) error {
 	}
 	sort.SliceStable(v.Rows, func(i, j int) bool {
 		a, b := v.Rows[i], v.Rows[j]
+		if a.Findings != b.Findings {
+			return a.Findings > b.Findings
+		}
+		if a.Review != b.Review {
+			return a.Review > b.Review
+		}
+		if a.Protected != b.Protected {
+			return a.Protected > b.Protected
+		}
 		if (a.Path == "") != (b.Path == "") {
 			return a.Path != ""
 		}

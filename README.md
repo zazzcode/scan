@@ -10,6 +10,20 @@ assessment of relevant evidence. Field validation and sink protection are separa
 email address does not establish that a SQL query uses bound parameters. Unknown behavior stays
 unknown rather than becoming a safety claim or a vulnerability by assumption.
 
+## Explore sample findings
+
+See the expandable report UI and source evidence from two intentionally vulnerable applications:
+
+| Application | What the current sample shows | Output |
+|---|---|---|
+| **OWASP Juice Shop** | 152 route entries; 5 static injection findings and 1 poor-practice finding | [HTML](docs/samples/juice-shop/findings.html) · [JSON](docs/samples/juice-shop/findings.json) · [SARIF](docs/samples/juice-shop/findings.sarif) |
+| **Vulnerable TypeScript app** | 19 route entries; evidence and incomplete-analysis records | [HTML](docs/samples/vulnerable-typescript-app/findings.html) · [JSON](docs/samples/vulnerable-typescript-app/findings.json) · [SARIF](docs/samples/vulnerable-typescript-app/findings.sarif) |
+
+**Download an HTML file and open it in your browser**—GitHub displays its source rather than running
+it. Findings appear first; expand rows for evidence and remediation, or click a category pill for its
+glossary. No setup or model calls are needed. These [evolving samples](docs/samples/README.md) include
+coverage limits and refresh instructions; they will be updated as scan improves.
+
 ## Goals and current scope
 
 The goal is to report vulnerabilities, weak security practices, and sufficient protection by route,

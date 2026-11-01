@@ -40,7 +40,11 @@ scanner default. You may keep the variable in your ignored `.env`; load it in th
 because the scanner does not automatically read `.env`. It is a local filesystem path, not a URL.
 
 Open the printed `findings.html` path in your browser (on macOS: `open /path/to/run/findings.html`).
-Route rows are sorted alphabetically by path, then HTTP method; unresolved entries appear last.
+Route rows start with Findings, then Review, then Protected counts (highest first), followed by
+route path A–Z and method; blank rows appear last. Click
+Route signature to sort by path, or the grouped Findings / Review / Protected header to sort by
+those counts together (highest first, then path A–Z; blank rows last). Click again to reverse.
+Expanded rows remain open when reordered.
 The **Route location** column points to the route declaration. Each expanded finding has its own
 **Finding location**. Row-end type pills identify review areas such as SQL Injection, NoSQL Injection,
 and Input Validation, alongside their poor-practice/review/protected status. Select a pill to open its
@@ -49,8 +53,8 @@ not mean an injection is confirmed. The complete glossary is also available belo
 
 Expand a source row to see the HTTP method and path, findings, validation and operation-protection
 explanations, code evidence, unresolved analysis, and remediation recommendations. HTML embeds its
-styles and content and uses native disclosure controls; no server, JavaScript, or external assets
-are required. It presents scan results only. JSON retains the richer evidence for agents; SARIF is
+styles, content, and a small sorting script, with native disclosure and glossary controls. No server
+or external assets are required; without JavaScript the default findings-first view remains usable. It presents scan results only. JSON retains the richer evidence for agents; SARIF is
 the standard interchange format for security-tool integrations. Generated reports contain source
 excerpts, so keep them with the same access controls as that source.
 

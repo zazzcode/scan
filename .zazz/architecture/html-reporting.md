@@ -57,8 +57,10 @@ Show one expandable entry per inventoried source, grouped by route ID rather tha
 source type, method/path signature, **Route location**, finding count, analysis-review count,
 protected-claim count, and row-end finding-type pills in **Categories**. Route location is the source declaration,
 not a finding location. An unresolved entry displays “Not resolved”; operation locations remain
-in the expanded records labeled **Finding location**. Sort all route rows lexicographically by route path, then HTTP method, regardless of findings or
-review counts. Keep stable input order for ties and place unresolved entries last. Distinct HTTP methods sharing a path remain separate. Today the source type is
+in the expanded records labeled **Finding location**. Default to descending Findings, Review, Protected counts, then route path A–Z and method. Two keyboard-accessible header buttons sort route path or
+the grouped Findings/Review/Protected counts. The grouped descending order compares those three
+counts in that priority, then path A–Z and method, leaving empty rows last. Repeated activation
+reverses the selected order. The count block is one control, not three independent sorts. Keep stable input order for ties and place unresolved entries last. Distinct HTTP methods sharing a path remain separate. Today the source type is
 HTTP route; a use without a matching entry appears under an explicit unresolved entry, never an invented
 route. Other entry types require future detector contracts rather than labels inferred by the viewer.
 
@@ -118,7 +120,7 @@ The native behavior follows [MDN's declarative popover guide](https://developer.
 ## Soft status palette
 
 Use soft red for scanner-supported definitive vulnerability judgments, orange for established poor
-practice, blue for Review, and green for Protected. Light-grey category cells say None reported. Row backgrounds remain unchanged.
+practice, blue for Review, and green for Protected. Plain muted text says None reported, without a shaded box. Protected and Categories have explicit spacing. Row backgrounds remain unchanged.
 Keep explicit status labels and readable contrast. The red CSS treatment is reserved for
 `confirmed_vulnerability`, emitted only from the evidence-gated injection judgment described in
 [query judgment design](query-judgment.md). User statements and practice answers must not become
@@ -129,12 +131,15 @@ The verdict is a bounded static judgment; independent review/runtime confirmatio
 
 Go `html/template` escapes report text, code, source paths, and locations. Source excerpts are untrusted
 text and must never be cast to trusted HTML. CSS and markup are bundled with the scanner, with no
-scripts, remote fonts, CDN dependencies, automatic JSON fetch, or analytics. A restrictive content
-security policy disables scripts and network resources. The generated file can be opened directly
+remote fonts, CDN dependencies, automatic JSON fetch, or analytics. A small compiled-in script
+reorders existing rows only, preserving open state and source text. Escaped data attributes carry
+counts/path/method; report values never become JavaScript. CSP permits the exact script SHA-256 hash
+and blocks other scripts and network resources. Controls are disabled when the script cannot run;
+default findings-first rendering, expansion, and glossary controls remain usable. The generated file can be opened directly
 with `file://`; browser access to a neighboring JSON file is unnecessary.
 
 Reports contain source excerpts and must be handled with the target source's access controls. The
-current viewer does not link to or execute arbitrary source paths. Optional future filtering, sorting,
+current viewer does not link to or execute arbitrary source paths. Optional future filtering
 and expand-all controls would require a separate UX decision; they are not needed for native row
 expansion. Standard browser find remains available, although matching inside collapsed disclosures is
 browser-dependent. Printing follows the current disclosure state; expand required rows before printing.
@@ -156,3 +161,6 @@ flags. Detector baselines are compared against fresh offline runs on the two pin
 presentation changes must not alter raw use or gap totals. Browser inspection checks real expanded
 findings and remediation. JSON/HTML/SARIF pairs and verification notes belong in ignored local run
 artifacts; reusable rendering and classification tests belong in Go test sources.
+
+Curated public samples live under [docs/samples](../../docs/samples/README.md), with canonical JSON
+and offline-generated HTML/SARIF. Public root labels replace local absolute target paths.

@@ -27,7 +27,8 @@ The HTML uses soft fills with readable text and explicit labels:
 - **Soft orange:** established poor practice to remediate or refactor.
 - **Soft blue:** Review; the problem or adequate protection remains unresolved.
 - **Soft green:** protection supported for the named claim.
-- **Light grey:** None reported; no category records for the source entry.
+None reported uses plain muted text without a shaded box; it means no category records for the
+source entry.
 
 Red is reserved for a definitive scanner verdict. The bounded query classifier can emit a
 source-supported static vulnerability when its injection-specific assessment and evidence gates
