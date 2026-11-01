@@ -1,5 +1,5 @@
 id: javascript
-version: 2
+version: 3
 languages: javascript, typescript
 
 # JavaScript and TypeScript practice
@@ -21,6 +21,10 @@ Comments, messages, descriptions, reviews, feedback, notes, and similar fields m
 ## Sinks
 
 Do not build a query, update, or insert by concatenation, template interpolation, or a `$where` string. Bind the value with the driver's parameter API. A bound value is sufficient protection for statement structure even when validation is weak. A type or length check does not make an interpolated statement safe. Logging a SQL-looking string is not a query. `Array.find` is not a NoSQL query.
+
+## Logging
+
+Do not write credentials or personal data into logs. A credential is a password, token, API key, session cookie, `Authorization` header value, or one-time code; personal data identifies or describes a person. Log a non-revealing fact instead: presence, length, whether a value matched, or a non-reversible identifier. Log an allowlist of fields, never a whole request body, query, or header set. Do not send credentials in URL query strings: request logging such as morgan's predefined formats records the full URL. A logger counts only when its binding is shown; a local object named `logger` is not a logger. Redaction counts only when its effect is shown and it runs before the emission. Constant messages, startup banners, ports, and server-side error stacks without sensitive request data are not leaks.
 
 ## Do not claim
 

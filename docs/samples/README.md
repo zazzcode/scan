@@ -3,8 +3,8 @@
 [Project introduction](../../README.md) · [User documentation](../README.md) · [Interpret results](../interpreting-results.md)
 
 Explore actual scan output without installing the targets, configuring keys, or calling a model.
-Download a standalone HTML file and open it in your browser. GitHub's file view displays HTML source;
-it does not run the report. After cloning this repository, open the local file directly.
+Open the [hosted samples](https://zazzcode.github.io/scan/) in your browser, or download a standalone HTML file and open it
+locally. GitHub's file view displays HTML source; it does not run the report.
 
 | Sample | HTML report | Agent-readable evidence | Standard interchange |
 |---|---|---|---|
@@ -35,6 +35,10 @@ This updates presentation only, offline. To publish improved analysis, run a fre
 your normal external findings directory, replace the corresponding sample `findings.json` with that
 run's canonical JSON, update its README's target revision/date/assessment coverage, then run the
 refresh command. The script normalizes the public root label and exports matching HTML/SARIF.
+
+Saved model judgments may be carried into a fresh scan only for a use whose whole evidence is
+byte-identical to the judged use. A use whose evidence changed is published as not assessed until it
+is judged again; never copy an old answer onto changed evidence.
 Do not copy old judgments onto changed source evidence or invent missing model assessments.
 Review the diff and preserve upstream attribution before committing the refreshed samples.
 
@@ -43,9 +47,11 @@ checked in. Keep both sample applications current when analysis or reporting beh
 
 ## Browser-hosted previews
 
-The manual **Publish sample findings** GitHub Actions workflow publishes this directory to GitHub
-Pages, including an index linking both reports. A repository maintainer first selects **GitHub
-Actions** under Settings → Pages, then runs that workflow from the branch containing these samples.
-Use the deployment's actual published URL in README links once the first deployment succeeds.
-This setup is committed; hosting is not yet activated or verified. Until then, download/open the HTML.
+The **Publish sample findings** GitHub Actions workflow publishes this directory to GitHub Pages,
+including an index linking both reports. A repository maintainer first selects **GitHub Actions**
+under Settings → Pages and allows `stage` in the `github-pages` environment. The
+workflow then runs when sample files or the workflow change on `stage` (the default branch), and can
+be run manually there. Feature branches publish when they merge into `stage`.
+The hosted address is GitHub's project-site URL, https://zazzcode.github.io/scan/. It serves pages only after a maintainer
+enables Pages for the repository; until then, download and open the HTML file.
 Only the curated sample directory is published; no scan execution or provider keys are needed.

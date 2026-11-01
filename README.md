@@ -16,11 +16,12 @@ See the expandable report UI and source evidence from two intentionally vulnerab
 
 | Application | What the current sample shows | Output |
 |---|---|---|
-| **OWASP Juice Shop** | 152 route entries; 5 static injection findings and 1 poor-practice finding | [HTML](docs/samples/juice-shop/findings.html) · [JSON](docs/samples/juice-shop/findings.json) · [SARIF](docs/samples/juice-shop/findings.sarif) |
-| **Vulnerable TypeScript app** | 19 route entries; evidence and incomplete-analysis records | [HTML](docs/samples/vulnerable-typescript-app/findings.html) · [JSON](docs/samples/vulnerable-typescript-app/findings.json) · [SARIF](docs/samples/vulnerable-typescript-app/findings.sarif) |
+| **OWASP Juice Shop** | 152 route entries; 3 static injection findings, a credential written to access logs, and 3 query-construction findings | [View in browser](https://zazzcode.github.io/scan/juice-shop/findings.html) · [HTML file](docs/samples/juice-shop/findings.html) · [JSON](docs/samples/juice-shop/findings.json) · [SARIF](docs/samples/juice-shop/findings.sarif) |
+| **Vulnerable TypeScript app** | 19 route entries; a password logged in SQL text (Review) and other evidence and incomplete-analysis records | [View in browser](https://zazzcode.github.io/scan/vulnerable-typescript-app/findings.html) · [HTML file](docs/samples/vulnerable-typescript-app/findings.html) · [JSON](docs/samples/vulnerable-typescript-app/findings.json) · [SARIF](docs/samples/vulnerable-typescript-app/findings.sarif) |
 
-**Download an HTML file and open it in your browser**—GitHub displays its source rather than running
-it. Findings appear first; expand rows for evidence and remediation, or click a category pill for its
+**View in browser** opens the hosted copy published by GitHub Pages ([all samples](https://zazzcode.github.io/scan/)). GitHub's
+file view shows HTML source rather than running it, so you can also download an HTML file and open
+it locally. Findings appear first; expand rows for evidence and remediation, or click a category pill for its
 glossary. No setup or model calls are needed. These [evolving samples](docs/samples/README.md) include
 coverage limits and refresh instructions; they will be updated as scan improves.
 

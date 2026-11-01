@@ -74,3 +74,5 @@ Agents MUST run the assigned contract's scoped checks using the worktree's decla
 The [contributor guide](docs/contributing.md) owns build, test, vet, and format commands;
 [evidence conventions](.zazz/standards/testing.md) define the required validation record.
 Agents MUST format only changed Go files and keep documentation changes within the requested scope.
+A linked-computer session runs checks with the shared `.tools/` toolchain described in
+[worktree setup](.zazz/docs/worktree-setup.md#linked-computer-agent-toolchain).

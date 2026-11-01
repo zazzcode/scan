@@ -85,6 +85,8 @@ func describe(u graph.StringUse) graph.Finding {
 	case "account_creation_candidate":
 		f.Title = "Account-creation requirements need review"
 		f.Summary = "Check required fields and enforcing guards before persistence. A modeled account-creation operation is not proof of a validation bypass."
+	case "log_sink_candidate":
+		describeLog(u, &f)
 	case "outbound_http_candidate":
 		f.Title = "Outbound request needs destination review"
 		f.Summary = "Scan recorded a possible outbound HTTP use. Verify the destination, request-value handling, and applicable restrictions; this is not a confirmed SSRF finding."
@@ -102,9 +104,19 @@ func describe(u graph.StringUse) graph.Finding {
 		if answer := a.Answers["validation"]; answer != "" {
 			f.Validation += " Model validation answer: " + displayLabel(answer) + "."
 		}
-		f.Protection = "Assessed injection/use protection: " + displayLabel(a.Protection) + ". " + a.Reason
+		if u.Kind == "log_sink_candidate" {
+			f.Protection += " Assessed logging exposure: " + displayLabel(a.Answers["log_exposure"]) + " (data class " + displayLabel(a.Answers["data_class"]) + ", content " + displayLabel(a.Answers["content_exposure"]) + ", redaction " + displayLabel(a.Answers["redaction"]) + "). " + a.Reason
+		} else {
+			f.Protection = "Assessed injection/use protection: " + displayLabel(a.Protection) + ". " + a.Reason
+		}
 		switch a.FindingStatus {
 		case "confirmed_vulnerability":
+			if u.Kind == "log_sink_candidate" && len(a.BlockingGaps) == 0 && a.Answers["log_exposure"] == "vulnerable" {
+				f.RecordType = "finding"
+				f.Status = "confirmed_vulnerability"
+				f.Title = "Sensitive data written to logs, supported by source analysis"
+				f.Summary = "The supplied source and logging-specific assessment establish that credential or personal-data content reaches log output without effective redaction. Remove it from the log or log a non-revealing fact instead."
+			}
 			if u.Completeness != nil && u.Completeness.ClaimKind == "injection" && len(a.BlockingGaps) == 0 && (a.Answers["injection_protection"] == "vulnerable" || a.Answers["injection_protection"] == "insufficient") {
 				f.RecordType = "finding"
 				f.Status = "confirmed_vulnerability"
@@ -138,7 +150,9 @@ func describe(u graph.StringUse) graph.Finding {
 			}
 		}
 	}
-	if f.Status == "poor_practice" {
+	if f.Status == "poor_practice" && u.Kind == "log_sink_candidate" {
+		f.Uncertainty += " Who can read the log destination and how long it is retained have not been assessed; that does not remove this remediation task."
+	} else if f.Status == "poor_practice" {
 		f.Uncertainty += " Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task."
 	}
 	return f

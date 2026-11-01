@@ -3,6 +3,9 @@ package judge
 import "github.com/zazzcode/scan/internal/graph"
 
 func questionsFor(use graph.StringUse) []question {
+	if logUse(use) {
+		return logQuestions
+	}
 	if use.Kind != "sql_query_candidate" && use.Kind != "nosql_query_candidate" {
 		return questions
 	}
@@ -20,6 +23,9 @@ func questionsFor(use graph.StringUse) []question {
 }
 
 func questionChoices(q question) []map[string]string {
+	if c := logChoices(q.name); c != nil {
+		return c
+	}
 	if q.name == "injection_protection" {
 		return []map[string]string{
 			{"value": "vulnerable", "description": "The supplied source and verified operation model support input changing executable query syntax or selector operators on a relevant path."},

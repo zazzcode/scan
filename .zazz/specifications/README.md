@@ -30,6 +30,8 @@ Independent future deliverables may use separate feature worktrees/PRs targeting
 - [Route string validation](route-string-validation.md) — implementation explicitly authorized by
   the user on 2026-10-31 in the assigned feature worktree.
   Start from the [near-term sequence](../project/implementation-plan.md#route-string-validation-delivery-sequence).
+- [Sensitive-data logging](sensitive-data-logging.md) — requested by the user on 2026-11-01 in the
+  `logger-leak` worktree; increment 1 (explicit logger calls) in progress.
 - Remaining specs are not authored yet. Their proposed slices live in the
   [implementation plan](../project/implementation-plan.md); each needs a bounded contract and user authorization.
 

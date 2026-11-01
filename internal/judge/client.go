@@ -63,7 +63,11 @@ var choices = []map[string]string{
 
 // Assess evaluates a candidate but never lets model agreement close static gaps.
 func (c *Client) Assess(ctx context.Context, use graph.StringUse) graph.Assessment {
-	a := graph.Assessment{Status: "failed", Provider: c.provider, Model: c.model, QuestionVersion: questionVersion}
+	version := questionVersion
+	if logUse(use) {
+		version = logQuestionVersion
+	}
+	a := graph.Assessment{Status: "failed", Provider: c.provider, Model: c.model, QuestionVersion: version}
 	payload, err := c.payload(use)
 	if err != nil {
 		a.Reason = err.Error()

@@ -42,6 +42,22 @@ func guidance(use graph.StringUse) Guidance {
 			"Check runtime types, normalize according to policy, then enforce nonempty/format constraints; return immediately on rejection.",
 			"Add appropriate model/database constraints as defense in depth and test actual persisted state, not only an HTTP response or challenge flag.",
 		}, Example: "// Illustrative middleware; add the route's remaining schema requirements.\nconst { email, password } = req.body;\nif (typeof email !== 'string' || typeof password !== 'string' ||\n    email.trim().length === 0 || password.trim().length === 0) {\n  return res.status(400).json({ error: 'Invalid required fields' });\n}\n// Continue only after applying the remaining field policy.\nreturn next();", ExampleStatus: "illustrative_template; not a verified application patch"}
+	case "log_sink", "log_sink_candidate":
+		g = Guidance{Title: "Keep credential and personal-data content out of logs", Actions: []string{
+			"Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.",
+			"Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.",
+			"If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
+			"Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead.",
+		}, Example: "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' && password.length > 0 });", ExampleStatus: "illustrative_template; not a verified application patch"}
+		if hasGap(use, "log_request_line_credential") || hasGap(use, "log_request_line_hint") {
+			g.Title = "Keep credentials out of URLs and access logs"
+			g.Actions = []string{
+				"Move the credential from the URL query string to the request body (for example change GET to POST) and update every client that calls the route.",
+				"Until clients change, exclude this route's query string from access logs or use a format without :url for it, and rotate any credentials already written to existing logs.",
+				"Restrict who can read access-log files; a log directory served over HTTP exposes every recorded URL.",
+			}
+			g.Example = "// Illustrative: accept the credentials in the body, not the URL.\napp.post('/rest/user/change-password', express.json(), (req, res) => {\n  const { current, new: next, repeat } = req.body;\n  // ...existing checks and update\n});"
+		}
 	default:
 		g = Guidance{Title: "Review protection for the named use", Actions: []string{"Resolve the source-to-use relationship and applicable guards.", "Apply the destination/API-specific protection and the route's declared field requirements.", "Add vulnerable, protected and inconclusive regression cases."}, ExampleStatus: "no code example for an unverified library model"}
 	}

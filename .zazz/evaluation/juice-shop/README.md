@@ -34,6 +34,13 @@ SQL/NoSQL judgment against known-positive, protected, and unknown cases takes pr
 | sql_injection, routes/search.ts:23 | Supported potential | Request criteria interpolates after length restriction, which does not prevent SQL syntax |
 | SSRF and HTTP URL, routes/profileImageUrlUpload.ts:24 | Supported potential; one grouped concern | Request URL reaches fetch; authenticated-user requirement does not constrain destination |
 
+**Sensitive-data logging, 2026-11-01.** Juice Shop writes cleartext passwords to its access log:
+`GET /rest/user/change-password` carries `current`/`new`/`repeat` in the query string and
+`morgan('combined')` (`server.ts:366`) records the URL. None of Bearer's 278 logger findings covers
+this (false negative); its credential-looking logger lines log fixture keys, already-masked emails,
+or constant text. scan now reports the change-password case as a finding and the security-question
+email query as Review. The remaining Bearer logger rows were not individually adjudicated.
+
 These seven raw finding decisions contain three false positives and four supported potential rule
 results (three grouped source/sink concerns). They are agent source inspections, not independent
 human review or runtime confirmation. The other **664 findings remain pending**, so 3/671 is a lower

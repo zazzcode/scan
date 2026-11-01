@@ -122,6 +122,8 @@ func ruleIdentity(use graph.StringUse) (string, string) {
 		return "scan/input-validation", "CWE-20"
 	case "account_creation", "account_creation_candidate":
 		return "scan/required-field-validation", "CWE-20"
+	case "log_sink", "log_sink_candidate":
+		return "scan/sensitive-data-logging", "CWE-532"
 	default:
 		return "scan/unresolved-string-use", ""
 	}

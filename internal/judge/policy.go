@@ -5,6 +5,10 @@ import "github.com/zazzcode/scan/internal/graph"
 // applyPolicy uses claim-scoped completeness when supplied. Legacy candidates
 // remain conservative until their dependency and binding evidence is assembled.
 func applyPolicy(use graph.StringUse, a *graph.Assessment) {
+	if logUse(use) {
+		applyLogPolicy(use, a)
+		return
+	}
 	a.Protection = a.Answers["protection"]
 	if use.Completeness == nil {
 		if len(use.Gaps) > 0 {

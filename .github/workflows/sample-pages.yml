@@ -1,6 +1,12 @@
 name: Publish sample findings
 on:
   workflow_dispatch:
+  # stage is the default branch and the only branch allowed by the github-pages environment.
+  push:
+    branches: [stage]
+    paths:
+      - docs/samples/**
+      - .github/workflows/sample-pages.yml
 permissions:
   contents: read
 concurrency:

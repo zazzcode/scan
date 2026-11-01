@@ -85,16 +85,21 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 					h = args.NamedChild(args.NamedChildCount() - 1)
 				}
 				hm, body, req, gaps := set.handler(m, h)
+				var parts map[string]string
+				if body != nil && req == "" {
+					parts, gaps = requestParts(hm, body, gaps)
+				}
 				e.Gaps = append(e.Gaps, gaps...)
 				if body != nil {
 					evidence := hm.evidence("handler", body)
 					e.Handler = &evidence
-					f := flow{module: hm, set: set, route: r, request: req, env: map[string]value{}, context: []graph.Evidence{m.evidence("registration", call), evidence}, gaps: append([]graph.Gap{}, e.Gaps...), helpers: &helperExpansion{budget: 24, stack: map[string]bool{}}, facts: newInputFacts()}
+					f := flow{module: hm, set: set, route: r, request: req, env: map[string]value{}, context: []graph.Evidence{m.evidence("registration", call), evidence}, gaps: append([]graph.Gap{}, e.Gaps...), helpers: &helperExpansion{budget: 24, stack: map[string]bool{}}, facts: newInputFacts(), parts: parts}
 					// Effective middleware is not modeled; an offline candidate cannot be called safe.
 					f.gaps = append(f.gaps, graph.Gap{Kind: "middleware_unresolved", Detail: "effective middleware/guard chain is not modeled", At: r.Registration})
 					set.noteMiddlewareFields(&f, m, call)
 					f.statements(body)
 					f.finishValidation()
+					set.requestLineLogs(&f, m, call, obj.Utf8Text(m.src))
 					out.Uses = append(out.Uses, f.uses...)
 					e.Gaps = append(e.Gaps, f.gaps[len(e.Gaps):]...)
 				}

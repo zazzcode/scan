@@ -16,7 +16,7 @@ without a demonstrated exploit. A Review category is a question, not an establis
 | **Account Creation Validation** | Required fields and guards must hold before persistence | Declared account-creation cases; general bypass discovery is incomplete |
 | **Outbound Request Safety** | Destination, headers, or request values need appropriate constraints | Bounded use evidence; not complete SSRF detection |
 | **Reflected XSS** | Request content executes as script when reflected into a browser response | Planned; not assigned by the current detectors |
-| **Sensitive Data Logging** | Logs expose secrets or other sensitive values | Planned logger-leak detection; a constant startup message is not itself a leak |
+| **Sensitive Data Logging** | Logs expose secrets or other sensitive values | Bounded: verified console/winston calls in route handlers and morgan access logs of query credentials; see [logging rules](analysis/sensitive-data-logging.md). A constant startup message is not a leak |
 | **Sensitive Operation Review** | A possible operation does not map to a more specific supported family | Review fallback |
 
 XSS means cross-site scripting. NoSQL is one word. **Poor Input Validation** is a conclusion requiring

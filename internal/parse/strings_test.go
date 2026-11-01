@@ -94,7 +94,7 @@ func TestLocalDependencies(t *testing.T) {
 			sinks := 0
 			var u graph.StringUse
 			for _, use := range report.Uses {
-				if use.Kind == "input_validation_candidate" {
+				if use.Kind == "input_validation_candidate" || use.Kind == "log_sink_candidate" {
 					continue
 				}
 				sinks++

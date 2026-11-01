@@ -28,9 +28,9 @@ var findingTypes = []graph.FindingType{
 		Description:    "Request-controlled content is reflected into a browser response in a context that allows it to execute as script.",
 		Interpretation: "XSS means cross-site scripting. This glossary entry is vocabulary for a planned detector; the current reporting increment does not detect or assign Reflected XSS findings.",
 		Remediation:    "Use context-appropriate output encoding and safe template or DOM APIs. Input validation alone does not replace correct output handling."},
-	{ID: "sensitive-data-logging", Label: "Sensitive Data Logging", Coverage: "planned",
+	{ID: "sensitive-data-logging", Label: "Sensitive Data Logging", Coverage: "bounded analysis",
 		Description:    "Logs expose credentials, tokens, personal information, or other sensitive values to readers or storage that should not receive them.",
-		Interpretation: "This glossary entry prepares terminology for logger-leak detection. A constant startup message is not itself a sensitive-data leak. This detector is not implemented by the glossary update.",
+		Interpretation: "Covers verified console and winston calls in analyzed route handlers that receive request values with credential or personal-data evidence. A field name is a hint for review, not proof; Authorization and Cookie headers are credentials by HTTP semantics. Morgan request logging that records URLs is checked against credentials read from the query string. Constant messages are not leaks. Non-request secrets and logger redaction configuration are not yet analyzed.",
 		Remediation:    "Avoid logging secrets; minimize sensitive fields and apply verified redaction before emission. Review log access and retention."},
 	{ID: "sensitive-operation-review", Label: "Sensitive Operation Review", Coverage: "bounded analysis",
 		Description:    "A possible sensitive use was recorded but does not yet map to a more specific supported risk family.",
@@ -63,6 +63,9 @@ func findingTypeIDs(u graph.StringUse) []string {
 		ids = append(ids, "account-creation-validation", "input-validation")
 	case "outbound_http", "outbound_http_candidate":
 		ids = append(ids, "outbound-request-safety")
+	case "log_sink", "log_sink_candidate":
+		// Field validation does not change what a log line contains; it is reported on its own record.
+		return append(ids, "sensitive-data-logging")
 	default:
 		ids = append(ids, "sensitive-operation-review")
 	}

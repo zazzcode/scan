@@ -141,7 +141,7 @@ snapshot hashes and assessment state. Direct named relative ESM imports, importe
 local assignment, string expressions and simple object destructuring are supported. Branches,
 unknown transformations, middleware, receiver ambiguity, unverified library bindings and external
 response continuations remain explicit gaps. A SQL-shaped string logged to the console is not
-reported as an SQL call. HTTP client registrations are excluded by the new receiver filter.
+reported as an SQL call; if it carries a hinted request field, it is a sensitive-data logging record. HTTP client registrations are excluded by the new receiver filter.
 
 Use `--route /rest/user/login` to select an exact path pattern before model requests.
 Offline assessment is `not_run`. For provider selection and key instructions, including personal-key

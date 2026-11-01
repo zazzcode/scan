@@ -19,6 +19,8 @@ func TestFindingTypesPreserveScopeAndPlannedCoverage(t *testing.T) {
 		{"validation only", "input_validation_candidate", "input_validation_unresolved", []string{"input-validation"}},
 		{"account", "account_creation_candidate", "", []string{"account-creation-validation", "input-validation"}},
 		{"outbound", "outbound_http_candidate", "", []string{"outbound-request-safety"}},
+		{"logging", "log_sink_candidate", "log_sensitive_field_hint", []string{"sensitive-data-logging"}},
+		{"logging ignores validation gaps", "log_sink_candidate", "input_validation_absent", []string{"sensitive-data-logging"}},
 		{"unknown", "unrecognized_future_use", "", []string{"sensitive-operation-review"}},
 	}
 	for _, tt := range cases {
@@ -48,7 +50,7 @@ func TestFindingTypesPreserveScopeAndPlannedCoverage(t *testing.T) {
 		}
 		ids[typ.ID] = true
 	}
-	if findingTypesByID["reflected-xss"].Coverage != "planned" || findingTypesByID["sensitive-data-logging"].Coverage != "planned" {
+	if findingTypesByID["reflected-xss"].Coverage != "planned" || findingTypesByID["sensitive-data-logging"].Coverage != "bounded analysis" {
 		t.Fatal("glossary advertised planned detectors")
 	}
 }

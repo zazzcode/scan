@@ -81,6 +81,8 @@ func HTML(w io.Writer, r *graph.StringReport) error {
 		}
 	}
 	for _, row := range v.Rows {
+		// Within a route, show records in the same precedence as the table: Findings, Review, Protected.
+		sort.SliceStable(row.Items, func(i, j int) bool { return itemRank(row.Items[i].Finding) < itemRank(row.Items[j].Finding) })
 		row.Types = rowTypePills(row.Items)
 	}
 	sort.SliceStable(v.Rows, func(i, j int) bool {
@@ -130,4 +132,18 @@ func displayLabel(value string) string {
 		return "Assessment failed"
 	}
 	return value
+}
+
+// itemRank orders a route's records: established vulnerabilities, other findings, Review, Protected.
+func itemRank(f graph.Finding) int {
+	switch {
+	case f.RecordType == "finding" && f.Status == "confirmed_vulnerability":
+		return 0
+	case f.RecordType == "finding":
+		return 1
+	case f.RecordType == "protection":
+		return 3
+	default:
+		return 2
+	}
 }
