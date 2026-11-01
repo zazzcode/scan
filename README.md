@@ -127,7 +127,9 @@ implemented.
 
 ## Contributing
 
-Use the [contributor guide](docs/contributing.md) and [AGENTS.md](AGENTS.md). Run relevant scoped checks;
+Developing scan: use the [contributor guide](docs/contributing.md), [AGENTS.md](AGENTS.md), and
+[developer agent orientation](.zazz/docs/scan-agent-orientation.md) for workspace conventions, branches,
+commands, and the internal documentation map. Run relevant scoped checks;
 CI verifies formatting, vet, build, and race tests. Work stays on feature branches, draft PRs target
 `stage`, and humans review and merge. Live model calls are separate from offline tests.
 

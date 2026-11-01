@@ -121,6 +121,14 @@ Routine scans continue using the external _test-finding root; changes to bundled
 an intentional refresh and review. Independent UI acceptance and broader held-out accuracy checks
 remain separate from publishing these illustrative samples.
 
+## User-agent workflow skills
+
+Planned: [user-agent scan and remediation skills](user-agent-skills.md) for running scan on a user's
+repository, interpreting canonical findings/evidence, and implementing tested remediation. These
+product skills are separate from scan's own development-agent orientation and SDLC skills. Publish
+consumer guidance through root docs and future skill packages; keep internal process out of the
+primary user introduction. No consumer skills are implemented by this planning update.
+
 ## Future capability branches
 
 This branch's exit is input validation plus string-built SQL and NoSQL query, update, and insert
