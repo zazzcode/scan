@@ -7,9 +7,9 @@ including [philosophy](../../docs/philosophy.md) and [interpretation](../../docs
 This document owns renderer design, not the sole copy of user-facing semantics.
 
 
-HTML is scan's core human-facing report for CLI runs. The canonical JSON is the richer agent-readable
+HTML is zazzles's core human-facing report for CLI runs. The canonical JSON is the richer agent-readable
 artifact; SARIF remains the standard interchange output. See [reporting and SARIF](reporting-and-sarif.md)
-for shared statuses and evidence ownership. HTML contains scan's own results only. Comparisons to
+for shared statuses and evidence ownership. HTML contains zazzles's own results only. Comparisons to
 other tools belong in evaluation documents, never in the product report.
 
 ## Inconclusive judgments

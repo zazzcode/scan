@@ -23,7 +23,7 @@ an explicit capability-parity inventory and measured contracts; current capabili
 ## Current work
 
 Current repository state lives in the [project overview](../project.md#concept-stage-repository-state).
-The [orientation](../docs/scan-agent-orientation.md#current-work) defines the active documentation
+The [orientation](../docs/zazzles-agent-orientation.md#current-work) defines the active documentation
 session and routes to its operating rules.
 
 ## Proposed initial scope

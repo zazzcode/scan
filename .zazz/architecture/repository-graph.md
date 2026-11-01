@@ -1,7 +1,7 @@
 # Target repository graph design
 
 **Design direction, 2026-10-31.** This document owns the graph structure for analyzing a **target
-repository**: the application source under analysis, distinct from scan's own repository. It is a
+repository**: the application source under analysis, distinct from zazzles's own repository. It is a
 proposed semantic design; the current route-v1 artifact is only a syntax inventory. The
 [architecture](../architecture.md) owns pipeline/provider contracts and the
 [implementation contract](../specifications/route-string-validation.md) declares the implemented subset.
@@ -41,7 +41,7 @@ matching URL strings alone does not establish cross-service value flow.
 
 ## Canonical records and views
 
-Use scan-owned typed Go records with relation-filtered forward/reverse adjacency indexes. Preserve
+Use zazzles-owned typed Go records with relation-filtered forward/reverse adjacency indexes. Preserve
 parallel relation kinds and self-edges. There is one canonical store; call, control, data, and security
 views project from it. No graph database is required. Immutable read views follow graph construction;
 analysis worklists and context state stay separate. No file is parsed repeatedly for each route.
@@ -116,7 +116,7 @@ branch. Rejected inference: Juice Shop's length limit in `routes/search.ts` alon
 protection (see [source assessment](../project/06-route-validation-assessment.md#suggested-first-security-slice)).
 
 Parameterized SQL, output encoding, allow-lists and path containment have different preconditions.
-A model can recognize a custom validator without scan hard-coding its regex, but the analyzer must
+A model can recognize a custom validator without zazzles hard-coding its regex, but the analyzer must
 still establish that its result controls the relevant use. Unknown transfers may preserve possible
 taint conservatively; they MUST NOT manufacture a proven source-to-sink witness or safe outcome.
 

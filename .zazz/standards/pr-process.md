@@ -143,7 +143,7 @@ title, after the scope label, in the form `[<scope>] <CVE-ID>: <human descriptio
 title is what makes PR-list grep, dashboards, and post-incident audits work — burying it in the body
 breaks all three.
 
-This applies to scan's own code, dependencies, and build tooling. Maintaining scan's dependencies is
+This applies to zazzles's own code, dependencies, and build tooling. Maintaining zazzles's dependencies is
 distinct from the excluded product capability of scanning target repositories for vulnerable dependencies
 (see [scope exclusions](../project/02-project-scope.md#exclusions-and-limits)).
 

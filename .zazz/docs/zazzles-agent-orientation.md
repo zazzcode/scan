@@ -1,4 +1,4 @@
-# Scan — agent orientation
+# zazzles — agent orientation
 
 Compact session context and document routing. Read [AGENTS.md](../../AGENTS.md) for binding rules and
 when to load supporting guides. Keep this document under 400 lines; link to details rather than copy them.
@@ -72,7 +72,7 @@ repository capability state.
 **`<DEV_ROOT>` means this computer's development directory**, usually `Dev/` under the user's home.
 It is documentation notation, not an implemented environment variable. Usual locations:
 
-- Repositories: `<DEV_ROOT>/<account>/<project>`; scan's container is `<DEV_ROOT>/zazzcode/zazzles`.
+- Repositories: `<DEV_ROOT>/<account>/<project>`; zazzles's container is `<DEV_ROOT>/zazzcode/zazzles`.
 - Reference clones: `<DEV_ROOT>/juice-shop` (application), `<DEV_ROOT>/bearer`, and `<DEV_ROOT>/codeql`
   (SAST design references).
 

@@ -1,8 +1,8 @@
 # Scan Worktree and Worktrunk Cheat Sheet
 
 Load this command reference when using Worktrunk. The
-[worktree setup guide](worktree-setup.md#required-model) owns scan's layout and operating model;
-[orientation](scan-agent-orientation.md#portable-workspace-and-dev_root) defines portable root lookup.
+[worktree setup guide](worktree-setup.md#required-model) owns zazzles's layout and operating model;
+[orientation](zazzles-agent-orientation.md#portable-workspace-and-dev_root) defines portable root lookup.
 Commands below run from the resolved container or named worktree, not an assumed home-directory path.
 
 ## The main idea
@@ -263,7 +263,7 @@ hook does not run there.
 
 Worktrunk's `copy-ignored` hook copies machine-local files (`.env`, `.config/wt.toml`,
 `.zazz/ephemeral/`) into new worktrees. These are gitignored, so they propagate only through this
-hook. The scan project config lives at `stage/.config/wt.toml` (gitignored):
+hook. The zazzles project config lives at `stage/.config/wt.toml` (gitignored):
 
 ```toml
 pre-start = "/opt/homebrew/bin/wt step copy-ignored"

@@ -28,13 +28,13 @@ Recorded so a future upstream sync does not blindly overwrite them:
 
 - **`contextual-split.md`** — rewritten. Upstream's copy is a catalog of the upstream repo's own standards
   (HTTP layer, stored procedures, data layer, service layer, reports, frontend, Python testing, tooling).
-  That catalog describes another repository entirely, so the file was rewritten around scan's standards and
+  That catalog describes another repository entirely, so the file was rewritten around zazzles's standards and
   backlog.
 - **`pr-process.md`** — rewritten. Upstream's copy is roughly two-thirds specific to a monorepo with a
   frontend and a backend: `[FE]`/`[BE]`/`[DB]` scope labels, a legacy-screen-screenshot PR convention, and
   a root-only `.envrc`/`yamlfmt`/pre-commit section. The portable rules (bracketed scope labels, one
   logical change per PR, no transitional cruft, CVE identifiers in titles, draft-first human merge) were
-  kept, and the labels now map to scan's package layout.
+  kept, and the labels now map to zazzles's package layout.
 - **`docs-hygiene.md`** — one upstream Python example remains in the "working-doc identifiers" section; the
   substance is stack-agnostic and the example is illustrative. Scheduled to be genericized.
 - **`docs-hygiene-reference-structure.md`** — the citation and section-ordering rules are kept; some

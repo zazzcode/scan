@@ -3,7 +3,7 @@
 [Project introduction](../../README.md) · [User documentation](../README.md) · [Interpret results](../interpreting-results.md)
 
 Explore actual scan output without installing the targets, configuring keys, or calling a model.
-Open the [hosted samples](https://zazzcode.github.io/scan/) in your browser, or download a standalone HTML file and open it
+Open the [hosted samples](https://zazzcode.github.io/zazzles/) in your browser, or download a standalone HTML file and open it
 locally. GitHub's file view displays HTML source; it does not run the report.
 
 | Sample | HTML report | Agent-readable evidence | Standard interchange |
@@ -22,7 +22,7 @@ unassessed records remain visible. The target root is replaced with its public p
 source locations, hashes, use IDs, and provider judgments are preserved. Source excerpts belong to
 the upstream projects; vulnerable fixture values are training data, not scan provider credentials.
 
-## Refresh as scan improves
+## Refresh as zazzles improves
 
 Build scan, then regenerate both checked-in HTML/SARIF views from the saved JSON:
 
@@ -52,6 +52,6 @@ including an index linking both reports. A repository maintainer first selects *
 under Settings → Pages and allows `stage` in the `github-pages` environment. The
 workflow then runs when sample files or the workflow change on `stage` (the default branch), and can
 be run manually there. Feature branches publish when they merge into `stage`.
-The hosted address is GitHub's project-site URL, https://zazzcode.github.io/scan/. It serves pages only after a maintainer
+The hosted address is GitHub's project-site URL, https://zazzcode.github.io/zazzles/. It serves pages only after a maintainer
 enables Pages for the repository; until then, download and open the HTML file.
 Only the curated sample directory is published; no scan execution or provider keys are needed.

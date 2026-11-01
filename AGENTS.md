@@ -1,8 +1,8 @@
-# AGENTS.md — scan
+# AGENTS.md — zazzles
 
 ## Start here
 
-Agents MUST read this file and the [agent orientation](.zazz/docs/scan-agent-orientation.md)
+Agents MUST read this file and the [agent orientation](.zazz/docs/zazzles-agent-orientation.md)
 at session start, then load only the context required for the task. Links are not automatic includes.
 The [README](README.md) introduces the project; root [user documentation](docs/README.md) owns
 philosophy, user setup, CLI usage, result interpretation, and contributor guides.
@@ -16,8 +16,8 @@ before editing and MUST preserve unrelated user changes.
 
 | Task | Load |
 |---|---|
-| Run scan or configure a decision provider | [README](README.md), then [decision-model user guide](docs/decision-models.md) when needed |
-| Product, scope, or architecture decisions | Orientation's [documentation map](.zazz/docs/scan-agent-orientation.md#documentation-map); select the document that owns the topic |
+| Run zazzles or configure a decision provider | [README](README.md), then [decision-model user guide](docs/decision-models.md) when needed |
+| Product, scope, or architecture decisions | Orientation's [documentation map](.zazz/docs/zazzles-agent-orientation.md#documentation-map); select the document that owns the topic |
 | Graph structure or outbound service paths | [Repository graph design](.zazz/architecture/repository-graph.md), then relevant architecture sections |
 | Author or refine a spec | Relevant [plan](.zazz/project/implementation-plan.md) and contract, `spec-builder`, and [spec hygiene](.zazz/standards/spec-hygiene.md) |
 | Implement, test, resume, or verify work | Assigned contract and local run log, [execution discipline](.zazz/docs/agent-execution-discipline.md), `spec-driven`, and matched [standards](.zazz/standards/index.yaml) |
@@ -57,7 +57,7 @@ and the zazzcode Git/`gh` authentication profile. Feature/deliverable PRs MUST s
 
 **Internal DOCS_ROOT: `.zazz/`**. User-facing documentation belongs in root `docs/`. Specs are Git-tracked in `.zazz/specifications/`; execution scratch belongs in
 gitignored `.zazz/ephemeral/` and MUST NOT be committed. Zazz Board is not used. See the
-[documentation map](.zazz/docs/scan-agent-orientation.md#documentation-map) for durable document owners.
+[documentation map](.zazz/docs/zazzles-agent-orientation.md#documentation-map) for durable document owners.
 
 ## Credentials and live model calls
 

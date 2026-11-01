@@ -1,6 +1,6 @@
 # Testing
 
-Testing conventions for `scan`. Applies to `cmd/`, `internal/`, `testdata/`, and CI workflow changes.
+Testing conventions for `zazzles`. Applies to `cmd/`, `internal/`, `testdata/`, and CI workflow changes.
 
 ## 1. Principles
 

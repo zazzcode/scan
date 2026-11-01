@@ -34,7 +34,7 @@ query operand and is excluded from these source-dependent query observations. A 
 The target README names `main.ts` and `app.controller.ts`, which are absent at this revision.
 The scanned source is `src/server.ts`.
 
-| Target claim and source | What scan actually observes | Input validation and remaining review | Bearer output |
+| Target claim and source | What zazzles actually observes | Input validation and remaining review | Bearer output |
 |---|---|---|---|
 | SQL injection. `src/server.ts:73` | The code constructs and logs SQL-looking text but does not send it to a database. Scan therefore reports no database-sink finding here. | Username reaches `users.find`; the call's validation effect is unresolved. That is not proof of missing validation and the array lookup is not a NoSQL operation. | SQL injection: no finding reported. A separate logger finding was reported. |
 | Other documented weaknesses in `src/server.ts` | Routes are inventoried; request-field validation is recorded for supported reads. The proxy remains an outbound-operation analysis item at line 125. | Command injection, file access, XSS, eval, XXE, redirect, secrets, cookies, and logger detection are outside this implemented detector increment. No absence-of-weakness claim follows. | Other rule families are present in the earlier 28-finding run; see the pinned results. |

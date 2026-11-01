@@ -1,7 +1,7 @@
 # Scan methodology guides
 
 Supporting methodology guides and workflow cheat sheets, vendored from the upstream
-[zazz-skills](https://github.com/zazzcode/zazz-skills) `docs/` directory and **adapted for scan**.
+[zazz-skills](https://github.com/zazzcode/zazz-skills) `docs/` directory and **adapted for zazzles**.
 
 Local deviations from upstream are deliberate. Known adaptations:
 
@@ -22,7 +22,7 @@ Load these on demand using [AGENTS.md](../../AGENTS.md#load-context-by-task); th
 automatic context bundle. Orientation is the session entry point, execution discipline governs active
 work, and worktree setup owns layout/operations. The cheat sheet is for Worktrunk commands only.
 
-- [scan-agent-orientation.md](scan-agent-orientation.md) — **first-read** agent orientation: repo layout, branch model, routing (repo-specific)
+- [zazzles-agent-orientation.md](zazzles-agent-orientation.md) — **first-read** agent orientation: repo layout, branch model, routing (repo-specific)
 - [openai-decisions-setup.md](openai-decisions-setup.md) — current GPT decision API key and Go setup
 - [agent-execution-discipline.md](agent-execution-discipline.md) — agent execution discipline (vendored)
 - [worktree-setup.md](worktree-setup.md) — worktree operating model setup (adapted: stage integration branch)

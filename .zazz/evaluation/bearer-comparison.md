@@ -2,7 +2,7 @@
 
 **Initial pinned CLI experiment completed, 2026-10-31.** See [results](bearer-results.md), the
 [capability inventory](bearer-capabilities.md) and [complete Juice Shop challenge/review index](juice-shop/README.md).
-The procedure below remains the repeat/extension protocol. Compare scan's AI-assisted route/evidence judgments
+The procedure below remains the repeat/extension protocol. Compare zazzles's AI-assisted route/evidence judgments
 with the local traditional SAST CLI on the same pinned source. Bearer is a comparator, not ground truth.
 The [long-term objective](../project.md#long-term-objectives) is equal-or-better SAST detection and
 capability parity across CLI and Pro, with fewer false positives at equal-or-better detection.
@@ -26,13 +26,13 @@ for current product/edition claims before making broader comparisons.
 ## Procedure
 
 1. Verify checkout status and available binary/version. Build from the pinned local source if needed,
-   writing binaries/results to scan's ignored execution directory where feasible. Follow actual
+   writing binaries/results to zazzles's ignored execution directory where feasible. Follow actual
    dependency/generation requirements, not a guessed Makefile; no Makefile was found at the root.
 2. Inspect `--help` / `scan --help` for output formats, exclusions, rules, network/rule downloads,
    telemetry and exit semantics. Record effective defaults and rule versions. Never forward
    `OPENAI_API_KEY` or `TYPESAFE_API_KEY` to Bearer. Do not run a target server.
 3. Run the original corpus, then pinned Juice Shop and the second TypeScript target. Compare equal
-   source/exclusion scope; record when Bearer cannot match scan's entry or route selection.
+   source/exclusion scope; record when Bearer cannot match zazzles's entry or route selection.
 4. Preserve raw output, logs, invocation/configuration and snapshot identity. Export JSON/SARIF only
    if supported by the inspected version. A tool's nonzero findings exit is not a build failure.
 5. Normalize findings by route, source/sink location and weakness class. Match equivalent claims;
@@ -59,7 +59,7 @@ References: [original controls](corpus/README.md), [Juice Shop results](juice-sh
 ## Capability-parity inventory
 
 Create a versioned matrix before claiming broad parity. For each capability record the verified
-Bearer version/edition and behavior, scan's implemented/planned/unsupported state, a corresponding
+Bearer version/edition and behavior, zazzles's implemented/planned/unsupported state, a corresponding
 phase/spec, and acceptance evidence. Cover languages/frameworks, vulnerability families, local and
 cross-file/interprocedural taint/control flow, sensitive-data classification and privacy impact,
 explanations/remediation, output/configuration, baselines/incremental operation and CI integration.

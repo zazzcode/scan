@@ -1,4 +1,4 @@
-# Interpreting scan results
+# Interpreting zazzles results
 
 [Documentation index](README.md) · [Philosophy](philosophy.md) · [Categories](glossary.md)
 

@@ -12,7 +12,7 @@ detection/policy implementations for JSON, SARIF, and HTML.
 - **SARIF 2.1.0:** standard security-tool interchange. Preserve extra scan context in namespaced
   properties instead of dropping uncertainty to fit a consumer's default result display.
 - **Standalone HTML:** the core human-facing CLI report, generated offline from the canonical JSON.
-  Show only scan's results. Comparator/tool benchmarking belongs in evaluation documents.
+  Show only zazzles's results. Comparator/tool benchmarking belongs in evaluation documents.
 
 All three formats share the same use/route IDs, raw assessments, and report interpretation. None
 runs an additional detector, changes eligibility, or silently upgrades uncertainty to protection.

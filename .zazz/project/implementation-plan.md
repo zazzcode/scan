@@ -112,7 +112,7 @@ Each sample records the pinned upstream source revision, source attribution, act
 model-assessment coverage, scanner baseline/question versions, and limitations. Public project labels
 replace developer-specific absolute roots. HTML and SARIF are generated from matching canonical JSON;
 no model call is needed to view them or refresh their presentation. The offline refresh script is
-owned by the [sample guide](../../docs/samples/README.md#refresh-as-scan-improves).
+owned by the [sample guide](../../docs/samples/README.md#refresh-as-zazzles-improves).
 
 Keep examples honest: preserve incomplete/failed/unassessed states, source hashes and IDs. Do not
 invent a protected finding or vulnerability for visual effect. Input-validation and DB-protection
@@ -125,7 +125,7 @@ remain separate from publishing these illustrative samples.
 
 Planned: [user-agent scan and remediation skills](user-agent-skills.md) for running scan on a user's
 repository, interpreting canonical findings/evidence, and implementing tested remediation. These
-product skills are separate from scan's own development-agent orientation and SDLC skills. Publish
+product skills are separate from zazzles's own development-agent orientation and SDLC skills. Publish
 consumer guidance through root docs and future skill packages; keep internal process out of the
 primary user introduction. No consumer skills are implemented by this planning update.
 
@@ -204,10 +204,10 @@ async pattern needs its own evidence and capability tests. General OWASP coverag
 Use the [repository-state record](../project.md#concept-stage-repository-state) for existing artifacts.
 Phase 0 below audits their fitness; their presence does not establish an accepted implementation.
 
-Every phase uses Go for scan-authored scanner, code-analysis, integration, and evaluation-harness code,
+Every phase uses Go for zazzles-authored scanner, code-analysis, integration, and evaluation-harness code,
 following the [implementation boundary](../architecture.md#1-architecture-premise). Target-language
 fixtures and later Python/Go/Java adapters refer to languages being analyzed. Reference tools such
-as IRIS inform the design without introducing their runtimes into scan.
+as IRIS inform the design without introducing their runtimes into zazzles.
 
 Before the next implementation spec, select its JS/TS/framework slice, OWASP edition, analysis limits,
 source-transmission policy, and evaluation criteria from the
@@ -224,7 +224,7 @@ the pasted library examples do not constitute approved dependency selections.
 Use the assigned isolated feature worktree for related specification, design, implementation and tests.
 Independent future deliverables may use separate worktrees/PRs into `stage`. Explicit user requests
 authorize implementation under [AGENTS.md](../../AGENTS.md#authorization-and-delivery). See the
-[orientation](../docs/scan-agent-orientation.md#branches-and-worktrees).
+[orientation](../docs/zazzles-agent-orientation.md#branches-and-worktrees).
 
 - Suggested spec names below describe future contracts; they are not files created or greenlit now.
 - Each spec has one reviewable outcome and its own scope, non-goals, inputs/outputs, dependencies,
@@ -256,7 +256,7 @@ the chosen slice. Do not call total challenge count a scanner recall denominator
 and challenge explanations out of model input. Paired cases live in our separate corpus rather
 than modifying the reference checkout; selected built-in coding-challenge fixes can seed that corpus. Fixture access, licensing, inclusion/exclusion, and versioning
 belong in a future spec. Local clone lookup and handling follow the
-[orientation workspace conventions](../docs/scan-agent-orientation.md#portable-workspace-and-dev_root).
+[orientation workspace conventions](../docs/zazzles-agent-orientation.md#portable-workspace-and-dev_root).
 
 ### Juice Shop case selection and paired fixes
 
@@ -393,7 +393,7 @@ question semantics. Preserve offline artifacts; narrow the proposal rather than 
 **Future specs:** `parser-binding-evaluation`; `analysis-ir-contract`; `jsts-cst-extraction`.
 Evaluate selected grammars/bindings on real syntax and the intended build matrix. Define normalized
 operations, values, blocks, source spans, provenance, identities, and serialized artifact versions.
-Define scan-owned typed adjacency and forward/reverse relation indexes using the
+Define zazzles-owned typed adjacency and forward/reverse relation indexes using the
 [graph decision](../architecture.md#graph-storage-decision). Then extract declarations, imports, calls,
 assignments, branches, and anonymous handlers. Verify the chosen parser's compatibility rather than
 reopening library choices without a concrete blocker.

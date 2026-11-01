@@ -1,4 +1,4 @@
-# Contributing to scan
+# Contributing to zazzles
 
 [Documentation index](README.md) · [Project philosophy](philosophy.md)
 
@@ -11,7 +11,7 @@ branch, and existing changes with `pwd` and `git status --short --branch` before
 `stage` is the integration branch; `main` is reserved for human-operated releases.
 
 Read [AGENTS.md](../AGENTS.md) for agent rules and the
-[orientation](../.zazz/docs/scan-agent-orientation.md) for documentation routing. Agree on bounded scope
+[orientation](../.zazz/docs/zazzles-agent-orientation.md) for documentation routing. Agree on bounded scope
 and acceptance criteria before implementation, keeping the contract in `.zazz/specifications/`.
 Put transient run logs and handoffs in ignored `.zazz/ephemeral/`. Keep changes focused and preserve
 unrelated work already in the checkout.

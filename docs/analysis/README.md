@@ -2,7 +2,7 @@
 
 [Documentation index](../README.md) · [Result interpretation](../interpreting-results.md)
 
-These product documents explain how scan evaluates code and how contributors and coding agents
+These product documents explain how zazzles evaluates code and how contributors and coding agents
 should improve its analysis. They belong outside `.zazz/`, alongside user documentation.
 
 | Guide | Scope |
@@ -21,5 +21,5 @@ Sensitive-data logging analysis covers explicit logger calls in analyzed route h
 request logging of URL query credentials, with a logging judgment protocol. Live calibration is pending.
 
 `.zazz/` owns internal architecture, specifications, project planning, evaluation history, and SDLC
-standards. User instructions, product philosophy, analysis rules, and scan operation guides live in
+standards. User instructions, product philosophy, analysis rules, and zazzles operation guides live in
 root `docs/`. See [contributing](../contributing.md) for repository workflow.

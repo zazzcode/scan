@@ -80,7 +80,7 @@ accepted implementation code, and their incomplete package URLs are replaced by 
 | Sanitizer subtree fingerprint cache; memory/Redis suggestion | [Persistence](../architecture.md#10-persistence-and-determinism) | Context/dependency-aware local cache first; no globally safe helper hash or Redis dependency adopted |
 | Async parsing, graph, and inference pools | [Pipeline](../architecture.md#2-pipeline) | Bounded workers, ownership, cancellation, backpressure, and deterministic merging |
 | Multi-language normalization into universal primitives | [IR/graphs](../architecture.md#4-normalized-representation-and-graph-views), [adapters](../architecture.md#3-parsing-and-language-adapters) | Shared Go IR with language-specific lowering/transfer semantics; source/sink/sanitizer labels alone are insufficient |
-| Go libraries and executable blueprints | [Candidate libraries](#library-choices) | Verify/pin the chosen parser and stdlib adapters; use scan-owned adjacency; no unchecked client code adopted |
+| Go libraries and executable blueprints | [Candidate libraries](#library-choices) | Verify/pin the chosen parser and stdlib adapters; use zazzles-owned adjacency; no unchecked client code adopted |
 | JSON/SARIF, CLI, and CI alerts | [Reports/CI](../architecture.md#9-findings-comparison-and-ci), [capabilities](01-functionality.md) | JSON/Markdown first, SARIF later; configurable policy distinguishes findings from incomplete analysis |
 | Parsing → graph → semantic analysis → reporting phases | [Sequenced implementation plan](implementation-plan.md) | Corpus/semantic feasibility early, then bounded engine slices, integration, reporting, and further languages; separate specs/worktrees |
 | Fast, cheap decisions and aggressive filtering | [Quality hypotheses](02-project-scope.md#non-functional-hypotheses) | Measure end-to-end latency/spend and missed candidates; no adopted 250 ms, fractional-cent, or 98% filtering guarantee |
@@ -103,20 +103,20 @@ accepted implementation code, and their incomplete package URLs are replaced by 
 - The pasted client snippets and numerical thresholds are illustrative. Verify the chosen client's
   current API and calibrate policy before implementation; no blind copy of unchecked type assertions.
 - Sub-quarter-second latency, fractional-cent requests, and “98% filtered” are unverified hypotheses
-  for scan. Measure end-to-end behavior, including network time, retries, and coverage lost to limits.
+  for zazzles. Measure end-to-end behavior, including network time, retries, and coverage lost to limits.
 
 ## Graph representation decision
 
-**Decision for the concept design: use scan-owned typed Go adjacency structures for core storage.**
+**Decision for the concept design: use zazzles-owned typed Go adjacency structures for core storage.**
 Gonum remains an optional algorithm library when a named need justifies it. This narrows the planned
 implementation; it is not a claim that custom storage benchmarks faster or uses less memory.
 
-| Concern | Gonum | Scan-owned adjacency |
+| Concern | Gonum | Zazzles-owned adjacency |
 |---|---|---|
 | Graph algorithms | Reusable traversal/topology algorithms and graph interfaces | Implement the small worklist/witness operations needed initially; test their correctness |
 | Program semantics | Custom nodes/edges or views can carry domain facts; CFG/dataflow semantics remain our work | Domain records and relation indexes directly express values, guards, bindings, and provenance |
 | Multiple relationships and loops | Choose suitable graph/multigraph types or views; the simple directed type rejects self-edges | Explicitly preserve parallel relation kinds and self-edges where required by the IR |
-| Integration and maintenance | Library supplies algorithms; scan still owns representation adapters and analysis state | Fewer initial integration layers; scan owns index invariants, traversal, and resource behavior |
+| Integration and maintenance | Library supplies algorithms; zazzles still owns representation adapters and analysis state | Fewer initial integration layers; scan owns index invariants, traversal, and resource behavior |
 
 Sources: [Gonum interfaces and implicit-graph example](https://pkg.go.dev/gonum.org/v1/gonum/graph),
 [simple directed graph](https://pkg.go.dev/gonum.org/v1/gonum/graph/simple#DirectedGraph.SetEdge),
@@ -211,5 +211,5 @@ A failed feasibility result can narrow scope or reopen the proposal with the Pro
 Diagnostic Jev-only/LLM-only baselines measure the chosen Jev Assessment → Findings Review pipeline; they do
 not make the selected model roles optional or imply a return to unrestricted LLM detection.
 
-Methodology refinements follow the [orientation guidance](../docs/scan-agent-orientation.md#methodology-refinement).
+Methodology refinements follow the [orientation guidance](../docs/zazzles-agent-orientation.md#methodology-refinement).
 Unrelated cleanup remains a separate change.

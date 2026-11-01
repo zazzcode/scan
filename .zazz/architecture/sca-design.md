@@ -8,7 +8,7 @@ It does not replace the source scanner or require all target languages to be imp
 ## Adapter boundary
 
 Go owns orchestration, normalization, identity, reporting and correlation. Ecosystem-specific audit
-commands are external analysis tools, not additional scan-authored analysis runtimes. Prefer the
+commands are external analysis tools, not additional zazzles-authored analysis runtimes. Prefer the
 package manager/lockfile already used by the target. Proposed initial adapters:
 
 - JavaScript/TypeScript: [npm audit](https://docs.npmjs.com/cli/v11/commands/npm-audit/) or
