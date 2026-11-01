@@ -40,3 +40,12 @@ Review the diff and preserve upstream attribution before committing the refreshe
 
 Routine scans continue to write outside the worktree. Only these deliberately curated samples are
 checked in. Keep both sample applications current when analysis or reporting behavior changes.
+
+## Browser-hosted previews
+
+The manual **Publish sample findings** GitHub Actions workflow publishes this directory to GitHub
+Pages, including an index linking both reports. A repository maintainer first selects **GitHub
+Actions** under Settings → Pages, then runs that workflow from the branch containing these samples.
+Use the deployment's actual published URL in README links once the first deployment succeeds.
+This setup is committed; hosting is not yet activated or verified. Until then, download/open the HTML.
+Only the curated sample directory is published; no scan execution or provider keys are needed.
