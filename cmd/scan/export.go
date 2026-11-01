@@ -11,6 +11,10 @@ import (
 )
 
 func runExportSARIF(path string, stdout, stderr io.Writer) int {
+	return runExport(path, false, stdout, stderr)
+}
+
+func runExport(path string, asHTML bool, stdout, stderr io.Writer) int {
 	f, err := os.Open(path)
 	if err != nil {
 		fmt.Fprintf(stderr, "scan: %v\n", err)
@@ -26,6 +30,13 @@ func runExportSARIF(path string, stdout, stderr io.Writer) int {
 	if err := json.Unmarshal(data, &saved); err != nil || saved.SchemaVersion != 1 || saved.Uses == nil {
 		fmt.Fprintln(stderr, "scan: expected a schema-v1 canonical string report")
 		return exitError
+	}
+	if asHTML {
+		if err := report.HTML(stdout, &saved); err != nil {
+			fmt.Fprintf(stderr, "scan: %v\n", err)
+			return exitError
+		}
+		return exitOK
 	}
 	enc := json.NewEncoder(stdout)
 	enc.SetIndent("", "  ")

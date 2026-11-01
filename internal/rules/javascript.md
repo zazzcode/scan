@@ -1,5 +1,5 @@
 id: javascript
-version: 1
+version: 2
 languages: javascript, typescript
 
 # JavaScript and TypeScript practice
@@ -25,3 +25,15 @@ Do not build a query, update, or insert by concatenation, template interpolation
 ## Do not claim
 
 Do not invent a guard, a binding, or a branch that the evidence does not show. Unknown middleware and unknown custom checks stay uncertain.
+
+## Evidence and human-readable results
+
+Keep input validation separate from SQL and NoSQL operation protection. Describe what the code does,
+which field or argument is involved, which checks were observed, and what remains unverified.
+A query-pattern match is not a confirmed injection. An ORM search value containing interpolation is
+not necessarily executable SQL; establish the library behavior before claiming injection.
+A NoSQL document accepting a value is not automatically operator injection; inspect its slot, type,
+permitted keys, and driver behavior. A numeric conversion or character filter must be assessed on the
+actual path, not dismissed by name. No validator identified in a bounded slice does not establish that
+all paths lack validation. Use NoSQL as one word. Report uncertainty explicitly rather than presenting
+an internal “candidate” label as the human explanation.

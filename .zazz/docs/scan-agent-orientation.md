@@ -16,9 +16,12 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 
 ## Current work
 
-**Current assignment, 2026-10-31: `route-string-validation`.** Work in that sibling worktree;
-verify the actual path, branch, and changes with `pwd` and `git status --short --branch`.
-The historical definition-only `stage/` exception is not this assignment.
+**Current worktree, 2026-11-01: `logger-leak`.** Verify the actual path, branch, and changes with
+`pwd` and `git status --short --branch`. The user requested stable agent guidance, README setup/usage,
+clearer validation and database results, fresh offline target scans, and JSON-driven standalone HTML with expandable rows and remediation.
+See the [reporting contract](../specifications/human-readable-reports.md). Logger-leak detection follows
+this reporting increment and is not implemented by it. The historical definition-only `stage/`
+exception is not this assignment.
 
 - **Implemented:** `--list` and a Tree-sitter JS/TS route inventory (`--routes`).
 - **Verified:** Juice Shop `v20.3.0` login/search registrations; repeatable syntactic output.
@@ -43,7 +46,8 @@ The historical definition-only `stage/` exception is not this assignment.
   [original controls](../evaluation/corpus/README.md) exercise vulnerable/protected/unknown cases;
   held-out repository accuracy and runtime confirmation remain unmeasured.
   Current user restriction: live calls use `gpt-6-luna` only, with small explicit request caps.
-- **Authorization:** the user explicitly requested implementation here. That is sufficient under
+- **Authorization:** the earlier route/string implementation request is historical context, not
+  authorization for a new scanner slice. Explicit user requests are sufficient under
   [AGENTS.md](../../AGENTS.md#authorization-and-delivery); no separate greenlight is required.
 
 **Local session handoff:** when resuming this checkout, read
@@ -109,6 +113,7 @@ in these files independently of chat attachments.
 | [Repository graph design](../architecture/repository-graph.md) | Target-repository nodes/edges, inbound/outbound API boundaries, response flow, identity and provenance |
 | [Evidence and claims](../architecture/evidence-and-claims.md) | Source-backed route slices, relevant functions, checked requirements and finding eligibility |
 | [Reporting and SARIF](../architecture/reporting-and-sarif.md) | Route-oriented output, remediation options, internal model and implemented bounded SARIF export |
+| [Standalone HTML](../architecture/html-reporting.md) | Core human-facing CLI report, native disclosure rows and JSON/SARIF relationship |
 | [SCA design](../architecture/sca-design.md) | Follow-on ecosystem audit adapters and reachability correlation |
 | [Functionality](../project/01-functionality.md) | Capabilities, detection modes, rule families, language sequence, interfaces |
 | [Scope](../project/02-project-scope.md) | Boundaries, quality hypotheses, risks |
@@ -141,6 +146,10 @@ and preserve human authority. Assigned process changes do not authorize scanner 
 
 ## Commands and credentials
 
-Commands: [AGENTS.md](../../AGENTS.md#repository-commands). Current live-model setup:
+Commands and contributor checks: [README](../../README.md#contributing). Current live-model setup:
 [OpenAI Decisions setup](openai-decisions-setup.md). Offline extraction and fixture work need no key.
+The decision-model key is already configured in the local ignored `.env`; agents MUST NOT print it.
+The scanner does not auto-load that file; see the [README](../../README.md#optional-decision-model-setup).
 API setup is separate from permission to transmit target source or execute a paid evaluation.
+Live requests remain restricted to OpenAI Decisions with `gpt-6-luna`, small explicit request caps,
+and no provider/model fallback. The previously reported $10 funding is context, not a spending authorization.

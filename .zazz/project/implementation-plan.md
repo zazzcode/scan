@@ -77,6 +77,42 @@ controls. Next extend automatic claim assembly to novel targets through the
 [Phase 3/5–8 sequence](../architecture/evidence-and-claims.md#discovery-on-novel-target-repositories);
 explicit check files are evaluation/business-policy inputs, not the final discovery strategy.
 
+## Human report UI and packaged demonstration
+
+The current [human-report contract](../specifications/human-readable-reports.md) adds clearer JSON
+finding explanations, standard SARIF output, and the [standalone HTML UI](../architecture/html-reporting.md).
+Review the UI against the input-validation and SQL/NoSQL cases before beginning logger-leak detection.
+Local scan artifacts live outside worktrees under the configured
+`_test-finding/<repo-name>/run-<id>/` root; they are not committed as routine test output.
+
+### Follow-on feature: bundled Juice Shop findings demo
+
+**Dependency:** finalize and accept the human report UI first. This item records future scope, not
+permission to package an unfinished UI or add the demo during the current reporting increment.
+
+Add a tracked `demo/juice-shop/` directory so a new user can inspect the report experience immediately,
+without cloning Juice Shop, compiling scan, configuring keys, or running a model. Include a matching
+`findings.json`, `findings.html`, and `findings.sarif`, plus a short README describing the pinned target
+revision, scan command and scope, scanner/report versions, regeneration steps, and limitations.
+The repository README should link to this demonstration.
+
+Acceptance expectations:
+
+- Opening the HTML directly shows expandable route/source rows, finding evidence, separate input
+  validation and database-protection explanations, analysis uncertainty, and remediation recommendations.
+- Include representative SQL, NoSQL, unresolved-analysis, and zero-finding route records as available;
+  label any selection as an excerpt and preserve original IDs and evidence. Do not invent a protected
+  claim or model verdict merely to showcase a badge.
+- Generate the HTML and SARIF from the packaged JSON with scan's normal exporters. Demonstration
+  output contains only scan results, without comparator-tool content.
+- Remove machine-specific paths and real credentials; use clearly documented reproducible substitutions
+  where needed. Preserve source provenance, hashes as applicable, and required upstream attribution.
+  Example secrets in intentionally vulnerable source must be identified as fixtures, not active keys.
+- Keep the example bounded in repository size and include a regeneration check to prevent JSON/HTML/
+  SARIF drift. Pin source and tool versions; new paid evaluation is not required to view or export it.
+- Add the packaged demo through its own scoped follow-on change after UI acceptance. Routine scan runs
+  continue to use the external findings root rather than overwriting the tracked demonstration.
+
 ## Future capability branches
 
 This branch's exit is input validation plus string-built SQL and NoSQL query, update, and insert

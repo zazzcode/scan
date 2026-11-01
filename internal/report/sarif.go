@@ -14,12 +14,13 @@ const SchemaURI = "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/sc
 // SARIF returns an interoperable view of the canonical evidence report. Advisory
 // findings, protected claims and incomplete analysis remain distinct.
 func SARIF(report *graph.StringReport) map[string]any {
+	Enrich(report)
 	rules := []any{}
 	results := []any{}
 	indexes := map[string]int{}
 	notifications := []any{}
 	successful := true
-	for _, use := range report.Uses {
+	for i, use := range report.Uses {
 		id, cwe := ruleIdentity(use)
 		index, ok := indexes[id]
 		g := guidance(use)
@@ -41,11 +42,9 @@ func SARIF(report *graph.StringReport) map[string]any {
 		}
 		kind, level := resultKind(use.Assessment)
 		route := routeName(report, use)
-		message := fmt.Sprintf("%s: %s; finding=%s; validation=%s; use protection=%s. %s", route, g.Title, use.Assessment.FindingStatus, use.Assessment.Answers["validation"], use.Assessment.Protection, use.Assessment.Reason)
-		if use.Assessment.FindingStatus == "" {
-			message = route + ": candidate needs semantic assessment; no vulnerability verdict is established."
-		}
-		props := map[string]any{"scan.route": route, "scan.useId": use.ID, "scan.kind": use.Kind, "scan.assessment": use.Assessment, "scan.reviewStatus": "not_run", "scan.runtimeConfirmation": "not_run", "scan.recommendations": g, "scan.coverageGaps": use.Gaps}
+		finding := report.Findings[i]
+		message := fmt.Sprintf("%s: %s [%s]. %s %s", route, finding.Title, finding.Status, finding.Summary, finding.Protection)
+		props := map[string]any{"scan.finding": report.Findings[i], "scan.route": route, "scan.useId": use.ID, "scan.kind": use.Kind, "scan.assessment": use.Assessment, "scan.reviewStatus": "not_run", "scan.runtimeConfirmation": "not_run", "scan.recommendations": g, "scan.coverageGaps": use.Gaps}
 		if use.Check != nil {
 			props["scan.check"] = use.Check
 		}

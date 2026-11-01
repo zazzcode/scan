@@ -1,72 +1,73 @@
 # AGENTS.md — scan
 
-Read this file and the [agent orientation](.zazz/docs/scan-agent-orientation.md) at session start.
-Then load only the supporting context required for the task; links are not automatic includes.
+## Start here
+
+Agents MUST read this file and the [agent orientation](.zazz/docs/scan-agent-orientation.md)
+at session start, then load only the context required for the task. Links are not automatic includes.
+The [README](README.md) owns the project introduction, user setup, CLI usage, and contributor setup.
+Current assignments, progress, evaluation results, and session restrictions belong in the project
+docs or local handoff, not this file. Agents MUST verify the actual worktree path, branch, and changes
+before editing and MUST preserve unrelated user changes.
 
 ## Load context by task
 
 | Task | Load |
 |---|---|
-| Verify routes or plan string validation | Orientation's [current work](.zazz/docs/scan-agent-orientation.md#current-work) and [task reading paths](.zazz/docs/scan-agent-orientation.md#task-reading-paths) |
-| Configure the GPT decision API | [OpenAI Decisions setup](.zazz/docs/openai-decisions-setup.md); no key is needed for offline checks |
-| Graph structure / outbound service paths | [Repository graph design](.zazz/architecture/repository-graph.md), then relevant architecture sections |
-| Product, scope, or architecture decisions | Orientation's [documentation map](.zazz/docs/scan-agent-orientation.md#documentation-map); select the relevant product/design doc |
-| Author or refine a spec | Assigned phase/spec in the [plan](.zazz/project/implementation-plan.md), `spec-builder`, and [spec hygiene](.zazz/standards/spec-hygiene.md) |
-| Implement, test, resume, or verify work | Active implementation contract/run log, [execution discipline](.zazz/docs/agent-execution-discipline.md), `spec-driven`, and matched [standards](.zazz/standards/index.yaml) |
-| Create/manage a worktree | [Worktree setup](.zazz/docs/worktree-setup.md); [Worktrunk cheat sheet](.zazz/docs/wt-cheat-sheet.md) only when using Worktrunk |
+| Run scan or configure a decision provider | [README](README.md), then [decision API setup](.zazz/docs/openai-decisions-setup.md) when needed |
+| Product, scope, or architecture decisions | Orientation's [documentation map](.zazz/docs/scan-agent-orientation.md#documentation-map); select the document that owns the topic |
+| Graph structure or outbound service paths | [Repository graph design](.zazz/architecture/repository-graph.md), then relevant architecture sections |
+| Author or refine a spec | Relevant [plan](.zazz/project/implementation-plan.md) and contract, `spec-builder`, and [spec hygiene](.zazz/standards/spec-hygiene.md) |
+| Implement, test, resume, or verify work | Assigned contract and local run log, [execution discipline](.zazz/docs/agent-execution-discipline.md), `spec-driven`, and matched [standards](.zazz/standards/index.yaml) |
+| Create or manage a worktree | [Worktree setup](.zazz/docs/worktree-setup.md); [Worktrunk cheat sheet](.zazz/docs/wt-cheat-sheet.md) only when using Worktrunk |
 | Refine SDLC or ownership/process rules | [Zazz methodology](.zazz/docs/zazz-methodology.md) |
 | Edit documentation or standards | Matched [standards](.zazz/standards/index.yaml) and `doc-check` |
-| Prepare or review a PR | [PR process](.zazz/standards/pr-process.md) and the matching `pr-builder`/`pr-review` skill; [human-review guide](.zazz/docs/human-in-loop-pr-review-strategy.md) only for review policy |
+| Prepare or review a PR | [PR process](.zazz/standards/pr-process.md) and matching `pr-builder`/`pr-review` skill; [human-review guide](.zazz/docs/human-in-loop-pr-review-strategy.md) only for review policy |
 
-Skills live in `.agents/skills/`; load only the matching skill. Keep this entry point small and place
-procedures in their owning guides.
+Skills live in `.agents/skills/`; agents MUST load only the matching skill. Procedures belong in their
+owning guides so this entry point stays small and stable.
+
+## Authorization and delivery
+
+An explicit user request to implement authorizes the requested work in the assigned isolated feature
+worktree. Agents MUST NOT require a separate Deliverable Owner ceremony or repeated confirmation.
+Agents MUST record bounded implementation scope and acceptance evidence in a tracked implementation
+contract and refine it as the user steers the work. A backlog entry alone is not an implementation request.
+The human user owns scope and review decisions; this is the meaning of Deliverable Owner in older guides.
+
+Agents MUST use the assigned worktree for related architecture, documentation, implementation, and tests.
+Independent future deliverables MAY be split when useful; agents MUST NOT create extra worktrees or PRs
+merely for steps of the active task. These authorization rules take precedence over stricter
+greenlight/topology wording in the methodology, execution discipline, and skills.
 
 ## Branch model
 
 `stage` integrates reviewed work; `main` receives human-operated release promotion and version tags.
-All fixes flow through `stage`. Agents MUST NOT merge, tag releases, or push directly to integration.
-Current exception: assigned concept/architecture/methodology documentation may be edited in `stage/`;
-this does not permit spec work or feature implementation there. Detailed layout, naming, and operations:
-[worktree setup](.zazz/docs/worktree-setup.md).
+All fixes flow through `stage`. Agents MUST NOT merge PRs, merge locally into integration, tag releases,
+or push directly to integration. Only explicitly assigned concept, architecture, or methodology
+documentation may be edited in `stage/`; this does not permit spec work or feature implementation there.
+Detailed layout and operations live in [worktree setup](.zazz/docs/worktree-setup.md).
 
-## Authorization and delivery
-
-An explicit user request to implement authorizes the requested work in the assigned isolated
-feature worktree. Agents MUST NOT require a separate Deliverable Owner ceremony or repeated
-confirmation. Record the bounded scope and acceptance evidence in a tracked implementation contract;
-refine it in place as the user steers the work. A backlog entry alone is not an implementation request.
-The human user owns scope and review decisions; this is the meaning of Deliverable Owner in older guides.
-
-Use the assigned worktree for related architecture, documentation, implementation, and tests. Split
-independent future deliverables when useful; do not create extra worktrees or PRs merely for the
-steps of the active task. Existing human merge/release boundaries still apply. Repository-local rules
-in this section take precedence over stricter greenlight/topology wording in the methodology,
-execution discipline, and skills. Current authorization: implement `route-string-validation` here,
-per the user's 2026-10-31 instructions.
+Before committing or pushing, agents MUST verify path/branch, `git config user.name` (**zazzcode**),
+and the zazzcode Git/`gh` authentication profile. Feature/deliverable PRs MUST start as drafts and target `stage`.
 
 ## Document model
 
 **DOCS_ROOT: `.zazz/`**. Specs are Git-tracked in `.zazz/specifications/`; execution scratch belongs in
-gitignored `.zazz/ephemeral/`, never committed. Zazz Board is not used. See the
+gitignored `.zazz/ephemeral/` and MUST NOT be committed. Zazz Board is not used. See the
 [documentation map](.zazz/docs/scan-agent-orientation.md#documentation-map) for durable document owners.
 
-## Live decision-model usage for this branch
+## Credentials and live model calls
 
-Current user restriction (2026-10-31): live judge calls MUST use OpenAI Decisions with
-`gpt-6-luna` only. Keep request counts small and explicit; no automatic provider/model fallback.
-The user initially funded $10; that is context, not authorization to exhaust the balance.
-Alternative providers remain part of the design and may be tested with local HTTP stubs.
-Never print the `.env` contents or credentials; pass the selected key only to the child process.
+Agents MUST NOT print `.env` contents or credentials, include secrets in tracked files, or pass keys
+in command arguments. Agents MUST pass only the selected provider's key to the scanner child process.
+Offline checks need no key. An existing local key is configuration, not authorization for paid calls.
+Agents MUST follow the user's active provider/model restrictions, keep live request counts small and
+explicit, and MUST NOT use automatic provider/model fallback. Funding context is not authorization to
+exhaust a balance. Alternative adapters MAY be tested with local HTTP stubs.
 
-## Repository commands
+## Verification
 
-Run in the active worktree using its declared Go toolchain and the assigned spec's scoped checks:
-
-- List inputs: `go run ./cmd/scan --list .` (add `--json` before the path for JSON).
-- Route inventory: `go run ./cmd/scan --routes --json <target-root>`; matches are syntactic candidates.
-  Verification scope and limitations: [route assessment](.zazz/project/06-route-validation-assessment.md).
-- Build/test/vet: `go build ./...`, `go test ./...`, `go vet ./...`.
-- Format check: `gofmt -l .`; format only changed Go files when needed.
-
-Before committing/pushing, verify path/branch, `git config user.name` (**zazzcode**), and the zazzcode
-Git/`gh` authentication profile. Test/evidence conventions live in [testing](.zazz/standards/testing.md).
+Agents MUST run the assigned contract's scoped checks using the worktree's declared Go toolchain.
+The [README contributor guide](README.md#contributing) owns build, test, vet, and format commands;
+[evidence conventions](.zazz/standards/testing.md) define the required validation record.
+Agents MUST format only changed Go files and keep documentation changes within the requested scope.

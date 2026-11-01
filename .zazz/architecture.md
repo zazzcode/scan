@@ -458,3 +458,11 @@ false-negative audit results against human labels; LLM agreement is not ground t
 The [proposal decision register](project/03-jev-design-proposal.md#open-decision-register) owns unresolved
 choices and their refinement gates; [scope](project/02-project-scope.md) owns project-level risks and
 quality hypotheses.
+
+## CLI report artifacts
+
+The [reporting design](architecture/reporting-and-sarif.md) owns canonical JSON and standard SARIF
+output. The [standalone HTML design](architecture/html-reporting.md) defines the core human-facing
+CLI report: source/route rows expandable into findings, evidence, uncertainty, and remediation.
+All outputs share raw assessment and evidence identities; the viewer contains only scan results,
+while tool comparisons stay in evaluation documents.

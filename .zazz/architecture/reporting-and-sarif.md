@@ -2,7 +2,20 @@
 
 **Design and bounded implementation, 2026-10-31.** Use one versioned internal
 model for route analysis, evidence and findings, with SARIF 2.1.0 as an implemented findings
-export. Avoid separate detection/policy implementations for JSON and SARIF.
+export and a [standalone HTML report](html-reporting.md) for human CLI review. Avoid separate
+detection/policy implementations for JSON, SARIF, and HTML.
+
+## Output responsibilities
+
+- **Canonical scan JSON:** full bounded source evidence, entries/uses, source hashes, assessment and
+  completeness context, plus human-readable finding records. This is the primary agent-readable artifact.
+- **SARIF 2.1.0:** standard security-tool interchange. Preserve extra scan context in namespaced
+  properties instead of dropping uncertainty to fit a consumer's default result display.
+- **Standalone HTML:** the core human-facing CLI report, generated offline from the canonical JSON.
+  Show only scan's results. Comparator/tool benchmarking belongs in evaluation documents.
+
+All three formats share the same use/route IDs, raw assessments, and report interpretation. None
+runs an additional detector, changes eligibility, or silently upgrades uncertainty to protection.
 
 ## Canonical report
 
@@ -33,6 +46,26 @@ Recommendations should be organized around a route and its relevant graph slice.
 appropriate set can include SQL parameter binding, server-side input type/format constraints, suitable
 password storage, and authentication regression tests. Each addresses a different property. Do not
 label email validation alone a sufficient SQL-injection fix or guarantee an impervious route.
+
+## Human-readable finding interpretation
+
+Schema-v1 evidence remains compatible. Additive `presentation_version` and `findings` fields describe
+one result record per use. A record includes `id`, `use_id`, `route_id`, `record_type`, `status`, `title`,
+`summary`, separate `input_validation` and `use_protection` explanations, `uncertainty`, and
+`recommendations`. Evidence stays in the referenced use; it is not replaced by generated prose.
+`internal/report/findings.go` owns interpretation; `guidance.go` owns reviewable remediation.
+
+`record_type` is `finding` for an observed construction/check issue or supported potential issue,
+`analysis` for unresolved sensitive behavior, and `protection` for an assessed protected claim.
+Observation status does not establish exploitability. The existing judge's finding status remains
+separate and unchanged; failed/not-run assessments never become completed verdicts through export.
+
+Descriptions explain behavior and uncertainty in ordinary language. Internal names such as
+`query_text_interpolated` remain available as evidence identifiers, not the primary explanation.
+For example, an interpolated ORM `Op.like` value requires library review rather than an automatic
+SQL-injection finding. NoSQL document values require slot, type, key/operator and API review. NoSQL
+is one word. “No validator identified” applies only to the analyzed slice; unknown validation remains
+unknown. Shared uses count per route and must not be described as unique confirmed vulnerabilities.
 
 ## SARIF mapping
 
@@ -65,7 +98,9 @@ additional assessment, not the advisory's existence.
 
 `--strings --sarif` exports a current scan. `--export-sarif <saved-report.json>` converts a canonical
 JSON report offline with no new judge request. These flags are mutually exclusive with `--json`.
-The exporter does not recompute or upgrade saved assessments.
+The exporter does not recompute or upgrade saved assessments. It rebuilds deterministic human-readable
+presentation from saved raw uses, including for older schema-v1 reports. `scan.finding` preserves the
+human-readable finding alongside `scan.assessment`, source evidence, gaps, and recommendations.
 
 Results map supported_potential to fail/warning, protected_for_claim to pass/none, needs_evidence
 and incomplete assessments to review/note, and not_applicable to notApplicable/none. A pass applies
