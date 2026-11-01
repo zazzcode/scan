@@ -3,7 +3,7 @@
 [Project introduction](../../README.md) · [User documentation](../README.md) · [Interpret results](../interpreting-results.md)
 
 Explore actual scan output without installing the targets, configuring keys, or calling a model.
-Open the [hosted samples](https://zazzcode.github.io/zazzles/) in your browser, or download a standalone HTML file and open it
+Open the [hosted samples](https://zazzcode.github.io/zazzles/docs/samples/) in your browser, or download a standalone HTML file and open it
 locally. GitHub's file view displays HTML source; it does not run the report.
 
 | Sample | HTML report | Agent-readable evidence | Standard interchange |
@@ -59,11 +59,11 @@ checked in. Keep all three sample applications current when analysis or reportin
 
 ## Browser-hosted previews
 
-The **Publish sample findings** GitHub Actions workflow publishes this directory to GitHub Pages,
-including an index linking all three reports. A repository maintainer first selects **GitHub Actions**
-under Settings → Pages and allows `stage` in the `github-pages` environment. The
-workflow then runs when sample files or the workflow change on `stage` (the default branch), and can
-be run manually there. Feature branches publish when they merge into `stage`.
-The hosted address is GitHub's project-site URL, https://zazzcode.github.io/zazzles/. It serves pages only after a maintainer
-enables Pages for the repository; until then, download and open the HTML file.
-Only the curated sample directory is published; no scan execution or provider keys are needed.
+GitHub Pages currently deploys the `stage` branch (Settings → Pages → *Deploy from a branch*, `stage`,
+root), so the reports are served under https://zazzcode.github.io/zazzles/docs/samples/, with an index linking all three apps.
+Changes reach the site when a feature branch merges into `stage`; nothing is published from feature branches.
+No scan execution or provider keys are needed.
+
+The **Publish sample findings** GitHub Actions workflow can instead publish only this directory at the
+site root (`https://zazzcode.github.io/zazzles/<app>/findings.html`). To use it, a maintainer selects
+**GitHub Actions** under Settings → Pages; the README links must then drop the `docs/samples/` segment.

@@ -13,15 +13,17 @@ unknown rather than becoming a safety claim or a vulnerability by assumption.
 
 ## Explore sample findings
 
-See the expandable report UI and source evidence from three intentionally vulnerable applications:
+These reports show how a Zazzles scan works end to end: each is the unedited output of an offline scan of
+an intentionally vulnerable application, with route and browser entries, source-to-sink evidence, per-path
+protection, and Findings, Review and Protected results. Open one in your browser:
 
 | Application | What the current sample shows | Output |
 |---|---|---|
-| **OWASP Juice Shop** | 152 route entries and 9 browser entries; DOM search and cross-tier track-order XSS, SQL/NoSQL query-construction findings, and a credential written to access logs | [View in browser](https://zazzcode.github.io/zazzles/juice-shop/findings.html) · [HTML file](docs/samples/juice-shop/findings.html) · [JSON](docs/samples/juice-shop/findings.json) · [SARIF](docs/samples/juice-shop/findings.sarif) |
-| **Node.js Goof** | 19 route entries; reflected login XSS, stored Markdown XSS with separate create/update write paths, and two escaped outputs marked Protected | [HTML file](docs/samples/nodejs-goof/findings.html) · [JSON](docs/samples/nodejs-goof/findings.json) · [SARIF](docs/samples/nodejs-goof/findings.sarif) |
-| **Vulnerable TypeScript app** | 19 route entries; a reflected-XSS search response, plus Review records for a password logged in SQL text and other incomplete analysis | [View in browser](https://zazzcode.github.io/zazzles/vulnerable-typescript-app/findings.html) · [HTML file](docs/samples/vulnerable-typescript-app/findings.html) · [JSON](docs/samples/vulnerable-typescript-app/findings.json) · [SARIF](docs/samples/vulnerable-typescript-app/findings.sarif) |
+| **OWASP Juice Shop** | 152 route entries and 9 browser entries; DOM search and cross-tier track-order XSS, SQL/NoSQL query-construction findings, and a credential written to access logs | [View in browser](https://zazzcode.github.io/zazzles/docs/samples/juice-shop/findings.html) · [HTML file](docs/samples/juice-shop/findings.html) · [JSON](docs/samples/juice-shop/findings.json) · [SARIF](docs/samples/juice-shop/findings.sarif) |
+| **Node.js Goof** | 19 route entries; reflected login XSS, stored Markdown XSS with separate create/update write paths, and two escaped outputs marked Protected | [View in browser](https://zazzcode.github.io/zazzles/docs/samples/nodejs-goof/findings.html) · [HTML file](docs/samples/nodejs-goof/findings.html) · [JSON](docs/samples/nodejs-goof/findings.json) · [SARIF](docs/samples/nodejs-goof/findings.sarif) |
+| **Vulnerable TypeScript app** | 19 route entries; a reflected-XSS search response, plus Review records for a password logged in SQL text and other incomplete analysis | [View in browser](https://zazzcode.github.io/zazzles/docs/samples/vulnerable-typescript-app/findings.html) · [HTML file](docs/samples/vulnerable-typescript-app/findings.html) · [JSON](docs/samples/vulnerable-typescript-app/findings.json) · [SARIF](docs/samples/vulnerable-typescript-app/findings.sarif) |
 
-**View in browser** opens the hosted copy published by GitHub Pages ([all samples](https://zazzcode.github.io/zazzles/)). GitHub's
+**View in browser** opens the hosted copy published by GitHub Pages ([all samples](https://zazzcode.github.io/zazzles/docs/samples/)). GitHub's
 file view shows HTML source rather than running it, so you can also download an HTML file and open
 it locally. Findings appear first; expand rows for evidence and remediation, or click a category pill for its
 glossary. No setup or model calls are needed. These [evolving samples](docs/samples/README.md) include
