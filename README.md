@@ -40,12 +40,17 @@ The goal is to report vulnerabilities, weak security practices, and sufficient p
 with useful explanations and remediation guidance. Bearer and Semgrep Community Edition serve as local
 comparison tools on source-reviewed cases.
 
-Today, Zazzles analyzes local **JavaScript, TypeScript and Python** source. It inventories supported
-Express-style routes (including CommonJS exports and static router mounts), Python Flask/Blueprint,
-RESTX and FastAPI routes, and browser entries. Bounded flow analysis follows handlers, imports,
-helpers, branches, selected asynchronous paths, and supported template/rendering operations. Reports
-export source evidence and claim judgments as JSON, standalone HTML or SARIF. The
-[Python coverage guide](docs/python-support.md) records framework and flow limits. Current capabilities:
+Today, Zazzles analyzes local **JavaScript, TypeScript and Python** source:
+
+- **JavaScript/TypeScript routes:** Express-style registrations, including CommonJS exports and static router mounts.
+- **Python routes:** Flask/Blueprint, RESTX and FastAPI registrations.
+- **Browser entries:** supported client-side entry points.
+- **Flow analysis:** bounded tracing through handlers, imports, helpers, branches, selected asynchronous paths, and supported template/rendering operations.
+- **Reports:** source evidence and claim judgments in JSON, standalone HTML and SARIF.
+
+The [Python coverage guide](docs/python-support.md) records framework and flow limits.
+
+Current capabilities:
 
 | Area | Current support |
 |---|---|
