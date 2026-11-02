@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func relatedLocations(use graph.StringUse) []any {
+func relatedLocations(use analysis.CandidateUse) []any {
 	out := []any{}
 	seen := map[string]bool{}
 	for _, e := range use.Context {
@@ -23,7 +23,7 @@ func relatedLocations(use graph.StringUse) []any {
 	return out
 }
 
-func checkedDependency(d graph.Dependency, use graph.StringUse) bool {
+func checkedDependency(d analysis.Dependency, use analysis.CandidateUse) bool {
 	if use.Check == nil {
 		return true
 	}
@@ -35,16 +35,16 @@ func checkedDependency(d graph.Dependency, use graph.StringUse) bool {
 	return false
 }
 
-func codeFlows(report *graph.StringReport, use graph.StringUse) []any {
+func codeFlows(report *analysis.AnalysisReport, use analysis.CandidateUse) []any {
 	out := []any{}
 	for _, dep := range use.Dependencies {
 		if !checkedDependency(dep, use) {
 			continue
 		}
-		records := []graph.Evidence{}
+		records := []analysis.Evidence{}
 		for _, e := range report.Entries {
 			if e.Route.ID == use.RouteID {
-				records = append(records, graph.Evidence{Kind: "inbound_route", Span: e.Route.Registration})
+				records = append(records, analysis.Evidence{Kind: "inbound_route", Span: e.Route.Registration})
 				break
 			}
 		}

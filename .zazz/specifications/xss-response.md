@@ -19,8 +19,8 @@ Applicable standards: [code structure](../standards/code-structure.md),
 [testing](../standards/testing.md), [spec hygiene](../standards/spec-hygiene.md), and
 [documentation hygiene](../standards/docs-hygiene.md).
 
-Changes may touch `internal/parse` (JS/TS extraction and templates), `internal/graph` (shared claim
-facts), `internal/report` (classification and export), `internal/judge` / `internal/rules` (XSS
+Changes may touch `internal/parse` (JS/TS extraction and templates), `internal/analysis` (shared claim
+facts), `internal/report` (classification and export), `internal/judge` / `internal/guidelines` (XSS
 protocol/policy), `cmd/scan` (integration only), matching tests/fixtures, `docs/analysis` and user
 guides, curated `docs/samples`, and the owning `.zazz` architecture/project/spec/evaluation docs.
 Target repositories remain unchanged. Python parsing, SCA, live exploit execution, paid model

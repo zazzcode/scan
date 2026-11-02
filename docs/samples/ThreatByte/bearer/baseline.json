@@ -1,0 +1,42 @@
+{
+  "tool": "bearer",
+  "run": "bearer-20261101-1",
+  "findings": [
+    {
+      "rule": "python_lang_path_traversal",
+      "path": "server/routes.py",
+      "line": 342,
+      "message": "Unsanitized dynamic input in file path"
+    },
+    {
+      "rule": "python_lang_path_traversal",
+      "path": "server/routes.py",
+      "line": 363,
+      "message": "Unsanitized dynamic input in file path"
+    },
+    {
+      "rule": "python_lang_path_traversal",
+      "path": "server/routes.py",
+      "line": 364,
+      "message": "Unsanitized dynamic input in file path"
+    },
+    {
+      "rule": "python_django_debug_mode_enabled",
+      "path": "server/config.py",
+      "line": 5,
+      "message": "Usage of Django debug mode"
+    },
+    {
+      "rule": "python_lang_weak_hash_md5",
+      "path": "db/create_dummy_data.py",
+      "line": 8,
+      "message": "Usage of weak hashing library (MDx)"
+    },
+    {
+      "rule": "python_lang_weak_hash_md5",
+      "path": "server/routes.py",
+      "line": 403,
+      "message": "Usage of weak hashing library (MDx)"
+    }
+  ]
+}

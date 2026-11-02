@@ -1,0 +1,12 @@
+{
+  "revision": "b188493768ca2c1ef003e08148fb2e4577219c36",
+  "files": {
+    "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "README.md": "7ad6713b8ba379db4e9c31ad496af9a0270d517f960dce9002b872c397c1839a",
+    "app/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "app/config.py": "b4d91ced6138a38e91a55764e40e5c2f22ac4f5152d56c21a95345793b137b47",
+    "app/main.py": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890",
+    "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/test_main.py": "af865141823482b7f55e83e9250150432f37c81e00ad3a7ebec6229724a2979c"
+  }
+}

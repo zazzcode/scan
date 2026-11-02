@@ -1,0 +1,124 @@
+package analysis
+
+// ReportSchemaVersion identifies analysis reports using analysis_guidelines metadata.
+const ReportSchemaVersion = 2
+
+// Evidence binds an observed operation to an immutable source file snapshot.
+type Evidence struct {
+	Kind   string `json:"kind"`
+	Text   string `json:"text"`
+	Span   Span   `json:"span"`
+	SHA256 string `json:"sha256"`
+}
+
+// Dependency records a local value relationship; use-level gaps distinguish
+// supported expression dependencies from uncertain transfers. It is not a runtime trace.
+type Dependency struct {
+	SinkSlot   string     `json:"sink_slot,omitempty"`
+	StorageKey string     `json:"storage_key,omitempty"`
+	Source     Evidence   `json:"source"`
+	Transfers  []Evidence `json:"transfers"`
+}
+
+// CandidateUse is a security-sensitive value use needing claim-specific analysis.
+type CandidateUse struct {
+	XSS          *XSSFacts     `json:"xss,omitempty"`
+	APIModel     *APIModel     `json:"api_model,omitempty"`
+	ControlEdges []ControlEdge `json:"control_edges,omitempty"`
+	Check        *Check        `json:"check,omitempty"`
+	Completeness *Completeness `json:"completeness,omitempty"`
+	ID           string        `json:"id"`
+	RouteID      string        `json:"route_id,omitempty"`
+	ClientID     string        `json:"client_id,omitempty"`
+	Kind         string        `json:"kind"`
+	Sink         Evidence      `json:"sink"`
+	Dependencies []Dependency  `json:"dependencies"`
+	Context      []Evidence    `json:"context"`
+	Gaps         []Gap         `json:"gaps"`
+	Assessment   Assessment    `json:"assessment"`
+}
+
+// Assessment preserves the judge's result independently from structural evidence.
+type Assessment struct {
+	AnswerDetails   map[string]AnswerDetail `json:"answer_details,omitempty"`
+	FindingStatus   string                  `json:"finding_status,omitempty"`
+	BlockingGaps    []Gap                   `json:"blocking_gaps,omitempty"`
+	Answers         map[string]string       `json:"answers,omitempty"`
+	Usage           map[string]int64        `json:"usage,omitempty"`
+	Status          string                  `json:"status"`
+	Provider        string                  `json:"provider,omitempty"`
+	Model           string                  `json:"model,omitempty"`
+	QuestionVersion string                  `json:"question_version,omitempty"`
+	Protection      string                  `json:"protection,omitempty"`
+	Reason          string                  `json:"reason,omitempty"`
+}
+
+// Entry links a syntactic route registration to a selected handler body.
+type Entry struct {
+	Route   Route     `json:"route"`
+	Handler *Evidence `json:"resolved_handler,omitempty"`
+	Gaps    []Gap     `json:"gaps"`
+}
+
+// AnalysisReport contains bounded security analysis, separate from the route inventory.
+type AnalysisReport struct {
+	ClientEntries       []ClientEntry   `json:"client_entries,omitempty"`
+	FindingTypes        []FindingType   `json:"finding_types,omitempty"`
+	PresentationVersion int             `json:"presentation_version,omitempty"`
+	Findings            []Finding       `json:"findings,omitempty"`
+	SelectedRoute       string          `json:"selected_route,omitempty"`
+	SchemaVersion       int             `json:"schema_version"`
+	Root                string          `json:"root"`
+	Entries             []Entry         `json:"entries"`
+	Uses                []CandidateUse  `json:"uses"`
+	Gaps                []Gap           `json:"gaps"`
+	Files               []Evidence      `json:"files"`
+	Limitations         []string        `json:"limitations"`
+	AnalysisGuidelines  []GuidelinesRef `json:"analysis_guidelines,omitempty"`
+}
+
+// GuidelinesRef identifies the embedded language analysis guidelines used for a report.
+// The full text is sent with a decision request, not copied into every use.
+type GuidelinesRef struct {
+	ID        string   `json:"id"`
+	Version   string   `json:"version"`
+	Languages []string `json:"languages"`
+}
+
+// Check declares a security requirement independently of the expected test answer.
+type Check struct {
+	ID         string   `json:"id"`
+	Method     string   `json:"method"`
+	Path       string   `json:"path"`
+	Kind       string   `json:"kind"`
+	Fields     []string `json:"fields"`
+	Validation string   `json:"validation"`
+	Protection string   `json:"protection"`
+}
+
+// Completeness separates claim blockers from unrelated coverage limitations.
+type Completeness struct {
+	ModelFacts []string              `json:"model_facts,omitempty"`
+	Resolved   []Gap                 `json:"resolved_gaps,omitempty"`
+	ClaimKind  string                `json:"claim_kind,omitempty"`
+	Required   []string              `json:"required"`
+	Evidence   map[string][]Evidence `json:"evidence"`
+	Blockers   []Gap                 `json:"blockers"`
+	Coverage   []Gap                 `json:"coverage"`
+	Scope      string                `json:"scope"`
+}
+
+// ControlEdge records a source-backed local successor, including both guard outcomes.
+type ControlEdge struct {
+	From Evidence `json:"from"`
+	To   Evidence `json:"to"`
+	Kind string   `json:"kind"`
+}
+
+// APIModel describes a versioned library contract separately from source evidence.
+type APIModel struct {
+	ID        string `json:"id"`
+	Library   string `json:"library"`
+	Semantics string `json:"semantics"`
+	Reference string `json:"reference"`
+}

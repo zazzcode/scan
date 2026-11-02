@@ -4,11 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func logUses(report *graph.StringReport) []graph.StringUse {
-	var out []graph.StringUse
+func logUses(report *analysis.AnalysisReport) []analysis.CandidateUse {
+	var out []analysis.CandidateUse
 	for _, u := range report.Uses {
 		if u.Kind == "log_sink_candidate" {
 			out = append(out, u)
@@ -40,7 +40,7 @@ func TestLogSinkClassification(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "server.ts", "import express from 'express';const app=express();app.post('/x',(req,res)=>{"+tt.body+"})")
-			report, err := Strings(root, "server.ts")
+			report, err := Analyze(root, "server.ts")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -87,7 +87,7 @@ func TestLogSinkNegativeControls(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "server.ts", "import express from 'express';"+tt.prefix+"const app=express();app.post('/x',(req,res)=>{"+tt.body+"})")
-			report, err := Strings(root, "server.ts")
+			report, err := Analyze(root, "server.ts")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -114,7 +114,7 @@ func TestWinstonLoggerBindings(t *testing.T) {
 				writeSource(t, root, "lib/logger.ts", tt.logger)
 			}
 			writeSource(t, root, "server.ts", tt.server)
-			report, err := Strings(root, "server.ts")
+			report, err := Analyze(root, "server.ts")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -128,7 +128,7 @@ func TestWinstonLoggerBindings(t *testing.T) {
 		root := t.TempDir()
 		writeSource(t, root, "lib/logger.ts", "export default {warn(){}}")
 		writeSource(t, root, "server.ts", "import express from 'express';import logger from './lib/logger';const app=express();app.get('/x',(req,res)=>{logger.warn(req.query.token)})")
-		report, err := Strings(root, "server.ts")
+		report, err := Analyze(root, "server.ts")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -141,7 +141,7 @@ func TestWinstonLoggerBindings(t *testing.T) {
 func TestLoggerIsNotAValidator(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "server.ts", "import express from 'express';const app=express();app.post('/x',(req,res)=>{console.log(req.body.password)})")
-	report, err := Strings(root, "server.ts")
+	report, err := Analyze(root, "server.ts")
 	if err != nil {
 		t.Fatal(err)
 	}

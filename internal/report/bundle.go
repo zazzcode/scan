@@ -9,12 +9,12 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 // WriteBundle creates a fresh private run folder under base, never replacing an earlier run.
 // The directory name is operational metadata; artifact contents remain deterministic.
-func WriteBundle(base string, r *graph.StringReport) (string, error) {
+func WriteBundle(base string, r *analysis.AnalysisReport) (string, error) {
 	base, err := filepath.Abs(base)
 	if err != nil {
 		return "", err

@@ -2,7 +2,7 @@
 // the pipeline consumes.
 //
 // Traversal is deterministic: results are sorted by path and do not depend on
-// filesystem enumeration order, because every downstream artifact -- graph.json,
+// filesystem enumeration order, because every downstream artifact -- manifests,
 // findings, fingerprints -- depends on a stable input order.
 //
 // Nothing is dropped silently. Unsupported files are counted, and every

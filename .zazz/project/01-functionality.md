@@ -78,15 +78,33 @@ forward as a release commitment. Dependency vulnerability scanning is excluded.
 ## Language sequence
 
 The committed language sequence is JavaScript, TypeScript, Python, and Go. JavaScript and
-TypeScript are the current analysis target. Python is the next adapter, then Go. Each adapter
+TypeScript and a bounded Python adapter are implemented; Go remains future work. Each adapter
 includes extraction, resolution, lowering/flow semantics, library models, and a coverage matrix.
 Recognizing a file extension is not analysis support. A new language may expose core IR changes
 that need a contract revision before that adapter claims the same query and validation findings.
 
+## Trace-backed judgments and remediation
+
+The shared [trace judgment pipeline](../architecture/trace-judgment.md) supplies Luna with
+source references, dependency/control relations, actual helper implementations, field policy,
+operation slots, API contracts and explicit missing evidence. Adapters supply language facts;
+the shared judge assesses exploitability and recommended protective patterns for that exact use.
+It does not infer arbitrary validation rules from field names or benchmark labels.
+
+Policy-backed validation claims distinguish unmet server requirements, enforced constraints and
+missing evidence. Flask form constraints currently supply named policy for Python claims; this
+mechanism does not establish general framework schema coverage. Injection, construction practice,
+validation, output escaping and log-content sensitivity remain separate judgments.
+
+Reports reserve green for protected claims, retain raw model answers and show precise blockers
+for inconclusive results. Defect guidance names source operands and requirements, with narrow
+source-derived candidate replacements where supported. Protected guidance preserves demonstrated
+patterns. Model requests are bounded and saved decisions require exact matching evidence.
+
 ## Interfaces and report semantics
 
 The source-level CLI foundation currently present is `scan --list [--json] <path>`, `scan --routes [--json]`,
-and `scan --strings [--json]` with entry/route selectors, checked-mode requirement files, and bounded
+and `scan --analyze [--json]` with entry/route selectors, checked-mode requirement files, and bounded
 JSON/HTML/SARIF export. All further analysis interfaces are future spec work. Inspection of graph,
 classifications, witnesses, and explanation bundles is desirable, but exact flags/subcommands beyond
 these are not decided by this document.

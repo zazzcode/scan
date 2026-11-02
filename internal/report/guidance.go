@@ -1,13 +1,13 @@
 package report
 
-import "github.com/zazzcode/zazzles/internal/graph"
+import "github.com/zazzcode/zazzles/internal/analysis"
 
 // Guidance is evidence-scoped help, not a generated or verified patch.
 // Every result includes the hardening posture: report proven vulnerabilities and
 // weak or poor practice, because an agent can fix both cheaply.
-type Guidance = graph.Recommendation
+type Guidance = analysis.Recommendation
 
-func guidance(use graph.StringUse) Guidance {
+func guidance(use analysis.CandidateUse) Guidance {
 	kind := use.Kind
 	if use.Check != nil {
 		kind = use.Check.Kind
@@ -26,7 +26,7 @@ func guidance(use graph.StringUse) Guidance {
 			"Restrict each field as far as its business requirement allows. A string or length check is not injection protection. A comment or other free-text field may contain any character, so the sink construction is the injection control.",
 			"Add regression cases for normal input, rejected malformed input and query-structure preservation; resolve inconclusive guard and binding evidence before applying a fix.",
 		}, ExampleStatus: "not_generated; driver-specific adaptation and tests required"}
-		if use.Completeness != nil && len(use.Completeness.Evidence["sink_binding"]) > 0 {
+		if use.Completeness != nil && len(use.Completeness.Evidence["sink_binding"]) > 0 && use.APIModel != nil && use.APIModel.Library == "sequelize" {
 			g.Example = "// Illustrative Sequelize binding pattern; adapt schema and full authentication logic.\nconst rows = await sequelize.query(\n  'SELECT id FROM accounts WHERE email = $email',\n  { bind: { email: req.body.email } }\n);"
 			g.ExampleStatus = "illustrative_template; not a verified application patch"
 		}

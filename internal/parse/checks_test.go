@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func TestCheckedRouteContext(t *testing.T) {
@@ -25,8 +25,8 @@ func TestCheckedRouteContext(t *testing.T) {
 			writeSource(t, root, "model.ts", `import {Model,DataTypes} from 'sequelize';export class Account extends Model{};Account.init({`+variant.model+`},{sequelize:db})`)
 			writeSource(t, root, "middleware.ts", `export const audit=()=> (req,res,next)=>next()`)
 			writeSource(t, root, "server.ts", `import express from 'express';import * as rest from 'finale-rest';import {Account} from './model';import * as audit from './middleware';const api=express();function acceptable(value){return typeof value==='string'&&value.trim().length>0}api.post('/accounts',(req,res,next)=>{`+variant.guard+`});api.post('/accounts',audit.audit());const tables=[{name:'Account',model:Account}];for(const {name,model} of tables){rest.resource({model,endpoints:[`+"`/api/${name}s`"+`, '/unused']})}rest.resource({model:Account,endpoints:['/accounts','/accounts/:id']})`)
-			check := graph.Check{ID: "account", Method: "POST", Path: "/accounts", Kind: "account_creation", Fields: []string{"handle"}, Validation: "handle must be a nonempty string", Protection: "reject invalid handles before persistence"}
-			report, err := CheckedStrings(root, "server.ts", []graph.Check{check})
+			check := analysis.Check{ID: "account", Method: "POST", Path: "/accounts", Kind: "account_creation", Fields: []string{"handle"}, Validation: "handle must be a nonempty string", Protection: "reject invalid handles before persistence"}
+			report, err := AnalyzeWithChecks(root, "server.ts", []analysis.Check{check})
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -54,8 +54,8 @@ func TestCheckedRouteContext(t *testing.T) {
 func TestSQLClaimBindingAndUnrelatedGaps(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "server.ts", `import express from 'express';import {Sequelize} from 'sequelize';const db=new Sequelize('sqlite::memory:');const api=express();api.post('/session',(req,res)=>{db.query(`+"`SELECT '${req.body.handle}'`"+`,{model:UnknownResult})})`)
-	check := graph.Check{ID: "sql", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"handle"}, Validation: "valid handle", Protection: "handle cannot change SQL syntax"}
-	report, err := CheckedStrings(root, "server.ts", []graph.Check{check})
+	check := analysis.Check{ID: "sql", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"handle"}, Validation: "valid handle", Protection: "handle cannot change SQL syntax"}
+	report, err := AnalyzeWithChecks(root, "server.ts", []analysis.Check{check})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,8 +75,8 @@ func TestSQLClaimBindingAndUnrelatedGaps(t *testing.T) {
 func TestUnknownMiddlewareBlocksCheckedClaim(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "server.ts", `import express from 'express';const api=express();api.use(unknownGuard());api.post('/x',(req,res)=>db.query(req.body.handle))`)
-	c := graph.Check{ID: "x", Method: "POST", Path: "/x", Kind: "sql_query", Fields: []string{"handle"}}
-	report, err := CheckedStrings(root, "server.ts", []graph.Check{c})
+	c := analysis.Check{ID: "x", Method: "POST", Path: "/x", Kind: "sql_query", Fields: []string{"handle"}}
+	report, err := AnalyzeWithChecks(root, "server.ts", []analysis.Check{c})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,7 +88,7 @@ func TestUnknownMiddlewareBlocksCheckedClaim(t *testing.T) {
 func TestMethodSpecificChecks(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "server.ts", `import express from 'express';const api=express();api.get('/same',(req,res)=>db.query(req.query.handle));api.post('/same',(req,res)=>db.query(req.body.handle))`)
-	report, err := CheckedStrings(root, "server.ts", []graph.Check{{ID: "post", Method: "POST", Path: "/same", Kind: "sql_query", Fields: []string{"handle"}}})
+	report, err := AnalyzeWithChecks(root, "server.ts", []analysis.Check{{ID: "post", Method: "POST", Path: "/same", Kind: "sql_query", Fields: []string{"handle"}}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,8 +106,8 @@ func TestRelevantHelperBounds(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "model.ts", `export class Account{};`)
 			writeSource(t, root, "server.ts", `import express from 'express';import * as rest from 'finale-rest';import {Account} from './model';const api=express();function bookkeeping(){level1('constant')}function level1(v){level2(v)}function level2(v){level3(v)}function level3(v){level4(v)}function level4(v){return v}api.post('/accounts',(req,res,next)=>{`+tt.call+`;next()});rest.resource({model:Account,endpoints:['/accounts','/accounts/:id']})`)
-			c := graph.Check{ID: "bounded", Method: "POST", Path: "/accounts", Kind: "account_creation", Fields: []string{"handle"}}
-			report, err := CheckedStrings(root, "server.ts", []graph.Check{c})
+			c := analysis.Check{ID: "bounded", Method: "POST", Path: "/accounts", Kind: "account_creation", Fields: []string{"handle"}}
+			report, err := AnalyzeWithChecks(root, "server.ts", []analysis.Check{c})
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -127,8 +127,8 @@ func TestRelevantHelperBounds(t *testing.T) {
 
 func TestCheckedEvidenceGolden(t *testing.T) {
 	const root = "testdata/string-flow"
-	c := graph.Check{ID: "login-input", Method: "POST", Path: "/login", Kind: "sql_query", Fields: []string{"email"}, Validation: "email must be a valid string", Protection: "separate data from SQL structure"}
-	report, err := CheckedStrings(root, "server.ts", []graph.Check{c})
+	c := analysis.Check{ID: "login-input", Method: "POST", Path: "/login", Kind: "sql_query", Fields: []string{"email"}, Validation: "email must be a valid string", Protection: "separate data from SQL structure"}
+	report, err := AnalyzeWithChecks(root, "server.ts", []analysis.Check{c})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -137,7 +137,7 @@ func TestCheckedEvidenceGolden(t *testing.T) {
 		t.Fatal(err)
 	}
 	data = append(data, '\n')
-	const file = root + "/checked.graph.json"
+	const file = root + "/checked-analysis.json"
 	if *update {
 		if err := os.WriteFile(file, data, 0644); err != nil {
 			t.Fatal(err)
@@ -156,7 +156,7 @@ func TestShadowedValidationHelperRemainsUnknown(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "model.ts", `export class Account{}`)
 	writeSource(t, root, "server.ts", `import express from 'express';import * as rest from 'finale-rest';import {Account} from './model';const api=express();function validate(v){return true}api.post('/accounts',(req,res,next)=>{const validate=unknown;validate(req);next()});rest.resource({model:Account,endpoints:['/accounts','/accounts/:id']})`)
-	report, err := CheckedStrings(root, "server.ts", []graph.Check{{ID: "account", Method: "POST", Path: "/accounts", Kind: "account_creation", Fields: []string{"handle"}}})
+	report, err := AnalyzeWithChecks(root, "server.ts", []analysis.Check{{ID: "account", Method: "POST", Path: "/accounts", Kind: "account_creation", Fields: []string{"handle"}}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -174,7 +174,7 @@ func TestShadowedValidationHelperRemainsUnknown(t *testing.T) {
 func TestUnreturnedSequelizeDoesNotBindSink(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "server.ts", `import express from 'express';import {Sequelize} from 'sequelize';function make(){const unused=new Sequelize('sqlite::memory:');return fake}const db=make();const api=express();api.post('/x',(req,res)=>db.query(req.body.handle))`)
-	report, err := CheckedStrings(root, "server.ts", []graph.Check{{ID: "x", Method: "POST", Path: "/x", Kind: "sql_query", Fields: []string{"handle"}}})
+	report, err := AnalyzeWithChecks(root, "server.ts", []analysis.Check{{ID: "x", Method: "POST", Path: "/x", Kind: "sql_query", Fields: []string{"handle"}}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -186,7 +186,7 @@ func TestUnreturnedSequelizeDoesNotBindSink(t *testing.T) {
 func TestWildcardMiddlewareCannotBeSilentlyIgnored(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "server.ts", `import express from 'express';const api=express();api.use('*',guard());api.post('/x',(req,res)=>db.query(req.body.handle))`)
-	report, err := CheckedStrings(root, "server.ts", []graph.Check{{ID: "x", Method: "POST", Path: "/x", Kind: "sql_query", Fields: []string{"handle"}}})
+	report, err := AnalyzeWithChecks(root, "server.ts", []analysis.Check{{ID: "x", Method: "POST", Path: "/x", Kind: "sql_query", Fields: []string{"handle"}}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -204,7 +204,7 @@ func TestWildcardMiddlewareCannotBeSilentlyIgnored(t *testing.T) {
 func TestConciseSQLHandlerHasCompleteLocalControl(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "server.ts", `import express from 'express';import {Sequelize} from 'sequelize';const db=new Sequelize('sqlite::memory:');const api=express();api.post('/x',(req,res)=>db.query('SELECT $handle',{bind:{handle:req.body.handle}}))`)
-	report, err := CheckedStrings(root, "server.ts", []graph.Check{{ID: "x", Method: "POST", Path: "/x", Kind: "sql_query", Fields: []string{"handle"}}})
+	report, err := AnalyzeWithChecks(root, "server.ts", []analysis.Check{{ID: "x", Method: "POST", Path: "/x", Kind: "sql_query", Fields: []string{"handle"}}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -215,7 +215,7 @@ func TestConciseSQLHandlerHasCompleteLocalControl(t *testing.T) {
 
 func TestHelperSQLDiscovery(t *testing.T) {
 	corpus := filepath.Join("..", "..", ".zazz", "evaluation", "transfer-corpus")
-	sql := graph.Check{ID: "query-structure", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"handle"}, Validation: "nonempty", Protection: "request input must not change SQL structure"}
+	sql := analysis.Check{ID: "query-structure", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"handle"}, Validation: "nonempty", Protection: "request input must not change SQL structure"}
 	t.Run("case09 same-file", func(t *testing.T) {
 		use := oneSQL(t, checkedDir(t, filepath.Join(corpus, "case09")))
 		if use.Sink.Span.File != "server.ts" || !strings.Contains(use.Sink.Text, "SELECT") {
@@ -271,7 +271,7 @@ func TestHelperSQLDiscovery(t *testing.T) {
 	t.Run("recursion stops", func(t *testing.T) {
 		root := t.TempDir()
 		writeSource(t, root, "server.ts", "import express from 'express';const api=express();function loop(value){return loop(value)}api.post('/session',(req,res)=>database.query(loop(req.body.handle)))")
-		report, err := Strings(root, "server.ts")
+		report, err := Analyze(root, "server.ts")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -296,33 +296,33 @@ func TestHelperSQLDiscovery(t *testing.T) {
 	})
 }
 
-func checkedDir(t *testing.T, dir string) *graph.StringReport {
+func checkedDir(t *testing.T, dir string) *analysis.AnalysisReport {
 	t.Helper()
 	raw, err := os.ReadFile(filepath.Join(dir, "checks.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	var checks []graph.Check
+	var checks []analysis.Check
 	if err := json.Unmarshal(raw, &checks); err != nil {
 		t.Fatal(err)
 	}
-	report, err := CheckedStrings(dir, "server.ts", checks)
+	report, err := AnalyzeWithChecks(dir, "server.ts", checks)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return report
 }
 
-func mustChecked(t *testing.T, root string, check graph.Check) *graph.StringReport {
+func mustChecked(t *testing.T, root string, check analysis.Check) *analysis.AnalysisReport {
 	t.Helper()
-	report, err := CheckedStrings(root, "server.ts", []graph.Check{check})
+	report, err := AnalyzeWithChecks(root, "server.ts", []analysis.Check{check})
 	if err != nil {
 		t.Fatal(err)
 	}
 	return report
 }
 
-func oneSQL(t *testing.T, report *graph.StringReport) graph.StringUse {
+func oneSQL(t *testing.T, report *analysis.AnalysisReport) analysis.CandidateUse {
 	t.Helper()
 	if len(report.Uses) != 1 || report.Uses[0].Kind != "sql_query_candidate" {
 		t.Fatalf("uses=%+v", report.Uses)
@@ -330,7 +330,7 @@ func oneSQL(t *testing.T, report *graph.StringReport) graph.StringUse {
 	return report.Uses[0]
 }
 
-func assertParameter(t *testing.T, use graph.StringUse, file, name string) {
+func assertParameter(t *testing.T, use analysis.CandidateUse, file, name string) {
 	t.Helper()
 	source, param := false, false
 	for _, d := range use.Dependencies {
@@ -348,7 +348,7 @@ func assertParameter(t *testing.T, use graph.StringUse, file, name string) {
 	}
 }
 
-func transferKind(use graph.StringUse, kind, text string) bool {
+func transferKind(use analysis.CandidateUse, kind, text string) bool {
 	for _, d := range use.Dependencies {
 		for _, e := range d.Transfers {
 			if e.Kind == kind && strings.Contains(e.Text, text) {
@@ -359,7 +359,7 @@ func transferKind(use graph.StringUse, kind, text string) bool {
 	return false
 }
 
-func evidenceKind(items []graph.Evidence, kind string) bool {
+func evidenceKind(items []analysis.Evidence, kind string) bool {
 	for _, e := range items {
 		if e.Kind == kind {
 			return true
@@ -369,11 +369,11 @@ func evidenceKind(items []graph.Evidence, kind string) bool {
 }
 
 func TestQueryShapeAndValidation(t *testing.T) {
-	sql := graph.Check{ID: "query-structure", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"handle"}, Validation: "nonempty", Protection: "request input must not change query structure"}
+	sql := analysis.Check{ID: "query-structure", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"handle"}, Validation: "nonempty", Protection: "request input must not change query structure"}
 	t.Run("nosql where string", func(t *testing.T) {
 		root := t.TempDir()
 		writeSource(t, root, "server.ts", "import express from 'express';const api=express();api.get('/rest/track-order/:id',(req,res)=>{const id=utils.trunc(req.params.id,60);db.ordersCollection.find({$where:`this.orderId === '${id}'`})})")
-		report, err := Strings(root, "server.ts")
+		report, err := Analyze(root, "server.ts")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -385,7 +385,7 @@ func TestQueryShapeAndValidation(t *testing.T) {
 	t.Run("nosql update document", func(t *testing.T) {
 		root := t.TempDir()
 		writeSource(t, root, "server.ts", "import express from 'express';const api=express();api.patch('/rest/products/reviews',(req,res)=>{db.reviewsCollection.update({_id:req.body.id},{$set:{message:req.body.message}},{multi:true})})")
-		report, err := Strings(root, "server.ts")
+		report, err := Analyze(root, "server.ts")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -397,7 +397,7 @@ func TestQueryShapeAndValidation(t *testing.T) {
 	t.Run("array find is not a query", func(t *testing.T) {
 		root := t.TempDir()
 		writeSource(t, root, "server.ts", "import express from 'express';const api=express();api.post('/api/login',(req,res)=>{const query=`SELECT '${req.body.username}'`;console.log(query);users.find((u)=>u.username===req.body.username)})")
-		report, err := Strings(root, "server.ts")
+		report, err := Analyze(root, "server.ts")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -433,7 +433,7 @@ func TestQueryShapeAndValidation(t *testing.T) {
 	t.Run("string check does not protect an interpolated query", func(t *testing.T) {
 		root := t.TempDir()
 		writeSource(t, root, "server.ts", "import express from 'express';const api=express();function guard(req,res,next){if(typeof req.body.handle!=='string')return res.status(400).end();next()}api.use(guard);api.post('/session',(req,res)=>db.query(`SELECT '${req.body.handle}'`))")
-		report, err := Strings(root, "server.ts")
+		report, err := Analyze(root, "server.ts")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -445,7 +445,7 @@ func TestQueryShapeAndValidation(t *testing.T) {
 	t.Run("free text must be bound at the sink", func(t *testing.T) {
 		root := t.TempDir()
 		writeSource(t, root, "server.ts", "import express from 'express';const api=express();api.post('/session',(req,res)=>db.reviewsCollection.update({_id:1},{$set:{message:req.body.comment}}))")
-		report, err := Strings(root, "server.ts")
+		report, err := Analyze(root, "server.ts")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -457,7 +457,7 @@ func TestQueryShapeAndValidation(t *testing.T) {
 	t.Run("bound free text does not demand an allow-list", func(t *testing.T) {
 		root := t.TempDir()
 		writeSource(t, root, "server.ts", "import express from 'express';import {Sequelize} from 'sequelize';const db=new Sequelize('sqlite::memory:');const api=express();api.post('/session',(req,res)=>db.query('SELECT $comment',{bind:{comment:req.body.comment}}))")
-		report, err := Strings(root, "server.ts")
+		report, err := Analyze(root, "server.ts")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -468,7 +468,7 @@ func TestQueryShapeAndValidation(t *testing.T) {
 	})
 }
 
-func kindUse(t *testing.T, report *graph.StringReport, kind string) graph.StringUse {
+func kindUse(t *testing.T, report *analysis.AnalysisReport, kind string) analysis.CandidateUse {
 	t.Helper()
 	for _, use := range report.Uses {
 		if use.Kind == kind {
@@ -476,10 +476,10 @@ func kindUse(t *testing.T, report *graph.StringReport, kind string) graph.String
 		}
 	}
 	t.Fatalf("missing %s in %+v", kind, report.Uses)
-	return graph.StringUse{}
+	return analysis.CandidateUse{}
 }
 
-func gapKind(gaps []graph.Gap, kind string) bool {
+func gapKind(gaps []analysis.Gap, kind string) bool {
 	for _, g := range gaps {
 		if g.Kind == kind {
 			return true

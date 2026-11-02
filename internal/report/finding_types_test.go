@@ -3,7 +3,7 @@ package report
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"reflect"
 	"strings"
 	"testing"
@@ -26,8 +26,8 @@ func TestFindingTypesPreserveImplementedScope(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			u := graph.StringUse{Kind: tt.kind, Gaps: []graph.Gap{{Kind: tt.gap}}, Assessment: graph.Assessment{Status: "not_run"}}
-			r := &graph.StringReport{Uses: []graph.StringUse{u}}
+			u := analysis.CandidateUse{Kind: tt.kind, Gaps: []analysis.Gap{{Kind: tt.gap}}, Assessment: analysis.Assessment{Status: "not_run"}}
+			r := &analysis.AnalysisReport{Uses: []analysis.CandidateUse{u}}
 			before, _ := json.Marshal(r.Uses)
 			Enrich(r)
 			if !reflect.DeepEqual(r.Findings[0].TypeIDs, tt.want) {
@@ -58,9 +58,9 @@ func TestFindingTypesPreserveImplementedScope(t *testing.T) {
 
 func TestRowPillsAggregateTypesWithoutUpgradingStatus(t *testing.T) {
 	items := []htmlItem{
-		{Finding: graph.Finding{TypeIDs: []string{"sql-injection", "input-validation"}, Status: "poor_practice"}},
-		{Finding: graph.Finding{TypeIDs: []string{"sql-injection", "input-validation"}, Status: "needs_evidence"}},
-		{Finding: graph.Finding{TypeIDs: []string{"nosql-injection"}, Status: "protected_for_claim"}},
+		{Finding: analysis.Finding{TypeIDs: []string{"sql-injection", "input-validation"}, Status: "poor_practice"}},
+		{Finding: analysis.Finding{TypeIDs: []string{"sql-injection", "input-validation"}, Status: "needs_evidence"}},
+		{Finding: analysis.Finding{TypeIDs: []string{"nosql-injection"}, Status: "protected_for_claim"}},
 	}
 	pills := rowTypePills(items)
 	if len(pills) != 3 {
@@ -77,13 +77,13 @@ func TestRowPillsAggregateTypesWithoutUpgradingStatus(t *testing.T) {
 }
 
 func TestHTMLTypePanelsAndDistinctLocations(t *testing.T) {
-	r := &graph.StringReport{SchemaVersion: 1, Entries: []graph.Entry{{Route: graph.Route{ID: "r", Method: "POST", PathPattern: "/search", Registration: graph.Span{File: "server.ts", StartLine: 3}}}}, Uses: []graph.StringUse{{ID: "u", RouteID: "r", Kind: "sql_query_candidate", Sink: graph.Evidence{Text: "db.query(sql)", Span: graph.Span{File: "handler.ts", StartLine: 11}}, Gaps: []graph.Gap{{Kind: "query_text_interpolated"}, {Kind: "input_validation_absent"}}, Assessment: graph.Assessment{Status: "not_run"}}}}
+	r := &analysis.AnalysisReport{SchemaVersion: 1, Entries: []analysis.Entry{{Route: analysis.Route{ID: "r", Method: "POST", PathPattern: "/search", Registration: analysis.Span{File: "server.ts", StartLine: 3}}}}, Uses: []analysis.CandidateUse{{ID: "u", RouteID: "r", Kind: "sql_query_candidate", Sink: analysis.Evidence{Text: "db.query(sql)", Span: analysis.Span{File: "handler.ts", StartLine: 11}}, Gaps: []analysis.Gap{{Kind: "query_text_interpolated"}, {Kind: "input_validation_absent"}}, Assessment: analysis.Assessment{Status: "not_run"}}}}
 	var b bytes.Buffer
 	if err := HTML(&b, r); err != nil {
 		t.Fatal(err)
 	}
 	html := b.String()
-	for _, want := range []string{`<span>Route location</span>`, `server.ts:3`, `Finding location · </span>handler.ts:11`, `class="type-pill poor-practice"`, `popovertarget="glossary-sql-injection"`, `id="glossary-sql-injection" class="glossary-panel" popover="auto"`, `popovertargetaction="hide"`, `aria-labelledby="glossary-heading-sql-injection"`, `SQL Injection <span class="pill-status">· poor practice`, `Input Validation <span class="pill-status">· poor practice`, `Coverage: bounded server response and template analysis`, `id="finding-glossary"`} {
+	for _, want := range []string{`<span>Route location</span>`, `server.ts:3`, `Finding location · </span>handler.ts:11`, `class="type-pill poor-practice"`, `popovertarget="glossary-sql-injection"`, `id="glossary-sql-injection" class="glossary-panel" popover="auto"`, `popovertargetaction="hide"`, `aria-labelledby="glossary-heading-sql-injection"`, `SQL Injection <span class="pill-status">· poor practice`, `Input Validation <span class="pill-status">· review`, `Coverage: bounded server response and template analysis`, `id="finding-glossary"`} {
 		if !strings.Contains(html, want) {
 			t.Fatalf("missing %s", want)
 		}
@@ -98,5 +98,26 @@ func TestHTMLTypePanelsAndDistinctLocations(t *testing.T) {
 	}
 	if !bytes.Contains(data, []byte(`"scan.findingTypes"`)) || !bytes.Contains(data, []byte(`"type_ids":["sql-injection","input-validation"]`)) {
 		t.Fatal("SARIF lost glossary context")
+	}
+}
+
+func TestSQLBindingDoesNotColorInputValidationGreen(t *testing.T) {
+	item := htmlItem{Finding: analysis.Finding{TypeIDs: []string{"sql-injection", "input-validation"}, RecordType: "protection", Status: "protected_for_claim"}, Use: analysis.CandidateUse{Kind: "sql_query_candidate", Assessment: analysis.Assessment{Status: "completed", FindingStatus: "protected_for_claim", Answers: map[string]string{"injection_protection": "protected", "validation": "uncertain"}}}}
+	pills := rowTypePills([]htmlItem{item})
+	for _, p := range pills {
+		if p.ID == "input-validation" && (p.Tone != "review" || p.Protected != 0) {
+			t.Fatal("SQL binding lent green status to inconclusive validation")
+		}
+		if p.ID == "sql-injection" && p.Tone != "protected" {
+			t.Fatal("separate SQL protection facet lost")
+		}
+	}
+}
+
+func TestOwnValidationPracticeColorsValidationPill(t *testing.T) {
+	item := htmlItem{Finding: analysis.Finding{TypeIDs: []string{"input-validation"}, RecordType: "finding", Status: "poor_practice"}, Use: analysis.CandidateUse{Kind: "input_validation_candidate", Completeness: &analysis.Completeness{ClaimKind: "validation"}, Assessment: analysis.Assessment{Status: "completed", Answers: map[string]string{"validation": "insufficient"}}}}
+	pills := rowTypePills([]htmlItem{item})
+	if len(pills) != 1 || pills[0].Tone != "poor-practice" {
+		t.Fatal("independent validation defect lost its status")
 	}
 }

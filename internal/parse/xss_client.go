@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var indexProjection = regexp.MustCompile(`\[[^\]]*\]`)
@@ -18,17 +18,17 @@ type clientInjection struct {
 }
 
 type clientContext struct {
-	entry    graph.ClientEntry
+	entry    analysis.ClientEntry
 	injected map[string]clientInjection
 	methods  map[string]*sitter.Node
 	fields   map[string]*sitter.Node
-	template *graph.Evidence
-	bindings []graph.Evidence
+	template *analysis.Evidence
+	bindings []analysis.Evidence
 	angular  bool
 	react    bool
 }
 
-func (s *moduleSet) browser(report *graph.StringReport) error {
+func (s *moduleSet) browser(report *analysis.AnalysisReport) error {
 	var files []string
 	for path := range s.allowed {
 		files = append(files, path)
@@ -38,20 +38,20 @@ func (s *moduleSet) browser(report *graph.StringReport) error {
 		m, err := s.load(file)
 		if err != nil {
 			if strings.Contains(err.Error(), "2 MiB") {
-				report.Gaps = append(report.Gaps, graph.Gap{Kind: "client_source_limit", Detail: "Browser source exceeds the 2 MiB parser limit", At: graph.Span{File: file}})
+				report.Gaps = append(report.Gaps, analysis.Gap{Kind: "client_source_limit", Detail: "Browser source exceeds the 2 MiB parser limit", At: analysis.Span{File: file}})
 				continue
 			}
 			return err
 		}
 		text := string(m.src)
-		if !strings.Contains(text, "document") && !strings.Contains(text, "location") && !strings.Contains(text, "@angular") && !strings.Contains(text, "react") && !strings.Contains(text, "innerHTML") && !strings.Contains(text, "postMessage") && !strings.Contains(text, "setTimeout") {
+		if !strings.Contains(text, "document") && !strings.Contains(text, "location") && !strings.Contains(text, "@angular") && !strings.Contains(text, "react") && !strings.Contains(text, "innerHTML") && !strings.Contains(text, "postMessage") && !strings.Contains(text, "setTimeout") && !strings.Contains(text, "jquery") {
 			continue
 		}
 		if m.tree.RootNode().HasError() {
-			report.Gaps = append(report.Gaps, graph.Gap{Kind: "client_parse_error", Detail: "Browser-relevant source contains syntax errors", At: spanOf(file, m.tree.RootNode())})
+			report.Gaps = append(report.Gaps, analysis.Gap{Kind: "client_parse_error", Detail: "Browser-relevant source contains syntax errors", At: spanOf(file, m.tree.RootNode())})
 			continue
 		}
-		base := &clientContext{entry: graph.ClientEntry{ID: "client:" + file, Kind: "script", Name: file, Location: spanOf(file, m.tree.RootNode())},
+		base := &clientContext{entry: analysis.ClientEntry{ID: "client:" + file, Kind: "script", Name: file, Location: spanOf(file, m.tree.RootNode())},
 			injected: map[string]clientInjection{}, methods: map[string]*sitter.Node{}, fields: map[string]*sitter.Node{}}
 		for _, imp := range m.imports {
 			base.react = base.react || imp.module == "react"
@@ -134,17 +134,17 @@ func (s *moduleSet) browser(report *graph.StringReport) error {
 
 func newClientFlow(s *moduleSet, m *sourceModule, client *clientContext) flow {
 	return flow{module: m, set: s, client: client, env: map[string]value{}, helpers: &helperExpansion{budget: 24, stack: map[string]bool{}},
-		facts: newInputFacts(), context: append([]graph.Evidence{}, client.bindings...)}
+		facts: newInputFacts(), context: append([]analysis.Evidence{}, client.bindings...)}
 }
 
-func addClientUses(report *graph.StringReport, client *clientContext, uses []graph.StringUse) {
+func addClientUses(report *analysis.AnalysisReport, client *clientContext, uses []analysis.CandidateUse) {
 	if len(uses) == 0 {
 		return
 	}
 	// The same sink can be reached from module, function and class flows. Records
 	// are merged so an earlier weak candidate never hides a later stronger one.
 	index := map[string]int{}
-	var merged []graph.StringUse
+	var merged []analysis.CandidateUse
 	for _, u := range uses {
 		if u.XSS == nil {
 			continue
@@ -162,7 +162,7 @@ func addClientUses(report *graph.StringReport, client *clientContext, uses []gra
 	}
 }
 
-func xssRank(x *graph.XSSFacts) int {
+func xssRank(x *analysis.XSSFacts) int {
 	switch x.Protection {
 	case "raw", "ineffective":
 		return 2
@@ -174,7 +174,7 @@ func xssRank(x *graph.XSSFacts) int {
 
 // xssDependencyProtections gives each dependency's protection within its own record.
 // Origin resolution stays a separate record fact and gap, not a path protection.
-func xssDependencyProtections(u graph.StringUse) []string {
+func xssDependencyProtections(u analysis.CandidateUse) []string {
 	out := make([]string, len(u.Dependencies))
 	for i := range out {
 		out[i] = u.XSS.Protection
@@ -188,7 +188,7 @@ func xssDependencyProtections(u graph.StringUse) []string {
 // mergeXSSUse keeps the strongest supported claim (unsafe, then unknown, then
 // protected; a resolved origin breaks ties) and retains every other record's paths,
 // context and gaps as siblings. Protection is never raised by a merge.
-func mergeXSSUse(a, b graph.StringUse) graph.StringUse {
+func mergeXSSUse(a, b analysis.CandidateUse) analysis.CandidateUse {
 	first, second := a, b
 	if xssRank(b.XSS) > xssRank(a.XSS) || (xssRank(b.XSS) == xssRank(a.XSS) && b.XSS.OriginResolved && !a.XSS.OriginResolved) {
 		first, second = b, a
@@ -213,7 +213,7 @@ func mergeXSSUse(a, b graph.StringUse) graph.StringUse {
 	out.XSS.Paths = xssPaths(protections, nil)
 	evidence := map[string]bool{}
 	out.Context = nil
-	for _, e := range append(append([]graph.Evidence{}, first.Context...), second.Context...) {
+	for _, e := range append(append([]analysis.Evidence{}, first.Context...), second.Context...) {
 		k := fmt.Sprintf("%s:%s:%d:%d", e.Kind, e.Span.File, e.Span.StartByte, e.Span.EndByte)
 		if !evidence[k] {
 			evidence[k] = true
@@ -222,7 +222,7 @@ func mergeXSSUse(a, b graph.StringUse) graph.StringUse {
 	}
 	gaps := map[string]bool{}
 	out.Gaps = nil
-	for _, g := range append(append([]graph.Gap{}, first.Gaps...), second.Gaps...) {
+	for _, g := range append(append([]analysis.Gap{}, first.Gaps...), second.Gaps...) {
 		k := fmt.Sprintf("%s:%s:%s:%d:%d", g.Kind, g.Detail, g.At.File, g.At.StartByte, g.At.EndByte)
 		if !gaps[k] {
 			gaps[k] = true
@@ -230,7 +230,7 @@ func mergeXSSUse(a, b graph.StringUse) graph.StringUse {
 		}
 	}
 	if second.XSS.Type == "cross_tier" && out.XSS.ResponsePath == "" {
-		out.Gaps = append(out.Gaps, graph.Gap{Kind: "cross_tier_sibling_unresolved", Detail: "Another path to this sink starts at an unlinked API response: " + second.XSS.ResponseMethod + " " + second.XSS.ResponsePath, At: second.Sink.Span})
+		out.Gaps = append(out.Gaps, analysis.Gap{Kind: "cross_tier_sibling_unresolved", Detail: "Another path to this sink starts at an unlinked API response: " + second.XSS.ResponseMethod + " " + second.XSS.ResponsePath, At: second.Sink.Span})
 	}
 	return out
 }
@@ -239,16 +239,16 @@ func clientKey(text string) string {
 	return indexProjection.ReplaceAllString(strings.ReplaceAll(text, "?.", "."), "[]")
 }
 
-func (f *flow) clientClassEvidence(node *sitter.Node) graph.Evidence {
+func (f *flow) clientClassEvidence(node *sitter.Node) analysis.Evidence {
 	if node == nil {
-		return graph.Evidence{}
+		return analysis.Evidence{}
 	}
 	return f.module.evidence("render_binding", node)
 }
 
-func (f *flow) clientRecord(node *sitter.Node, v value, context string, escaped bool, binding graph.Evidence) {
+func (f *flow) clientRecord(node *sitter.Node, v value, context string, escaped bool, binding analysis.Evidence) {
 	before := len(f.uses)
-	f.recordXSS(f.module.evidence("browser_output", node), v, context, "text/html", escaped, []graph.Evidence{binding})
+	f.recordXSS(f.module.evidence("browser_output", node), v, context, "text/html", escaped, []analysis.Evidence{binding})
 	if len(f.uses) == before {
 		return
 	}

@@ -2,7 +2,7 @@ package report
 
 import (
 	"encoding/json"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -12,7 +12,7 @@ import (
 
 func TestBundlesPreserveFailedAssessmentAndEarlierRuns(t *testing.T) {
 	base := t.TempDir()
-	r := &graph.StringReport{SchemaVersion: 1, Root: "sample", Uses: []graph.StringUse{{ID: "use", Kind: "sql_query_candidate", Assessment: graph.Assessment{Status: "failed", Reason: "offline failure"}}}}
+	r := &analysis.AnalysisReport{SchemaVersion: 1, Root: "sample", Uses: []analysis.CandidateUse{{ID: "use", Kind: "sql_query_candidate", Assessment: analysis.Assessment{Status: "failed", Reason: "offline failure"}}}}
 	first, err := WriteBundle(base, r)
 	if err != nil {
 		t.Fatal(err)
@@ -51,7 +51,7 @@ func TestBundlesPreserveFailedAssessmentAndEarlierRuns(t *testing.T) {
 		}
 	}
 	data, _ := os.ReadFile(filepath.Join(first, "findings.json"))
-	var saved graph.StringReport
+	var saved analysis.AnalysisReport
 	if err := json.Unmarshal(data, &saved); err != nil || saved.Uses[0].Assessment.Status != "failed" {
 		t.Fatal("assessment changed")
 	}

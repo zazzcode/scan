@@ -27,7 +27,7 @@ func TestCrossTierResponseFieldLinks(t *testing.T) {
 			writeSource(t, root, "client/item.service.ts", "import {HttpClient} from '@angular/common/http';import {Injectable,inject} from '@angular/core';@Injectable() export class ItemService {private readonly http=inject(HttpClient);private readonly host='/rest/item';find(id:any){return this.http.get(`${this.host}/${id}`)}}")
 			writeSource(t, root, "client/page.component.ts", "import {Component,inject} from '@angular/core';import {DomSanitizer} from '@angular/platform-browser';import {ItemService} from './item.service';@Component({templateUrl:'./page.html'}) export class Page {private items=inject(ItemService);private sanitizer=inject(DomSanitizer);public results:any={};run(){this.items.find(1).subscribe((r)=>{this.results.name=this.sanitizer.bypassSecurityTrustHtml(`<b>${r.data[0]."+tt.field+"}</b>`)})}}")
 			writeSource(t, root, "client/page.html", `<span [innerHTML]="results.name"></span>`)
-			r, err := Strings(root, "server.ts")
+			r, err := Analyze(root, "server.ts")
 			if err != nil {
 				t.Fatal(err)
 			}

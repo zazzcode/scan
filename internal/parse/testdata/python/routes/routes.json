@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "root": "python/routes",
+  "routes": [
+    {
+      "id": "route:app.py:279:GET:/people/\u003cname\u003e",
+      "method": "GET",
+      "path_pattern": "/people/\u003cname\u003e",
+      "framework": "flask",
+      "registration": {
+        "file": "app.py",
+        "start_line": 12,
+        "end_line": 12,
+        "start_byte": 279,
+        "end_byte": 332
+      },
+      "handler": {
+        "name": "people",
+        "kind": "function",
+        "span": {
+          "file": "app.py",
+          "start_line": 13,
+          "end_line": 14,
+          "start_byte": 333,
+          "end_byte": 366
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.route",
+            "kind": "decorator",
+            "span": {
+              "file": "app.py",
+              "start_line": 12,
+              "end_line": 12,
+              "start_byte": 279,
+              "end_byte": 332
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "people",
+            "kind": "function",
+            "span": {
+              "file": "app.py",
+              "start_line": 13,
+              "end_line": 14,
+              "start_byte": 333,
+              "end_byte": 366
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:app.py:279:POST:/people/\u003cname\u003e",
+      "method": "POST",
+      "path_pattern": "/people/\u003cname\u003e",
+      "framework": "flask",
+      "registration": {
+        "file": "app.py",
+        "start_line": 12,
+        "end_line": 12,
+        "start_byte": 279,
+        "end_byte": 332
+      },
+      "handler": {
+        "name": "people",
+        "kind": "function",
+        "span": {
+          "file": "app.py",
+          "start_line": 13,
+          "end_line": 14,
+          "start_byte": 333,
+          "end_byte": 366
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.route",
+            "kind": "decorator",
+            "span": {
+              "file": "app.py",
+              "start_line": 12,
+              "end_line": 12,
+              "start_byte": 279,
+              "end_byte": 332
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "people",
+            "kind": "function",
+            "span": {
+              "file": "app.py",
+              "start_line": 13,
+              "end_line": 14,
+              "start_byte": 333,
+              "end_byte": 366
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:app.py:368:GET:/items/status",
+      "method": "GET",
+      "path_pattern": "/items/status",
+      "framework": "flask",
+      "registration": {
+        "file": "app.py",
+        "start_line": 16,
+        "end_line": 16,
+        "start_byte": 368,
+        "end_byte": 393
+      },
+      "handler": {
+        "name": "status",
+        "kind": "function",
+        "span": {
+          "file": "app.py",
+          "start_line": 17,
+          "end_line": 18,
+          "start_byte": 394,
+          "end_byte": 423
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "blueprint.get",
+            "kind": "decorator",
+            "span": {
+              "file": "app.py",
+              "start_line": 16,
+              "end_line": 16,
+              "start_byte": 368,
+              "end_byte": 393
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "status",
+            "kind": "function",
+            "span": {
+              "file": "app.py",
+              "start_line": 17,
+              "end_line": 18,
+              "start_byte": 394,
+              "end_byte": 423
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:app.py:425:GET:/api/entry",
+      "method": "GET",
+      "path_pattern": "/api/entry",
+      "framework": "flask_restx",
+      "registration": {
+        "file": "app.py",
+        "start_line": 20,
+        "end_line": 20,
+        "start_byte": 425,
+        "end_byte": 444
+      },
+      "handler": {
+        "name": "get",
+        "kind": "function",
+        "span": {
+          "file": "app.py",
+          "start_line": 22,
+          "end_line": 23,
+          "start_byte": 472,
+          "end_byte": 504
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "ns.route",
+            "kind": "decorator",
+            "span": {
+              "file": "app.py",
+              "start_line": 20,
+              "end_line": 20,
+              "start_byte": 425,
+              "end_byte": 444
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "get",
+            "kind": "function",
+            "span": {
+              "file": "app.py",
+              "start_line": 22,
+              "end_line": 23,
+              "start_byte": 472,
+              "end_byte": 504
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "route:app.py:506:POST:/records/{record}",
+      "method": "POST",
+      "path_pattern": "/records/{record}",
+      "framework": "fastapi",
+      "registration": {
+        "file": "app.py",
+        "start_line": 25,
+        "end_line": 25,
+        "start_byte": 506,
+        "end_byte": 537
+      },
+      "handler": {
+        "name": "records",
+        "kind": "function",
+        "span": {
+          "file": "app.py",
+          "start_line": 26,
+          "end_line": 27,
+          "start_byte": 538,
+          "end_byte": 587
+        }
+      },
+      "steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "fast.post",
+            "kind": "decorator",
+            "span": {
+              "file": "app.py",
+              "start_line": 25,
+              "end_line": 25,
+              "start_byte": 506,
+              "end_byte": 537
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "records",
+            "kind": "function",
+            "span": {
+              "file": "app.py",
+              "start_line": 26,
+              "end_line": 27,
+              "start_byte": 538,
+              "end_byte": 587
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "gaps": []
+}

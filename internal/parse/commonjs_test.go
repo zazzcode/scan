@@ -23,7 +23,7 @@ func TestCommonJSRouteBindings(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "app.js", tt.entry)
 			writeSource(t, root, "routes/index.js", tt.handlers)
-			r, err := Strings(root, "app.js")
+			r, err := Analyze(root, "app.js")
 			if err != nil {
 				t.Fatal(err)
 			}

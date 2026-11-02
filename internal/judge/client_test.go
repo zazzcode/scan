@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func TestProviders(t *testing.T) {
@@ -26,8 +26,21 @@ func TestProviders(t *testing.T) {
 				if provider == "jev" {
 					field = "state"
 				}
-				if len(body[field]) == 0 || len(body["questions"]) == 0 || !strings.Contains(string(body[field]), "id: javascript") || !strings.Contains(string(body["questions"]), "practice standard") {
+				if len(body[field]) == 0 || len(body["questions"]) == 0 || !strings.Contains(string(body[field]), "id: javascript") || !strings.Contains(string(body["questions"]), "analysis guidelines") {
 					t.Error("wrong provider request shape")
+				}
+				var input map[string]json.RawMessage
+				var source string
+				if err := json.Unmarshal(body[field], &source); err != nil {
+					t.Error(err)
+					return
+				}
+				if err := json.Unmarshal([]byte(source), &input); err != nil {
+					t.Error(err)
+					return
+				}
+				if len(input["analysis_guidelines"]) == 0 || len(input["practice"]) != 0 {
+					t.Error("guideline metadata uses the wrong input key")
 				}
 				if provider == "openai" {
 					w.Write([]byte(`{"model":"test-model","answers":[{"name":"validation","type":"choice","choice":"insufficient"},{"name":"protection","type":"choice","choice":"sufficient"}],"usage":{"input_tokens":12}}`))
@@ -42,7 +55,7 @@ func TestProviders(t *testing.T) {
 			}
 			client.endpoint = server.URL
 			client.http = server.Client()
-			use := graph.StringUse{Sink: graph.Evidence{Span: graph.Span{File: "server.ts"}}, Gaps: []graph.Gap{{Kind: "unresolved_flow"}}}
+			use := analysis.CandidateUse{Sink: analysis.Evidence{Span: analysis.Span{File: "server.ts"}}, Gaps: []analysis.Gap{{Kind: "unresolved_flow"}}}
 			got := client.Assess(context.Background(), use)
 			if got.Status != "completed" || got.Answers["protection"] != "sufficient" || got.Protection != "uncertain" || got.Provider != provider || got.Usage["input_tokens"] != 12 {
 				t.Fatalf("assessment=%+v", got)
@@ -70,7 +83,7 @@ func TestInvalidResponses(t *testing.T) {
 			c, _ := New("openai", "", "test-key")
 			c.endpoint = s.URL
 			c.http = s.Client()
-			a := c.Assess(context.Background(), graph.StringUse{})
+			a := c.Assess(context.Background(), analysis.CandidateUse{})
 			if a.Status != "failed" || a.Protection == "sufficient" || strings.Contains(a.Reason, "secret") {
 				t.Fatalf("assessment=%+v", a)
 			}
@@ -90,10 +103,10 @@ func TestConfigurationAndCancellation(t *testing.T) {
 	c, _ := New("openai", "", "key")
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	if a := c.Assess(ctx, graph.StringUse{}); a.Status != "failed" {
+	if a := c.Assess(ctx, analysis.CandidateUse{}); a.Status != "failed" {
 		t.Fatalf("canceled assessment=%+v", a)
 	}
-	a := c.Assess(context.Background(), graph.StringUse{Sink: graph.Evidence{Text: strings.Repeat("x", 65<<10)}})
+	a := c.Assess(context.Background(), analysis.CandidateUse{Sink: analysis.Evidence{Text: strings.Repeat("x", 65<<10)}})
 	if a.Status != "not_run" {
 		t.Fatalf("oversized evidence=%+v", a)
 	}

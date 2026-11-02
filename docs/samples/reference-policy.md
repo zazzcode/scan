@@ -2,7 +2,8 @@
 
 [Samples](README.md)
 
-Keep the pinned Goof, Juice Shop and vulnerable TypeScript checkouts unchanged. Their source-reviewed
+Keep the pinned Goof, Juice Shop, vulnerable TypeScript, ThreatByte, Python insecure app and
+Vulnerable Flask App checkouts unchanged. Their source-reviewed
 answer keys and file-hash manifest provide reusable expectations for future offline scans. Detector
 results and model agreement are comparison observations, not the authority defining these labels.
 Review the code once per changed case/revision; do not spend model tokens repeatedly classifying
@@ -45,3 +46,8 @@ negative controls rather than forcing a desired count of positive findings.
 
 For logging, identify the sensitive data class and its content transfer to the log before claiming a
 leak. Whole-container logging alone is an observation for Review. Record missing evidence explicitly.
+
+Python references: [ThreatByte](ThreatByte/reference.md), [FastAPI app](python-insecure-app/reference.md),
+[Erlik 2](vulnerable-flask-app/reference.md). Each has a separate source-hash manifest, case inventory,
+curated Zazzles report and normalized comparator baseline. These labels never enter scanned source
+or decision requests. Their scoped pass counts do not imply exhaustive vulnerability recall.

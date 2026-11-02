@@ -83,7 +83,7 @@ The human explanations correspond to internal evidence identifiers, retained for
 
 This Markdown comparison is maintained by review; no code generator for this file is present.
 Detection observations originate in [query-shape analysis](../../internal/parse/query_shape.go).
-The [embedded JS/TS practice rules](../../internal/rules/javascript.md) constrain model assessment;
+The [embedded JS/TS Analysis Guidelines](../../internal/guidelines/javascript.md) constrain model assessment;
 the [human report rules](../../internal/report/findings.go) explain raw uses without upgrading their
 security verdict, and [remediation rules](../../internal/report/guidance.go) provide reviewable actions.
 JSON, HTML, and SARIF share that interpretation; the HTML contains only scan results, without tool comparisons.

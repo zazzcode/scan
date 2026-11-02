@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func (f *flow) clientHTTPValue(m *sourceModule, call, endpoint *sitter.Node, method string, fields map[string]*sitter.Node) value {
@@ -19,7 +19,7 @@ func (f *flow) clientHTTPValue(m *sourceModule, call, endpoint *sitter.Node, met
 		}
 	}
 	evidence := m.evidence("api_response", call)
-	return value{apiPath: strings.Split(path, "?")[0], apiMethod: method, deps: []graph.Dependency{{Source: evidence, Transfers: []graph.Evidence{}}}}
+	return value{apiPath: strings.Split(path, "?")[0], apiMethod: method, deps: []analysis.Dependency{{Source: evidence, Transfers: []analysis.Evidence{}}}}
 }
 
 func (f *flow) clientServiceCall(call *sitter.Node, object, method string) (value, bool) {

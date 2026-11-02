@@ -16,7 +16,7 @@ func TestCompiledTemplateFlows(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "app.ts", "import express from 'express';import fs from 'node:fs';import pug from 'pug';import * as entities from 'entities';const app=express();app.get('/x',async(req,res)=>{"+tt.body+"})")
 			writeSource(t, root, "views/page.pug", "p _name_")
-			r, err := Strings(root, "app.ts")
+			r, err := Analyze(root, "app.ts")
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -4,13 +4,13 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 type storageWrite struct {
 	route string
 	value value
-	sink  graph.Evidence
+	sink  analysis.Evidence
 }
 
 func (f *flow) storedProperty(n *sitter.Node) (value, bool) {
@@ -35,7 +35,7 @@ func (f *flow) storedProperty(n *sitter.Node) (value, bool) {
 		return value{}, false
 	}
 	source := f.module.evidence("storage_read", n)
-	return value{deps: []graph.Dependency{{StorageKey: v.model + "." + field, Source: source, Transfers: []graph.Evidence{*v.read}}}}, true
+	return value{deps: []analysis.Dependency{{StorageKey: v.model + "." + field, Source: source, Transfers: []analysis.Evidence{*v.read}}}}, true
 }
 
 func (f *flow) assignStoredField(left *sitter.Node, v value) {
@@ -122,7 +122,7 @@ func (f *flow) modelCallback(fn *sitter.Node, v value, method string) {
 	child.env = copyValues(f.env)
 	child.uses, child.returns = nil, nil
 	child.depth++
-	child.context = append(append([]graph.Evidence{}, f.context...), f.module.evidence("storage_callback", fn))
+	child.context = append(append([]analysis.Evidence{}, f.context...), f.module.evidence("storage_callback", fn))
 	index := 1
 	if strings.HasSuffix(method, ".then") || strings.HasSuffix(method, ".forEach") || strings.HasSuffix(method, ".map") {
 		index = 0
@@ -210,7 +210,7 @@ func (s *moduleSet) modelIdentity(m *sourceModule, name string, depth int) strin
 				if imp.module == "mongoose" {
 					if label, ok := stringLiteral(args.NamedChild(0), m.src); ok {
 						key := "mongoose:" + label
-						s.rememberModel(key, []graph.Evidence{m.evidence("storage_model_binding", v), m.evidence("storage_library_binding", imp.declaration)})
+						s.rememberModel(key, []analysis.Evidence{m.evidence("storage_model_binding", v), m.evidence("storage_library_binding", imp.declaration)})
 						return key
 					}
 				}
@@ -239,7 +239,7 @@ func (s *moduleSet) modelIdentity(m *sourceModule, name string, depth int) strin
 				base := strings.TrimSpace(heritage.Utf8Text(m.src))
 				if imp.module == "sequelize" && imp.name == "Model" && (base == "extends "+local || strings.HasPrefix(base, "extends "+local+"<")) {
 					key := "sequelize:" + m.file + ":" + name
-					s.rememberModel(key, []graph.Evidence{m.evidence("storage_model_binding", n), m.evidence("storage_library_binding", imp.declaration)})
+					s.rememberModel(key, []analysis.Evidence{m.evidence("storage_model_binding", n), m.evidence("storage_library_binding", imp.declaration)})
 					return key
 				}
 			}
@@ -248,9 +248,9 @@ func (s *moduleSet) modelIdentity(m *sourceModule, name string, depth int) strin
 	return ""
 }
 
-func (s *moduleSet) rememberModel(key string, evidence []graph.Evidence) {
+func (s *moduleSet) rememberModel(key string, evidence []analysis.Evidence) {
 	if s.modelEvidence == nil {
-		s.modelEvidence = map[string][]graph.Evidence{}
+		s.modelEvidence = map[string][]analysis.Evidence{}
 	}
 	s.modelEvidence[key] = evidence
 }

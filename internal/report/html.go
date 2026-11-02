@@ -8,7 +8,7 @@ import (
 	"io"
 	"sort"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 //go:embed report.html
@@ -22,32 +22,32 @@ var htmlReport = template.Must(template.New("report").Funcs(template.FuncMap{
 }).Parse(htmlSource))
 
 type htmlItem struct {
-	Finding graph.Finding
-	Use     graph.StringUse
+	Finding analysis.Finding
+	Use     analysis.CandidateUse
 }
 type htmlRow struct {
 	ID, SourceType, Signature   string
 	Path, Method                string
-	Location                    graph.Span
+	Location                    analysis.Span
 	Items                       []htmlItem
 	Types                       []htmlTypePill
-	Gaps                        []graph.Gap
+	Gaps                        []analysis.Gap
 	Findings, Review, Protected int
 }
 type htmlView struct {
 	SortScript                  template.JS
 	ScriptHash                  string
-	Glossary                    []graph.FindingType
+	Glossary                    []analysis.FindingType
 	Root                        string
 	Rows                        []*htmlRow
 	ClientRows                  []*htmlRow
-	Gaps                        []graph.Gap
+	Gaps                        []analysis.Gap
 	Limitations                 []string
 	Findings, Review, Protected int
 }
 
 // HTML renders a standalone snapshot with native disclosure rows and no network resources.
-func HTML(w io.Writer, r *graph.StringReport) error {
+func HTML(w io.Writer, r *analysis.AnalysisReport) error {
 	Enrich(r)
 	v := htmlView{Glossary: r.FindingTypes, Root: r.Root, Gaps: r.Gaps, Limitations: r.Limitations}
 	hash := sha256.Sum256([]byte(sortSource))
@@ -154,7 +154,7 @@ func displayLabel(value string) string {
 }
 
 // itemRank orders a route's records: established vulnerabilities, other findings, Review, Protected.
-func itemRank(f graph.Finding) int {
+func itemRank(f analysis.Finding) int {
 	switch {
 	case f.RecordType == "finding" && f.Status == "confirmed_vulnerability":
 		return 0

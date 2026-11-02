@@ -22,7 +22,17 @@ func rowTypePills(items []htmlItem) []htmlTypePill {
 			}
 			p := &pills[i]
 			p.Count++
-			switch item.Finding.Status {
+			status := item.Finding.Status
+			if id == "input-validation" {
+				status = "needs_evidence"
+				c, a := item.Use.Completeness, item.Use.Assessment
+				if c != nil && c.ClaimKind == "validation" && a.Status == "completed" && a.Answers["validation"] == "sufficient" && len(a.BlockingGaps) == 0 && item.Finding.Status == "protected_for_claim" {
+					status = "protected_for_claim"
+				} else if c != nil && c.ClaimKind == "validation" && a.Status == "completed" && a.Answers["validation"] == "insufficient" && len(a.BlockingGaps) == 0 && item.Finding.Status == "poor_practice" {
+					status = "poor_practice"
+				}
+			}
+			switch status {
 			case "protected_for_claim":
 				p.Protected++
 			case "confirmed_vulnerability":

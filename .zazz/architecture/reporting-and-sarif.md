@@ -106,7 +106,7 @@ additional assessment, not the advisory's existence.
 
 ## Implemented interface and remediation
 
-`--strings --sarif` exports a current scan. `--export-sarif <saved-report.json>` converts a canonical
+`--analyze --sarif` exports a current scan. `--export-sarif <saved-report.json>` converts a canonical
 JSON report offline with no new judge request. These flags are mutually exclusive with `--json`.
 The exporter does not recompute or upgrade saved assessments. It rebuilds deterministic human-readable
 presentation from saved raw uses, including for older schema-v1 reports. `scan.finding` preserves the
@@ -140,3 +140,6 @@ finding eligibility, runtime-confirmation state or independent-review policy.
 
 The [query judgment design](query-judgment.md) owns automatic injection evidence and policy gates.
 Public [analysis rules](../../docs/analysis/README.md) describe SQL/NoSQL and validation semantics.
+
+Current analysis JSON uses schema 2 and `analysis_guidelines`; schema-1 saved reports remain readable.
+See [naming and compatibility](../architecture.md#naming-and-compatibility).

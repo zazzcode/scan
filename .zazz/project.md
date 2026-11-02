@@ -45,6 +45,10 @@ coverage and evidence quality; record latency, resource use and model cost along
 findings alone do not establish superiority. Demonstrated parity applies only to the capabilities and
 corpus actually evaluated; broad parity has not been achieved by the current implementation.
 
+The [technical approach](../docs/technical-approach.md) distinguishes implemented design strengths,
+comparison evidence and unproven novelty/performance claims. The full repository graph remains
+planned; today the judge consumes bounded source slices.
+
 The intended advantage is a decision model that considers the relevant paths in a repository-wide
 code graph, including actual custom-validator bodies, enforced guards, value changes, bypasses and
 sink semantics, so valid protection is recognized and false positives are reduced. This is a quality
@@ -113,7 +117,7 @@ The module is `github.com/zazzcode/zazzles`, declaring Go `1.27.2`. `scan --list
 [route-identification spec](specifications/tree-sitter-route-identification-mvp.md). There is no
 complete CFG/interprocedural analysis, independent Findings Reviewer, or reviewed findings report yet.
 
-**Implemented 2026-10-31:** `--strings` adds bounded route/handler resolution and request-value
+**Implemented 2026-10-31:** `--analyze` adds bounded route/handler resolution and request-value
 use witnesses with source hashes, candidate SQL/outbound HTTP call models, and explicit gaps.
 Optional `--judge openai|jev` sends bounded evidence through provider-specific typed adapters;
 bounded Luna integration/control evaluations are recorded in [results](evaluation/juice-shop/results.md). See the [current contract](specifications/route-string-validation.md)

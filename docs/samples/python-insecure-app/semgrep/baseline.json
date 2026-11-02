@@ -1,0 +1,5 @@
+{
+  "tool": "semgrep",
+  "run": "semgrep-20261101-1",
+  "findings": []
+}

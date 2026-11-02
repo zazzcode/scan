@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var htmlAttribute = regexp.MustCompile(`(?i)([a-z_:][a-z0-9_:.-]*)\s*=\s*(["']?)[^"']*$`)
@@ -84,7 +84,7 @@ func (f *flow) xssPathProtection(v value, context string, escaped bool) (string,
 
 // dependencyProtection classifies one path by its call transfers in order. A later
 // transformation of unknown effect leaves the path unknown even after an encoder.
-func (f *flow) dependencyProtection(dependency graph.Dependency, context string) string {
+func (f *flow) dependencyProtection(dependency analysis.Dependency, context string) string {
 	protection := "raw"
 	for _, transfer := range dependency.Transfers {
 		if transfer.Kind != "call_argument_dependency" {
@@ -144,7 +144,7 @@ func (f *flow) dependencyProtection(dependency graph.Dependency, context string)
 
 // xssPaths reports per-path protection only when paths differ. entries, when
 // present, has one writing entry per dependency.
-func xssPaths(protections, entries []string) []graph.XSSPath {
+func xssPaths(protections, entries []string) []analysis.XSSPath {
 	distinct := map[string]bool{}
 	for _, p := range protections {
 		distinct[p] = true
@@ -152,9 +152,9 @@ func xssPaths(protections, entries []string) []graph.XSSPath {
 	if len(distinct) < 2 {
 		return nil
 	}
-	paths := make([]graph.XSSPath, len(protections))
+	paths := make([]analysis.XSSPath, len(protections))
 	for i, p := range protections {
-		paths[i] = graph.XSSPath{Dependency: i, Protection: p}
+		paths[i] = analysis.XSSPath{Dependency: i, Protection: p}
 		if i < len(entries) {
 			paths[i].Entry = entries[i]
 		}
@@ -214,7 +214,7 @@ func verifiedOutputProtection(m *sourceModule, call *sitter.Node) string {
 
 // handlebarsSafeString reports a verified Handlebars SafeString construction on a
 // path. Handlebars emits SafeString content without escaping, even in {{...}}.
-func (f *flow) handlebarsSafeString(dependency graph.Dependency) bool {
+func (f *flow) handlebarsSafeString(dependency analysis.Dependency) bool {
 	for _, transfer := range dependency.Transfers {
 		m := f.set.modules[transfer.Span.File]
 		if m == nil || !strings.HasPrefix(transfer.Text, "new ") {

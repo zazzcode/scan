@@ -6,14 +6,14 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 // inputFacts records which request fields were read, passed to some other call,
 // or consumed by a query sink. It is shared across helper and callback flows
 // for one route so a helper call is not mistaken for a validator.
 type inputFacts struct {
-	inputs     map[string]graph.Evidence
+	inputs     map[string]analysis.Evidence
 	touched    map[string]bool
 	middleware map[string]bool
 	weak       map[string]bool
@@ -23,10 +23,10 @@ type inputFacts struct {
 }
 
 func newInputFacts() *inputFacts {
-	return &inputFacts{inputs: map[string]graph.Evidence{}, touched: map[string]bool{}, middleware: map[string]bool{}, weak: map[string]bool{}, sunk: map[string]bool{}, credentialDest: map[string]credentialDestination{}}
+	return &inputFacts{inputs: map[string]analysis.Evidence{}, touched: map[string]bool{}, middleware: map[string]bool{}, weak: map[string]bool{}, sunk: map[string]bool{}, credentialDest: map[string]credentialDestination{}}
 }
 
-func (f *flow) rememberInput(source graph.Evidence) {
+func (f *flow) rememberInput(source analysis.Evidence) {
 	if f.facts == nil || source.Text == "" {
 		return
 	}
@@ -99,8 +99,8 @@ func weakPredicate(text string) bool {
 	return false
 }
 
-func (f *flow) structureGaps(kind string, args *sitter.Node, values []value, call *sitter.Node) []graph.Gap {
-	gaps := []graph.Gap{}
+func (f *flow) structureGaps(kind string, args *sitter.Node, values []value, call *sitter.Node) []analysis.Gap {
+	gaps := []analysis.Gap{}
 	text := ""
 	if args != nil {
 		text = args.Utf8Text(f.module.src)
@@ -162,7 +162,7 @@ func requestFieldNode(n *sitter.Node, src []byte, req string) *sitter.Node {
 	return found
 }
 
-func (f *flow) sinkValidationGap(field string, structureRisk bool, at *sitter.Node) graph.Gap {
+func (f *flow) sinkValidationGap(field string, structureRisk bool, at *sitter.Node) analysis.Gap {
 	// Free text, such as a comment, may legitimately contain any character. Tightening
 	// the alphabet would reject valid input. Injection control has to be the sink.
 	if freeTextField(field) && structureRisk {
@@ -193,7 +193,7 @@ func freeTextField(field string) bool {
 	}
 }
 
-func (f *flow) validationGap(field string, at *sitter.Node) graph.Gap {
+func (f *flow) validationGap(field string, at *sitter.Node) analysis.Gap {
 	if f.facts != nil && f.facts.middleware[field] {
 		return f.gap("input_validation_middleware", "applicable middleware reads "+field+"; whether that check keeps the value out of query structure is unresolved", at)
 	}
@@ -282,8 +282,8 @@ func (f *flow) enterQueryCallback(n *sitter.Node) {
 		request: f.request,
 		parts:   f.parts,
 		env:     copyValues(f.env),
-		context: append([]graph.Evidence{}, f.context...),
-		gaps:    append([]graph.Gap{}, f.gaps...),
+		context: append([]analysis.Evidence{}, f.context...),
+		gaps:    append([]analysis.Gap{}, f.gaps...),
 		depth:   f.depth + 1,
 		helpers: f.helpers,
 		facts:   f.facts,
@@ -313,15 +313,15 @@ func (f *flow) finishValidation() {
 		if gap.Kind == "input_validation_absent" {
 			gap.Detail = field + " is read and no handler or applicable middleware validator handles it"
 		}
-		f.uses = append(f.uses, graph.StringUse{
+		f.uses = append(f.uses, analysis.CandidateUse{
 			ID:           fmt.Sprintf("input:%s:%s:%d", f.route.ID, field, source.Span.StartByte),
 			RouteID:      f.route.ID,
 			Kind:         "input_validation_candidate",
 			Sink:         source,
-			Dependencies: []graph.Dependency{{Source: source, Transfers: []graph.Evidence{}}},
-			Context:      append([]graph.Evidence{}, f.context...),
-			Gaps:         append(append([]graph.Gap{}, f.gaps...), gap),
-			Assessment:   graph.Assessment{Status: "not_run"},
+			Dependencies: []analysis.Dependency{{Source: source, Transfers: []analysis.Evidence{}}},
+			Context:      append([]analysis.Evidence{}, f.context...),
+			Gaps:         append(append([]analysis.Gap{}, f.gaps...), gap),
+			Assessment:   analysis.Assessment{Status: "not_run"},
 		})
 	}
 }

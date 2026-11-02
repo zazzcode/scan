@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var requestContainers = map[string]bool{"body": true, "query": true, "params": true, "headers": true, "cookies": true}
@@ -15,14 +15,14 @@ var requestContainers = map[string]bool{"body": true, "query": true, "params": t
 var urlLogFormats = map[string]bool{"combined": true, "common": true, "dev": true, "short": true, "tiny": true}
 
 type credentialDestination struct {
-	dep  graph.Dependency
-	pair graph.Evidence
+	dep  analysis.Dependency
+	pair analysis.Evidence
 }
 
 // requestParts resolves a destructured request parameter such as
 // ({ query, headers }) so its container members become request sources.
 // Other destructured members stay explicit as a partial-projection gap.
-func requestParts(m *sourceModule, body *sitter.Node, gaps []graph.Gap) (map[string]string, []graph.Gap) {
+func requestParts(m *sourceModule, body *sitter.Node, gaps []analysis.Gap) (map[string]string, []analysis.Gap) {
 	fn := body.Parent()
 	if fn == nil {
 		return nil, gaps
@@ -52,14 +52,14 @@ func requestParts(m *sourceModule, body *sitter.Node, gaps []graph.Gap) (map[str
 	if len(parts) == 0 {
 		return nil, gaps
 	}
-	out := make([]graph.Gap, 0, len(gaps)+1)
+	out := make([]analysis.Gap, 0, len(gaps)+1)
 	for _, g := range gaps {
 		if g.Kind != "request_projection_unresolved" {
 			out = append(out, g)
 		}
 	}
 	if len(other) > 0 {
-		out = append(out, graph.Gap{Kind: "request_projection_partial", Detail: "destructured request members other than body/query/params/headers/cookies are not modeled as sources: " + strings.Join(other, ", "), At: spanOf(m.file, p)})
+		out = append(out, analysis.Gap{Kind: "request_projection_partial", Detail: "destructured request members other than body/query/params/headers/cookies are not modeled as sources: " + strings.Join(other, ", "), At: spanOf(m.file, p)})
 	}
 	return parts, out
 }
@@ -162,9 +162,9 @@ func (s *moduleSet) requestLineLogs(f *flow, m *sourceModule, route *sitter.Node
 	if use == nil {
 		return
 	}
-	var claims []graph.Gap
-	var deps []graph.Dependency
-	context := append([]graph.Evidence{}, f.context...)
+	var claims []analysis.Gap
+	var deps []analysis.Dependency
+	context := append([]analysis.Evidence{}, f.context...)
 	context = append(context, binding, format)
 	claimed := map[string]bool{}
 	keys := make([]string, 0, len(f.facts.credentialDest))
@@ -181,7 +181,7 @@ func (s *moduleSet) requestLineLogs(f *flow, m *sourceModule, route *sitter.Node
 		claimed[field] = true
 		deps = append(deps, dest.dep)
 		context = append(context, dest.pair)
-		claims = append(claims, graph.Gap{Kind: "log_request_line_credential", Detail: fmt.Sprintf("request query field %s reaches credential evidence %q and the URL with its query string is recorded by request logging (%s)", field, dest.pair.Text, format.Text), At: dest.pair.Span})
+		claims = append(claims, analysis.Gap{Kind: "log_request_line_credential", Detail: fmt.Sprintf("request query field %s reaches credential evidence %q and the URL with its query string is recorded by request logging (%s)", field, dest.pair.Text, format.Text), At: dest.pair.Span})
 	}
 	inputs := make([]string, 0, len(f.facts.inputs))
 	for k := range f.facts.inputs {
@@ -190,29 +190,29 @@ func (s *moduleSet) requestLineLogs(f *flow, m *sourceModule, route *sitter.Node
 	sort.Strings(inputs)
 	for _, k := range inputs {
 		source := f.facts.inputs[k]
-		container, field := requestKey(graph.Dependency{Source: source})
+		container, field := requestKey(analysis.Dependency{Source: source})
 		if container != "query" || field == "" || claimed[field] || lexiconHint(field) == "" {
 			continue
 		}
 		claimed[field] = true
-		deps = append(deps, graph.Dependency{Source: source, Transfers: []graph.Evidence{}})
-		claims = append(claims, graph.Gap{Kind: "log_request_line_hint", Detail: fmt.Sprintf("request query field %s has a %s field-name hint and the URL with its query string is recorded by request logging (%s)", field, lexiconHint(field), format.Text), At: source.Span})
+		deps = append(deps, analysis.Dependency{Source: source, Transfers: []analysis.Evidence{}})
+		claims = append(claims, analysis.Gap{Kind: "log_request_line_hint", Detail: fmt.Sprintf("request query field %s has a %s field-name hint and the URL with its query string is recorded by request logging (%s)", field, lexiconHint(field), format.Text), At: source.Span})
 	}
 	if len(claims) == 0 {
 		return
 	}
-	gaps := append(append([]graph.Gap{}, f.gaps...), claims...)
+	gaps := append(append([]analysis.Gap{}, f.gaps...), claims...)
 	gaps = append(gaps, notes...)
-	gaps = append(gaps, graph.Gap{Kind: "log_destination_unresolved", Detail: "access-log stream destination, retention and readers are not modeled", At: spanOf(m.file, use)})
-	f.uses = append(f.uses, graph.StringUse{ID: fmt.Sprintf("log:%s:%s:%d", f.route.ID, m.file, use.StartByte()), RouteID: f.route.ID, Kind: "log_sink_candidate", Sink: m.evidence("log_sink_candidate", use), Dependencies: deps, Context: context, Gaps: gaps, Assessment: graph.Assessment{Status: "not_run"}})
+	gaps = append(gaps, analysis.Gap{Kind: "log_destination_unresolved", Detail: "access-log stream destination, retention and readers are not modeled", At: spanOf(m.file, use)})
+	f.uses = append(f.uses, analysis.CandidateUse{ID: fmt.Sprintf("log:%s:%s:%d", f.route.ID, m.file, use.StartByte()), RouteID: f.route.ID, Kind: "log_sink_candidate", Sink: m.evidence("log_sink_candidate", use), Dependencies: deps, Context: context, Gaps: gaps, Assessment: analysis.Assessment{Status: "not_run"}})
 }
 
 // requestLogger finds `<receiver>.use(morgan(format))` in the route's own function
 // scope, registered before the route, whose format records the URL.
-func (s *moduleSet) requestLogger(m *sourceModule, route *sitter.Node, receiver, path string) (*sitter.Node, graph.Evidence, graph.Evidence, []graph.Gap) {
+func (s *moduleSet) requestLogger(m *sourceModule, route *sitter.Node, receiver, path string) (*sitter.Node, analysis.Evidence, analysis.Evidence, []analysis.Gap) {
 	var found *sitter.Node
-	var binding, format graph.Evidence
-	var notes []graph.Gap
+	var binding, format analysis.Evidence
+	var notes []analysis.Gap
 	scope := enclosingFunction(route)
 	walkCalls(m.tree.RootNode(), func(call *sitter.Node) {
 		if found != nil || call.StartByte() >= route.StartByte() || !sameNode(enclosingFunction(call), scope) {
@@ -258,10 +258,10 @@ func (s *moduleSet) requestLogger(m *sourceModule, route *sitter.Node, receiver,
 			binding = m.evidence("logger_binding", imp.declaration)
 			format = m.evidence("log_format", f0)
 			if margs.NamedChildCount() > 1 && property(margs.NamedChild(1), "skip", m.src) != nil {
-				notes = append(notes, graph.Gap{Kind: "log_request_line_conditional", Detail: "a skip option may exclude some requests from the access log", At: spanOf(m.file, margs.NamedChild(1))})
+				notes = append(notes, analysis.Gap{Kind: "log_request_line_conditional", Detail: "a skip option may exclude some requests from the access log", At: spanOf(m.file, margs.NamedChild(1))})
 			}
 			if conditionalWithin(call, scope) {
-				notes = append(notes, graph.Gap{Kind: "log_request_line_conditional", Detail: "request logging is registered under a condition", At: spanOf(m.file, call)})
+				notes = append(notes, analysis.Gap{Kind: "log_request_line_conditional", Detail: "request logging is registered under a condition", At: spanOf(m.file, call)})
 			}
 			return
 		}

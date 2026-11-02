@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 // helperExpansion bounds one handler's helper-call traversal. The stack stops
@@ -58,8 +58,8 @@ func (f *flow) enterHelper(call *sitter.Node, name string, args []value) (ret va
 		set:          f.set,
 		route:        f.route,
 		env:          map[string]value{},
-		context:      append(append([]graph.Evidence{}, f.context...), f.module.evidence("helper_call", call)),
-		gaps:         append([]graph.Gap{}, f.gaps...),
+		context:      append(append([]analysis.Evidence{}, f.context...), f.module.evidence("helper_call", call)),
+		gaps:         append([]analysis.Gap{}, f.gaps...),
 		depth:        f.depth + 1,
 		helpers:      f.helpers,
 		facts:        f.facts,
@@ -72,7 +72,7 @@ func (f *flow) enterHelper(call *sitter.Node, name string, args []value) (ret va
 			continue
 		}
 		unbound = true
-		child.env[p.name] = value{gaps: []graph.Gap{{Kind: "unknown_value", Detail: "helper parameter has no argument: " + p.name, At: spanOf(hm.file, p.node)}}}
+		child.env[p.name] = value{gaps: []analysis.Gap{{Kind: "unknown_value", Detail: "helper parameter has no argument: " + p.name, At: spanOf(hm.file, p.node)}}}
 	}
 	child.statements(helper.ChildByFieldName("body"))
 	f.uses = append(f.uses, child.uses...)

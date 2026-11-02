@@ -86,3 +86,19 @@ These bounded judgments still require calibration: consistent model answers can 
 [Sequelize raw queries](https://sequelize.org/docs/v6/core-concepts/raw-queries/) describes query
 arguments and value binding. [MarsDB DocumentMatcher](https://github.com/c58/marsdb/blob/master/lib/DocumentMatcher.js)
 is the primary implementation reference for executable predicates and operator matching.
+
+## Python adapter
+
+[Python analysis](../python-support.md) verifies sqlite3 connection/cursor provenance and keeps
+SQL text separate from the parameter operand. Percent/f-string/format/concatenation construction
+remains a practice concern; bound values do not protect dynamic identifiers. Unknown pre-use calls
+on the SQL value block an injection claim; transformations of unrelated bound values do not turn
+literal SQL into executable interpolation. Python NoSQL is unimplemented and out of the current corpus.
+
+Verified Python connection/cursor bindings also include Psycopg 2/3, PyMySQL and MySQL Connector.
+Driver-specific placeholder contracts are supplied to the judge; a parameter operand does not
+repair SQL text interpolated earlier. SQLite storage correlation is not extended to those drivers.
+Contract references: [Psycopg 3](https://www.psycopg.org/psycopg3/docs/basic/params.html),
+[Psycopg 2](https://www.psycopg.org/docs/usage.html#passing-parameters-to-sql-queries),
+[PyMySQL](https://pymysql.readthedocs.io/en/latest/modules/cursors.html), and
+[MySQL Connector](https://dev.mysql.com/doc/connector-python/en/connector-python-api-mysqlcursor-execute.html).

@@ -39,7 +39,7 @@ Prefer one table over many near-identical test functions:
 Parsing and resolution are golden-file tested because the output is large and structural:
 
 - fixtures live under `internal/parse/testdata/<language>/<case>/` as real source files
-- expected output lives beside them as a `.graph.json` golden file
+- expected output lives beside them as a descriptive `.json` golden file
 - update goldens with an explicit `-update` flag, never by hand-editing
 - always review the golden diff in the PR — an unexplained golden change is the whole review
 - golden files are ordered deterministically; if they are not, fix the emitter, not the test
@@ -66,8 +66,8 @@ Parallel stages are tested for equivalence, not just for absence of races:
 
 ## 7. Semantic adapter stubbing
 
-Future Jev Assessment (`internal/jev`) and LLM Findings Reviewer (`internal/llm`) adapters are tested
-against a local `httptest` server, never a live endpoint:
+Current semantic judge adapters (`internal/judge`) MUST be tested against a local `httptest`
+server, never a live endpoint. The same requirement applies to a future independent reviewer:
 
 - the stub returns fixed, schema-valid responses
 - test the failure paths explicitly: timeout, malformed JSON, non-200 status, and retry exhaustion

@@ -1,22 +1,26 @@
-# Optional decision-model assessment
+# Required decision-model assessment
 
 [Documentation index](README.md) · [Getting started](getting-started.md) · [Interpret results](interpreting-results.md)
 
-## Start offline
+## Core security judgment
 
-Source extraction, deterministic practice findings, saved-report export, and local tests need no API
-key. Offline findings are useful remediation tasks where the rule establishes the practice. A model
-can help assess custom validation/protection semantics from supplied evidence; it cannot establish
-missing source facts. Assessment completion is separate from independent review and runtime confirmation.
+Decision-model assessment is required and core to Zazzles' security-assessment workflow. The scanner
+builds source-backed traces and operation/guard evidence for the model to judge. We develop and test
+with the OpenAI Decisions API using Luna (`gpt-6-luna`). Jev and other models are planned for future
+support. Model answers cannot replace missing source facts or override claim blockers.
+
+Inventory, evidence extraction, deterministic practice checks, saved-report rendering and local tests
+can run without an API key. Those are useful inspection/development modes; they do not complete the
+model-assessed security workflow. Assessment completion remains separate from independent review
+and runtime confirmation.
 
 ## Credentials and local environment
 
-Configure only the provider you deliberately choose:
+Configure Luna for the current assessed-scan workflow:
 
 | Scanner provider | Environment variable | Selection |
 |---|---|---|
 | OpenAI Decisions | `OPENAI_API_KEY` | `--judge openai --judge-model gpt-6-luna` |
-| Jev | `TYPESAFE_API_KEY` | `--judge jev --judge-model <exact-provider-model>` |
 
 Obtain a key through the selected provider's account/console. Keep it in a password manager or local
 ignored `.env`, never chat, tracked files, logs, or command arguments. The tracked
@@ -26,7 +30,7 @@ environment variables and does not automatically load the file.
 
 A funded API account/key is separate from source-transmission permission and the zazzles's request cap.
 The scanner has no currency-budget enforcement; choose an explicit small limit. There is no automatic
-provider fallback, and Jev requires an explicit model name. Agents must also obey the user's active provider/model restrictions.
+provider/model fallback. Agents must also obey the user's active provider/model restrictions.
 
 ## Scope a live run
 
@@ -37,7 +41,7 @@ Confirm the target root, entry file, selected route, and allowed source evidence
   set -a
   . ./.env
   set +a
-  ./bin/scan --strings --json --entry server.ts \
+  ./bin/scan --analyze --json --entry server.ts \
     --route /rest/user/login --judge openai --judge-model gpt-6-luna \
     --judge-limit 1 /path/to/app
 )

@@ -5,12 +5,12 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var ejsCode = regexp.MustCompile(`<%([=-]?)([\s\S]*?)%>`)
 
-func (f *flow) templateModule(file graph.Evidence, extension string) *sourceModule {
+func (f *flow) templateModule(file analysis.Evidence, extension string) *sourceModule {
 	if cached := f.set.modules[file.Span.File]; cached != nil {
 		return cached
 	}
@@ -53,9 +53,9 @@ func (f *flow) templateModule(file graph.Evidence, extension string) *sourceModu
 	return m
 }
 
-func (f *flow) templateLocals(m *sourceModule, locals *sitter.Node) (map[string]value, []graph.Evidence) {
+func (f *flow) templateLocals(m *sourceModule, locals *sitter.Node) (map[string]value, []analysis.Evidence) {
 	env := map[string]value{}
-	var bindings []graph.Evidence
+	var bindings []analysis.Evidence
 	if locals.Kind() == "object" {
 		for i := uint(0); i < locals.NamedChildCount(); i++ {
 			pair := locals.NamedChild(i)

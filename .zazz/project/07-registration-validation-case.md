@@ -1,5 +1,8 @@
 # Registration validation: next graph and judging case
 
+Historical contract/evidence below retains its original names. Current package, CLI and report
+names are documented in the [implemented architecture](../architecture.md#naming-and-compatibility).
+
 **Source review, 2026-10-31; target Juice Shop `v20.3.0`.** This is a concrete design/acceptance case
 for the next scanner increment, not a finding already emitted by scan. No application was started,
 HTTP request sent to the target, or additional model request made for this investigation.

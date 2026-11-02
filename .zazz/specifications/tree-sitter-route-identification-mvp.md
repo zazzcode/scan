@@ -1,5 +1,8 @@
 # Tree-sitter route identification — Deliverable Specification
 
+Historical contract/evidence below retains its original names. Current package, CLI and report
+names are documented in the [implemented architecture](../architecture.md#naming-and-compatibility).
+
 **Worktree / branch:** `tree-sitter-route-identification-mvp`
 **Feature:** JS/TS API route and syntactic code-path inventory
 **Milestone:** N/A — first scanner slice, ahead of the later phase list

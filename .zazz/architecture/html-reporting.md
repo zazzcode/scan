@@ -28,10 +28,10 @@ Source analysis → raw uses / assessments → human-readable finding records �
                                                                          └→ SARIF 2.1.0
 ```
 
-`--strings --json` includes additive human-readable `findings` and `presentation_version` fields.
-`--export-html <saved.json>` reads a schema-v1 string report and renders HTML offline; no target-source
+`--analyze --json` includes additive human-readable `findings` and `presentation_version` fields.
+`--export-html <saved.json>` reads a schema-1 or schema-2 analysis report and renders HTML offline; no target-source
 read, key, model request, application execution, or server is needed. `--export-sarif` uses the same
-saved report. `--strings --output-dir <base>` or `SCAN_FINDINGS_DIR` writes all three formats under
+saved report. `--analyze --output-dir <base>` or `SCAN_FINDINGS_DIR` writes all three formats under
 `<base>/<repo-name>/run-<id>/`. The explicit flag overrides the environment; an empty flag disables file
 output. Repository names come from the target basename; clones with equal basenames share a repository
 folder but never a run folder. Run directories use private permissions, and output files are created
@@ -41,7 +41,7 @@ without a machine-specific default. The local workspace convention is a sibling 
 The CLI keeps stdout JSON/SARIF redirectable while reporting the bundle path on stderr. Text mode
 prints bundle paths instead of the full text report when file output is active. Without file output,
 existing stdout behavior remains available. Export and list modes ignore the output environment
-variable; an explicit output-dir flag is valid only for strings scans. `.env` is not auto-loaded.
+variable; an explicit output-dir flag is valid only for analysis scans. `.env` is not auto-loaded.
 The user places regenerated JSON, HTML, and SARIF in the same run folder. Each generated view is a snapshot and must be regenerated after JSON changes.
 
 The exporter rebuilds deterministic presentation from saved raw uses, supporting older schema-v1
@@ -164,3 +164,6 @@ artifacts; reusable rendering and classification tests belong in Go test sources
 
 Curated public samples live under [docs/samples](../../docs/samples/README.md), with canonical JSON
 and offline-generated HTML/SARIF. Public root labels replace local absolute target paths.
+
+Current analysis JSON uses schema 2 and `analysis_guidelines`; schema-1 saved reports remain readable.
+See [naming and compatibility](../architecture.md#naming-and-compatibility).

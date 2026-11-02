@@ -1,10 +1,14 @@
 package judge
 
-import "github.com/zazzcode/zazzles/internal/graph"
+import "github.com/zazzcode/zazzles/internal/analysis"
 
 // applyPolicy uses claim-scoped completeness when supplied. Legacy candidates
 // remain conservative until their dependency and binding evidence is assembled.
-func applyPolicy(use graph.StringUse, a *graph.Assessment) {
+func applyPolicy(use analysis.CandidateUse, a *analysis.Assessment) {
+	if validationUse(use) {
+		applyValidationPolicy(use, a)
+		return
+	}
 	if use.Kind == "xss_candidate" {
 		applyXSSPolicy(use, a)
 		return
@@ -34,26 +38,26 @@ func applyPolicy(use graph.StringUse, a *graph.Assessment) {
 			a.Protection = "uncertain"
 		}
 	}
-	blockers := append([]graph.Gap{}, c.Blockers...)
+	blockers := append([]analysis.Gap{}, c.Blockers...)
 	for _, required := range c.Required {
 		if len(c.Evidence[required]) == 0 {
-			blockers = append(blockers, graph.Gap{Kind: "required_evidence_missing", Detail: required, At: use.Sink.Span})
+			blockers = append(blockers, analysis.Gap{Kind: "required_evidence_missing", Detail: required, At: use.Sink.Span})
 		}
 	}
 	if c.ClaimKind == "injection" {
 		if use.APIModel == nil {
-			blockers = append(blockers, graph.Gap{Kind: "api_contract_missing", Detail: "verified operation contract is required"})
+			blockers = append(blockers, analysis.Gap{Kind: "api_contract_missing", Detail: "verified operation contract is required"})
 		}
 		for _, role := range []string{"request_source", "sink_binding", "route_handler", "control_flow"} {
 			if len(c.Evidence[role]) == 0 {
-				blockers = append(blockers, graph.Gap{Kind: "injection_evidence_missing", Detail: role})
+				blockers = append(blockers, analysis.Gap{Kind: "injection_evidence_missing", Detail: role})
 			}
 		}
 		if use.Kind == "nosql_query_candidate" {
 			for _, name := range []string{"source_coverage", "library_coverage", "guard_coverage", "path_coverage"} {
 				answer := a.Answers[name]
 				if answer != "yes" {
-					blockers = append(blockers, graph.Gap{Kind: "injection_semantic_coverage", Detail: name + ": " + answer})
+					blockers = append(blockers, analysis.Gap{Kind: "injection_semantic_coverage", Detail: name + ": " + answer})
 				}
 			}
 		}

@@ -3,13 +3,13 @@ package report
 import (
 	"strings"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 // describeLog applies the sensitive-data logging outcome rules: an established
 // protocol credential in log content is a finding, hints and unresolved
 // transformations are Review, and only non-content facts are Protected.
-func describeLog(u graph.StringUse, f *graph.Finding) {
+func describeLog(u analysis.CandidateUse, f *analysis.Finding) {
 	var details []string
 	for _, g := range u.Gaps {
 		switch g.Kind {

@@ -34,6 +34,33 @@ func TestSavedDecisionReplayRequiresIdenticalEvidenceAndRetainsScores(t *testing
 	if strings.Contains(string(encoded), "never-persist-fixture-token") {
 		t.Fatal("trace includes authentication")
 	}
+	// Keep source and claim protocol identical while changing the supplied
+	// guidelines. Neither a changed document nor the old envelope may replay.
+	for _, change := range []string{"body", "key"} {
+		old := trace
+		var request map[string]json.RawMessage
+		if err := json.Unmarshal(trace.Request, &request); err != nil {
+			t.Fatal(err)
+		}
+		var input string
+		if err := json.Unmarshal(request["input"], &input); err != nil {
+			t.Fatal(err)
+		}
+		changed := ""
+		if change == "body" {
+			changed = strings.Replace(input, "# JavaScript and TypeScript analysis guidelines", "# historical guideline text", 1)
+		} else {
+			changed = strings.Replace(input, `"analysis_guidelines":`, `"practice":`, 1)
+		}
+		if changed == input {
+			t.Fatal("test did not change guideline input")
+		}
+		request["input"], _ = json.Marshal(changed)
+		old.Request, _ = json.Marshal(request)
+		if got := c.Replay(u, old); got.Status != "failed" {
+			t.Fatalf("reused decision with changed guidelines %s: %+v", change, got)
+		}
+	}
 	u.Sink.Text = "changed evidence"
 	if a := c.Replay(u, trace); a.Status != "failed" {
 		t.Fatal("reused a decision on changed source evidence")

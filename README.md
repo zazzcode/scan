@@ -1,21 +1,26 @@
 # Zazzles
 
-Zazzles is a Go static application security scanner (SAST) and dependency-audit CLI under active
+Zazzles is a Go static application security scanner (SAST) under active
 development. It aims to help developers and coding agents understand how request inputs reach
 security-sensitive operations,
 what validation and protection already hold, and where code needs hardening. Reports should give
 reviewers source evidence and explicit analysis gaps so they can judge each finding.
 
-The approach combines Tree-sitter source extraction with code-flow analysis and optional decision-model
-assessment of relevant evidence. Field validation and sink protection are separate questions: a valid
-email address does not establish that a SQL query uses bound parameters. Unknown behavior stays
-unknown rather than becoming a safety claim or a vulnerability by assumption.
+The approach combines Tree-sitter source extraction, code-flow analysis and decision-model
+assessment of source-backed evidence. Decision-model assessment is core to Zazzles' security judgment:
+the code trace supplies the relevant inputs, operations and controls for the model to assess. We
+develop and test with the OpenAI Luna Decision API (`gpt-6-luna`); support for Jev and other decision
+models is planned.
+
+Field validation and sink protection are separate questions: a valid email address does not establish
+that a SQL query uses bound parameters. Missing source facts and unresolved behavior remain explicit
+rather than becoming a safety claim or a vulnerability by assumption.
 
 ## Explore sample findings
 
-These reports show how a Zazzles scan works end to end: each is the unedited output of an offline scan of
-an intentionally vulnerable application, with route and browser entries, source-to-sink evidence, per-path
-protection, and Findings, Review and Protected results. Open one in your browser:
+These saved reports show scans of intentionally vulnerable applications, including route and browser
+entries, source-to-sink evidence, per-path protection, recorded assessments where available, and
+Findings, Review and Protected results. Open one in your browser:
 
 | Application | What the current sample shows | Output |
 |---|---|---|
@@ -32,63 +37,72 @@ coverage limits and refresh instructions; they will be updated as Zazzles improv
 ## Goals and current scope
 
 The goal is to report vulnerabilities, weak security practices, and sufficient protection by route,
-with useful explanations and remediation guidance. Longer term, Zazzles aims to match or exceed Bearer's
-SAST and developer-workflow capabilities with fewer false positives, measured at comparable detection
-coverage on independently labeled cases. Bearer and Semgrep Community Edition serve as local comparison
-tools. That is a project objective; broad parity is not established.
+with useful explanations and remediation guidance. Bearer and Semgrep Community Edition serve as local
+comparison tools on source-reviewed cases.
 
-Today, Zazzles analyzes local JavaScript and TypeScript source. It inventories Express-style routes
-(including CommonJS exports and static router mounts) and browser entries, follows a bounded subset of
-handlers, helpers, branches and promise continuations, and exports source evidence as JSON, standalone
-HTML, or SARIF. Supported capabilities:
+Today, Zazzles analyzes local **JavaScript, TypeScript and Python** source. It inventories supported
+Express-style routes (including CommonJS exports and static router mounts), Python Flask/Blueprint,
+RESTX and FastAPI routes, and browser entries. Bounded flow analysis follows handlers, imports,
+helpers, branches, selected asynchronous paths, and supported template/rendering operations. Reports
+export source evidence and claim judgments as JSON, standalone HTML or SARIF. The
+[Python coverage guide](docs/python-support.md) records framework and flow limits. Current capabilities:
 
 | Area | Current support |
 |---|---|
 | **Cross-site scripting (XSS)** | Reflected server output (Express `send`/`write`/`end`, EJS, Handlebars, Pug); template construction before compilation; stored XSS through Mongoose/Sequelize model fields, with each write path kept separate; DOM sinks, jQuery, React, Vue and Angular templates, including trust bypasses; cross-tier links from a browser output to the server route and JSON response field that produce it. Protection is context-specific (HTML text, attribute, URL, script, style) and must hold on every modeled path. |
-| **Injection** | String-built SQL, NoSQL selectors and `$where` construction, Sequelize raw queries |
-| **Input validation** | Request fields reaching sinks without modeled validation, kept separate from sink protection |
+| **Injection** | Verified SQL construction/binding and operation models, including Sequelize and bounded Python DB-API support; JS/TS NoSQL selectors and `$where` construction. Python NoSQL remains pending. |
+| **Input validation** | Source-backed field requirements and enforcing guards, kept separate from destination protection; missing business policy remains Review |
 | **Logging** | Request data and credentials reaching verified loggers |
 | **Outbound requests** | Request-influenced `fetch`/`axios` destinations |
-| **Judgment (optional)** | Versioned OpenAI Decisions or Jev questions; answers never replace missing source evidence |
+| **Core decision assessment** | Versioned evidence and claim-specific questions, developed and tested with Luna; answers never replace missing source facts or override blocking gaps |
 
 See the [XSS analysis guide](docs/analysis/xss.md) for the exact contracts and limits.
 
-Full control-flow and whole-program interprocedural analysis, independent findings review, Python and Go
+Full control-flow and whole-program interprocedural analysis, independent findings review, Go
 analysis, and dependency vulnerability scanning remain planned. Recognizing a file extension in the file list
 does not establish analysis support. A clean scan does not certify that an application is secure.
 
 ## Roadmap: vulnerability types
 
-Each type is delivered as its own bounded increment with source-reviewed answer keys, paired
-protected/unknown controls, and fresh sample reports. The order follows the
-[implementation plan](.zazz/project/implementation-plan.md#future-capability-branches): Python support
-comes next, then the remaining types below for JavaScript, TypeScript and Python.
+Checked boxes mark **initial implementation**, not complete coverage of every framework or input
+path. Each capability uses source-reviewed answer keys and vulnerable/protected/unknown controls;
+remaining gaps stay visible. The [project plan](.zazz/project/implementation-plan.md#future-capability-branches)
+contains the detailed per-language checklist and delivery order.
 
-| Vulnerability type | Status | First acceptance target |
-|---|---|---|
-| Input validation | Delivered | Request fields reaching sinks without modeled validation |
-| SQL injection (string-built queries) | Delivered | Juice Shop login/search query construction |
-| NoSQL injection (selectors, `$where`) | Delivered | Juice Shop and Goof Mongo/Mongoose queries |
-| Sensitive-data logging | Delivered | Credentials and request data reaching verified loggers and access logs |
-| Outbound request destinations | Review records | Request-influenced `fetch`/`axios` targets; SSRF judgment is planned below |
-| Cross-site scripting (XSS) | In progress | Reflected, stored, template, DOM and cross-tier cases across all three samples; Juice Shop stored/JWT/dialog origins remain |
-| **Python support** | **Next** | Python adapter for the delivered types above on a vulnerable Python app, with the same reports and judgment |
-| Hard-coded secrets | Planned | Private material in source; public verification keys stay negatives |
-| Command injection | Planned | `exec` of request input (TypeScript app `/api/ping`) |
-| Path traversal | Planned | `fs.readFile` of a request path (`/api/files`) |
-| Code injection | Planned | `eval` of a request expression (`/api/calculate`) |
-| XML external entities (XXE) | Planned | XML parse of a request body (`/api/parse-xml`) |
-| Open redirect | Planned | `res.redirect` of a request URL |
-| Weak randomness | Planned | `Math.random` used as a token |
-| Cookie, session and security headers | Planned | `httpOnly`, `secure`, session secret, missing baseline headers |
-| Server-side request forgery (SSRF) | Planned | Judge existing outbound destination candidates |
-| Prototype pollution | Planned | `_.merge` of request objects |
+**Initial implementation**
 
-After all of these OWASP attack types: dependency vulnerability scanning (SCA) for JavaScript,
-TypeScript and Python libraries. Other languages such as Go and Java come after that, along with finding
-baselines and CI gating. The
-[Semgrep CE and Bearer comparisons](.zazz/evaluation/semgrep-results.md) track each type against
-other scanners on the same labeled cases.
+- [x] Input validation — source-backed field policies and enforcement, separate from sink protection.
+- [x] SQL injection — verified query construction, value binding and source-to-operation evidence.
+- [x] NoSQL injection for JavaScript/TypeScript — supported selectors and executable expressions.
+- [x] Sensitive-data logger leaks — actual credential/personal-data content and logging behavior.
+- [x] Reflected/server-output XSS — HTML responses and supported template output contexts.
+- [x] Stored XSS — bounded source/write/read/render traces with explicit origin gaps.
+- [x] Client-side/DOM/framework XSS — supported JS/TS browser patterns and inline scripts in Python templates.
+- [x] API-to-browser XSS linkage for JavaScript/TypeScript — bounded cross-tier evidence.
+- [x] Python support — Flask/Blueprint, RESTX, FastAPI, DB-API bindings, Jinja/HTML, logging and outbound evidence.
+
+**Next and planned work**
+
+- [ ] **Command injection — next:** process/shell execution and protective patterns across JavaScript, TypeScript and Python.
+- [ ] Dynamic-route support — generated/factory routes in Python and Node.js; distinguish static/dynamic registration and resolution in reports.
+- [ ] XSS hardening — renderer configuration, helpers, generated routes, stored/cross-tier origins and VulnPy coverage gaps.
+- [ ] Complete Python NoSQL and API-to-browser XSS linkage coverage.
+- [ ] Path traversal — request-influenced paths and enforced containment.
+- [ ] Code injection — request-to-eval/code-generation paths.
+- [ ] XML external entities (XXE) — actual parsers and their security configuration.
+- [ ] Open redirect — request-influenced destinations and enforcing policy.
+- [ ] Weak randomness — random values used for security-sensitive purposes.
+- [ ] Cookie, session and security headers — configuration and source-backed baseline requirements.
+- [ ] Server-side request forgery (SSRF) — assess existing outbound-destination candidates and restrictions.
+- [ ] Prototype pollution — JS/TS prototype/object operations; document Python non-applicability.
+- [ ] Dependency vulnerability scanning (SCA) — resolved JavaScript/TypeScript and Python packages and advisories.
+- [ ] Secret scanning — private material in source, with public keys and placeholders as controls.
+- [ ] Additional languages — Go, Java and others after current-language capabilities, SCA and secret scanning.
+
+All future functionality must include JavaScript, TypeScript and Python acceptance evidence, with
+semantic non-applicability documented where relevant. We continue expanding the vulnerable-app
+library and comparing scans with independent source expectations and pinned Semgrep CE/Bearer
+baselines. VulnPy's known SQL/XSS misses remain tracked coverage work.
 
 ## Agent-first philosophy
 
@@ -102,12 +116,13 @@ same operation. Read the [project philosophy](docs/philosophy.md).
 
 Start with the [documentation index and introduction](docs/README.md):
 
+- [Technical approach](docs/technical-approach.md) — architecture rationale, strengths and comparisons
 - [Philosophy](docs/philosophy.md) — why and when an agent should fix code
 - [Getting started](docs/getting-started.md) — prerequisites, compilation, and `.env`
 - [Running scans](docs/running-scans.md) — modes, entry selection, output folders, and exports
 - [Interpreting results](docs/interpreting-results.md) — Findings, Review, Protected, evidence, and remediation
 - [Finding categories](docs/glossary.md) — definitions and current coverage
-- [Decision-model setup](docs/decision-models.md) — optional assessment and provider credentials
+- [Decision-model setup](docs/decision-models.md) — core assessment, source transmission and provider credentials
 - [CI/CD](docs/ci.md) — JSON, HTML, and SARIF artifacts
 - [Contributing](docs/contributing.md) — development workflow and verification
 
@@ -121,24 +136,34 @@ go build -o bin/scan ./cmd/scan
 ```
 
 For a new local setup, copy [.env.sample](.env.sample) to `.env`; merge settings if `.env` already
-exists so you preserve your keys. Zazzles does not auto-load `.env`. Offline scanning needs no API key.
+exists so you preserve your keys. Zazzles does not auto-load `.env`. Model-assessed security scans require the configured API key.
 See the [setup guide](docs/getting-started.md) for full instructions.
 
-### Optional decision-model setup
+### Required decision-model setup
 
-Use [decision-model setup](docs/decision-models.md) when explicitly enabling assessment. The scanner
+Configure [required decision-model assessment](docs/decision-models.md) with Luna before running a
+security assessment. Decision-model judgment is required and core to the workflow. The scanner
 reads the selected provider's key from its process environment. Model requests transmit source
 evidence and need an explicit request cap; a key is not a reason to run paid assessment automatically.
+
+Pass `--judge openai --judge-model gpt-6-luna --judge-limit <count>` to select the required model
+assessment. Inventory, evidence inspection and saved-report rendering remain available without API
+calls. Commands without `--judge` collect evidence but do not complete a model-assessed security scan.
 
 ## Run
 
 ```bash
 export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-findings"
-./bin/scan --strings --entry server.ts /path/to/juice-shop
-./bin/scan --strings --entry src/server.ts /path/to/vulnerable-typescript-app
+./bin/scan --analyze --entry server.ts \
+  --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/juice-shop
+./bin/scan --analyze --entry src/server.ts \
+  --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/vulnerable-typescript-app
+./bin/scan --analyze --entry server/routes.py \
+  --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/ThreatByte
 ```
 
-Each run creates `<output-root>/<repo-name>/run-<id>/` containing `findings.json`, `findings.html`, and
+The request cap bounds the run; uses beyond it remain unassessed and the report is incomplete.
+Choose a limit appropriate to the authorized scope. Each run creates `<output-root>/<repo-name>/run-<id>/` containing `findings.json`, `findings.html`, and
 `findings.sarif`. Open the printed HTML path to review expandable source rows and category definitions.
 `--output-dir` overrides the environment variable; `--output-dir ""` disables bundle output.
 

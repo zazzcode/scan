@@ -33,5 +33,17 @@ Name the field, requirement, relevant path, and evidence of the enforcement defe
 protection separate. Recommend changes that preserve valid application behavior, with normal,
 rejected, boundary, protected, and inconclusive cases where relevant.
 
-Current validation answers are facets of use records. Separate established per-field defect counting
-is incomplete; do not add overlapping category pills together as independent findings.
+Validation answers on query records remain facets. Policy-backed standalone field claims use a
+separate validation protocol and can establish an unmet requirement independently of SQL protection.
+Do not add overlapping category pills as independent defects. Complete required evidence and
+consistent policy/enforcement/coverage answers gate a definite field result.
+
+The [Python adapter](../python-support.md) includes relevant handler/helper code, branch preconditions
+and source-backed input constraints from a form posting to the same handler. Client constraints
+establish declared policy; they do not prove server enforcement. Standalone fields remain Review
+when no business policy is established. Query records retain separate validation and injection facets.
+
+The shared trace bundle indexes actual helper/condition evidence and exposes missing roles to the
+judge. Presence is not proof of enforcement. A Review recommendation names the missing fact; a
+validation-practice finding names the exact source-declared field constraints and direct-request
+rejection tests. Protected query guidance does not prescribe a speculative validation repair.

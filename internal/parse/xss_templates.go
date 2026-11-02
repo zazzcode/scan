@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"github.com/zazzcode/zazzles/internal/walk"
 )
 
@@ -18,15 +18,15 @@ var handlebarsOutput = regexp.MustCompile(`\{\{(\{?)([^{}]+)\}\}\}?`)
 var pugOutput = regexp.MustCompile(`([!#])\{([^}]+)\}`)
 var simpleTemplateField = regexp.MustCompile(`^[A-Za-z_$][A-Za-z0-9_$]*(?:\.[A-Za-z_$][A-Za-z0-9_$]*)*$`)
 
-func (s *moduleSet) readText(file string) (graph.Evidence, bool) {
+func (s *moduleSet) readText(file string) (analysis.Evidence, bool) {
 	file = filepath.ToSlash(filepath.Clean(file))
 	if file == "." || filepath.IsAbs(file) || strings.HasPrefix(file, "../") {
-		return graph.Evidence{}, false
+		return analysis.Evidence{}, false
 	}
 	for _, part := range strings.Split(file, "/") {
 		for _, skipped := range walk.DefaultSkipDirs {
 			if part == skipped {
-				return graph.Evidence{}, false
+				return analysis.Evidence{}, false
 			}
 		}
 	}
@@ -37,30 +37,30 @@ func (s *moduleSet) readText(file string) (graph.Evidence, bool) {
 	real, err := filepath.EvalSymlinks(path)
 	root, rootErr := filepath.EvalSymlinks(s.root)
 	if err != nil || rootErr != nil {
-		return graph.Evidence{}, false
+		return analysis.Evidence{}, false
 	}
 	relative, err := filepath.Rel(root, real)
 	if err != nil || relative == ".." || strings.HasPrefix(relative, ".."+string(filepath.Separator)) {
-		return graph.Evidence{}, false
+		return analysis.Evidence{}, false
 	}
 	info, err := os.Stat(path)
 	if err != nil || !info.Mode().IsRegular() || info.Size() > 2<<20 {
-		return graph.Evidence{}, false
+		return analysis.Evidence{}, false
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return graph.Evidence{}, false
+		return analysis.Evidence{}, false
 	}
-	e := graph.Evidence{Kind: "template", Text: string(data), SHA256: fmt.Sprintf("%x", sha256.Sum256(data)),
-		Span: graph.Span{File: file, StartLine: 1, EndLine: strings.Count(string(data), "\n") + 1, EndByte: len(data)}}
+	e := analysis.Evidence{Kind: "template", Text: string(data), SHA256: fmt.Sprintf("%x", sha256.Sum256(data)),
+		Span: analysis.Span{File: file, StartLine: 1, EndLine: strings.Count(string(data), "\n") + 1, EndByte: len(data)}}
 	if s.textSources == nil {
-		s.textSources = map[string]graph.Evidence{}
+		s.textSources = map[string]analysis.Evidence{}
 	}
 	s.textSources[file] = e
 	return e, true
 }
 
-func textRange(e graph.Evidence, start, end int, kind string) graph.Evidence {
+func textRange(e analysis.Evidence, start, end int, kind string) analysis.Evidence {
 	before, part := e.Text[:start], e.Text[start:end]
 	e.Kind = kind
 	e.Span.StartByte, e.Span.EndByte = start, end
@@ -70,9 +70,9 @@ func textRange(e graph.Evidence, start, end int, kind string) graph.Evidence {
 	return e
 }
 
-func (f *flow) renderSettings() (string, string, []graph.Evidence) {
+func (f *flow) renderSettings() (string, string, []analysis.Evidence) {
 	engine, views := "", "views"
-	var evidence []graph.Evidence
+	var evidence []analysis.Evidence
 	m := f.registration
 	if m == nil {
 		return "", "", nil
@@ -198,7 +198,8 @@ func (f *flow) renderTemplate(call, args *sitter.Node) {
 			context = pugOutputContext(file.Text[:match[0]])
 		}
 		sink := textRange(file, match[0], match[1], "template_output")
-		extra := append(append([]graph.Evidence{}, config...), f.module.evidence("template_render", call))
+		extra := append(append([]analysis.Evidence{}, config...), f.module.evidence("template_render", call))
+		extra = append(extra, renderMarkup(file, match[0], match[1]))
 		before := len(f.uses)
 		f.recordXSS(sink, v, context, "text/html", escaped, extra)
 		if len(f.uses) > before && escaped && requestRenderOptions(f, args.NamedChild(1)) {

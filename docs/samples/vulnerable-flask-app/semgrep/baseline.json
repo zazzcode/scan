@@ -1,0 +1,108 @@
+{
+  "tool": "semgrep",
+  "run": "semgrep-20261101-1",
+  "findings": [
+    {
+      "rule": "semgrep-rules.20261101.python.flask.security.injection.tainted-sql-string.tainted-sql-string",
+      "path": "vulnerable-flask-app.py",
+      "line": 20,
+      "message": "Detected user input used to manually construct a SQL string. This is usually bad practice because manual construction could accidentally result in a SQL injection. An attacker could use a SQL injection to steal or modify contents of the database. Instead, use a parameterized query which is available by default in most database engines. Alternatively, consider using an object-relational mapper (ORM) such as SQLAlchemy which will protect your queries."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.flask.security.audit.directly-returned-format-string.directly-returned-format-string",
+      "path": "vulnerable-flask-app.py",
+      "line": 37,
+      "message": "Detected Flask route directly returning a formatted string. This is subject to cross-site scripting if user input can reach the string. Consider using the template engine instead and rendering pages with 'render_template()'."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.django.security.injection.raw-html-format.raw-html-format",
+      "path": "vulnerable-flask-app.py",
+      "line": 43,
+      "message": "Detected user input flowing into a manually constructed HTML string. You may be accidentally bypassing secure methods of rendering HTML by manually constructing HTML and this could create a cross-site scripting vulnerability, which could let attackers steal sensitive user data. To be sure this is safe, check that the HTML is rendered safely. Otherwise, use templates (`django.shortcuts.render`) which will safely render HTML instead."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.flask.security.injection.raw-html-concat.raw-html-format",
+      "path": "vulnerable-flask-app.py",
+      "line": 43,
+      "message": "Detected user input flowing into a manually constructed HTML string. You may be accidentally bypassing secure methods of rendering HTML by manually constructing HTML and this could create a cross-site scripting vulnerability, which could let attackers steal sensitive user data. To be sure this is safe, check that the HTML is rendered safely. Otherwise, use templates (`flask.render_template`) which will safely render HTML instead."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.flask.security.injection.subprocess-injection.subprocess-injection",
+      "path": "vulnerable-flask-app.py",
+      "line": 58,
+      "message": "Detected user input entering a `subprocess` call unsafely. This could result in a command injection vulnerability. An attacker could use this vulnerability to execute arbitrary commands on the host, which allows them to download malware, scan sensitive data, or run any command they wish on the server. Do not let users choose the command to run. In general, prefer to use Python API versions of system commands. If you must use subprocess, use a dictionary to allowlist a set of commands."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.lang.security.dangerous-subprocess-use.dangerous-subprocess-use",
+      "path": "vulnerable-flask-app.py",
+      "line": 58,
+      "message": "Detected subprocess function 'check_output' with user controlled data. A malicious actor could leverage this to perform command injection. You may consider using 'shlex.escape()'."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.lang.security.audit.subprocess-shell-true.subprocess-shell-true",
+      "path": "vulnerable-flask-app.py",
+      "line": 58,
+      "message": "Found 'subprocess' function 'check_output' with 'shell=True'. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and variables, which makes it much easier for a malicious actor to execute commands. Use 'shell=False' instead."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.flask.security.audit.directly-returned-format-string.directly-returned-format-string",
+      "path": "vulnerable-flask-app.py",
+      "line": 62,
+      "message": "Detected Flask route directly returning a formatted string. This is subject to cross-site scripting if user input can reach the string. Consider using the template engine instead and rendering pages with 'render_template()'."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.django.security.injection.path-traversal.path-traversal-open.path-traversal-open",
+      "path": "vulnerable-flask-app.py",
+      "line": 76,
+      "message": "Found request data in a call to 'open'. Ensure the request data is validated or sanitized, otherwise it could result in path traversal attacks and therefore sensitive data being leaked. To mitigate, consider using os.path.abspath or os.path.realpath or the pathlib library."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.flask.security.injection.path-traversal-open.path-traversal-open",
+      "path": "vulnerable-flask-app.py",
+      "line": 77,
+      "message": "Found request data in a call to 'open'. Ensure the request data is validated or sanitized, otherwise it could result in path traversal attacks."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.flask.security.injection.subprocess-injection.subprocess-injection",
+      "path": "vulnerable-flask-app.py",
+      "line": 119,
+      "message": "Detected user input entering a `subprocess` call unsafely. This could result in a command injection vulnerability. An attacker could use this vulnerability to execute arbitrary commands on the host, which allows them to download malware, scan sensitive data, or run any command they wish on the server. Do not let users choose the command to run. In general, prefer to use Python API versions of system commands. If you must use subprocess, use a dictionary to allowlist a set of commands."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.lang.security.dangerous-subprocess-use.dangerous-subprocess-use",
+      "path": "vulnerable-flask-app.py",
+      "line": 119,
+      "message": "Detected subprocess function 'check_output' with user controlled data. A malicious actor could leverage this to perform command injection. You may consider using 'shlex.escape()'."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.lang.security.audit.subprocess-shell-true.subprocess-shell-true",
+      "path": "vulnerable-flask-app.py",
+      "line": 119,
+      "message": "Found 'subprocess' function 'check_output' with 'shell=True'. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and variables, which makes it much easier for a malicious actor to execute commands. Use 'shell=False' instead."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.django.security.injection.path-traversal.path-traversal-open.path-traversal-open",
+      "path": "vulnerable-flask-app.py",
+      "line": 127,
+      "message": "Found request data in a call to 'open'. Ensure the request data is validated or sanitized, otherwise it could result in path traversal attacks and therefore sensitive data being leaked. To mitigate, consider using os.path.abspath or os.path.realpath or the pathlib library."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.django.security.injection.request-data-write.request-data-write",
+      "path": "vulnerable-flask-app.py",
+      "line": 128,
+      "message": "Found user-controlled request data passed into '.write(...)'. This could be dangerous if a malicious actor is able to control data into sensitive files. For example, a malicious actor could force rolling of critical log files, or cause a denial-of-service by using up available disk space. Instead, ensure that request data is properly escaped or sanitized."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.flask.security.injection.path-traversal-open.path-traversal-open",
+      "path": "vulnerable-flask-app.py",
+      "line": 129,
+      "message": "Found request data in a call to 'open'. Ensure the request data is validated or sanitized, otherwise it could result in path traversal attacks."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host",
+      "path": "vulnerable-flask-app.py",
+      "line": 228,
+      "message": "Running flask app with host 0.0.0.0 could expose the server publicly."
+    }
+  ]
+}

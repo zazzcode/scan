@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func expressConstructor(m *sourceModule, fn *sitter.Node) bool {
@@ -48,20 +48,20 @@ func exportedReceiver(m *sourceModule) string {
 	return result
 }
 
-func (s *moduleSet) mountedRoutes(out *graph.StringReport, selected []string) {
+func (s *moduleSet) mountedRoutes(out *analysis.AnalysisReport, selected []string) {
 	s.mountedOrigins = map[string]bool{}
 	for _, file := range selected {
 		if m := s.modules[file]; m != nil {
 			s.scanMounts(out, m, m, "", 0, map[string]bool{})
 		}
 	}
-	entries := []graph.Entry{}
+	entries := []analysis.Entry{}
 	for _, entry := range out.Entries {
 		if !s.mountedOrigins[entry.Route.ID] {
 			entries = append(entries, entry)
 		}
 	}
-	uses := []graph.StringUse{}
+	uses := []analysis.CandidateUse{}
 	for _, use := range out.Uses {
 		if !s.mountedOrigins[use.RouteID] {
 			uses = append(uses, use)
@@ -70,9 +70,9 @@ func (s *moduleSet) mountedRoutes(out *graph.StringReport, selected []string) {
 	out.Entries, out.Uses = entries, uses
 }
 
-func (s *moduleSet) scanMounts(out *graph.StringReport, m, owner *sourceModule, prefix string, depth int, stack map[string]bool) {
+func (s *moduleSet) scanMounts(out *analysis.AnalysisReport, m, owner *sourceModule, prefix string, depth int, stack map[string]bool) {
 	if depth > 3 || stack[m.file] {
-		out.Gaps = append(out.Gaps, graph.Gap{Kind: "router_mount_limit", Detail: "Router mount nesting is cyclic or exceeds three levels", At: spanOf(m.file, m.tree.RootNode())})
+		out.Gaps = append(out.Gaps, analysis.Gap{Kind: "router_mount_limit", Detail: "Router mount nesting is cyclic or exceeds three levels", At: spanOf(m.file, m.tree.RootNode())})
 		return
 	}
 	stack[m.file] = true
@@ -106,17 +106,17 @@ func (s *moduleSet) scanMounts(out *graph.StringReport, m, owner *sourceModule, 
 		for i := range out.Entries {
 			entry := &out.Entries[i]
 			if entry.Route.Method == "USE" && entry.Route.Registration.File == m.file && entry.Route.Registration.StartByte == int(call.StartByte()) {
-				var gaps []graph.Gap
+				var gaps []analysis.Gap
 				for _, gap := range entry.Gaps {
 					if gap.Kind != "unresolved_handler" {
 						gaps = append(gaps, gap)
 					}
 				}
-				entry.Gaps = append(gaps, graph.Gap{Kind: "router_container", Detail: "Imported router endpoints are listed separately; effective middleware remains unresolved.", At: entry.Route.Registration})
+				entry.Gaps = append(gaps, analysis.Gap{Kind: "router_container", Detail: "Imported router endpoints are listed separately; effective middleware remains unresolved.", At: entry.Route.Registration})
 			}
 		}
 		fullPrefix := strings.TrimRight(prefix, "/") + path
-		context := []graph.Evidence{m.evidence("router_mount", call), m.evidence("router_import", imp.declaration)}
+		context := []analysis.Evidence{m.evidence("router_mount", call), m.evidence("router_import", imp.declaration)}
 		locals := map[string]*sitter.Node{}
 		collectFuncs(target.tree.RootNode(), target.src, locals)
 		walkCalls(target.tree.RootNode(), func(child *sitter.Node) {

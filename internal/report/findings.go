@@ -3,22 +3,22 @@ package report
 import (
 	"strings"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 // Enrich adds deterministic display records while preserving raw evidence and assessments.
-// Rebuilding from uses also lets older saved reports use the current presentation rules.
-func Enrich(r *graph.StringReport) {
-	r.PresentationVersion = 3
-	r.FindingTypes = append([]graph.FindingType(nil), findingTypes...)
-	r.Findings = make([]graph.Finding, 0, len(r.Uses))
+// Rebuilding from uses also lets older saved reports use the current presentation guidelines.
+func Enrich(r *analysis.AnalysisReport) {
+	r.PresentationVersion = 5
+	r.FindingTypes = append([]analysis.FindingType(nil), findingTypes...)
+	r.Findings = make([]analysis.Finding, 0, len(r.Uses))
 	for _, u := range r.Uses {
 		r.Findings = append(r.Findings, describe(u))
 	}
 }
 
-func describe(u graph.StringUse) graph.Finding {
-	f := graph.Finding{ID: "finding:" + u.ID, TypeIDs: findingTypeIDs(u), UseID: u.ID, RouteID: u.RouteID,
+func describe(u analysis.CandidateUse) analysis.Finding {
+	f := analysis.Finding{ID: "finding:" + u.ID, TypeIDs: findingTypeIDs(u), UseID: u.ID, RouteID: u.RouteID,
 		ClientID:   u.ClientID,
 		RecordType: "analysis", Status: "needs_review", Title: "Sensitive operation needs review",
 		Summary:    "Scan recorded a possible sensitive operation. Its security behavior has not been established.",
@@ -30,7 +30,7 @@ func describe(u graph.StringUse) graph.Finding {
 		detail := ""
 		switch g.Kind {
 		case "input_validation_absent":
-			detail = "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation."
+			detail = "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim."
 		case "input_validation_unresolved", "input_validation_middleware":
 			detail = "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use."
 		case "validation_insufficient_for_sink", "validation_type_only":
@@ -106,8 +106,13 @@ func describe(u graph.StringUse) graph.Finding {
 	if a.Status == "completed" {
 		if answer := a.Answers["validation"]; answer != "" {
 			f.Validation += " Model validation answer: " + displayLabel(answer) + "."
+			if u.Kind == "sql_query_candidate" || u.Kind == "nosql_query_candidate" {
+				f.Validation += " This operation-level answer is not an independent field-policy finding."
+			}
 		}
-		if u.Kind == "xss_candidate" {
+		if u.Kind == "input_validation_candidate" && u.Completeness != nil && u.Completeness.ClaimKind == "validation" {
+			f.Protection = "Field-policy enforcement: " + displayLabel(a.Protection) + ". " + a.Reason
+		} else if u.Kind == "xss_candidate" {
 			f.Protection = "Decision XSS exposure: " + displayLabel(a.Answers["xss_exposure"]) + ". Scanner policy: " + a.Reason
 		} else if u.Kind == "log_sink_candidate" {
 			f.Protection += " Assessed logging exposure: " + displayLabel(a.Answers["log_exposure"]) + " (data class " + displayLabel(a.Answers["data_class"]) + ", content " + displayLabel(a.Answers["content_exposure"]) + ", redaction " + displayLabel(a.Answers["redaction"]) + "). " + a.Reason
@@ -139,12 +144,22 @@ func describe(u graph.StringUse) graph.Finding {
 			if u.Completeness != nil && len(u.Completeness.Evidence["conditional_value"]) > 0 {
 				f.Uncertainty += " Conditional value paths are present. This static vulnerability judgment is scoped to an unsafe supported path under its configuration/branch precondition, not every runtime configuration; inspect the conditional-expression evidence."
 			}
+		case "poor_practice":
+			if u.Kind == "input_validation_candidate" && a.QuestionVersion == "validation-use-v2" && len(a.BlockingGaps) == 0 && a.Answers["field_requirement"] == "established" && a.Answers["enforcement_coverage"] == "complete" && a.Answers["validation"] == "insufficient" {
+				f.RecordType, f.Status = "finding", "poor_practice"
+				f.Title = "Declared field validation is not enforced"
+				f.Summary = "A source-backed requirement for the named field is not enforced on a supported server path. This is a validation-practice defect; exploitability at a downstream operation is assessed separately."
+			}
 		case "supported_potential":
 			if f.Status != "poor_practice" {
 				f.RecordType = "analysis"
 				f.Status = "supported_potential"
 			}
 		case "protected_for_claim":
+			if u.Kind == "input_validation_candidate" && u.Completeness != nil && u.Completeness.ClaimKind == "validation" {
+				f.Title = "Declared field policy is enforced"
+				f.Summary = "The supplied implementation and validation assessment support enforcement of the exact named field constraints. Downstream sink protection remains a separate claim."
+			}
 			if f.Status != "poor_practice" {
 				f.RecordType = "protection"
 				f.Status = "protected_for_claim"
@@ -160,17 +175,49 @@ func describe(u graph.StringUse) graph.Finding {
 			}
 		}
 	}
+	if f.RecordType == "protection" && (a.Status == "failed" || protectionBlocked(u)) {
+		f.Status = "needs_evidence"
+	}
+	if f.RecordType == "protection" && f.Status != "protected_for_claim" {
+		f.RecordType = "analysis"
+		f.Title = "Protection evidence is inconclusive"
+		f.Summary = "Some protective behavior was observed, but the complete claim remains unresolved. Review the named source, path and assessment gaps before relying on this output."
+	}
+	if f.RecordType == "protection" && u.Kind == "sql_query_candidate" {
+		f.Title = "SQL values remain separate from query syntax"
+		f.Summary = "The verified driver binding and injection assessment support data/statement separation for this operation. Field validity and authorization are separate claims."
+	}
 	if f.Status == "poor_practice" && u.Kind == "log_sink_candidate" {
 		f.Uncertainty += " Who can read the log destination and how long it is retained have not been assessed; that does not remove this remediation task."
-	} else if f.Status == "poor_practice" {
+	} else if f.Status == "poor_practice" && u.Kind != "input_validation_candidate" {
 		f.Uncertainty += " Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task."
 	}
+	f.Recommendations = scopedGuidance(u, f)
 	return f
 }
-func hasGap(u graph.StringUse, kind string) bool {
+func hasGap(u analysis.CandidateUse, kind string) bool {
 	for _, g := range u.Gaps {
 		if g.Kind == kind {
 			return true
+		}
+	}
+	return false
+}
+
+// Display must not inherit a safe label from an old assessment whose source claim
+// still declares blockers. The raw model answer remains available for audit.
+func protectionBlocked(u analysis.CandidateUse) bool {
+	if len(u.Assessment.BlockingGaps) > 0 {
+		return true
+	}
+	if c := u.Completeness; c != nil {
+		if len(c.Blockers) > 0 {
+			return true
+		}
+		for _, role := range c.Required {
+			if len(c.Evidence[role]) == 0 {
+				return true
+			}
 		}
 	}
 	return false

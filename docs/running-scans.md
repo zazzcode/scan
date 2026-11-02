@@ -7,13 +7,22 @@ it is not cloned, installed, or started by zazzles.
 
 ## Run
 
-After compiling, configure a results root outside the worktree and run a local scan:
+After compiling and [configuring required model assessment](decision-models.md), set a results root
+outside the worktree and run a model-assessed scan:
 
 ```bash
 export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-findings"
-./bin/scan --strings --entry server.ts /path/to/juice-shop
-./bin/scan --strings --entry src/server.ts /path/to/vulnerable-typescript-app
+./bin/scan --analyze --entry server.ts \
+  --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/juice-shop
+./bin/scan --analyze --entry src/server.ts \
+  --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/vulnerable-typescript-app
+./bin/scan --analyze --entry server/routes.py \
+  --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/ThreatByte
 ```
+
+Decision-model assessment is core to security judgment. The explicit request cap bounds a run;
+uses beyond it remain unassessed and the report is incomplete. Inventory, evidence-only inspection
+and saved-report rendering can run without calls, but do not complete model assessment.
 
 Each command prints a new run folder. The layout keeps repositories and successive runs separate:
 
@@ -31,7 +40,7 @@ _test-findings/
       findings.sarif
 ```
 
-`SCAN_FINDINGS_DIR` is the output root, and `--output-dir <root>` overrides it for one strings scan.
+`SCAN_FINDINGS_DIR` is the output root, and `--output-dir <root>` overrides it for one analysis scan.
 Use `--output-dir ""` to disable bundle output for one run. Paths are resolved relative to the working
 directory; use an absolute path for shared storage. The repository folder is named from the target
 root's basename, so clones sharing a basename share that folder but receive separate run folders.
@@ -58,10 +67,10 @@ or external assets are required; without JavaScript the default findings-first v
 the standard interchange format for security-tool integrations. Generated reports contain source
 excerpts, so keep them with the same access controls as that source.
 
-Without an output root, existing stdout modes still work. You can also regenerate views from JSON:
+Without an output root, stdout modes still work. For evidence-only inspection and offline rendering:
 
 ```bash
-./bin/scan --strings --json --output-dir "" --entry server.ts /path/to/app > findings.json
+./bin/scan --analyze --json --output-dir "" --entry server.ts /path/to/app > findings.json
 ./bin/scan --export-html findings.json > findings.html
 ./bin/scan --export-sarif findings.json > findings.sarif
 ```
@@ -91,10 +100,11 @@ go run ./cmd/scan --routes --json /path/to/app > graph.json
 
 ## What the graph contains
 
-`scan --routes` parses `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.tsx`, `.mts`, and `.cts`.
-It skips `node_modules`, `vendor`, `dist`, `build`, and the other dependency and output
-directories listed in `internal/walk`. `--list` still counts Python, Go, and Java files.
-Those files are not mined for routes.
+`scan --routes` parses supported JavaScript/TypeScript extensions and `.py` files. Python route
+extraction covers a bounded Flask/Blueprint, RESTX and FastAPI subset; generated registration and
+unresolved dispatch remain explicit coverage work. It skips `node_modules`, `vendor`, `dist`, `build`
+and other dependency/output directories listed in `internal/walk`. `--list` also recognizes Go and
+Java files; those languages do not yet have route analysis. See [Python limits](python-support.md).
 
 A route is a member call named `get`, `post`, `put`, `patch`, `delete`, `all`, or `use`
 whose path is a string literal starting with `/`, or an array of such strings.
@@ -128,7 +138,7 @@ trace.
 ## Route-to-string-use analysis
 
 ```bash
-go run ./cmd/scan --strings --json --entry server.ts <target-root>
+go run ./cmd/scan --analyze --json --entry server.ts <target-root>
 ```
 
 Entry paths are relative to the target repository. Use `server.ts` for Juice Shop and
@@ -158,7 +168,7 @@ constraints. This avoids guessing business requirements from a helper's name or 
 Two known target cases are tracked in `.zazz/evaluation/juice-shop/validation-checks.json`:
 
 ```bash
-go run ./cmd/scan --strings --json --entry server.ts \
+go run ./cmd/scan --analyze --json --entry server.ts \
   --checks .zazz/evaluation/juice-shop/validation-checks.json <target-root>
 ```
 
@@ -172,7 +182,7 @@ novel repositories remains incomplete; see [discovery design](../.zazz/architect
 ## SARIF output
 
 ```bash
-go run ./cmd/scan --strings --sarif --entry server.ts <target-root> > findings.sarif
+go run ./cmd/scan --analyze --sarif --entry server.ts <target-root> > findings.sarif
 go run ./cmd/scan --export-sarif saved-evidence.json > findings.sarif
 ```
 
@@ -192,3 +202,15 @@ See [the XSS analysis guide](analysis/xss.md) for protection gates and current l
 Use **Hide protected results** to focus on Findings and Review. It hides protected records and
 protected-only source entries; saved JSON/SARIF and total counts remain unchanged. A Protected result
 is scoped to its exact output and evidence, never the entire route/application.
+
+## Analysis naming and saved-report compatibility
+
+`--analyze` selects bounded security analysis of route and browser candidate uses. The previous
+`--strings` flag remains a compatibility alias. Both perform the same analysis; add an explicitly
+configured `--judge` for the required model-assessed security workflow.
+
+Fresh analysis JSON uses `schema_version: 2` and `analysis_guidelines` metadata in place of
+`practice`. Route inventory JSON remains schema 1. HTML/SARIF export accepts saved analysis reports
+from schemas 1 and 2, including historical guideline metadata. Saved sample reports retain their
+original assessments and provenance; changed guideline text or model inputs cannot reuse those
+answers as judgments of a new scan. Consumers reading fresh JSON should use `analysis_guidelines`.

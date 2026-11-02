@@ -1,14 +1,14 @@
 package parse
 
 import (
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"sort"
 	"strings"
 )
 
 // automaticQueries reuses claim-scoped assembly without benchmark answer files.
-func (s *moduleSet) automaticQueries(report *graph.StringReport) {
-	entries := map[string]graph.Entry{}
+func (s *moduleSet) automaticQueries(report *analysis.AnalysisReport) {
+	entries := map[string]analysis.Entry{}
 	for _, e := range report.Entries {
 		entries[e.Route.ID] = e
 	}
@@ -38,11 +38,11 @@ func (s *moduleSet) automaticQueries(report *graph.StringReport) {
 			names = append(names, name)
 		}
 		sort.Strings(names)
-		check := graph.Check{ID: "automatic-query", Method: entry.Route.Method, Path: entry.Route.PathPattern, Kind: kind, Fields: names,
+		check := analysis.Check{ID: "automatic-query", Method: entry.Route.Method, Path: entry.Route.PathPattern, Kind: kind, Fields: names,
 			Validation: "Assess only field requirements established by the supplied code; missing business constraints remain uncertain.",
 			Protection: "Untrusted input must remain data and must not change executable query syntax or selector operators. Evaluate actual transformations and enforcing guards separately from construction practice."}
-		tmp := &graph.StringReport{Entries: []graph.Entry{entry}, Uses: []graph.StringUse{old}}
-		s.buildChecks(tmp, []graph.Check{check})
+		tmp := &analysis.AnalysisReport{Entries: []analysis.Entry{entry}, Uses: []analysis.CandidateUse{old}}
+		s.buildChecks(tmp, []analysis.Check{check})
 		for _, assembled := range tmp.Uses {
 			if assembled.Kind == old.Kind {
 				assembled.ID = old.ID
@@ -53,7 +53,7 @@ func (s *moduleSet) automaticQueries(report *graph.StringReport) {
 	}
 }
 
-func (s *moduleSet) collectionBinding(use graph.StringUse) []graph.Evidence {
+func (s *moduleSet) collectionBinding(use analysis.CandidateUse) []analysis.Evidence {
 	m := s.modules[use.Sink.Span.File]
 	if m == nil {
 		return nil
@@ -72,7 +72,7 @@ func (s *moduleSet) collectionBinding(use graph.StringUse) []graph.Evidence {
 	}
 	if obj := fn.ChildByFieldName("object"); obj != nil && obj.Kind() == "identifier" && !shadowed(call, obj.Utf8Text(m.src), m.src) {
 		if id := s.modelIdentity(m, obj.Utf8Text(m.src), 0); strings.HasPrefix(id, "mongoose:") {
-			binding := append([]graph.Evidence{}, s.modelEvidence[id]...)
+			binding := append([]analysis.Evidence{}, s.modelEvidence[id]...)
 			for i := range binding {
 				binding[i].Kind = "sink_binding"
 			}
@@ -94,7 +94,7 @@ func (s *moduleSet) collectionBinding(use graph.StringUse) []graph.Evidence {
 	parts := strings.Split(obj.Utf8Text(m.src), ".")
 	target := m
 	name := parts[0]
-	out := []graph.Evidence{}
+	out := []analysis.Evidence{}
 	if len(parts) == 2 {
 		imp, ok := m.imports[parts[0]]
 		if !ok || imp.name != "*" {

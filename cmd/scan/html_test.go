@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -15,7 +15,7 @@ import (
 func TestExportHTMLFromSavedReport(t *testing.T) {
 	dir := t.TempDir()
 	file := filepath.Join(dir, "report.json")
-	saved := graph.StringReport{SchemaVersion: 1, Root: "target-no-longer-present", Entries: []graph.Entry{{Route: graph.Route{ID: "r", Method: "POST", PathPattern: "/login"}}}, Uses: []graph.StringUse{{ID: "u", RouteID: "r", Kind: "sql_query_candidate", Sink: graph.Evidence{Text: "db.query(sql)"}, Assessment: graph.Assessment{Status: "not_run"}}}}
+	saved := analysis.AnalysisReport{SchemaVersion: 1, Root: "target-no-longer-present", Entries: []analysis.Entry{{Route: analysis.Route{ID: "r", Method: "POST", PathPattern: "/login"}}}, Uses: []analysis.CandidateUse{{ID: "u", RouteID: "r", Kind: "sql_query_candidate", Sink: analysis.Evidence{Text: "db.query(sql)"}, Assessment: analysis.Assessment{Status: "not_run"}}}}
 	data, _ := json.Marshal(saved)
 	if err := os.WriteFile(file, data, 0600); err != nil {
 		t.Fatal(err)
@@ -28,14 +28,14 @@ func TestExportHTMLFromSavedReport(t *testing.T) {
 	if !bytes.Equal(data, after) {
 		t.Fatal("export changed canonical JSON")
 	}
-	for _, args := range [][]string{{"--export-html", file, "--export-sarif", file}, {"--export-html", file, "--json"}, {"--export-html", file, "--strings", "target"}, {"--export-html", file, "--judge", "openai"}} {
+	for _, args := range [][]string{{"--export-html", file, "--export-sarif", file}, {"--export-html", file, "--json"}, {"--export-html", file, "--analyze", "target"}, {"--export-html", file, "--judge", "openai"}} {
 		out.Reset()
 		errout.Reset()
 		if code := run(args, &out, &errout); code != 2 {
 			t.Fatalf("args=%v code=%d", args, code)
 		}
 	}
-	for _, bad := range []string{`{`, `{"schema_version":2,"uses":[]}`, `{"schema_version":1,"routes":[]}`} {
+	for _, bad := range []string{`{`, `{"schema_version":99,"uses":[]}`, `{"schema_version":1,"routes":[]}`} {
 		if err := os.WriteFile(file, []byte(bad), 0600); err != nil {
 			t.Fatal(err)
 		}
@@ -57,16 +57,16 @@ func TestOutputDirectoryPrecedenceAndStdout(t *testing.T) {
 	override := filepath.Join(base, "flag")
 	t.Setenv("SCAN_FINDINGS_DIR", environmentDir)
 	for _, args := range [][]string{
-		{"--strings", "--entry", "server.ts", target},
-		{"--strings", "--json", "--output-dir", override, "--entry", "server.ts", target},
-		{"--strings", "--json", "--output-dir", "", "--entry", "server.ts", target},
+		{"--analyze", "--entry", "server.ts", target},
+		{"--analyze", "--json", "--output-dir", override, "--entry", "server.ts", target},
+		{"--analyze", "--json", "--output-dir", "", "--entry", "server.ts", target},
 	} {
 		var out, stderr bytes.Buffer
 		if code := run(args, &out, &stderr); code != 0 {
 			t.Fatalf("code=%d err=%s", code, stderr.String())
 		}
 		if strings.Contains(strings.Join(args, " "), "--json") {
-			var report graph.StringReport
+			var report analysis.AnalysisReport
 			if err := json.Unmarshal(out.Bytes(), &report); err != nil || len(report.Findings) == 0 {
 				t.Fatalf("stdout not evidence JSON: %s", out.String())
 			}
@@ -88,7 +88,7 @@ func TestOutputDirectoryPrecedenceAndStdout(t *testing.T) {
 	if code := run([]string{"--list", "--output-dir", override, target}, &out, &stderr); code != 2 {
 		t.Fatalf("list output-dir code=%d", code)
 	}
-	if code := run([]string{"--strings", "--output-dir", target + "/server.ts", "--entry", "server.ts", target}, &out, &stderr); code != 1 {
+	if code := run([]string{"--analyze", "--output-dir", target + "/server.ts", "--entry", "server.ts", target}, &out, &stderr); code != 1 {
 		t.Fatalf("file output-dir code=%d", code)
 	}
 }
@@ -112,7 +112,7 @@ func TestFailedJudgeRetainsOutputBundle(t *testing.T) {
 	http.DefaultTransport = failingReportTransport{}
 	t.Cleanup(func() { http.DefaultTransport = previous })
 	var out, stderr bytes.Buffer
-	if code := run([]string{"--strings", "--entry", "server.ts", "--judge", "openai", "--judge-limit", "1", target}, &out, &stderr); code != 1 {
+	if code := run([]string{"--analyze", "--entry", "server.ts", "--judge", "openai", "--judge-limit", "1", target}, &out, &stderr); code != 1 {
 		t.Fatalf("code=%d stderr=%s", code, stderr.String())
 	}
 	files, err := filepath.Glob(filepath.Join(base, "string-flow", "run-*", "findings.json"))
@@ -123,7 +123,7 @@ func TestFailedJudgeRetainsOutputBundle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var report graph.StringReport
+	var report analysis.AnalysisReport
 	if err := json.Unmarshal(data, &report); err != nil || report.Uses[0].Assessment.Status != "failed" {
 		t.Fatal("failure lost")
 	}

@@ -4,12 +4,12 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 // conditionalConstraints describes output alternatives, rather than propagating
 // a conversion's guarantee across sibling branches. It does not decide injection.
-func conditionalConstraints(m *sourceModule, n *sitter.Node, c *graph.Completeness) {
+func conditionalConstraints(m *sourceModule, n *sitter.Node, c *analysis.Completeness) {
 	if n == nil || n.Kind() != "ternary_expression" {
 		return
 	}

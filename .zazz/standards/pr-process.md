@@ -12,28 +12,28 @@ remediations.
 ## PR titles — bracketed scope labels
 
 Every PR title begins with one or more bracketed scope labels, before any descriptive text. Labels map to
-the package layout in [architecture package map](../architecture.md#11-proposed-package-boundaries), so a reader can tell which part of
+the package layout in [architecture package map](../architecture.md#11-implemented-package-boundaries), so a reader can tell which part of
 the tool a PR touches before opening it.
 
 | Label | Scope |
 |---|---|
 | `CLI` | `cmd/scan` — flags, output formats, exit codes |
 | `PARSE` | `internal/parse`, `internal/lang` — Tree-sitter integration, grammars, parsing |
-| `GRAPH` | `internal/graph` — node and edge model, resolver, argument bindings |
-| `RULES` | `internal/rules`, `internal/patterns` — rule engine, pattern rules, classification |
-| `TRACE` | `internal/trace`, `internal/flow` — supported CFG/dataflow, witnesses, pruning |
+| `ANALYSIS` | `internal/analysis` — shared route, candidate, evidence and assessment records |
+| `GUIDELINES` | `internal/guidelines` — embedded language Analysis Guidelines |
+| `TRACE` | Bounded flow and witnesses currently in `internal/parse`; future dedicated packages |
 | `SCOPES` | future bounded scope checks, if separately approved |
-| `JEV` | `internal/jev` — typed System One transport/questions/answers |
-| `LLM` | `internal/llm` — LLM Findings Reviewer, evidence checks and structured review |
-| `CONTEXT` | `internal/context`, `internal/policy` — evidence, routing, decision policy |
-| `FIND` | `internal/findings` — identity, ledger, baseline, diffing |
-| `REPORT` | `internal/report` — JSON and Markdown emitters |
+| `JUDGE` | `internal/judge` — provider transport, questions, answers, evidence and claim policy |
+| `LLM` | Planned independent Findings Reviewer; no implemented reviewer package |
+| `CONTEXT` | Evidence assembly in `internal/parse` and `internal/judge`; dedicated packages are planned |
+| `FIND` | Planned finding identity/baseline/diffing; presentation currently lives in `internal/report` |
+| `REPORT` | `internal/report` — JSON, HTML and SARIF emitters |
 | `CI` | GitHub Actions, tooling, and format gates |
 | `DOC` | Documentation, standards, and specifications |
 | `AGENT` | Agent skills and agent configuration under `.agents/` |
 
 Cross-cutting PRs combine labels with `+` and **no spaces** inside the brackets. The canonical form is
-`[GRAPH+TRACE]`, never `[GRAPH + TRACE]` or `[GRAPH] + [TRACE]`.
+`[ANALYSIS+TRACE]`, never `[ANALYSIS + TRACE]` or `[ANALYSIS] + [TRACE]`.
 
 A label that maps to a package does not mean every change in that package needs every label — use the
 labels for the packages the PR actually changes.
@@ -42,14 +42,14 @@ labels for the packages the PR actually changes.
 
 ```text
 [PARSE] Add TypeScript grammar and extension registry
-[GRAPH] Resolve barrel re-exports through index.ts
+[PARSE] Resolve barrel re-exports through index.ts
 [TRACE] Bound path search depth and report dropped candidates
-[RULES] Add NoSQL operator-injection pattern rule
-[JEV] Validate typed answers and uncertainty outcomes
+[GUIDELINES] Clarify SQL parameter-binding analysis guidelines
+[JUDGE] Validate typed answers and uncertainty outcomes
 [FIND] Fingerprint findings from rule identity and scoped sink site
 [CI] Add race-detector test job
 [DOC] Add path-tracking standard and register in index
-[GRAPH+TRACE] Add argument bindings and consume them in path search
+[ANALYSIS+TRACE] Add argument bindings and consume them in path search
 [CLI+REPORT] Report incomplete analysis and candidate evidence
 ```
 
@@ -59,11 +59,11 @@ labels for the packages the PR actually changes.
 Add TypeScript grammar
 # missing scope label entirely
 
-[GRAPH] + [TRACE] Add argument bindings
-# split brackets; canonical form is [GRAPH+TRACE]
+[ANALYSIS] + [TRACE] Add argument bindings
+# split brackets; canonical form is [ANALYSIS+TRACE]
 
-[GRAPH + TRACE] Add argument bindings
-# spaces around +; canonical form is [GRAPH+TRACE]
+[ANALYSIS + TRACE] Add argument bindings
+# spaces around +; canonical form is [ANALYSIS+TRACE]
 ```
 
 ## PR scope — one logical change per PR
@@ -85,14 +85,14 @@ fix lands in its own commit with a clear message so `git revert` and `git blame`
 [TRACE] Fix depth bound excluding sinks at the boundary
 # one-liner extracted from a feature PR
 
-[GRAPH+TRACE] Track paths across resolved barrel imports
+[ANALYSIS+TRACE] Track paths across resolved barrel imports
 # feature only, no bundled refactors or drive-by fixes
 ```
 
 ### Not desired ❌
 
 ```text
-[GRAPH+TRACE] Track barrel-import paths + rename Node.Role + reformat package
+[ANALYSIS+TRACE] Track barrel-import paths + rename Node.Role + reformat package
 # three logically distinct changes bundled into one PR
 ```
 

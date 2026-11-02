@@ -16,15 +16,43 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 
 ## Current work
 
-**Active worktree, 2026-11-01: `xss-response`.** The first XSS discovery/reporting pass was
+**Follow-up foundation:** the [common entry/dispatch brief](../project/common-entry-dispatch.md)
+records a separate implementation activity before dynamic-route/GraphQL adapters. Current code
+still has HTTP-shaped entry/check records; naming changes do not implement the generalized model.
+Use the current reviewed Python/terminology revision as the prerequisite, not the old pre-rename API.
+
+**Architecture/terminology closeout:** embedded documents are **Analysis Guidelines**
+(`internal/guidelines`); shared records live in `internal/analysis` as `CandidateUse`,
+`AnalysisReport` and `RouteInventory`. `--analyze` is canonical; `--strings` remains an external
+alias. Fresh analysis JSON is schema 2 with `analysis_guidelines`; schema-1 saved reports still
+export. See the [implemented architecture](../architecture.md) and the
+[closeout contract](../specifications/python-support.md#architecture-and-terminology-closeout).
+Historical reports retain their original versions/answers; changed guideline inputs need fresh judgments.
+
+
+**Active worktree, 2026-11-01: `python-support-base`.** The bounded Python adapter is implemented
+and tested on three pinned apps. Read the [Python contract](../specifications/python-support.md),
+[results and limits](../evaluation/python-support-results.md), and [user guide](../../docs/python-support.md)
+for resumption. Raw results remain under `_test-findings/<app>/run-<id>/`; source keys, hashes and curated
+reports are in root `docs/samples/`. 184 Luna calls were completed; saved answers require exact
+request matching and changed evidence cannot inherit them. The user authorized pushing `python-support-base` and continued general hardening;
+The user subsequently authorized committing/pushing this closeout and creating a draft PR into
+`stage`. Integration pushes and merge remain unauthorized. Python NoSQL is out of corpus/unimplemented. Shared trace/report hardening and policy-backed
+validation are documented in [trace judgment](../architecture/trace-judgment.md); all 29 independent
+Python case checks pass. Only final Protected records are green.
+Living answer guides for ThreatByte, the FastAPI app and the added VulnPy corpus are linked from
+[Python results](../evaluation/python-support-results.md). VulnPy has six known positive coverage misses
+and four warning controls; its offline baseline is not part of the original 29-case pass claim.
+
+**Previous XSS worktree: `xss-response`.** The first XSS discovery/reporting pass was
 committed and pushed as `26f50d0`. Verify the actual path, branch and changes with `pwd` and
 `git status --short --branch`; later work may have advanced the branch.
 
-For the next analysis/judging hardening session, read in this order:
+For a later JS/TS XSS hardening session, read in this order:
 
 1. [Implementation results](../evaluation/xss-implementation-results.md) for delivered behavior,
    current sample counts, actual model observations and verification limits.
-2. The local, gitignored [XSS handoff](../ephemeral/xss-analysis-handoff.md), if present, for prioritized
+2. The local, gitignored XSS handoff (`.zazz/ephemeral/xss-analysis-handoff.md`), if present, for prioritized
    investigations, code entry points and the suggested first bounded task. Handoffs MUST stay under
    `.zazz/ephemeral/` and MUST NOT be committed. A fresh clone will not contain them; resume from
    the tracked results, contract and reference documents instead.
@@ -40,12 +68,12 @@ scanner parity. Cross-tier origin, helper/control-flow and protection completene
 work; unsupported paths stay Review. The [results](../evaluation/xss-implementation-results.md) own
 current details; historical reports may contain superseded protection labels.
 
-**Next-session boundaries:** further XSS hardening uses this same worktree, one bounded case at a
+**XSS follow-up boundaries:** further XSS hardening uses `xss-response`, one bounded case at a
 time. Preserve all implemented analyzers and compare against independent source references.
 Baseline vulnerable apps MUST remain unchanged; remediation uses copies. Five approved Luna calls
 are complete and saved for offline inspection/replay. They authorize no additional paid requests.
-Changed evidence MUST NOT reuse old model answers. Python vulnerable-app support follows XSS, then the remaining vulnerability types, then SCA for JS/TS and
-Python; other languages come after all OWASP attack types and SCA;
+Changed evidence MUST NOT reuse old model answers. The bounded Python adapter is now documented above; remaining vulnerability types follow, then SCA
+for JS/TS and Python; other languages come after all OWASP attack types and SCA;
 shared graph/judgment/report facts remain language-neutral. No merge or integration push is authorized.
 
 **Sample applications are read-only scan targets.** Zazzles detects vulnerabilities; agents do not
@@ -174,7 +202,7 @@ and preserve human authority. Assigned process changes do not authorize scanner 
 Commands and contributor checks: [README](../../README.md#contributing). Current live-model setup:
 [OpenAI Decisions setup](openai-decisions-setup.md). Offline extraction and fixture work need no key.
 The decision-model key is already configured in the local ignored `.env`; agents MUST NOT print it.
-The scanner does not auto-load that file; see the [README](../../README.md#optional-decision-model-setup).
+The scanner does not auto-load that file; see the [README](../../README.md#required-decision-model-setup).
 API setup is separate from permission to transmit target source or execute a paid evaluation.
 Live requests remain restricted to OpenAI Decisions with `gpt-6-luna`, small explicit request caps,
 and no provider/model fallback. The previously reported $10 funding is context, not a spending authorization.

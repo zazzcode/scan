@@ -1,9 +1,9 @@
 package report
 
-import "github.com/zazzcode/zazzles/internal/graph"
+import "github.com/zazzcode/zazzles/internal/analysis"
 
 // findingTypes is the shared terminology registry, independent of detector verdicts.
-var findingTypes = []graph.FindingType{
+var findingTypes = []analysis.FindingType{
 	{ID: "dom-xss", Label: "Client-side XSS", Coverage: "bounded browser DOM and Angular/React/Vue analysis",
 		Description:    "Browser or API data reaches a DOM or framework rendering operation in an active output context.",
 		Interpretation: "Client entries identify browser sources and verified sinks. Raw flows are construction findings; unknown origin, trust-to-template linkage or API response mapping remains Review. Framework defaults can protect a specific output.",
@@ -50,15 +50,15 @@ var findingTypes = []graph.FindingType{
 		Remediation:    "Resolve the source, operation, API behavior, and required protection before selecting a fix."},
 }
 
-var findingTypesByID = func() map[string]graph.FindingType {
-	index := make(map[string]graph.FindingType, len(findingTypes))
+var findingTypesByID = func() map[string]analysis.FindingType {
+	index := make(map[string]analysis.FindingType, len(findingTypes))
 	for _, t := range findingTypes {
 		index[t.ID] = t
 	}
 	return index
 }()
 
-func findingTypeIDs(u graph.StringUse) []string {
+func findingTypeIDs(u analysis.CandidateUse) []string {
 	kind := u.Kind
 	if u.Check != nil {
 		kind = u.Check.Kind

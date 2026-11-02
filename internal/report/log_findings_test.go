@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func TestLogOutcomes(t *testing.T) {
@@ -26,12 +26,12 @@ func TestLogOutcomes(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			u := graph.StringUse{ID: "u", Kind: "log_sink_candidate", Assessment: graph.Assessment{Status: "not_run"}}
+			u := analysis.CandidateUse{ID: "u", Kind: "log_sink_candidate", Assessment: analysis.Assessment{Status: "not_run"}}
 			for _, k := range tt.gaps {
-				u.Gaps = append(u.Gaps, graph.Gap{Kind: k, Detail: k + " detail"})
+				u.Gaps = append(u.Gaps, analysis.Gap{Kind: k, Detail: k + " detail"})
 			}
-			u.Gaps = append(u.Gaps, graph.Gap{Kind: "log_destination_unresolved"})
-			r := &graph.StringReport{Uses: []graph.StringUse{u}}
+			u.Gaps = append(u.Gaps, analysis.Gap{Kind: "log_destination_unresolved"})
+			r := &analysis.AnalysisReport{Uses: []analysis.CandidateUse{u}}
 			Enrich(r)
 			f := r.Findings[0]
 			if f.RecordType != tt.record || f.Status != tt.status || !strings.Contains(f.Title, tt.titleWord) {
@@ -48,7 +48,7 @@ func TestLogOutcomes(t *testing.T) {
 }
 
 func TestLogSARIFRule(t *testing.T) {
-	r := &graph.StringReport{SchemaVersion: 1, Uses: []graph.StringUse{{ID: "u", Kind: "log_sink_candidate", Sink: graph.Evidence{Text: "console.log(x)", Span: graph.Span{File: "server.ts", StartLine: 2}}, Gaps: []graph.Gap{{Kind: "log_protocol_credential"}}, Assessment: graph.Assessment{Status: "not_run"}}}}
+	r := &analysis.AnalysisReport{SchemaVersion: 1, Uses: []analysis.CandidateUse{{ID: "u", Kind: "log_sink_candidate", Sink: analysis.Evidence{Text: "console.log(x)", Span: analysis.Span{File: "server.ts", StartLine: 2}}, Gaps: []analysis.Gap{{Kind: "log_protocol_credential"}}, Assessment: analysis.Assessment{Status: "not_run"}}}}
 	data, err := json.Marshal(SARIF(r))
 	if err != nil {
 		t.Fatal(err)
@@ -68,11 +68,11 @@ func TestRequestLineOutcomes(t *testing.T) {
 		{[]string{"log_request_line_hint"}, "needs_review"},
 	}
 	for _, tt := range cases {
-		u := graph.StringUse{ID: "u", Kind: "log_sink_candidate", Assessment: graph.Assessment{Status: "not_run"}}
+		u := analysis.CandidateUse{ID: "u", Kind: "log_sink_candidate", Assessment: analysis.Assessment{Status: "not_run"}}
 		for _, k := range tt.gaps {
-			u.Gaps = append(u.Gaps, graph.Gap{Kind: k, Detail: k})
+			u.Gaps = append(u.Gaps, analysis.Gap{Kind: k, Detail: k})
 		}
-		r := &graph.StringReport{Uses: []graph.StringUse{u}}
+		r := &analysis.AnalysisReport{Uses: []analysis.CandidateUse{u}}
 		Enrich(r)
 		if r.Findings[0].Status != tt.status || !strings.Contains(r.Findings[0].Title, "URL query") || (tt.status == "needs_review" && !strings.Contains(r.Findings[0].Title, "sensitive data")) {
 			t.Fatalf("%v -> %+v", tt.gaps, r.Findings[0])
@@ -81,9 +81,9 @@ func TestRequestLineOutcomes(t *testing.T) {
 }
 
 func TestRouteRecordsListFindingsFirst(t *testing.T) {
-	r := &graph.StringReport{SchemaVersion: 1, Entries: []graph.Entry{{Route: graph.Route{ID: "r", Method: "GET", PathPattern: "/x"}}}, Uses: []graph.StringUse{
-		{ID: "a", RouteID: "r", Kind: "outbound_http_candidate", Sink: graph.Evidence{Text: "fetch(first)"}, Assessment: graph.Assessment{Status: "not_run"}},
-		{ID: "b", RouteID: "r", Kind: "log_sink_candidate", Sink: graph.Evidence{Text: "use(morgan(second))"}, Gaps: []graph.Gap{{Kind: "log_request_line_credential"}}, Assessment: graph.Assessment{Status: "not_run"}},
+	r := &analysis.AnalysisReport{SchemaVersion: 1, Entries: []analysis.Entry{{Route: analysis.Route{ID: "r", Method: "GET", PathPattern: "/x"}}}, Uses: []analysis.CandidateUse{
+		{ID: "a", RouteID: "r", Kind: "outbound_http_candidate", Sink: analysis.Evidence{Text: "fetch(first)"}, Assessment: analysis.Assessment{Status: "not_run"}},
+		{ID: "b", RouteID: "r", Kind: "log_sink_candidate", Sink: analysis.Evidence{Text: "use(morgan(second))"}, Gaps: []analysis.Gap{{Kind: "log_request_line_credential"}}, Assessment: analysis.Assessment{Status: "not_run"}},
 	}}
 	var b bytes.Buffer
 	if err := HTML(&b, r); err != nil {

@@ -35,3 +35,8 @@ Before declaring a rule ready, verify positive, protected, and inconclusive cont
 cases, and check JSON/HTML/SARIF agreement. Model answer consistency is necessary for a definitive
 judgment but does not by itself establish accuracy. Independent review and broader held-out
 validation remain separate from these bounded checks.
+
+The shared evidence wire format includes an explicit static trace graph and supplied/missing
+role ledger. Template context includes focused source markup rather than only the expression.
+Neither a graph edge nor a supplied-role index proves complete execution coverage. Calibrate
+changed evidence with fresh exact requests; never relabel an old answer onto a changed trace.

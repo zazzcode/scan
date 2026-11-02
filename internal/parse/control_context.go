@@ -2,14 +2,14 @@ package parse
 
 import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 // controlContext exposes branch tests and statement successors rather than
 // flattening validation branches into one unconditional list of calls.
-func controlContext(m *sourceModule, body *sitter.Node) ([]graph.ControlEdge, []graph.Gap) {
-	edges := []graph.ControlEdge{}
-	gaps := []graph.Gap{}
+func controlContext(m *sourceModule, body *sitter.Node) ([]analysis.ControlEdge, []analysis.Gap) {
+	edges := []analysis.ControlEdge{}
+	gaps := []analysis.Gap{}
 	if body != nil && body.Kind() == "call_expression" {
 		return edges, gaps
 	} // implicit return of a concise handler
@@ -33,7 +33,7 @@ func controlContext(m *sourceModule, body *sitter.Node) ([]graph.ControlEdge, []
 			yes := statement(n.ChildByFieldName("consequence"), next)
 			no := statement(n.ChildByFieldName("alternative"), next)
 			if condition == nil {
-				gaps = append(gaps, graph.Gap{Kind: "control_flow_unresolved", Detail: "if condition missing", At: spanOf(m.file, n)})
+				gaps = append(gaps, analysis.Gap{Kind: "control_flow_unresolved", Detail: "if condition missing", At: spanOf(m.file, n)})
 				return n
 			}
 			for _, branch := range []struct {
@@ -41,7 +41,7 @@ func controlContext(m *sourceModule, body *sitter.Node) ([]graph.ControlEdge, []
 				kind string
 			}{{yes, "TRUE_BRANCH"}, {no, "FALSE_BRANCH"}} {
 				if branch.node != nil {
-					edges = append(edges, graph.ControlEdge{From: m.evidence("condition", condition), To: m.evidence("statement", branch.node), Kind: branch.kind})
+					edges = append(edges, analysis.ControlEdge{From: m.evidence("condition", condition), To: m.evidence("statement", branch.node), Kind: branch.kind})
 				}
 			}
 			return condition
@@ -51,7 +51,7 @@ func controlContext(m *sourceModule, body *sitter.Node) ([]graph.ControlEdge, []
 			return n
 		case "expression_statement", "lexical_declaration", "variable_declaration", "empty_statement":
 			if next != nil {
-				edges = append(edges, graph.ControlEdge{From: m.evidence("statement", n), To: m.evidence("statement", next), Kind: "NEXT"})
+				edges = append(edges, analysis.ControlEdge{From: m.evidence("statement", n), To: m.evidence("statement", next), Kind: "NEXT"})
 			}
 			return n
 		case "else_clause":
@@ -60,7 +60,7 @@ func controlContext(m *sourceModule, body *sitter.Node) ([]graph.ControlEdge, []
 			}
 			return next
 		default:
-			gaps = append(gaps, graph.Gap{Kind: "control_flow_unresolved", Detail: "unsupported control statement: " + n.Kind(), At: spanOf(m.file, n)})
+			gaps = append(gaps, analysis.Gap{Kind: "control_flow_unresolved", Detail: "unsupported control statement: " + n.Kind(), At: spanOf(m.file, n)})
 			return n
 		}
 	}

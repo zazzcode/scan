@@ -1,0 +1,2306 @@
+{
+  "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "artifacts": [
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "apps/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "248246529cd13561276b1ee62b8145408c4c776f83e17380c30faad0df7681b9"
+          },
+          "location": {
+            "uri": "apps/aiohttp_app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "8d808221dc099b8dea8f1f2e6aaa82d09bfc8586cb13b5d06a5bd6918e084dfc"
+          },
+          "location": {
+            "uri": "apps/bottle_app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "1a497185e77c5affd5399ef38c047d2ed16e11709590ca3ca0a5ca59d2e25f9b"
+          },
+          "location": {
+            "uri": "apps/django_app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "b599ba739485427bbadd88a434ff7cbdff6b29aeaa2317e25aa09b483f763902"
+          },
+          "location": {
+            "uri": "apps/django_asgi_app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "8928993f202a14808b7b243dcef73a26b5e983689b133b8f56490e5c54effc66"
+          },
+          "location": {
+            "uri": "apps/falcon_app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "9074051758bb19c4248fb89e8b8476c9f60cf0c384475449aa7dc608b4eb8ba5"
+          },
+          "location": {
+            "uri": "apps/falcon_asgi_app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "4302b50dc4c08dac14dc917424117c498bac9e22b17d4d682ea7f846794f4d51"
+          },
+          "location": {
+            "uri": "apps/fastapi_app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "05d02a3da636231b6bff09f36afc437a00b31d30ff21103b1f63e6efdb7cd5fc"
+          },
+          "location": {
+            "uri": "apps/flask_app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "51db4ad778845c27f91c6162ac794f1a3a5fe8c2374f6d7f4d13c66ad511b0cf"
+          },
+          "location": {
+            "uri": "apps/flask_two_apps.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "a6cc80b6d4477c3a94532e3302eafff17599c3027dd64f0456f963309764e366"
+          },
+          "location": {
+            "uri": "apps/pyramid_app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "d4c8037ce0522e20270a63ac936e4d9896c8e18a7314d24581d1e11c5136490b"
+          },
+          "location": {
+            "uri": "apps/quart_app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "b43a3819641b40cd10cbd33cd7a0f200c154d84f4642d81604cc03acb03458e0"
+          },
+          "location": {
+            "uri": "apps/wsgi_app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "6ef77f90661fc159041b59d48aa0f0ddaf7f5107e8b3ee76babc7980efa0c05c"
+          },
+          "location": {
+            "uri": "apps/wsgi_two_apps.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "4a776636af434d51e31be398e7b540c86a47a9fc652a821752f93490732c2dfa"
+          },
+          "location": {
+            "uri": "setup.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "src/vulnpy/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e5b636e013f443c870661108419cd430f57e43116cb3613c1caa17cd99bbcce6"
+          },
+          "location": {
+            "uri": "src/vulnpy/aiohttp/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "d90f18c4343bb848ee61b5efb9df71c9d0b587508268cece0afa7c8c14082257"
+          },
+          "location": {
+            "uri": "src/vulnpy/aiohttp/vulnerable_routes.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "102269e51f8053d7596bd3a0d338302d2f635d3928a1e80f342ab98407761ab8"
+          },
+          "location": {
+            "uri": "src/vulnpy/bottle/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e5289717512a3b729e91863ee85a31e8c2e7a154fe10d8af97ca3568d182b07a"
+          },
+          "location": {
+            "uri": "src/vulnpy/bottle/vulnerable_routes.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "c10110f33a046ac5f067e4eb3b9803121a3504d57aba4b2eda63cd1a5d611ef1"
+          },
+          "location": {
+            "uri": "src/vulnpy/common/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "5f8433e52e1cdd70cb86f459ee829831c29acc42c63d299bcf7f689996d2c2f8"
+          },
+          "location": {
+            "uri": "src/vulnpy/common/templating.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "4b67db3b8ffbf03748b0d9c5249aaac0dadb0c856779609d22a4e6df85985bdd"
+          },
+          "location": {
+            "uri": "src/vulnpy/django/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e70e2194d30e71dc8e72938da548aa4d4814117fba98912592f8956991b30c35"
+          },
+          "location": {
+            "uri": "src/vulnpy/django/vulnerable.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "118444c2ca9e24c9f436099623f9037b73c632707fc21b643c5d524ed90693c5"
+          },
+          "location": {
+            "uri": "src/vulnpy/django/vulnerable_asgi.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "47084b3c61562859165f03cf98b3663925366889b160c1b68185e9cdfd5e72f2"
+          },
+          "location": {
+            "uri": "src/vulnpy/falcon/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "b34cf2218d5030ad94c162f11d008bb803e83e371143f6962628126693d32343"
+          },
+          "location": {
+            "uri": "src/vulnpy/falcon/vulnerable.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "69eb6900749b4e0059ee76d6317c24654d7601a0352fd863ba080914228000b7"
+          },
+          "location": {
+            "uri": "src/vulnpy/falcon/vulnerable_asgi.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "cd2ed76a36f1212ef93762e4b953046992cf1cb4742ef5288a1649bbad614499"
+          },
+          "location": {
+            "uri": "src/vulnpy/fastapi/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "cb148dfd6cccb85e67e036e97a0f59562bb3799fb9aed919bae84367fac69d70"
+          },
+          "location": {
+            "uri": "src/vulnpy/fastapi/vulnerable.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "291781a21562f13690fc53d2949016bde07d1886a5e318a47fc48850951693af"
+          },
+          "location": {
+            "uri": "src/vulnpy/flask/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "96b6b3d939009a3cd8c6ee42ce3aff662b4fb32793edd0626484897ee71cf180"
+          },
+          "location": {
+            "uri": "src/vulnpy/flask/blueprint.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "src/vulnpy/pyramid/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "3c20bf7162b1b7dc1a969f8fe17c224818e29dc45842a8d7390a1f67e8884660"
+          },
+          "location": {
+            "uri": "src/vulnpy/pyramid/vulnerable_routes.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "291781a21562f13690fc53d2949016bde07d1886a5e318a47fc48850951693af"
+          },
+          "location": {
+            "uri": "src/vulnpy/quart/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "8f18eef389202ca6beb269438fb7d8762b8b78469d66730630fc1a46722128b5"
+          },
+          "location": {
+            "uri": "src/vulnpy/quart/blueprint.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "16167b079a1606c7826f0aa0728ebc4991eb8d8c8249e40b39c38a465d2f24e1"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "4915765f669ec0426aaad82813d411ea737b4ff5e8020305351864b0f6a3393d"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/cmdi.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "83ceae9eac03684fbf983a8c397880352153dd2e9b72d1ac0b7e951190f987e9"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/deserialization.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "2f7664c4548878cc78dc8e9d65f39b16182b791c83939f84ba01c53575c78478"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/hash.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "77ae850bf132a02621750c9549c61a6833bc25b0e0cf2e0b5007c8300bb12c0a"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/parameter_pollution.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "5008396966c09eb8a0931b8b1da51aae243d6f0529b1ac9e981d7c8f5d738b82"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/pt.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "9b2ef39f7f00942c19e418866f60730513dd1aae681123294da1d5520c95b2ca"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/rand.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "d60a4c5b51039d8157897a4bb6798f102dd0949635eff561cef1432ee05add04"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/redos.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "8e83f50e1bb0c7f7e70b57d3934803587e11ae84c207757bd0a0f1e1efa10311"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/sqli.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "2de2abe43f3a173db49ce603446a7acdf5ebb5bf9e386bf942f7fda16224b9d5"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/ssrf.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "4efa22d217b9e0194becdf5fd7effad048333afef2d6fe699d78bf45eba2dcb8"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/unsafe_code_exec.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "ef38148eb9ade03915246c605aa0646e2f8dacb5ec47f46dad63097153c1cff4"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/util.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "0e9f66b7348182cb60364f39eca41eed1d33f2faa414c23eafbce742830c7d98"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/xpath.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "27079c3956aef4c564d4d9d886ad04dad18657517d85a87806af8de0fe2b1864"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/xss.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "ab95d5eea0e1f9de62ef6eb24bbc97886c9638019c07a63b3795f12b0c6b23ff"
+          },
+          "location": {
+            "uri": "src/vulnpy/trigger/xxe.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "d9c75ce2116aa00e72a4ded2c2c86bb3f9f7bcd92a9953ee7c924fad72b26ab7"
+          },
+          "location": {
+            "uri": "src/vulnpy/utils/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "99871796f9eee30fabe042fcb20b04fbca36aef1eb7ef0a6e5e9ca4a6e40ff71"
+          },
+          "location": {
+            "uri": "src/vulnpy/utils/utils_string.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "76ab465b67df344adae4cf2d1ec3ac9c2012d55e85920fff12763dd1aeeda5ca"
+          },
+          "location": {
+            "uri": "src/vulnpy/wsgi/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "453be2fd672a21bb1449cb0ddcf970d944e9d5c91ac0dc659d51474dc546448e"
+          },
+          "location": {
+            "uri": "src/vulnpy/wsgi/app.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "a9505e87247894955820c94ed4aa087f9b5a4459226609faa49672d33587caf2"
+          },
+          "location": {
+            "uri": "tests/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "tests/aiohttp/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "af5d10021521fb3a8bb354c6d1789d20159688ad0bd0c5e88d13a65cd05d1d22"
+          },
+          "location": {
+            "uri": "tests/aiohttp/test_vulnerable_async.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "tests/bottle/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "0a427ef586741c3a710f6f9d163c54661ee64746c1d400a4e34ca8a1ca6fd1e4"
+          },
+          "location": {
+            "uri": "tests/bottle/test_vulnerable.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "8aa2edbc01847ecc64cf84c5d1e3c84efb42a61efa8c4ab01cec5007cd8e8c17"
+          },
+          "location": {
+            "uri": "tests/conftest.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "tests/django/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "31ab50ce0034dbfc98bf65a32dd9dfb481215f3bb62c4f5d3455a560ed4ff108"
+          },
+          "location": {
+            "uri": "tests/django/test_vulnerable.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "75696a3fc49965471dcc9b63121d7982edad69ed3a71788599b55c4aa4e1fbd0"
+          },
+          "location": {
+            "uri": "tests/django/test_vulnerable_asgi.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "tests/falcon/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "3ef37d5329ddf01d458c0bca62bba75c2b1cefaae52f870540fd461b9d209c86"
+          },
+          "location": {
+            "uri": "tests/falcon/test_vulnerable.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "8585ff0db87b532f0c3b5276550727199d86f58594c0c8673530e096c152b956"
+          },
+          "location": {
+            "uri": "tests/falcon/test_vulnerable_asgi.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "tests/fastapi/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "d2782d902090ba290c369ed985d76cd33d97351dcae834e78ba0dd9cf016bb00"
+          },
+          "location": {
+            "uri": "tests/fastapi/test_vulnerable.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "tests/flask/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "af219d30961f2b8107105e2ec742aa67b95c5f00bf343fce8eeb86c72bd9e52f"
+          },
+          "location": {
+            "uri": "tests/flask/test_blueprint.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "tests/pyramid/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "3d7ca6471b736d80998ad75b0dbcab850094dadd92da20a3867de948165e87d2"
+          },
+          "location": {
+            "uri": "tests/pyramid/test_vulnerable_routes.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "tests/quart/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "44d660be636c3678e88ee6370227d8c26383e4b0f5c1ef70ba3614a685d30a32"
+          },
+          "location": {
+            "uri": "tests/quart/test_blueprint.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "tests/trigger/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "6b4bdf92756196bc1c519453b16a5d0e10eafb96bd23e6ca9ee6fb60c5c9f6fc"
+          },
+          "location": {
+            "uri": "tests/trigger/base_test.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e24134eb51588bb861e6082a4f84fc043c6988643e6c743d4f1e92a275269d44"
+          },
+          "location": {
+            "uri": "tests/trigger/samples/sample.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "1526cf1932a1420e7705c7c896a06e702f33192b75953ff6057beb4e023a9ffb"
+          },
+          "location": {
+            "uri": "tests/trigger/test_cmdi.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "3af0b6001fda39e3457361d584d05019195d83fce22525519cf6542d57d39739"
+          },
+          "location": {
+            "uri": "tests/trigger/test_deserialization.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "88c1f8cb034626e29bdb266775070906587346a7136225e4c66be4bc21c27c06"
+          },
+          "location": {
+            "uri": "tests/trigger/test_hash.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "2e8dee2a8199ae3450f12ff7442d128a9f17f8058f472a465a144dc033c03ed5"
+          },
+          "location": {
+            "uri": "tests/trigger/test_pt.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "3a0e5822bcd0f7bb5dcc1421e0e2dc8c931c14f6608ae9cb88abea187f1431ee"
+          },
+          "location": {
+            "uri": "tests/trigger/test_rand.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "82808f574c17c8137f7787e8b6d569474ac85879ab555fd17fbf48573f95257b"
+          },
+          "location": {
+            "uri": "tests/trigger/test_redos.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "d6261cb078ccc024dc69e11d3f8dc451482420a533027c52ca7e0c40cf8e9349"
+          },
+          "location": {
+            "uri": "tests/trigger/test_sqli.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "883e4190f06f854f2b857e1fe484530d6e69ef5551f3cb79f5aa9332e042b89e"
+          },
+          "location": {
+            "uri": "tests/trigger/test_ssrf.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "4b79cea1292f2fe5ad81a1cd736b7177b68c783ae0bb1192235dc7bf417ddbb2"
+          },
+          "location": {
+            "uri": "tests/trigger/test_trigger.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "7947f9aea533e2ca805e40c14bac12abe3306df116ff05200dc4c1405f38164f"
+          },
+          "location": {
+            "uri": "tests/trigger/test_unsafe_code_exec.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "9d625cc016fb460ca726aefdde59e6332255c1e73b36af2e0f60369cfc2dc3ef"
+          },
+          "location": {
+            "uri": "tests/trigger/test_xpath.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "fb8539c601fd69ccd1ce02185117e2e8fa1d20285811d8139d87ae07125ba516"
+          },
+          "location": {
+            "uri": "tests/trigger/test_xss.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "tests/utils/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e9dac2d7f93eafdfb39bab9f4e63aeb7d79d2684ab78f7f817b2cf7a9944258d"
+          },
+          "location": {
+            "uri": "tests/utils/test_utils_string.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "location": {
+            "uri": "tests/wsgi/__init__.py"
+          }
+        },
+        {
+          "hashes": {
+            "sha-256": "0d374322f4e29f7c0eb05fff13d67e0a65855fadbc7b226323611e9be9a7c599"
+          },
+          "location": {
+            "uri": "tests/wsgi/test_app.py"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "executionSuccessful": false,
+          "toolExecutionNotifications": [
+            {
+              "level": "note",
+              "message": {
+                "text": "GET /items/{item_id}: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "GET /items/{item_id}: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "POST /files/upload: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "GET /cmdi: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "GET /template-xss/jinja: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "note",
+              "message": {
+                "text": "GET /template-xss/jinja: semantic assessment not_run"
+              }
+            },
+            {
+              "level": "warning",
+              "message": {
+                "text": "dynamic_path: Python route path is not literal"
+              }
+            },
+            {
+              "level": "warning",
+              "message": {
+                "text": "dynamic_path: Python route path is not literal"
+              }
+            },
+            {
+              "level": "warning",
+              "message": {
+                "text": "python_registration_unresolved: Verified Flask add_url_rule registration is outside the supported decorator registration subset; its generated handler/path is not analyzed."
+              }
+            },
+            {
+              "level": "warning",
+              "message": {
+                "text": "python_registration_unresolved: Verified Flask add_url_rule registration is outside the supported decorator registration subset; its generated handler/path is not analyzed."
+              }
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "scan.findingTypes": [
+          {
+            "id": "dom-xss",
+            "label": "Client-side XSS",
+            "description": "Browser or API data reaches a DOM or framework rendering operation in an active output context.",
+            "interpretation": "Client entries identify browser sources and verified sinks. Raw flows are construction findings; unknown origin, trust-to-template linkage or API response mapping remains Review. Framework defaults can protect a specific output.",
+            "remediation": "Prefer text APIs and default framework escaping/sanitization. Sanitize rich HTML before rendering, remove unnecessary trust bypasses and verify API origins.",
+            "coverage": "bounded browser DOM and Angular/React/Vue analysis"
+          },
+          {
+            "id": "rendering-flow-review",
+            "label": "Rendering Flow Review",
+            "description": "Data returned by an API needs its browser consumer linked before a rendering claim can be assessed.",
+            "interpretation": "JSON output alone is not an XSS sink or a vulnerability. This record is incomplete flow context for further analysis.",
+            "remediation": "Locate the browser consumer, establish its output context and protections, and assess that rendering flow before changing API data handling.",
+            "coverage": "bounded API response evidence"
+          },
+          {
+            "id": "sql-injection",
+            "label": "SQL Injection",
+            "description": "Input changes executable SQL structure instead of remaining a data value, potentially changing what the database reads or writes.",
+            "interpretation": "An SQL Injection pill identifies the risk family being reviewed. String-built executable SQL is poor practice to remediate even without a proven exploit; a library-managed search value may remain unresolved. The finding status and evidence determine the actual claim. The pill alone does not confirm injection.",
+            "remediation": "Use the verified driver's parameter-binding API for values. Review dynamic identifiers separately. Keep business-field validation independent of query-structure protection.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "nosql-injection",
+            "label": "NoSQL Injection",
+            "description": "Untrusted input changes a NoSQL query's operators, selector structure, or executable expression rather than remaining an allowed data value.",
+            "interpretation": "Executable $where string construction is poor practice to refactor even without a proven exploit. An unmodeled document constraint alone is Review, not an established defect. Inspect actual value types, keys, transformations, library behavior, and the named status.",
+            "remediation": "Prefer data-only query APIs, constrain scalar slots and permitted keys/operators, and avoid building executable $where strings from input.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "input-validation",
+            "label": "Input Validation",
+            "description": "Server-side checks enforce the business requirements for a field, such as required presence, runtime type, permitted format, range, or length.",
+            "interpretation": "Poor input validation means an applicable requirement is not adequately enforced. This neutral family label also covers unresolved checks and supported protection: no validator identified in an analyzed slice is not proof that every execution path lacks validation. Free-text punctuation is not itself a defect.",
+            "remediation": "Define field-specific requirements and enforce them before use on all applicable paths. Verify guard behavior and middleware. Apply destination-specific protection separately.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "account-creation-validation",
+            "label": "Account Creation Validation",
+            "description": "Required account fields and enforcing guards must be checked before an account is persisted.",
+            "interpretation": "Review field requirements, conditional bypasses, and generated persistence behavior. A modeled create operation alone does not prove a registration bypass.",
+            "remediation": "Enforce required fields before persistence, terminate rejected paths, add appropriate database constraints, and test the persisted result.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "outbound-request-safety",
+            "label": "Outbound Request Safety",
+            "description": "Input used in an outbound request may affect its destination, headers, or other request values. Unrestricted destination control can lead to server-side request forgery (SSRF).",
+            "interpretation": "The current scanner records bounded outbound-use evidence. A pill does not establish SSRF, destination reachability, or complete response-flow analysis.",
+            "remediation": "Verify allowed destinations and protocols, redirect handling, network boundaries, and sensitive request values for the specific HTTP client.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "reflected-xss",
+            "label": "Reflected XSS",
+            "description": "Request-controlled content is reflected into a browser response in a context that allows it to execute as script.",
+            "interpretation": "Request input reaches an HTML response or template output. Raw output is a construction finding; unknown context or sanitizers remain Review. Escaping protects only its modeled output context. Runtime exploitation is not implied.",
+            "remediation": "Use context-appropriate output encoding and safe template or DOM APIs. Input validation alone does not replace correct output handling.",
+            "coverage": "bounded server response and template analysis"
+          },
+          {
+            "id": "stored-xss",
+            "label": "Stored XSS",
+            "description": "Untrusted data is persisted and later rendered in an active browser context.",
+            "interpretation": "A matching model and field link source writes to rendering reads. Unresolved write origins remain Review; a verified raw path is a construction finding. A dependency version alone does not establish a reachable XSS flow.",
+            "remediation": "Preserve the intended stored data; apply context-appropriate escaping or maintained sanitization at every rendering sink, and review existing stored content.",
+            "coverage": "bounded model-field write/read and server template analysis"
+          },
+          {
+            "id": "sensitive-data-logging",
+            "label": "Sensitive Data Logging",
+            "description": "Logs expose credentials, tokens, personal information, or other sensitive values to readers or storage that should not receive them.",
+            "interpretation": "Covers verified console and winston calls in analyzed route handlers that receive request values with credential or personal-data evidence. A field name is a hint for review, not proof; Authorization and Cookie headers are credentials by HTTP semantics. Morgan request logging that records URLs is checked against credentials read from the query string. Constant messages are not leaks. Non-request secrets and logger redaction configuration are not yet analyzed.",
+            "remediation": "Avoid logging secrets; minimize sensitive fields and apply verified redaction before emission. Review log access and retention.",
+            "coverage": "bounded analysis"
+          },
+          {
+            "id": "sensitive-operation-review",
+            "label": "Sensitive Operation Review",
+            "description": "A possible sensitive use was recorded but does not yet map to a more specific supported risk family.",
+            "interpretation": "This is an analysis category. Inspect the evidence and missing operation semantics before making a security claim.",
+            "remediation": "Resolve the source, operation, API behavior, and required protection before selecting a fix.",
+            "coverage": "bounded analysis"
+          }
+        ],
+        "scan.identityPolicy": "snapshot-local use IDs; edit-stable baseline identity is not implemented",
+        "scan.limitations": [
+          "ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain",
+          "Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
+          "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
+          "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities",
+          "Python adapter v1: static Flask/Blueprint, RESTX Resource and FastAPI routes; dynamic registration, custom decorators and response overrides remain gaps",
+          "Python helper expansion is bounded to depth 3 and 24 calls per route; loops, comprehensions, mutation, exceptions and external dispatch are conservative",
+          "Jinja output requires a verified Flask template binding; unresolved configuration, includes/macros and stored origins remain Review; no runtime execution or SCA"
+        ],
+        "scan.selectedRoute": ""
+      },
+      "results": [
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 25,
+                            "startLine": 25
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 26,
+                            "startLine": 26
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "4302b50dc4c08dac14dc917424117c498bac9e22b17d4d682ea7f846794f4d51"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /items/{item_id}",
+                  "kind": "function",
+                  "name": "GET /items/{item_id}"
+                }
+              ],
+              "message": {
+                "text": "Resolve the specific claim blockers"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 26,
+                  "startLine": 26
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /items/{item_id}: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "query.item_id: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "at": {
+                  "file": "apps/fastapi_app.py",
+                  "start_line": 26,
+                  "end_line": 26,
+                  "start_byte": 615,
+                  "end_byte": 627
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:apps/fastapi_app.py:572:GET:/items/{item_id}:query.item_id",
+              "use_id": "input:route:apps/fastapi_app.py:572:GET:/items/{item_id}:query.item_id",
+              "route_id": "route:apps/fastapi_app.py:572:GET:/items/{item_id}",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.item_id: assess actual enforcing conditions in handler; no external business policy was supplied",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Resolve the specific claim blockers",
+                "actions": [
+                  "Investigate the operation at apps/fastapi_app.py:26: item_id: int. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
+                ],
+                "example_status": "no patch proposed while the claim is inconclusive"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Resolve the specific claim blockers",
+              "actions": [
+                "Investigate the operation at apps/fastapi_app.py:26: item_id: int. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
+              ],
+              "example_status": "no patch proposed while the claim is inconclusive"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /items/{item_id}",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:apps/fastapi_app.py:572:GET:/items/{item_id}:query.item_id"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "route_handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 27,
+                  "startLine": 26
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "route_registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 25,
+                  "startLine": 25
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "receiver_binding"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 11,
+                  "startLine": 11
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 25,
+                            "startLine": 25
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 26,
+                            "startLine": 26
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "4302b50dc4c08dac14dc917424117c498bac9e22b17d4d682ea7f846794f4d51"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /items/{item_id}",
+                  "kind": "function",
+                  "name": "GET /items/{item_id}"
+                }
+              ],
+              "message": {
+                "text": "Resolve the specific claim blockers"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 26,
+                  "startLine": 26
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /items/{item_id}: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "query.q: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "at": {
+                  "file": "apps/fastapi_app.py",
+                  "start_line": 26,
+                  "end_line": 26,
+                  "start_byte": 629,
+                  "end_byte": 652
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:apps/fastapi_app.py:572:GET:/items/{item_id}:query.q",
+              "use_id": "input:route:apps/fastapi_app.py:572:GET:/items/{item_id}:query.q",
+              "route_id": "route:apps/fastapi_app.py:572:GET:/items/{item_id}",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.q: assess actual enforcing conditions in handler; no external business policy was supplied",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Resolve the specific claim blockers",
+                "actions": [
+                  "Investigate the operation at apps/fastapi_app.py:26: q: Optional[str] = None. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
+                ],
+                "example_status": "no patch proposed while the claim is inconclusive"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Resolve the specific claim blockers",
+              "actions": [
+                "Investigate the operation at apps/fastapi_app.py:26: q: Optional[str] = None. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
+              ],
+              "example_status": "no patch proposed while the claim is inconclusive"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /items/{item_id}",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:apps/fastapi_app.py:572:GET:/items/{item_id}:query.q"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "route_handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 27,
+                  "startLine": 26
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "route_registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 25,
+                  "startLine": 25
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "receiver_binding"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 11,
+                  "startLine": 11
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 30,
+                            "startLine": 30
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 31,
+                            "startLine": 31
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "4302b50dc4c08dac14dc917424117c498bac9e22b17d4d682ea7f846794f4d51"
+                      }
+                    },
+                    {
+                      "executionOrder": 2,
+                      "location": {
+                        "message": {
+                          "text": "value_reference"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 32,
+                            "startLine": 32
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "4302b50dc4c08dac14dc917424117c498bac9e22b17d4d682ea7f846794f4d51"
+                      }
+                    },
+                    {
+                      "executionOrder": 3,
+                      "location": {
+                        "message": {
+                          "text": "call_argument_dependency"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 32,
+                            "startLine": 32
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "4302b50dc4c08dac14dc917424117c498bac9e22b17d4d682ea7f846794f4d51"
+                      }
+                    },
+                    {
+                      "executionOrder": 4,
+                      "location": {
+                        "message": {
+                          "text": "assignment"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 32,
+                            "startLine": 32
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "4302b50dc4c08dac14dc917424117c498bac9e22b17d4d682ea7f846794f4d51"
+                      }
+                    },
+                    {
+                      "executionOrder": 5,
+                      "location": {
+                        "message": {
+                          "text": "value_reference"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 33,
+                            "startLine": 33
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "4302b50dc4c08dac14dc917424117c498bac9e22b17d4d682ea7f846794f4d51"
+                      }
+                    },
+                    {
+                      "executionOrder": 6,
+                      "location": {
+                        "message": {
+                          "text": "field_projection"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 33,
+                            "startLine": 33
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "4302b50dc4c08dac14dc917424117c498bac9e22b17d4d682ea7f846794f4d51"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "POST /files/upload",
+                  "kind": "function",
+                  "name": "POST /files/upload"
+                }
+              ],
+              "message": {
+                "text": "Resolve the specific claim blockers"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 31,
+                  "startLine": 31
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "POST /files/upload: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "query.file: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "at": {
+                  "file": "apps/fastapi_app.py",
+                  "start_line": 31,
+                  "end_line": 31,
+                  "start_byte": 759,
+                  "end_byte": 787
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:apps/fastapi_app.py:697:POST:/files/upload:query.file",
+              "use_id": "input:route:apps/fastapi_app.py:697:POST:/files/upload:query.file",
+              "route_id": "route:apps/fastapi_app.py:697:POST:/files/upload",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.file: assess actual enforcing conditions in handler; no external business policy was supplied",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Resolve the specific claim blockers",
+                "actions": [
+                  "Investigate the operation at apps/fastapi_app.py:31: file: UploadFile = File(...). Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
+                ],
+                "example_status": "no patch proposed while the claim is inconclusive"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Resolve the specific claim blockers",
+              "actions": [
+                "Investigate the operation at apps/fastapi_app.py:31: file: UploadFile = File(...). Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
+              ],
+              "example_status": "no patch proposed while the claim is inconclusive"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "POST /files/upload",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:apps/fastapi_app.py:697:POST:/files/upload:query.file"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "route_handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 34,
+                  "startLine": 31
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "route_registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 30,
+                  "startLine": 30
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "receiver_binding"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 11,
+                  "startLine": 11
+                }
+              }
+            },
+            {
+              "id": 3,
+              "message": {
+                "text": "unresolved_pre_use_call"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 33,
+                  "startLine": 33
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 37,
+                            "startLine": 37
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/fastapi_app.py"
+                          },
+                          "region": {
+                            "endLine": 38,
+                            "startLine": 38
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "4302b50dc4c08dac14dc917424117c498bac9e22b17d4d682ea7f846794f4d51"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /cmdi",
+                  "kind": "function",
+                  "name": "GET /cmdi"
+                }
+              ],
+              "message": {
+                "text": "Resolve the specific claim blockers"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 38,
+                  "startLine": 38
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /cmdi: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "python_loop_unresolved",
+                "detail": "loop execution and mutation are not fully modeled",
+                "at": {
+                  "file": "apps/fastapi_app.py",
+                  "start_line": 41,
+                  "end_line": 46,
+                  "start_byte": 1025,
+                  "end_byte": 1182
+                }
+              },
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "query.user_input: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "at": {
+                  "file": "apps/fastapi_app.py",
+                  "start_line": 38,
+                  "end_line": 38,
+                  "start_byte": 915,
+                  "end_byte": 930
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:apps/fastapi_app.py:888:GET:/cmdi:query.user_input",
+              "use_id": "input:route:apps/fastapi_app.py:888:GET:/cmdi:query.user_input",
+              "route_id": "route:apps/fastapi_app.py:888:GET:/cmdi",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.user_input: assess actual enforcing conditions in handler; no external business policy was supplied",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Resolve the specific claim blockers",
+                "actions": [
+                  "Investigate the operation at apps/fastapi_app.py:38: user_input: str. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
+                ],
+                "example_status": "no patch proposed while the claim is inconclusive"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Resolve the specific claim blockers",
+              "actions": [
+                "Investigate the operation at apps/fastapi_app.py:38: user_input: str. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
+              ],
+              "example_status": "no patch proposed while the claim is inconclusive"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /cmdi",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:apps/fastapi_app.py:888:GET:/cmdi:query.user_input"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "route_handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 47,
+                  "startLine": 38
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "route_registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 37,
+                  "startLine": 37
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "receiver_binding"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/fastapi_app.py"
+                },
+                "region": {
+                  "endLine": 11,
+                  "startLine": 11
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/flask_app.py"
+                          },
+                          "region": {
+                            "endLine": 16,
+                            "startLine": 16
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/flask_app.py"
+                          },
+                          "region": {
+                            "endLine": 20,
+                            "startLine": 20
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "05d02a3da636231b6bff09f36afc437a00b31d30ff21103b1f63e6efdb7cd5fc"
+                      }
+                    },
+                    {
+                      "executionOrder": 2,
+                      "location": {
+                        "message": {
+                          "text": "field_projection"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/flask_app.py"
+                          },
+                          "region": {
+                            "endLine": 20,
+                            "startLine": 20
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "05d02a3da636231b6bff09f36afc437a00b31d30ff21103b1f63e6efdb7cd5fc"
+                      }
+                    },
+                    {
+                      "executionOrder": 3,
+                      "location": {
+                        "message": {
+                          "text": "call_argument_dependency"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/flask_app.py"
+                          },
+                          "region": {
+                            "endLine": 21,
+                            "startLine": 19
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "05d02a3da636231b6bff09f36afc437a00b31d30ff21103b1f63e6efdb7cd5fc"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /template-xss/jinja",
+                  "kind": "function",
+                  "name": "GET /template-xss/jinja"
+                }
+              ],
+              "message": {
+                "text": "Resolve the specific claim blockers"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/flask_app.py"
+                },
+                "region": {
+                  "endLine": 21,
+                  "startLine": 19
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /template-xss/jinja: HTML rendering protection needs review [needs_review]. A source value reaches a rendering operation. Resolve its output context and every transformation before judging XSS. Output context: html_text. A value definition or output alternative is unresolved; source availability does not establish a complete value path. Per-path protection: path 1 unknown."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.blockingGaps": [
+              {
+                "kind": "render_protection_unresolved",
+                "detail": "A value definition or output alternative is unresolved; source availability does not establish a complete value path.",
+                "at": {
+                  "file": "apps/flask_app.py",
+                  "start_line": 19,
+                  "end_line": 21,
+                  "start_byte": 514,
+                  "end_byte": 618
+                }
+              }
+            ],
+            "scan.coverageGaps": [
+              {
+                "kind": "python_value_unresolved",
+                "detail": "Value definition is not resolved: environment",
+                "at": {
+                  "file": "apps/flask_app.py",
+                  "start_line": 18,
+                  "end_line": 18,
+                  "start_byte": 466,
+                  "end_byte": 477
+                }
+              },
+              {
+                "kind": "python_call_unresolved",
+                "detail": "unmodeled return/content effect: template.render",
+                "at": {
+                  "file": "apps/flask_app.py",
+                  "start_line": 19,
+                  "end_line": 21,
+                  "start_byte": 514,
+                  "end_byte": 618
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "reflected-xss"
+              ],
+              "id": "finding:use:route:apps/flask_app.py:400:GET:/template-xss/jinja:apps/flask_app.py:514:xss",
+              "use_id": "use:route:apps/flask_app.py:400:GET:/template-xss/jinja:apps/flask_app.py:514:xss",
+              "route_id": "route:apps/flask_app.py:400:GET:/template-xss/jinja",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "HTML rendering protection needs review",
+              "summary": "A source value reaches a rendering operation. Resolve its output context and every transformation before judging XSS.",
+              "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+              "use_protection": "Output context: html_text. A value definition or output alternative is unresolved; source availability does not establish a complete value path. Per-path protection: path 1 unknown.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Resolve the specific claim blockers",
+                "actions": [
+                  "Investigate the operation at apps/flask_app.py:19: template.render(\n        path=\"/template-xss/jinja\", user_input=request.args.get(\"user_input\", \"\")\n    ). Its current Review status does not establish a code defect.",
+                  "Resolve render_protection_unresolved at apps/flask_app.py:19: A value definition or output alternative is unresolved; source availability does not establish a complete value path."
+                ],
+                "example_status": "no patch proposed while the claim is inconclusive"
+              }
+            },
+            "scan.kind": "xss_candidate",
+            "scan.recommendations": {
+              "title": "Resolve the specific claim blockers",
+              "actions": [
+                "Investigate the operation at apps/flask_app.py:19: template.render(\n        path=\"/template-xss/jinja\", user_input=request.args.get(\"user_input\", \"\")\n    ). Its current Review status does not establish a code defect.",
+                "Resolve render_protection_unresolved at apps/flask_app.py:19: A value definition or output alternative is unresolved; source availability does not establish a complete value path."
+              ],
+              "example_status": "no patch proposed while the claim is inconclusive"
+            },
+            "scan.requiredEvidence": [
+              "render_source",
+              "render_binding",
+              "render_context"
+            ],
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /template-xss/jinja",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.scope": "Bounded source-to-rendering flow; output context and protections are scoped to this sink.",
+            "scan.useId": "use:route:apps/flask_app.py:400:GET:/template-xss/jinja:apps/flask_app.py:514:xss"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "route_handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/flask_app.py"
+                },
+                "region": {
+                  "endLine": 21,
+                  "startLine": 17
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "route_registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/flask_app.py"
+                },
+                "region": {
+                  "endLine": 16,
+                  "startLine": 16
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "receiver_binding"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/flask_app.py"
+                },
+                "region": {
+                  "endLine": 13,
+                  "startLine": 13
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/xss-output-protection",
+          "ruleIndex": 1
+        },
+        {
+          "codeFlows": [
+            {
+              "message": {
+                "text": "Possible local source-to-use dependency path; not a runtime trace or a complete execution path."
+              },
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "executionOrder": 0,
+                      "location": {
+                        "message": {
+                          "text": "inbound_route"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/flask_app.py"
+                          },
+                          "region": {
+                            "endLine": 16,
+                            "startLine": 16
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": ""
+                      }
+                    },
+                    {
+                      "executionOrder": 1,
+                      "location": {
+                        "message": {
+                          "text": "request_source"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/flask_app.py"
+                          },
+                          "region": {
+                            "endLine": 20,
+                            "startLine": 20
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "05d02a3da636231b6bff09f36afc437a00b31d30ff21103b1f63e6efdb7cd5fc"
+                      }
+                    },
+                    {
+                      "executionOrder": 2,
+                      "location": {
+                        "message": {
+                          "text": "field_projection"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "apps/flask_app.py"
+                          },
+                          "region": {
+                            "endLine": 20,
+                            "startLine": 20
+                          }
+                        }
+                      },
+                      "properties": {
+                        "scan.sha256": "05d02a3da636231b6bff09f36afc437a00b31d30ff21103b1f63e6efdb7cd5fc"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "kind": "review",
+          "level": "note",
+          "locations": [
+            {
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "GET /template-xss/jinja",
+                  "kind": "function",
+                  "name": "GET /template-xss/jinja"
+                }
+              ],
+              "message": {
+                "text": "Resolve the specific claim blockers"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/flask_app.py"
+                },
+                "region": {
+                  "endLine": 20,
+                  "startLine": 20
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "GET /template-xss/jinja: Request-field validation needs review [needs_review]. Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection. Not established from the supplied evidence."
+          },
+          "properties": {
+            "scan.assessment": {
+              "status": "not_run"
+            },
+            "scan.coverageGaps": [
+              {
+                "kind": "input_validation_unresolved",
+                "detail": "args.user_input: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "at": {
+                  "file": "apps/flask_app.py",
+                  "start_line": 20,
+                  "end_line": 20,
+                  "start_byte": 578,
+                  "end_byte": 590
+                }
+              }
+            ],
+            "scan.finding": {
+              "type_ids": [
+                "input-validation"
+              ],
+              "id": "finding:input:route:apps/flask_app.py:400:GET:/template-xss/jinja:args.user_input",
+              "use_id": "input:route:apps/flask_app.py:400:GET:/template-xss/jinja:args.user_input",
+              "route_id": "route:apps/flask_app.py:400:GET:/template-xss/jinja",
+              "record_type": "analysis",
+              "status": "needs_review",
+              "title": "Request-field validation needs review",
+              "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: args.user_input: assess actual enforcing conditions in handler; no external business policy was supplied",
+              "use_protection": "Not established from the supplied evidence.",
+              "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
+              "recommendations": {
+                "title": "Resolve the specific claim blockers",
+                "actions": [
+                  "Investigate the operation at apps/flask_app.py:20: request.args. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
+                ],
+                "example_status": "no patch proposed while the claim is inconclusive"
+              }
+            },
+            "scan.kind": "input_validation_candidate",
+            "scan.recommendations": {
+              "title": "Resolve the specific claim blockers",
+              "actions": [
+                "Investigate the operation at apps/flask_app.py:20: request.args. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
+              ],
+              "example_status": "no patch proposed while the claim is inconclusive"
+            },
+            "scan.reviewStatus": "not_run",
+            "scan.route": "GET /template-xss/jinja",
+            "scan.runtimeConfirmation": "not_run",
+            "scan.useId": "input:route:apps/flask_app.py:400:GET:/template-xss/jinja:args.user_input"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "message": {
+                "text": "route_handler"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/flask_app.py"
+                },
+                "region": {
+                  "endLine": 21,
+                  "startLine": 17
+                }
+              }
+            },
+            {
+              "id": 1,
+              "message": {
+                "text": "route_registration"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/flask_app.py"
+                },
+                "region": {
+                  "endLine": 16,
+                  "startLine": 16
+                }
+              }
+            },
+            {
+              "id": 2,
+              "message": {
+                "text": "receiver_binding"
+              },
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "apps/flask_app.py"
+                },
+                "region": {
+                  "endLine": 13,
+                  "startLine": 13
+                }
+              }
+            }
+          ],
+          "ruleId": "scan/input-validation",
+          "ruleIndex": 0
+        }
+      ],
+      "tool": {
+        "driver": {
+          "informationUri": "https://github.com/zazzcode/zazzles",
+          "name": "scan",
+          "rules": [
+            {
+              "help": {
+                "markdown": "Resolve the specific claim blockers\n\n- Investigate the operation at apps/fastapi_app.py:26: item_id: int. Its current Review status does not establish a code defect.\n- Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection.\n",
+                "text": "Resolve the specific claim blockers. Investigate the operation at apps/fastapi_app.py:26: item_id: int. Its current Review status does not establish a code defect. Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
+              },
+              "id": "scan/input-validation",
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-20"
+                ]
+              },
+              "shortDescription": {
+                "text": "Resolve the specific claim blockers"
+              }
+            },
+            {
+              "help": {
+                "markdown": "Resolve the specific claim blockers\n\n- Investigate the operation at apps/flask_app.py:19: template.render(\n        path=\"/template-xss/jinja\", user_input=request.args.get(\"user_input\", \"\")\n    ). Its current Review status does not establish a code defect.\n- Resolve render_protection_unresolved at apps/flask_app.py:19: A value definition or output alternative is unresolved; source availability does not establish a complete value path.\n",
+                "text": "Resolve the specific claim blockers. Investigate the operation at apps/flask_app.py:19: template.render(\n        path=\"/template-xss/jinja\", user_input=request.args.get(\"user_input\", \"\")\n    ). Its current Review status does not establish a code defect. Resolve render_protection_unresolved at apps/flask_app.py:19: A value definition or output alternative is unresolved; source availability does not establish a complete value path."
+              },
+              "id": "scan/xss-output-protection",
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-79"
+                ]
+              },
+              "shortDescription": {
+                "text": "Resolve the specific claim blockers"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

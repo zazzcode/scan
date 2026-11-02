@@ -3,16 +3,16 @@ package parse
 import (
 	"sort"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func (s *moduleSet) linkStoredXSS(report *graph.StringReport) {
+func (s *moduleSet) linkStoredXSS(report *analysis.AnalysisReport) {
 	for i := range report.Uses {
 		u := &report.Uses[i]
 		if u.XSS == nil || u.XSS.Type != "stored" {
 			continue
 		}
-		var dependencies []graph.Dependency
+		var dependencies []analysis.Dependency
 		var entries []string
 		related := map[string]bool{}
 		resolved := true
@@ -43,7 +43,7 @@ func (s *moduleSet) linkStoredXSS(report *graph.StringReport) {
 						resolved = false
 						continue
 					}
-					origin.Transfers = append(append([]graph.Evidence{}, origin.Transfers...), write.sink, read.Source)
+					origin.Transfers = append(append([]analysis.Evidence{}, origin.Transfers...), write.sink, read.Source)
 					origin.Transfers = append(origin.Transfers, read.Transfers...)
 					dependencies = append(dependencies, origin)
 					entries = append(entries, write.route)

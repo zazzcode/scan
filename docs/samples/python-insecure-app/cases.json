@@ -1,0 +1,27 @@
+{
+  "revision": "b188493768ca2c1ef003e08148fb2e4577219c36",
+  "scope": "Source-reviewed case inventory, not an exhaustive vulnerability count. Labels are never detector or model inputs.",
+  "cases": [
+    {
+      "id": "PI-XSS-01",
+      "file": "app/main.py",
+      "line": 41,
+      "kind": "xss_candidate",
+      "expect": "raw_xss"
+    },
+    {
+      "id": "PI-OUT-FIXED",
+      "file": "app/main.py",
+      "line": 31,
+      "kind": "outbound_http_candidate",
+      "expect": "absent"
+    },
+    {
+      "id": "PI-VAL-NAME",
+      "file": "app/main.py",
+      "line": 19,
+      "kind": "input_validation_candidate",
+      "expect": "candidate"
+    }
+  ]
+}

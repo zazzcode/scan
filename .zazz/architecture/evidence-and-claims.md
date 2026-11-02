@@ -60,7 +60,7 @@ context, not expected-answer instructions; held-out original fixtures are requir
 ## Discovery on novel target repositories
 
 The product must discover checks without prior knowledge of a target's challenge routes. Current
-`--strings` already discovers supported SQL/outbound call shapes and route dependencies without a
+`--analyze` already discovers supported SQL/outbound call shapes and route dependencies without a
 requirements file; full claim-scoped automatic assessment is still incomplete. `--checks` files are
 explicit business-policy inputs and evaluation selectors, not the intended prerequisite for scanning
 a novel repository.
@@ -120,6 +120,12 @@ Model declarations are independent of validator adequacy. Exact package version 
 custom extensions, setter effects and runtime behavior still need validation. Upstream references:
 [Sequelize raw queries](https://sequelize.org/docs/v6/core-concepts/raw-queries/) and
 [finale resource semantics](https://github.com/tommybananas/finale/blob/master/README.md).
+
+## Shared trace contract
+
+The implemented [trace and judgment design](trace-judgment.md) adds explicit dependency/control
+relations and a supplied/missing evidence-role ledger without relaxing claim completeness.
+Validation has a separate policy-backed protocol; query binding cannot satisfy field requirements.
 
 ## Claim-specific completeness and outcomes
 

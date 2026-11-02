@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func answerDetails(data []byte, selected map[string]string, expected []question) (map[string]graph.AnswerDetail, error) {
+func answerDetails(data []byte, selected map[string]string, expected []question) (map[string]analysis.AnswerDetail, error) {
 	var envelope struct {
 		Answers json.RawMessage `json:"answers"`
 	}
@@ -16,7 +16,7 @@ func answerDetails(data []byte, selected map[string]string, expected []question)
 	}
 	type scored struct {
 		Name string `json:"name"`
-		graph.AnswerDetail
+		analysis.AnswerDetail
 	}
 	var list []scored
 	if len(envelope.Answers) > 0 && envelope.Answers[0] == '[' {
@@ -24,7 +24,7 @@ func answerDetails(data []byte, selected map[string]string, expected []question)
 			return nil, err
 		}
 	} else {
-		var byName map[string]graph.AnswerDetail
+		var byName map[string]analysis.AnswerDetail
 		if err := json.Unmarshal(envelope.Answers, &byName); err != nil {
 			return nil, err
 		}
@@ -39,7 +39,7 @@ func answerDetails(data []byte, selected map[string]string, expected []question)
 			allowed[q.name][choice["value"]] = true
 		}
 	}
-	out := map[string]graph.AnswerDetail{}
+	out := map[string]analysis.AnswerDetail{}
 	for _, answer := range list {
 		if answer.Confidence == nil && len(answer.Probabilities) == 0 {
 			continue

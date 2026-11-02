@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
@@ -13,9 +13,14 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 	}
 	if fn.Kind() == "identifier" {
 		name := fn.Utf8Text(f.module.src)
+		if binding, ok := f.module.browserGlobals[name]; ok && browserGlobal(f.module, n, name) && !bindingReassigned(f.module, name) {
+			f.context = append(f.context, binding)
+			return value{domNode: true, jqueryNode: true}, true
+		}
+
 		if imp, ok := f.module.imports[name]; ok && imp.module == "jquery" && !shadowed(n, name, f.module.src) {
 			f.context = append(f.context, f.module.evidence("render_binding", imp.declaration))
-			return value{domNode: true}, true
+			return value{domNode: true, jqueryNode: true}, true
 		}
 		if (name == "setTimeout" || name == "setInterval" || name == "eval") && browserGlobal(f.module, n, name) && args.NamedChildCount() > 0 && !isFunction(args.NamedChild(0)) {
 			v := f.eval(args.NamedChild(0))
@@ -70,7 +75,7 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 			if context != "" {
 				v := f.eval(args.NamedChild(0))
 				if len(v.deps) == 0 {
-					v.deps = []graph.Dependency{{Source: f.module.evidence("unresolved_source", args.NamedChild(0))}}
+					v.deps = []analysis.Dependency{{Source: f.module.evidence("unresolved_source", args.NamedChild(0))}}
 				}
 				v = f.transfer(v, "trust_bypass", n)
 				v.trustedContext = context
@@ -88,6 +93,26 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 		if object == "this" {
 			if v, ok := f.clientMethod(n, method, args); ok {
 				return v, true
+			}
+		}
+	}
+
+	if method == "find" || method == "closest" || method == "val" || method == "ready" || method == "each" || method == "submit" || method == "click" {
+		receiver := f.eval(obj)
+		if receiver.jqueryNode {
+			switch method {
+			case "find", "closest":
+				return value{domNode: true, jqueryNode: true}, true
+			case "val":
+				if args.NamedChildCount() == 0 {
+					return f.browserSource(n), true
+				}
+				return value{}, true
+			default:
+				if args.NamedChildCount() > 0 && isFunction(args.NamedChild(0)) {
+					f.clientCallback(args.NamedChild(0), value{})
+					return value{}, true
+				}
 			}
 		}
 	}
@@ -114,7 +139,7 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 				}
 				if isFunction(callback) {
 					if len(receiver.deps) == 0 {
-						receiver.deps = []graph.Dependency{{Source: f.module.evidence("unresolved_source", n)}}
+						receiver.deps = []analysis.Dependency{{Source: f.module.evidence("unresolved_source", n)}}
 					}
 					f.clientCallback(callback, receiver)
 					return receiver, true
@@ -130,7 +155,7 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 				}
 			}
 		case "insertAdjacentHTML", "createContextualFragment", "html", "append":
-			if receiver.domNode {
+			if receiver.domNode && ((method != "append" && method != "html") || receiver.jqueryNode) {
 				index := uint(0)
 				if method == "insertAdjacentHTML" {
 					index = 1
