@@ -25,16 +25,16 @@ exhaustive answer key. Source cases and pinned byte hashes live in [the referenc
 | Stored XSS | Country write/read/render path; other origins and escaped fields assessed separately |
 | DOM XSS | Inline jQuery comment input to HTML append |
 | SSRF | Request-influenced outbound destination candidate; complete SSRF protection/exploitation judgment unsupported |
-| Insecure configurations | Out of implemented family scope; comparator results retained |
-| Weak/improper cryptography | Out of scope; comparator results retained |
-| Brute-force protection | Out of scope |
-| Weak session management | Out of scope; session logging is a distinct content-sensitivity question |
-| BOLA | Out of scope |
-| BOPA | Out of scope |
-| BFLA | Out of scope; Swagger's delete-route description is evaluation intent, not scanner proof |
-| CSRF | Out of scope |
-| Path traversal | Out of scope; comparator results retained |
-| Unrestricted upload | Out of scope |
+| Insecure configurations | Planned for future branches; comparator results retained |
+| Weak/improper cryptography | Planned for future branches; comparator results retained |
+| Brute-force protection | Planned for future branches |
+| Weak session management | Planned for future branches; session logging is a distinct content-sensitivity question |
+| BOLA | Planned for future branches |
+| BOPA | Planned for future branches |
+| BFLA | Planned for future branches; Swagger's delete-route description is evaluation intent, not scanner proof |
+| CSRF | Planned for future branches |
+| Path traversal | Planned for future branches; comparator results retained |
+| Unrestricted upload | Planned for future branches |
 
 Form input types/required attributes also establish named field policy for the linked handler.
 The server's actual checks, helpers and rejection behavior determine enforcement; SQL binding
@@ -49,8 +49,8 @@ Task recipes describe external audit tooling; they were not run in the target ch
 
 | Documented family | Current handling |
 | --- | --- |
-| Insecure dependencies | SCA out of scope |
-| Hardcoded secrets | Secret scanning out of scope |
+| Insecure dependencies | SCA planned for a future branch |
+| Hardcoded secrets | Secret scanning planned for a future branch |
 | SSTI | Distinct family not implemented; the same source path has separately reviewed raw HTML/XSS evidence |
 
 The author's constant-template/variable repair changes template-source injection behavior.
@@ -72,12 +72,12 @@ These list categories, not every expected location. The retained source is pinne
 | SQL injection | Interpolated sqlite3 search; correct binding controls tested independently |
 | SSTI | Separate family unsupported; raw HTML flow reviewed independently |
 | Information disclosure | General family out of scope; sensitive log contents have separate evidence gates |
-| Command injection | Out of scope |
-| Brute force | Out of scope |
-| Deserialization | Out of scope |
-| Broken authentication | Out of scope |
-| DoS | Out of scope |
-| File upload | Out of scope |
+| Command injection | Planned for future branches |
+| Brute force | Planned for future branches |
+| Deserialization | Planned for future branches |
+| Broken authentication | Planned for future branches |
+| DoS | Planned for future branches |
+| File upload | Planned for future branches |
 
 No selected app supplies a Python MongoDB/NoSQL driver example. Python NoSQL remains unimplemented,
 not a passed negative test. Saved Semgrep CE/Bearer counts span broader/different rules; neither

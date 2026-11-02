@@ -248,3 +248,32 @@ def signup():
 		}
 	}
 }
+
+func TestPythonKeywordPathsAndRegistrationCoverage(t *testing.T) {
+	for _, tt := range []struct {
+		name, source, gap string
+		routes            int
+	}{
+		{"literal FastAPI keyword", "from fastapi import FastAPI\napp=FastAPI()\n@app.get(path='/keyword')\ndef view():\n    return 'ok'\n", "", 1},
+		{"generated FastAPI keyword", "from fastapi import APIRouter\nrouter=APIRouter()\ndef generate(path):\n    @router.get(path=path)\n    def view():\n        return 'ok'\n", "dynamic_path", 0},
+		{"verified add_url_rule", "from flask import Flask\napp=Flask(__name__)\ndef view():\n    return 'ok'\napp.add_url_rule('/generated',view_func=view)\n", "python_registration_unresolved", 0},
+		{"fake add_url_rule", "app=custom_factory()\napp.add_url_rule('/generated',view_func=view)\n", "", 0},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			root := pythonFixture(t, map[string]string{"main.py": tt.source})
+			r, err := Strings(root, "")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(r.Entries) != tt.routes {
+				t.Fatalf("routes=%d want %d", len(r.Entries), tt.routes)
+			}
+			if tt.gap != "" && !gapKind(r.Gaps, tt.gap) {
+				t.Fatalf("unsupported registration was silent: %+v", r.Gaps)
+			}
+			if tt.gap == "" && (gapKind(r.Gaps, "python_registration_unresolved") || gapKind(r.Gaps, "dynamic_path")) {
+				t.Fatalf("invented coverage warning: %+v", r.Gaps)
+			}
+		})
+	}
+}

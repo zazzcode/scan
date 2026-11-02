@@ -1,0 +1,82 @@
+{
+  "revision": "b81885e58283a3449b578d20c20557aff637e5ea",
+  "scope": "Independent source expectations; six known positive misses remain failing coverage cases, not redefined negatives. Labels never enter model/detector inputs. Four controls verify explicit coverage warnings.",
+  "cases": [
+    {
+      "id": "VP-SQL-EXECUTE",
+      "file": "src/vulnpy/trigger/sqli.py",
+      "line": 37,
+      "kind": "sql_query_candidate",
+      "expect": "construction",
+      "known_gap": true
+    },
+    {
+      "id": "VP-SQL-EXECUTEMANY",
+      "file": "src/vulnpy/trigger/sqli.py",
+      "line": 48,
+      "kind": "sql_query_candidate",
+      "expect": "construction",
+      "known_gap": true
+    },
+    {
+      "id": "VP-SQL-EXECUTESCRIPT",
+      "file": "src/vulnpy/trigger/sqli.py",
+      "line": 59,
+      "kind": "sql_query_candidate",
+      "expect": "construction",
+      "known_gap": true
+    },
+    {
+      "id": "VP-XSS-FLASK",
+      "file": "src/vulnpy/flask/blueprint.py",
+      "line": 57,
+      "kind": "xss_candidate",
+      "expect": "raw_xss",
+      "known_gap": true
+    },
+    {
+      "id": "VP-XSS-FASTAPI",
+      "file": "src/vulnpy/fastapi/vulnerable.py",
+      "line": 44,
+      "kind": "xss_candidate",
+      "expect": "raw_xss",
+      "known_gap": true
+    },
+    {
+      "id": "VP-XSS-JINJA",
+      "file": "apps/flask_app.py",
+      "line": 19,
+      "kind": "xss_candidate",
+      "expect": "raw_xss",
+      "known_gap": true
+    },
+    {
+      "id": "VP-COVERAGE-24",
+      "file": "src/vulnpy/fastapi/vulnerable.py",
+      "line": 24,
+      "kind": "dynamic_path",
+      "expect": "coverage_gap"
+    },
+    {
+      "id": "VP-COVERAGE-32",
+      "file": "src/vulnpy/fastapi/vulnerable.py",
+      "line": 32,
+      "kind": "dynamic_path",
+      "expect": "coverage_gap"
+    },
+    {
+      "id": "VP-COVERAGE-33",
+      "file": "src/vulnpy/flask/blueprint.py",
+      "line": 33,
+      "kind": "python_registration_unresolved",
+      "expect": "coverage_gap"
+    },
+    {
+      "id": "VP-COVERAGE-61",
+      "file": "src/vulnpy/flask/blueprint.py",
+      "line": 61,
+      "kind": "python_registration_unresolved",
+      "expect": "coverage_gap"
+    }
+  ]
+}

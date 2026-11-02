@@ -9,7 +9,7 @@ import (
 // Enrich adds deterministic display records while preserving raw evidence and assessments.
 // Rebuilding from uses also lets older saved reports use the current presentation rules.
 func Enrich(r *graph.StringReport) {
-	r.PresentationVersion = 4
+	r.PresentationVersion = 5
 	r.FindingTypes = append([]graph.FindingType(nil), findingTypes...)
 	r.Findings = make([]graph.Finding, 0, len(r.Uses))
 	for _, u := range r.Uses {
@@ -30,7 +30,7 @@ func describe(u graph.StringUse) graph.Finding {
 		detail := ""
 		switch g.Kind {
 		case "input_validation_absent":
-			detail = "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation."
+			detail = "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim."
 		case "input_validation_unresolved", "input_validation_middleware":
 			detail = "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use."
 		case "validation_insufficient_for_sink", "validation_type_only":
@@ -106,6 +106,9 @@ func describe(u graph.StringUse) graph.Finding {
 	if a.Status == "completed" {
 		if answer := a.Answers["validation"]; answer != "" {
 			f.Validation += " Model validation answer: " + displayLabel(answer) + "."
+			if u.Kind == "sql_query_candidate" || u.Kind == "nosql_query_candidate" {
+				f.Validation += " This operation-level answer is not an independent field-policy finding."
+			}
 		}
 		if u.Kind == "input_validation_candidate" && u.Completeness != nil && u.Completeness.ClaimKind == "validation" {
 			f.Protection = "Field-policy enforcement: " + displayLabel(a.Protection) + ". " + a.Reason
@@ -179,6 +182,10 @@ func describe(u graph.StringUse) graph.Finding {
 		f.RecordType = "analysis"
 		f.Title = "Protection evidence is inconclusive"
 		f.Summary = "Some protective behavior was observed, but the complete claim remains unresolved. Review the named source, path and assessment gaps before relying on this output."
+	}
+	if f.RecordType == "protection" && u.Kind == "sql_query_candidate" {
+		f.Title = "SQL values remain separate from query syntax"
+		f.Summary = "The verified driver binding and injection assessment support data/statement separation for this operation. Field validity and authorization are separate claims."
 	}
 	if f.Status == "poor_practice" && u.Kind == "log_sink_candidate" {
 		f.Uncertainty += " Who can read the log destination and how long it is retained have not been assessed; that does not remove this remediation task."

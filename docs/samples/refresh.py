@@ -10,7 +10,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--scan', default='./bin/scan', help='compiled scan executable')
     names = ('juice-shop', 'vulnerable-typescript-app', 'nodejs-goof',
-             'ThreatByte', 'python-insecure-app', 'vulnerable-flask-app')
+             'ThreatByte', 'python-insecure-app', 'vulnerable-flask-app', 'vulnpy')
     parser.add_argument('--sample', action='append', choices=names, help='refresh only selected samples')
     args = parser.parse_args()
     executable = str(Path(args.scan).resolve())

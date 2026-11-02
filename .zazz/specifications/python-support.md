@@ -192,3 +192,12 @@ iteration and raised the live request cap to 100, then removed the count cap dur
 2026-11-02: User requested shared route/browser trace evidence, definite source-supported
 validation/practice judgments, protection-color auditing and specific remediation. Added the
 shared trace/reporting acceptance section and architecture documentation requirement.
+
+2026-11-02: User added the read-only VulnPy sample and requested Zazzles/Semgrep/Bearer baselines,
+living source-backed answer guides, and branch closeout. Preserve new sample misses as coverage
+work, do not imply dynamic registration support. Add verified unsupported registration/path warnings
+and literal keyword-path extraction controls. No new vulnerability family is included by this change.
+
+Final route review identified contradictory generic protected-SQL titles and coarse missing-validator
+wording. Shared presentation now names SQL syntax protection and defers field-policy adequacy to
+its independent claim; source evidence and saved model answers remain unchanged.

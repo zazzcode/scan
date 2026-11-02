@@ -1,0 +1,153 @@
+{
+  "tool": "bearer",
+  "run": "bearer-20261102-2",
+  "findings": [
+    {
+      "rule_id": "python_lang_avoid_pickle",
+      "file": "src/vulnpy/trigger/deserialization.py",
+      "line": 8,
+      "severity": "critical",
+      "message": "Usage of unsafe Pickle libraries"
+    },
+    {
+      "rule_id": "python_lang_avoid_pickle",
+      "file": "src/vulnpy/trigger/deserialization.py",
+      "line": 12,
+      "severity": "critical",
+      "message": "Usage of unsafe Pickle libraries"
+    },
+    {
+      "rule_id": "python_lang_code_injection",
+      "file": "src/vulnpy/trigger/unsafe_code_exec.py",
+      "line": 2,
+      "severity": "critical",
+      "message": "Unsanitized external input in code generation"
+    },
+    {
+      "rule_id": "python_lang_code_injection",
+      "file": "src/vulnpy/trigger/util.py",
+      "line": 25,
+      "severity": "critical",
+      "message": "Unsanitized external input in code generation"
+    },
+    {
+      "rule_id": "python_lang_code_injection",
+      "file": "tests/trigger/test_unsafe_code_exec.py",
+      "line": 57,
+      "severity": "critical",
+      "message": "Unsanitized external input in code generation"
+    },
+    {
+      "rule_id": "python_lang_eval_using_user_input",
+      "file": "src/vulnpy/trigger/unsafe_code_exec.py",
+      "line": 6,
+      "severity": "critical",
+      "message": "Unsanitized user input in 'eval' type function"
+    },
+    {
+      "rule_id": "python_lang_os_command_injection",
+      "file": "apps/falcon_app.py",
+      "line": 64,
+      "severity": "critical",
+      "message": "Unsanitized user input in OS command"
+    },
+    {
+      "rule_id": "python_lang_os_command_injection",
+      "file": "apps/fastapi_app.py",
+      "line": 43,
+      "severity": "critical",
+      "message": "Unsanitized user input in OS command"
+    },
+    {
+      "rule_id": "python_lang_os_command_injection",
+      "file": "src/vulnpy/trigger/cmdi.py",
+      "line": 6,
+      "severity": "critical",
+      "message": "Unsanitized user input in OS command"
+    },
+    {
+      "rule_id": "python_lang_os_command_injection",
+      "file": "src/vulnpy/trigger/cmdi.py",
+      "line": 10,
+      "severity": "critical",
+      "message": "Unsanitized user input in OS command"
+    },
+    {
+      "rule_id": "python_lang_xml_external_entity_vulnerability",
+      "file": "src/vulnpy/trigger/xxe.py",
+      "line": 12,
+      "severity": "critical",
+      "message": "Usage of vulnerable XML libraries"
+    },
+    {
+      "rule_id": "python_lang_xml_external_entity_vulnerability",
+      "file": "src/vulnpy/trigger/xxe.py",
+      "line": 16,
+      "severity": "critical",
+      "message": "Usage of vulnerable XML libraries"
+    },
+    {
+      "rule_id": "python_lang_path_traversal",
+      "file": "src/vulnpy/common/templating.py",
+      "line": 26,
+      "severity": "high",
+      "message": "Unsanitized dynamic input in file path"
+    },
+    {
+      "rule_id": "python_lang_path_traversal",
+      "file": "src/vulnpy/common/templating.py",
+      "line": 27,
+      "severity": "high",
+      "message": "Unsanitized dynamic input in file path"
+    },
+    {
+      "rule_id": "python_lang_path_traversal",
+      "file": "src/vulnpy/trigger/pt.py",
+      "line": 48,
+      "severity": "high",
+      "message": "Unsanitized dynamic input in file path"
+    },
+    {
+      "rule_id": "python_lang_path_traversal",
+      "file": "src/vulnpy/trigger/pt.py",
+      "line": 57,
+      "severity": "high",
+      "message": "Unsanitized dynamic input in file path"
+    },
+    {
+      "rule_id": "python_lang_weak_random",
+      "file": "src/vulnpy/trigger/rand.py",
+      "line": 20,
+      "severity": "high",
+      "message": "Usage of weak Pseudo-Random Number Generator (PRNG)"
+    },
+    {
+      "rule_id": "python_lang_weak_random",
+      "file": "src/vulnpy/trigger/rand.py",
+      "line": 25,
+      "severity": "high",
+      "message": "Usage of weak Pseudo-Random Number Generator (PRNG)"
+    },
+    {
+      "rule_id": "python_lang_weak_random",
+      "file": "src/vulnpy/trigger/rand.py",
+      "line": 30,
+      "severity": "high",
+      "message": "Usage of weak Pseudo-Random Number Generator (PRNG)"
+    },
+    {
+      "rule_id": "python_lang_weak_random",
+      "file": "src/vulnpy/trigger/rand.py",
+      "line": 35,
+      "severity": "high",
+      "message": "Usage of weak Pseudo-Random Number Generator (PRNG)"
+    },
+    {
+      "rule_id": "python_lang_weak_hash_md5",
+      "file": "apps/falcon_app.py",
+      "line": 26,
+      "severity": "medium",
+      "message": "Usage of weak hashing library (MDx)"
+    }
+  ]
+}

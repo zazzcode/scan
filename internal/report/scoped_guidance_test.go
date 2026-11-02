@@ -53,3 +53,14 @@ func TestProtectedDisplayCannotOverrideCanonicalBlocker(t *testing.T) {
 		t.Fatalf("unsafe display: %+v", f)
 	}
 }
+
+func TestProtectedSQLHeadingAndValidationScope(t *testing.T) {
+	u := graph.StringUse{Kind: "sql_query_candidate", Gaps: []graph.Gap{{Kind: "input_validation_absent", Detail: "No complete policy established"}}, Assessment: graph.Assessment{Status: "completed", FindingStatus: "protected_for_claim", Answers: map[string]string{"injection_protection": "protected", "validation": "insufficient"}, Protection: "sufficient"}}
+	f := describe(u)
+	if f.RecordType != "protection" || f.Title != "SQL values remain separate from query syntax" {
+		t.Fatalf("contradictory SQL heading: %+v", f)
+	}
+	if strings.Contains(f.Validation, "No validator call") || !strings.Contains(f.Validation, "not an independent field-policy finding") {
+		t.Fatal("coarse SQL record claimed an absent guard or independent validation defect")
+	}
+}

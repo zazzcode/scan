@@ -1,7 +1,9 @@
 # Python adapter implementation and evaluation
 
 [Contract](../specifications/python-support.md) · [User guide](../../docs/python-support.md) ·
-[Sample reports](../../docs/samples/README.md)
+[Sample reports](../../docs/samples/README.md) ·
+[ThreatByte detection checklist](threatbyte-detection-guide.md) ·
+[FastAPI answer guide](python-insecure-app-detection-guide.md)
 
 ## Delivered behavior
 
@@ -143,3 +145,19 @@ full template inheritance/macros, exact stored-row identity and deployed schema 
 incomplete. Outbound destinations are review candidates, not a new SSRF verdict engine. New
 vulnerability families, SCA and other languages remain separate work. General novel-repository
 coverage and independent accuracy measurements still require more labeled controls and review.
+
+## Added VulnPy corpus and living answer guides
+
+The living [ThreatByte guide](threatbyte-detection-guide.md) independently verifies profile/signup
+SQL binding and dashboard SQL injection, with detailed current-family and future-branch checklists.
+The [FastAPI answer guide](python-insecure-app-detection-guide.md) distinguishes its two XSS source
+witnesses from SSTI and other planned families; the author article does not establish a SQL sink.
+
+[VulnPy](vulnpy-detection-guide.md) is an additional coverage corpus, not part of the original 29-case
+success claim. Its generated registrations/trigger dispatch hide three SQL variants and generated
+Flask/FastAPI XSS from the current route subset. The separate Jinja Environment path remains an
+unresolved candidate. Six source-positive cases remain known misses; four checks require explicit
+coverage warnings. Offline results: 11 static entries, six unassessed records, no model calls.
+Semgrep CE reports eight findings and Bearer 21 with pinned local rules; neither reports the three
+SQL variants. The initial sandbox-failed Bearer worker run was rejected and rerun successfully.
+Full details and provenance live with the sample; new framework/family work remains future branches.

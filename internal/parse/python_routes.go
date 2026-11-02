@@ -105,6 +105,15 @@ func (s *pythonSet) routeEntries() []pythonRoute {
 			continue
 		}
 		pyWalk(m.tree.RootNode(), func(n *sitter.Node) {
+			if n.Kind() == "call" {
+				fn := n.ChildByFieldName("function")
+				if fn != nil && fn.Kind() == "attribute" && pyText(m, fn.ChildByFieldName("attribute")) == "add_url_rule" {
+					recv := s.receiver(m, pyText(m, fn.ChildByFieldName("object")), 0)
+					if recv.kind == "flask" {
+						s.gaps = append(s.gaps, graph.Gap{Kind: "python_registration_unresolved", Detail: "Verified Flask add_url_rule registration is outside the supported decorator registration subset; its generated handler/path is not analyzed.", At: spanOf(m.file, n)})
+					}
+				}
+			}
 			if n.Kind() != "decorated_definition" {
 				return
 			}
@@ -135,10 +144,19 @@ func (s *pythonSet) routeEntries() []pythonRoute {
 					continue
 				}
 				args := pyArgs(call)
-				if len(args) == 0 {
+				var pathNode *sitter.Node
+				if len(args) > 0 {
+					pathNode = args[0]
+				} else if recv.kind == "fastapi" {
+					pathNode = pyKeywordIn(m, call, "path")
+				} else {
+					pathNode = pyKeywordIn(m, call, "rule")
+				}
+				if pathNode == nil {
+					s.gaps = append(s.gaps, graph.Gap{Kind: "dynamic_path", Detail: "Python route path operand is missing or unsupported", At: spanOf(m.file, d)})
 					continue
 				}
-				path, ok := pyLiteral(m, args[0])
+				path, ok := pyLiteral(m, pathNode)
 				if !ok {
 					s.gaps = append(s.gaps, graph.Gap{Kind: "dynamic_path", Detail: "Python route path is not literal", At: spanOf(m.file, d)})
 					continue

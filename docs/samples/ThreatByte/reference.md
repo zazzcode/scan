@@ -40,3 +40,6 @@ no password-complexity or length rule is inferred. Signup email also declares `t
 its server guards enforce only presence and equality, not email syntax. This is the separate
 validation defect. The insert at line 99 still binds values correctly. Seven independent cases
 record these positive/protected expectations; they never enter the production detector or model.
+
+The living [detection guide](../../../.zazz/evaluation/threatbyte-detection-guide.md) details
+profile/signup SQL protection, dashboard SQL injection, output and validation controls, and future work.

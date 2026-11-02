@@ -74,3 +74,9 @@ site root (`https://zazzcode.github.io/zazzles/<app>/findings.html`). To use it,
 The [Python evaluation](../../.zazz/evaluation/python-support-results.md) records 22 scoped case
 checks, nine reviewed SQL/XSS discovery cases, 78 live Luna requests and the retained Review boundaries.
 Python NoSQL is out of this corpus; no sample contains a MongoDB driver.
+
+## VulnPy coverage corpus
+
+[VulnPy](vulnpy/README.md) adds dynamically generated Python route/trigger coverage and source-backed
+SQL/XSS expectations. Its six known positive misses remain visible; four controls require explicit
+coverage warnings. [Living guide](../../.zazz/evaluation/vulnpy-detection-guide.md).

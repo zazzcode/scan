@@ -1,0 +1,16 @@
+{
+  "target_revision": "b81885e58283a3449b578d20c20557aff637e5ea",
+  "exit_code": 1,
+  "seconds": 1.571,
+  "environment_keys": [
+    "PATH",
+    "TMPDIR"
+  ],
+  "tool": "bearer",
+  "run": "bearer-20261102-2",
+  "valid_execution": true,
+  "source_scope": "Copy of all tracked non-symlink files; exact per-tool scanned paths and exclusions retained in raw output",
+  "source_files": 143,
+  "rules_revision": "82c335f781a61a6d8b052394f84fd1d93edec467",
+  "binary_sha256": "91abf5d6cf5ccdd081b649b8f265396d1efc558b655cd5493a19ef5a1377a0da"
+}

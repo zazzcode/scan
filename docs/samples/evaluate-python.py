@@ -11,7 +11,9 @@ def matches(case, uses):
             and u['sink']['span']['start_line'] == case['line']]
 
 
-def evaluate(case, uses):
+def evaluate(case, uses, gaps=()):
+    if case["expect"] == "coverage_gap":
+        return any(g["kind"] == case["kind"] and g.get("at", {}).get("file") == case["file"] and g.get("at", {}).get("start_line") == case["line"] for g in gaps)
     found = matches(case, uses)
     expected = case['expect']
     if expected == 'absent':
@@ -42,16 +44,16 @@ def evaluate(case, uses):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('app', choices=('ThreatByte', 'python-insecure-app', 'vulnerable-flask-app'))
+    parser.add_argument('app', choices=('ThreatByte', 'python-insecure-app', 'vulnerable-flask-app', 'vulnpy'))
     parser.add_argument('report', type=Path)
     args = parser.parse_args()
     cases = json.loads((Path(__file__).parent / args.app / 'cases.json').read_text())
     report = json.loads(args.report.read_text())
-    results = [{'id': case['id'], 'pass': evaluate(case, report['uses'])} for case in cases['cases']]
+    results = [{'id': case['id'], 'pass': evaluate(case, report['uses'], report.get('gaps', []))} for case in cases['cases']]
     positive = [case for case in cases['cases'] if case['expect'] in ('construction', 'raw_xss', 'validation_defect')]
     print(json.dumps({'app': args.app, 'cases': results,
                       'passed': sum(row['pass'] for row in results), 'total': len(results),
-                      'discovered_positive_cases': sum(evaluate(case, report['uses']) for case in positive),
+                      'discovered_positive_cases': sum(evaluate(case, report['uses'], report.get('gaps', [])) for case in positive),
                       'reviewed_positive_cases': len(positive)}, indent=2))
     raise SystemExit(0 if all(row['pass'] for row in results) else 1)
 

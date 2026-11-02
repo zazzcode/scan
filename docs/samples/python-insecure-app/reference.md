@@ -1,7 +1,7 @@
 # Python insecure app source reference
 
 [Source hashes](source-hashes.json) pin this reference. The README names dependencies, hardcoded
-secrets and SSTI; dependency/secret analysis is out of scope. SSTI is not itself an XSS verdict.
+secrets and SSTI; dependency/secret analysis is planned for future branches. SSTI is not itself an XSS verdict.
 
 | Case | Source | Expected and rationale |
 | --- | --- | --- |
@@ -14,3 +14,6 @@ HTML/template flow. No runtime exploit or application execution is part of this 
 
 The [documented-family inventory](../python-documented-claims.md) records all advertised families,
 additional local/upstream material reviewed, and current unsupported boundaries.
+
+The living [detection guide and answer key](../../../.zazz/evaluation/python-insecure-app-detection-guide.md)
+expands the source traces, controls and future-family checklist beyond these original comparison cases.

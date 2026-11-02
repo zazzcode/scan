@@ -38874,7 +38874,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.key is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.query.key is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -50806,7 +50806,7 @@
               "status": "needs_review",
               "title": "Outbound request needs destination review",
               "summary": "Scan recorded a possible outbound HTTP use. Verify the destination, request-value handling, and applicable restrictions; this is not a confirmed SSRF finding.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.imageUrl reaches a sensitive use with no validator call in the handler or applicable middleware",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.imageUrl reaches a sensitive use with no validator call in the handler or applicable middleware",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -51739,7 +51739,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.caption is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.caption is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -53243,7 +53243,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.captcha is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.captcha is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -53518,7 +53518,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.captchaId is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.captchaId is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -54852,7 +54852,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.email is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.email is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -55086,7 +55086,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.password is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.password is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -55320,7 +55320,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.passwordRepeat is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.passwordRepeat is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -59978,7 +59978,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.quantity is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.quantity is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -60456,7 +60456,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -64464,7 +64464,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -65698,7 +65698,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -67058,7 +67058,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -71346,7 +71346,7 @@
               "status": "poor_practice",
               "title": "A value is built into SQL query text",
               "summary": "Refactor the string-built query to keep values separate from SQL structure using the verified driver API. This construction is a poor-practice finding even when an exploitable injection has not been demonstrated. Field validation is a separate concern.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.email reaches a sensitive use with no validator call in the handler or applicable middleware The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body.password before the sink, and that call is not a proven validator",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.email reaches a sensitive use with no validator call in the handler or applicable middleware The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: a call receives req.body.password before the sink, and that call is not a proven validator",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
               "recommendations": {
@@ -75073,7 +75073,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: query.new is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: query.new is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -75721,7 +75721,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: query.repeat is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: query.repeat is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -78202,7 +78202,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: body.email is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: body.email is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -78938,7 +78938,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: body.new is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: body.new is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -79674,7 +79674,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: body.repeat is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: body.repeat is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -80069,7 +80069,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: query.email is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: query.email is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -86919,7 +86919,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.callback is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.query.callback is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -87555,7 +87555,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query?.fields is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.query?.fields is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -88903,7 +88903,7 @@
               "status": "poor_practice",
               "title": "A value is built into SQL query text",
               "summary": "Refactor the string-built query to keep values separate from SQL structure using the verified driver API. This construction is a poor-practice finding even when an exploitable injection has not been demonstrated. Field validation is a separate concern.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.query.q reaches a sensitive use with no validator call in the handler or applicable middleware",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.query.q reaches a sensitive use with no validator call in the handler or applicable middleware",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
               "recommendations": {
@@ -90935,7 +90935,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.params.id is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -92540,7 +92540,7 @@
               "status": "needs_review",
               "title": "NoSQL document type constraints need review",
               "summary": "A request value reaches a query, update, or insert document. Scan has not established the scalar type or permitted keys/operators for that slot. A structured document is not automatically unsafe; verify the driver and field constraints.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.orderDetails reaches a sensitive use with no validator call in the handler or applicable middleware",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.orderDetails reaches a sensitive use with no validator call in the handler or applicable middleware",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -101477,7 +101477,7 @@
               "status": "poor_practice",
               "title": "A value is built into a NoSQL $where expression",
               "summary": "Replace the concatenated or interpolated $where expression with an appropriate data-only query. This executable-string construction is a poor-practice finding even when conversions or filters may prevent exploitation. Review value types and preserve the intended query behavior.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id reaches a sensitive use with no validator call in the handler or applicable middleware",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.params.id reaches a sensitive use with no validator call in the handler or applicable middleware",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
               "recommendations": {
@@ -105137,7 +105137,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.answer is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.answer is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -112865,7 +112865,7 @@
               "status": "needs_review",
               "title": "NoSQL document type constraints need review",
               "summary": "A request value reaches a query, update, or insert document. Scan has not established the scalar type or permitted keys/operators for that slot. A structured document is not automatically unsafe; verify the driver and field constraints.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.deliveryStatus reaches a sensitive use with no validator call in the handler or applicable middleware No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id reaches a sensitive use with no validator call in the handler or applicable middleware",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.deliveryStatus reaches a sensitive use with no validator call in the handler or applicable middleware Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.params.id reaches a sensitive use with no validator call in the handler or applicable middleware",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -115055,7 +115055,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.paymentId is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.paymentId is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -117656,7 +117656,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.paymentId is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.paymentId is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -118365,7 +118365,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.paymentMode is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.paymentMode is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -122017,7 +122017,7 @@
               "status": "needs_review",
               "title": "NoSQL document type constraints need review",
               "summary": "A request value reaches a query, update, or insert document. Scan has not established the scalar type or permitted keys/operators for that slot. A structured document is not automatically unsafe; verify the driver and field constraints.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.author reaches a sensitive use with no validator call in the handler or applicable middleware The field name suggests free text. Confirm that business policy; allowing punctuation is not by itself a validation defect. Evidence: req.body.message may contain any character the business allows; bind it in the query, update, or insert instead of building that statement from the string No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.params.id reaches a sensitive use with no validator call in the handler or applicable middleware",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.author reaches a sensitive use with no validator call in the handler or applicable middleware The field name suggests free text. Confirm that business policy; allowing punctuation is not by itself a validation defect. Evidence: req.body.message may contain any character the business allows; bind it in the query, update, or insert instead of building that statement from the string Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.params.id reaches a sensitive use with no validator call in the handler or applicable middleware",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -122971,7 +122971,7 @@
               "status": "needs_review",
               "title": "NoSQL document type constraints need review",
               "summary": "A request value reaches a query, update, or insert document. Scan has not established the scalar type or permitted keys/operators for that slot. A structured document is not automatically unsafe; verify the driver and field constraints.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.id reaches a sensitive use with no validator call in the handler or applicable middleware The field name suggests free text. Confirm that business policy; allowing punctuation is not by itself a validation defect. Evidence: req.body.message may contain any character the business allows; bind it in the query, update, or insert instead of building that statement from the string",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.id reaches a sensitive use with no validator call in the handler or applicable middleware The field name suggests free text. Confirm that business policy; allowing punctuation is not by itself a validation defect. Evidence: req.body.message may contain any character the business allows; bind it in the query, update, or insert instead of building that statement from the string",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -124034,7 +124034,7 @@
               "status": "needs_review",
               "title": "NoSQL document type constraints need review",
               "summary": "A request value reaches a query, update, or insert document. Scan has not established the scalar type or permitted keys/operators for that slot. A structured document is not automatically unsafe; verify the driver and field constraints.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.id reaches a sensitive use with no validator call in the handler or applicable middleware",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.id reaches a sensitive use with no validator call in the handler or applicable middleware",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -125216,7 +125216,7 @@
               "status": "needs_review",
               "title": "NoSQL document type constraints need review",
               "summary": "A request value reaches a query, update, or insert document. Scan has not established the scalar type or permitted keys/operators for that slot. A structured document is not automatically unsafe; verify the driver and field constraints.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.id reaches a sensitive use with no validator call in the handler or applicable middleware",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.id reaches a sensitive use with no validator call in the handler or applicable middleware",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -126439,7 +126439,7 @@
               "status": "needs_review",
               "title": "NoSQL document type constraints need review",
               "summary": "A request value reaches a query, update, or insert document. Scan has not established the scalar type or permitted keys/operators for that slot. A structured document is not automatically unsafe; verify the driver and field constraints.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.id reaches a sensitive use with no validator call in the handler or applicable middleware",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.id reaches a sensitive use with no validator call in the handler or applicable middleware",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -129086,7 +129086,7 @@
               "status": "needs_review",
               "title": "NoSQL document type constraints need review",
               "summary": "A request value reaches a query, update, or insert document. Scan has not established the scalar type or permitted keys/operators for that slot. A structured document is not automatically unsafe; verify the driver and field constraints.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.id reaches a sensitive use with no validator call in the handler or applicable middleware",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.id reaches a sensitive use with no validator call in the handler or applicable middleware",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -134983,7 +134983,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.privateKey is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.privateKey is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -140580,7 +140580,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: body.cid is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: body.cid is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -157834,7 +157834,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.username is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.username is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -162713,7 +162713,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.selectedLines is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.selectedLines is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
@@ -165247,7 +165247,7 @@
               "status": "needs_review",
               "title": "Request-field validation evidence is incomplete",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: req.body.selectedFix is read and no handler or applicable middleware validator handles it",
+              "input_validation": "Complete enforcement of an applicable field policy was not established in this operation record. Consult any separate field-policy assessment; query binding is a different claim. Evidence: req.body.selectedFix is read and no handler or applicable middleware validator handles it",
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {

@@ -25,6 +25,9 @@ request matching and changed evidence cannot inherit them. The user authorized p
 PR publication, integration pushes and merge remain unauthorized. Python NoSQL is out of corpus/unimplemented. Shared trace/report hardening and policy-backed
 validation are documented in [trace judgment](../architecture/trace-judgment.md); all 29 independent
 Python case checks pass. Only final Protected records are green.
+Living answer guides for ThreatByte, the FastAPI app and the added VulnPy corpus are linked from
+[Python results](../evaluation/python-support-results.md). VulnPy has six known positive coverage misses
+and four warning controls; its offline baseline is not part of the original 29-case pass claim.
 
 **Previous XSS worktree: `xss-response`.** The first XSS discovery/reporting pass was
 committed and pushed as `26f50d0`. Verify the actual path, branch and changes with `pwd` and
