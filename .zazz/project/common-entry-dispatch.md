@@ -8,9 +8,8 @@ the next new vulnerability family. These capabilities are planned, not currently
 
 gRPC handlers are an entry/dispatch capability independent of source language. The model should
 facilitate their registration, callable binding and invocation context without HTTP-route assumptions.
-**Go is the next source language when language expansion begins**, after the existing coverage/SCA/
-secret-scanning prerequisites. Go-specific adapters will supply their own binding and flow evidence;
-this activity does not implement Go source analysis merely by adding gRPC or the common model.
+Language adapters supply their own binding and flow evidence; adding gRPC or the common model
+does not itself implement support for another source language.
 
 ## Governing design
 

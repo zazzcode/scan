@@ -102,7 +102,6 @@ contains the detailed per-language checklist and delivery order.
 - [ ] Complete Python NoSQL and API-to-browser XSS linkage coverage.
 - [ ] Dependency vulnerability scanning (SCA) — resolved JavaScript/TypeScript and Python packages and advisories.
 - [ ] Secret scanning — private material in source, with public keys and placeholders as controls.
-- [ ] Additional languages — **Go first**, then Java and others, after current-language capabilities, SCA and secret scanning.
 
 All future functionality must include JavaScript, TypeScript and Python acceptance evidence, with
 semantic non-applicability documented where relevant. We continue expanding the vulnerable-app

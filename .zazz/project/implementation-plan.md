@@ -178,10 +178,8 @@ Command injection follows this activity and remains the next new vulnerability f
 dynamic-route, GraphQL and gRPC support is next after Python support. Command injection and XSS
 hardening follow. Keep the other planned classes. Complete Python NoSQL and API-to-browser XSS
 linkage coverage immediately before dependency vulnerability scanning (SCA), after the other planned
-vulnerability-type work. Secret scanning is last before additional languages. **Go is the next
-source language when language expansion begins**, followed by Java and others. These wait until
-this work for JavaScript, TypeScript and Python is delivered; gRPC entry support is a separate
-capability and does not imply implemented Go source analysis.
+vulnerability-type work. Secret scanning follows SCA. Language expansion has no fixed position
+in this sequence; gRPC entry support is independent of source-language support.
 This order supersedes earlier sequence notes and the historical language-phase dependencies below.
 
 Each unchecked row is a future bounded contract/worktree, not implementation authorized by this
@@ -208,8 +206,7 @@ plan edit. Preserve current capabilities and their unresolved coverage while imp
 | [ ] | `prototype-pollution` | JS/TS object/prototype operations such as _.merge; test Python's non-applicability rather than inventing equivalent prototype semantics |
 | [ ] | `python-coverage-completion` | Complete Python NoSQL and API-to-browser XSS linkage coverage immediately before SCA; retain separate binding, origin and rendering claims with paired controls |
 | [ ] | `sca-library-audit` | Resolved dependency/advisory auditing for JS/TS npm/pnpm and Python pip-audit, with failures and reachability separate |
-| [ ] | `hardcoded-secrets` / secret scanning | Private material in source; public verification keys and placeholders remain controls; immediately before additional languages |
-| [ ] | `other-languages` | Go first, then Java and others, after current-language vulnerability work, SCA and secret scanning; baselines and CI alongside |
+| [ ] | `hardcoded-secrets` / secret scanning | Private material in source; public verification keys and placeholders remain controls |
 
 Dynamic-route reporting must not turn an unresolved factory into a fabricated concrete endpoint.
 Static/dynamic describes registration origin, not vulnerability status; both kinds can be resolved,
@@ -362,7 +359,7 @@ reference, not Bearer output. This study does not change the chosen Decision Ass
 | 9 | 4, 6–8 | Unified reporting, identity, baseline, CI behavior |
 | 10 | 9 | Correct incremental caches and resource/performance evidence |
 | 11 | Delivered under the Python contract | Existing bounded Python adapter; retained historical phase reference, not a future language |
-| 12 | Current-language capability list, SCA, secret scanning; Go-scope decision | Go adapter in a separate future contract |
+| 12 | Selected language-adapter scope and framework/flow prerequisites; unscheduled | Go adapter in a separate future contract |
 | 13 | Separate proposal + relevant foundation | Optional scope checks, coverage expansion, and additional languages such as Java |
 
 Phases 4 and 5 are independent after their prerequisites. Offline phases 0–7 can progress after their
@@ -411,9 +408,9 @@ separate worktrees when authorized. An explicit user implementation request is s
 | S28 | 10 | `release-packaging-and-readiness` | S27; release-scope decision | Reproducible selected-platform release evidence |
 | S29 | 11 | `python-extraction-and-resolution` (historical) | Superseded by [Python contract](../specifications/python-support.md) | Bounded Python extraction/resolution delivered |
 | S30 | 11 | `python-flow-and-rules` (historical) | Superseded by the delivered Python contract | Bounded Python flow/rules/judgment delivered; coverage gaps retained |
-| S31 | 12 | `go-resolution-and-lowering` | Current-language capability list, SCA and secret scanning; Go-scope decision | Go receiver/interface/lowering subset |
+| S31 | 12 | `go-resolution-and-lowering` | Selected language-adapter scope and framework/flow prerequisites; unscheduled | Go receiver/interface/lowering subset |
 | S32 | 12 | `go-flow-and-rules` | S31 | Go flow, rules, and assessment/review evaluation |
-| S33 | 13 | `java-resolution-and-lowering` | S32; Java-scope decision | Java types, annotations, overloads, lowering |
+| S33 | 13 | `java-resolution-and-lowering` | Java-scope decision and relevant shared foundation; unscheduled | Java types, annotations, overloads, lowering |
 | S34 | 13 | `java-flow-and-rules` | S33 | Java flow, rules, and assessment/review evaluation |
 
 S05's live experiment can remain pending while S06–S19 progress after their own authorization. S12 and
@@ -589,10 +586,9 @@ not a reason to mark the entire adapter as unimplemented or to claim universal p
 
 ## Phase 12 — Go adapter
 
-**Sequence update, 2026-11-02.** JavaScript, TypeScript and Python are currently supported.
-Go is an additional-language phase, deferred until current-language vulnerability capabilities,
-SCA and secret scanning are delivered (see the capability list above). Java and other languages
-remain later additions under their own contracts.
+JavaScript, TypeScript and Python are currently supported. This section is a technical design
+reference, not a scheduled roadmap commitment. Language-adapter work uses a separate scoped contract;
+phase numbering does not impose a language delivery order.
 
 **Future specs:** `go-resolution-and-lowering`; `go-flow-and-rules`.
 Go stresses receivers and interfaces.
@@ -617,7 +613,7 @@ positive/negative corpus, uncertainty routing, and evidence of benefit beyond pa
 
 After the accepted route/source-to-use milestone, add ecosystem audit adapters and dependency
 findings. Per the 2026-11-02 sequence decision, SCA for JS/TS and Python follows the remaining
-vulnerability types, then secret scanning precedes additional source languages. The
+vulnerability types and the remaining Python coverage item; secret scanning follows SCA. The
 [SCA design](../architecture/sca-design.md) owns SCA-1 schema/tool selection, SCA-2 bounded audit
 execution/reporting, and SCA-3 optional route-reachability correlation. Start with npm/pnpm audit for
 JS/TS targets and add pip-audit for Python inputs under its own verified adapter contract. Preserve
