@@ -11,6 +11,7 @@ type Evidence struct {
 // Dependency records a local value relationship; use-level gaps distinguish
 // supported expression dependencies from uncertain transfers. It is not a runtime trace.
 type Dependency struct {
+	SinkSlot   string     `json:"sink_slot,omitempty"`
 	StorageKey string     `json:"storage_key,omitempty"`
 	Source     Evidence   `json:"source"`
 	Transfers  []Evidence `json:"transfers"`

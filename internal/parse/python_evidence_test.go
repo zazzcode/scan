@@ -287,7 +287,7 @@ func TestPythonFormPolicyIsNotEnforcement(t *testing.T) {
 	root := pythonFixture(t, map[string]string{"a.py": `from flask import Flask,request,render_template
 import sqlite3
 app=Flask(__name__)
-@app.route('/signup',methods=['GET','POST'])
+@app.route('/signup',methods=['POST'])
 def signup():
     email=request.form.get('email')
     c=sqlite3.connect(':memory:')

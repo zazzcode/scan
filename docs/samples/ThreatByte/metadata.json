@@ -5,12 +5,12 @@
   "assessment": "gpt-6-luna; exact-request replay only",
   "entries": 23,
   "client_entries": 1,
-  "records": 51,
-  "assessed": 51,
+  "records": 56,
+  "assessed": 56,
   "outcomes": {
-    "protected_for_claim": 32,
-    "needs_evidence": 13,
-    "poor_practice": 1,
+    "protected_for_claim": 41,
+    "needs_evidence": 8,
+    "poor_practice": 2,
     "needs_review": 1,
     "confirmed_vulnerability": 4
   },
@@ -22,5 +22,7 @@
     "Semgrep CE 1.183.0 / 20261101 snapshot",
     "Bearer e3753de / rules 82c335f"
   ],
-  "raw_run": "run-2595692128"
+  "raw_run": "run-2441916737",
+  "evidence_version": 2,
+  "presentation_version": 4
 }

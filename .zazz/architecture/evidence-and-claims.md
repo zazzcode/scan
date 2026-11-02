@@ -121,6 +121,12 @@ custom extensions, setter effects and runtime behavior still need validation. Up
 [Sequelize raw queries](https://sequelize.org/docs/v6/core-concepts/raw-queries/) and
 [finale resource semantics](https://github.com/tommybananas/finale/blob/master/README.md).
 
+## Shared trace contract
+
+The implemented [trace and judgment design](trace-judgment.md) adds explicit dependency/control
+relations and a supplied/missing evidence-role ledger without relaxing claim completeness.
+Validation has a separate policy-backed protocol; query binding cannot satisfy field requirements.
+
 ## Claim-specific completeness and outcomes
 
 Required evidence roles are checked before a candidate becomes eligible for a scoped finding.

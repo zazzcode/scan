@@ -6,14 +6,14 @@ Target: [anotherik/ThreatByte](https://github.com/anotherik/ThreatByte), MIT, pi
 `ede28f2`. The source checkout was clean before and after analysis. Upstream source excerpts retain
 their authorship; this is a scanner evaluation, not a remediation of the vulnerable application.
 
-The report inventories 23 route/method entries plus one browser entry and 51 result records.
-All 51 records have completed `gpt-6-luna` assessments. Four source-supported static vulnerabilities
+The report inventories 23 route/method entries plus one browser entry and 56 result records.
+All 56 records have completed `gpt-6-luna` assessments. Four source-supported static vulnerabilities
 are retained: dashboard SQL injection, reflected search output, stored country output and inline
 jQuery comment DOM XSS. One additional construction-practice record for dynamic column names stays
 unconfirmed for injection; its key allow-lists require better structural modeling. Input-validation
 facets and protected bound-query/escaped-output controls remain separate.
 
-The [11-case source inventory](cases.json) passes, including four reviewed positive discovery cases.
+The [18-case source inventory](cases.json) passes, including four reviewed SQL/XSS positives and the separate email-format practice defect.
 [Reference review](reference.md), [source hashes](source-hashes.json),
 [Semgrep baseline](semgrep/baseline.json), [Bearer baseline](bearer/baseline.json), and
 [metadata](metadata.json) preserve the comparison. Semgrep's seven results include two locations for
@@ -21,8 +21,8 @@ one dashboard SQL case, plus MD5/IaC findings. Bearer's six results concern trav
 configuration. Neither baseline reports these three XSS flows or the request-influenced outbound URL.
 Those totals span different scopes and are not accuracy percentages.
 
-Source-backed form policy shows a required email field; the signup presence/password-match guards
-do not enforce email format. The parameterized insert still protects SQL syntax. Whole-session
+Source-backed form policy establishes a separate signup email-format defect; the required-only
+login/signup fields have enforced presence guards. The parameterized insert still protects SQL syntax. Whole-session
 logging, unresolved field origins, unknown transformations and outbound-destination semantics remain
 Review where evidence is incomplete. This is not exhaustive coverage of the README's vulnerabilities,
 independent findings-review completion, runtime exploitation, or whole-program soundness.

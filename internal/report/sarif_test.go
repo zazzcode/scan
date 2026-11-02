@@ -31,7 +31,7 @@ func TestSARIFStatusAndRouteEvidence(t *testing.T) {
 				t.Fatal("duplicate related locations")
 			}
 			data, _ := json.Marshal(doc)
-			if !bytes.Contains(data, []byte("session%20handler.ts")) || !bytes.Contains(data, []byte("POST /session")) || !bytes.Contains(data, []byte("illustrative_template")) || !bytes.Contains(data, []byte("poor practice")) {
+			if !bytes.Contains(data, []byte("session%20handler.ts")) || !bytes.Contains(data, []byte("POST /session")) || !bytes.Contains(data, []byte("example_status")) {
 				t.Fatalf("missing route/escaped source/example status: %s", data)
 			}
 		})

@@ -573,7 +573,17 @@ func (f *flow) call(n *sitter.Node) value {
 	}
 	if kind != "" {
 		v := value{}
-		for _, a := range values {
+		for i, a := range values {
+			if kind == "sql_query_candidate" {
+				a.deps = append([]graph.Dependency{}, a.deps...)
+				slot := "sql_options"
+				if i == 0 {
+					slot = "sql_text"
+				}
+				for j := range a.deps {
+					a.deps[j].SinkSlot = slot
+				}
+			}
 			v = combine(v, a)
 		}
 		if len(v.deps) > 0 || len(v.gaps) > 0 || kind == "outbound_http_candidate" {
@@ -656,7 +666,7 @@ func dependencyKey(d graph.Dependency) string {
 	key := func(e graph.Evidence) {
 		fmt.Fprintf(&b, "%s:%s:%d:%d;", e.Kind, e.Span.File, e.Span.StartByte, e.Span.EndByte)
 	}
-	b.WriteString(d.StorageKey + "|")
+	b.WriteString(d.StorageKey + "|" + d.SinkSlot + "|")
 	key(d.Source)
 	for _, e := range d.Transfers {
 		key(e)

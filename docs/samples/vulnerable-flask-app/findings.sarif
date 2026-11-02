@@ -134,7 +134,7 @@
                 }
               ],
               "message": {
-                "text": "Separate input data from SQL structure"
+                "text": "Bind this sqlite3 statement's values"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -198,8 +198,8 @@
                   ]
                 },
                 "validation": {
-                  "choice": "insufficient",
-                  "confidence": 0.57,
+                  "choice": "uncertain",
+                  "confidence": 0.53,
                   "probabilities": [
                     {
                       "value": "sufficient",
@@ -207,15 +207,15 @@
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.68
+                      "probability": 0.29
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.28
+                      "probability": 0.65
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.01
+                      "probability": 0.03
                     }
                   ]
                 }
@@ -224,10 +224,10 @@
               "answers": {
                 "injection_protection": "vulnerable",
                 "protection": "insufficient",
-                "validation": "insufficient"
+                "validation": "uncertain"
               },
               "usage": {
-                "input_tokens": 3243,
+                "input_tokens": 3724,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -285,32 +285,32 @@
               "status": "confirmed_vulnerability",
               "title": "SQL injection supported by source analysis",
               "summary": "The supplied source and injection-specific assessment establish that request input can affect query syntax or selector structure in the stated analysis scope. Remediate the injection using the verified database API; the underlying construction-practice concern is included in this one finding.",
-              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: No complete business-policy enforcement established for query.name Model validation answer: insufficient.",
+              "input_validation": "No validator call was identified for the named field in the analyzed handler and modeled middleware. This does not prove that every execution path lacks validation. Evidence: No complete business-policy enforcement established for query.name Model validation answer: Inconclusive.",
               "use_protection": "Assessed injection/use protection: insufficient. Source-backed injection claim has required source, binding and path evidence, no declared blockers, and an independent injection-specific insufficient-protection assessment; this is a static judgment, not runtime confirmation.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Separate input data from SQL structure",
+                "title": "Bind this sqlite3 statement's values",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Pass untrusted values through the verified driver's parameter-binding API. Keep SQL query, update, and insert structure separate from data. Review NoSQL APIs separately.",
-                  "Restrict each field as far as its business requirement allows. A string or length check is not injection protection. A comment or other free-text field may contain any character, so the sink construction is the injection control.",
-                  "Add regression cases for normal input, rejected malformed input and query-structure preservation; resolve inconclusive guard and binding evidence before applying a fix."
+                  "At vulnerable-flask-app.py:20, keep the sqlite3 execute SQL operand static and place each request-derived value in its separate parameter operand. Supplying parameters does not protect interpolation already present in the SQL text.",
+                  "Use ? placeholders for values. Column/table names cannot be bound as values: retain an explicit allow-list and reject unlisted identifiers before constructing those SQL fragments.",
+                  "Replace the interpolated SQL construction shown in the evidence with the value-binding candidate below. Verify the resulting data types and preserve wildcard behavior in bound LIKE values.",
+                  "Add a regression test that passes a quote-bearing value and checks the statement text remains unchanged while the complete original value is present only in the bound parameters."
                 ],
-                "illustrative_example": "// Illustrative Sequelize binding pattern; adapt schema and full authentication logic.\nconst rows = await sequelize.query(\n  'SELECT id FROM accounts WHERE email = $email',\n  { bind: { email: req.body.email } }\n);",
-                "example_status": "illustrative_template; not a verified application patch"
+                "illustrative_example": "cur.execute(\"select * from test where username = ?\", (name,))",
+                "example_status": "source-derived candidate; not executed or verified as an application patch"
               }
             },
             "scan.kind": "sql_query_candidate",
             "scan.recommendations": {
-              "title": "Separate input data from SQL structure",
+              "title": "Bind this sqlite3 statement's values",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Pass untrusted values through the verified driver's parameter-binding API. Keep SQL query, update, and insert structure separate from data. Review NoSQL APIs separately.",
-                "Restrict each field as far as its business requirement allows. A string or length check is not injection protection. A comment or other free-text field may contain any character, so the sink construction is the injection control.",
-                "Add regression cases for normal input, rejected malformed input and query-structure preservation; resolve inconclusive guard and binding evidence before applying a fix."
+                "At vulnerable-flask-app.py:20, keep the sqlite3 execute SQL operand static and place each request-derived value in its separate parameter operand. Supplying parameters does not protect interpolation already present in the SQL text.",
+                "Use ? placeholders for values. Column/table names cannot be bound as values: retain an explicit allow-list and reject unlisted identifiers before constructing those SQL fragments.",
+                "Replace the interpolated SQL construction shown in the evidence with the value-binding candidate below. Verify the resulting data types and preserve wildcard behavior in bound LIKE values.",
+                "Add a regression test that passes a quote-bearing value and checks the statement text remains unchanged while the complete original value is present only in the bound parameters."
               ],
-              "illustrative_example": "// Illustrative Sequelize binding pattern; adapt schema and full authentication logic.\nconst rows = await sequelize.query(\n  'SELECT id FROM accounts WHERE email = $email',\n  { bind: { email: req.body.email } }\n);",
-              "example_status": "illustrative_template; not a verified application patch"
+              "illustrative_example": "cur.execute(\"select * from test where username = ?\", (name,))",
+              "example_status": "source-derived candidate; not executed or verified as an application patch"
             },
             "scan.requiredEvidence": [
               "request_source",
@@ -545,7 +545,7 @@
                 }
               ],
               "message": {
-                "text": "Keep credential and personal-data content out of logs"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -559,76 +559,76 @@
             }
           ],
           "message": {
-            "text": "GET /user/\u003cstring:name\u003e: Possible sensitive data in a log entry [needs_evidence]. A verified logging call receives a request value whose field name or container suggests credentials or personal data, or that passes through an unresolved transformation. Confirm what the value contains and whether redaction applies before changing behavior. A field name is a hint, not proof. Logging evidence: unmodeled content transformation. Assessed logging exposure: Inconclusive (data class Inconclusive, content Inconclusive, redaction no). logging claim evidence is incomplete"
+            "text": "GET /user/\u003cstring:name\u003e: Possible sensitive data in a log entry [needs_evidence]. A verified logging call receives a request value whose field name or container suggests credentials or personal data, or that passes through an unresolved transformation. Confirm what the value contains and whether redaction applies before changing behavior. A field name is a hint, not proof. Logging evidence: unmodeled content transformation. Assessed logging exposure: Inconclusive (data class Inconclusive, content Inconclusive, redaction Inconclusive). logging claim evidence is incomplete"
           },
           "properties": {
             "scan.assessment": {
               "answer_details": {
                 "content_exposure": {
                   "choice": "unknown",
-                  "confidence": 0.8,
+                  "confidence": 0.93,
                   "probabilities": [
                     {
                       "value": "yes",
-                      "probability": 0.08
+                      "probability": 0.03
                     },
                     {
                       "value": "no",
-                      "probability": 0.05
+                      "probability": 0.02
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.87
+                      "probability": 0.95
                     }
                   ]
                 },
                 "data_class": {
                   "choice": "unknown",
-                  "confidence": 0.35,
+                  "confidence": 0.4,
                   "probabilities": [
                     {
                       "value": "credential",
-                      "probability": 0.08
+                      "probability": 0.09
                     },
                     {
                       "value": "personal_data",
-                      "probability": 0.2
+                      "probability": 0.13
                     },
                     {
                       "value": "other",
-                      "probability": 0.21
+                      "probability": 0.23
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.51
+                      "probability": 0.55
                     }
                   ]
                 },
                 "log_exposure": {
                   "choice": "unknown",
-                  "confidence": 0.91,
+                  "confidence": 0.93,
                   "probabilities": [
                     {
                       "value": "vulnerable",
-                      "probability": 0.02
-                    },
-                    {
-                      "value": "protected",
                       "probability": 0.04
                     },
                     {
+                      "value": "protected",
+                      "probability": 0.01
+                    },
+                    {
                       "value": "unknown",
-                      "probability": 0.93
+                      "probability": 0.95
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.01
+                      "probability": 0
                     }
                   ]
                 },
                 "redaction": {
-                  "choice": "no",
-                  "confidence": 0.52,
+                  "choice": "unknown",
+                  "confidence": 0.4,
                   "probabilities": [
                     {
                       "value": "yes",
@@ -636,15 +636,15 @@
                     },
                     {
                       "value": "no",
-                      "probability": 0.64
+                      "probability": 0.41
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.27
+                      "probability": 0.55
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.07
+                      "probability": 0.02
                     }
                   ]
                 }
@@ -667,10 +667,10 @@
                 "content_exposure": "unknown",
                 "data_class": "unknown",
                 "log_exposure": "unknown",
-                "redaction": "no"
+                "redaction": "unknown"
               },
               "usage": {
-                "input_tokens": 2759,
+                "input_tokens": 3159,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -716,33 +716,27 @@
               "title": "Possible sensitive data in a log entry",
               "summary": "A verified logging call receives a request value whose field name or container suggests credentials or personal data, or that passes through an unresolved transformation. Confirm what the value contains and whether redaction applies before changing behavior. A field name is a hint, not proof.",
               "input_validation": "Field validation is reported separately; it does not change what this log line contains.",
-              "use_protection": "Logging evidence: unmodeled content transformation. Assessed logging exposure: Inconclusive (data class Inconclusive, content Inconclusive, redaction no). logging claim evidence is incomplete",
+              "use_protection": "Logging evidence: unmodeled content transformation. Assessed logging exposure: Inconclusive (data class Inconclusive, content Inconclusive, redaction Inconclusive). logging claim evidence is incomplete",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Keep credential and personal-data content out of logs",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.",
-                  "Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.",
-                  "If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
-                  "Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+                  "Investigate the operation at vulnerable-flask-app.py:25: logging.debug(data). Its current Review status does not establish a code defect.",
+                  "Resolve log_transform_unresolved at vulnerable-flask-app.py:25: unmodeled content transformation",
+                  "Reconcile the semantic assessment with this exact source claim: logging claim evidence is incomplete"
                 ],
-                "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' \u0026\u0026 password.length \u003e 0 });",
-                "example_status": "illustrative_template; not a verified application patch"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "log_sink_candidate",
             "scan.recommendations": {
-              "title": "Keep credential and personal-data content out of logs",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.",
-                "Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.",
-                "If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
-                "Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+                "Investigate the operation at vulnerable-flask-app.py:25: logging.debug(data). Its current Review status does not establish a code defect.",
+                "Resolve log_transform_unresolved at vulnerable-flask-app.py:25: unmodeled content transformation",
+                "Reconcile the semantic assessment with this exact source claim: logging claim evidence is incomplete"
               ],
-              "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' \u0026\u0026 password.length \u003e 0 });",
-              "example_status": "illustrative_template; not a verified application patch"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /user/\u003cstring:name\u003e",
@@ -880,7 +874,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -901,7 +895,7 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.75,
+                  "confidence": 0.72,
                   "probabilities": [
                     {
                       "value": "sufficient",
@@ -913,33 +907,33 @@
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.12
+                      "probability": 0.14
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.81
+                      "probability": 0.79
                     }
                   ]
                 },
                 "validation": {
-                  "choice": "not_applicable",
-                  "confidence": 0.36,
+                  "choice": "uncertain",
+                  "confidence": 0.71,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.09
+                      "probability": 0.04
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.24
+                      "probability": 0.16
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.15
+                      "probability": 0.78
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.52
+                      "probability": 0.02
                     }
                   ]
                 }
@@ -960,10 +954,10 @@
               ],
               "answers": {
                 "protection": "not_applicable",
-                "validation": "not_applicable"
+                "validation": "uncertain"
               },
               "usage": {
-                "input_tokens": 1599,
+                "input_tokens": 1864,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -997,30 +991,28 @@
               "status": "needs_evidence",
               "title": "Request-field validation needs review",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.name: assess actual enforcing conditions in handler; no external business policy was supplied Model validation answer: Not applicable to this claim.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.name: assess actual enforcing conditions in handler; no external business policy was supplied Model validation answer: Inconclusive.",
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:30: name. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:30: query.name: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:30: name. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:30: query.name: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /welcome/\u003cstring:name\u003e",
@@ -1223,7 +1215,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Repair this HTML output"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -1244,7 +1236,7 @@
               "answer_details": {
                 "encoding_adequacy": {
                   "choice": "not_present",
-                  "confidence": 0.97,
+                  "confidence": 0.96,
                   "probabilities": [
                     {
                       "value": "adequate",
@@ -1252,11 +1244,11 @@
                     },
                     {
                       "value": "inadequate",
-                      "probability": 0.02
+                      "probability": 0.03
                     },
                     {
                       "value": "not_present",
-                      "probability": 0.98
+                      "probability": 0.97
                     },
                     {
                       "value": "unknown",
@@ -1312,19 +1304,19 @@
                 },
                 "sanitizer_effectiveness": {
                   "choice": "absent",
-                  "confidence": 0.96,
+                  "confidence": 0.87,
                   "probabilities": [
                     {
                       "value": "effective",
-                      "probability": 0
+                      "probability": 0.02
                     },
                     {
                       "value": "ineffective",
-                      "probability": 0.03
+                      "probability": 0.08
                     },
                     {
                       "value": "absent",
-                      "probability": 0.97
+                      "probability": 0.9
                     },
                     {
                       "value": "unknown",
@@ -1382,7 +1374,7 @@
                 "xss_exposure": "vulnerable"
               },
               "usage": {
-                "input_tokens": 3103,
+                "input_tokens": 3570,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -1409,28 +1401,24 @@
               "use_protection": "Decision XSS exposure: vulnerable. Scanner policy: Complete source-backed rendering claim and consistent XSS-specific answers establish an unsafe supported path; this is static analysis, not runtime confirmation.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Repair this HTML output",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "At vulnerable-flask-app.py:37, stop placing the source value into the HTML/template source consumed by data.",
+                  "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+                  "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
                 ],
-                "example_status": ""
+                "example_status": "source-derived candidate; review intended output semantics and test before applying"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Repair this HTML output",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "At vulnerable-flask-app.py:37, stop placing the source value into the HTML/template source consumed by data.",
+                "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+                "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
               ],
-              "example_status": ""
+              "example_status": "source-derived candidate; review intended output semantics and test before applying"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -1559,7 +1547,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -1580,45 +1568,45 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.8,
+                  "confidence": 0.79,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.02
+                      "probability": 0.04
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.07
+                      "probability": 0.08
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.06
+                      "probability": 0.04
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.85
+                      "probability": 0.84
                     }
                   ]
                 },
                 "validation": {
-                  "choice": "insufficient",
-                  "confidence": 0.31,
+                  "choice": "uncertain",
+                  "confidence": 0.35,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.01
+                      "probability": 0.1
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.48
+                      "probability": 0.19
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.21
+                      "probability": 0.51
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.3
+                      "probability": 0.2
                     }
                   ]
                 }
@@ -1639,10 +1627,10 @@
               ],
               "answers": {
                 "protection": "not_applicable",
-                "validation": "insufficient"
+                "validation": "uncertain"
               },
               "usage": {
-                "input_tokens": 1599,
+                "input_tokens": 1865,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -1676,30 +1664,28 @@
               "status": "needs_evidence",
               "title": "Request-field validation needs review",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.name: assess actual enforcing conditions in handler; no external business policy was supplied Model validation answer: insufficient.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.name: assess actual enforcing conditions in handler; no external business policy was supplied Model validation answer: Inconclusive.",
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:35: name. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:35: query.name: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:35: name. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:35: query.name: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /welcome2/\u003cstring:name\u003e",
@@ -1962,7 +1948,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Repair this HTML output"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -1983,23 +1969,23 @@
               "answer_details": {
                 "encoding_adequacy": {
                   "choice": "not_present",
-                  "confidence": 0.89,
+                  "confidence": 0.91,
                   "probabilities": [
                     {
                       "value": "adequate",
-                      "probability": 0.01
+                      "probability": 0
                     },
                     {
                       "value": "inadequate",
-                      "probability": 0.06
+                      "probability": 0.07
                     },
                     {
                       "value": "not_present",
-                      "probability": 0.92
+                      "probability": 0.93
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.01
+                      "probability": 0
                     }
                   ]
                 },
@@ -2050,24 +2036,24 @@
                   ]
                 },
                 "sanitizer_effectiveness": {
-                  "choice": "ineffective",
-                  "confidence": 0.4,
+                  "choice": "absent",
+                  "confidence": 0.87,
                   "probabilities": [
                     {
                       "value": "effective",
-                      "probability": 0.02
+                      "probability": 0
                     },
                     {
                       "value": "ineffective",
-                      "probability": 0.55
+                      "probability": 0.1
                     },
                     {
                       "value": "absent",
-                      "probability": 0.42
+                      "probability": 0.9
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.01
+                      "probability": 0
                     }
                   ]
                 },
@@ -2116,12 +2102,12 @@
               "answers": {
                 "encoding_adequacy": "not_present",
                 "output_context": "html_text",
-                "sanitizer_effectiveness": "ineffective",
+                "sanitizer_effectiveness": "absent",
                 "xss_all_paths_protected": "no",
                 "xss_exposure": "vulnerable"
               },
               "usage": {
-                "input_tokens": 3745,
+                "input_tokens": 4315,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -2148,28 +2134,24 @@
               "use_protection": "Decision XSS exposure: vulnerable. Scanner policy: Complete source-backed rendering claim and consistent XSS-specific answers establish an unsafe supported path; this is static analysis, not runtime confirmation.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Repair this HTML output",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "At vulnerable-flask-app.py:51, stop placing the source value into the HTML/template source consumed by template.",
+                  "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+                  "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
                 ],
-                "example_status": ""
+                "example_status": "source-derived candidate; review intended output semantics and test before applying"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Repair this HTML output",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "At vulnerable-flask-app.py:51, stop placing the source value into the HTML/template source consumed by template.",
+                "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+                "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
               ],
-              "example_status": ""
+              "example_status": "source-derived candidate; review intended output semantics and test before applying"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -2348,7 +2330,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -2369,7 +2351,7 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.73,
+                  "confidence": 0.75,
                   "probabilities": [
                     {
                       "value": "sufficient",
@@ -2377,37 +2359,37 @@
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.14
+                      "probability": 0.1
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.05
+                      "probability": 0.08
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.8
+                      "probability": 0.81
                     }
                   ]
                 },
                 "validation": {
                   "choice": "insufficient",
-                  "confidence": 0.83,
+                  "confidence": 0.56,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.01
+                      "probability": 0.02
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.87
+                      "probability": 0.67
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.06
+                      "probability": 0.27
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.06
+                      "probability": 0.04
                     }
                   ]
                 }
@@ -2431,7 +2413,7 @@
                 "validation": "insufficient"
               },
               "usage": {
-                "input_tokens": 1881,
+                "input_tokens": 2218,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -2469,26 +2451,24 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:42: request.args. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:42: args.name: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:42: request.args. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:42: args.name: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /hello",
@@ -2806,7 +2786,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -2827,33 +2807,33 @@
               "answer_details": {
                 "encoding_adequacy": {
                   "choice": "unknown",
-                  "confidence": 0.6,
+                  "confidence": 0.97,
                   "probabilities": [
                     {
                       "value": "adequate",
-                      "probability": 0.01
+                      "probability": 0
                     },
                     {
                       "value": "inadequate",
-                      "probability": 0.06
+                      "probability": 0.01
                     },
                     {
                       "value": "not_present",
-                      "probability": 0.23
+                      "probability": 0.01
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.7
+                      "probability": 0.98
                     }
                   ]
                 },
                 "output_context": {
-                  "choice": "html_text",
-                  "confidence": 0.46,
+                  "choice": "unknown",
+                  "confidence": 0.6,
                   "probabilities": [
                     {
                       "value": "html_text",
-                      "probability": 0.51
+                      "probability": 0.35
                     },
                     {
                       "value": "html_attribute",
@@ -2889,47 +2869,47 @@
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.48
+                      "probability": 0.64
                     }
                   ]
                 },
                 "sanitizer_effectiveness": {
-                  "choice": "absent",
-                  "confidence": 0.63,
+                  "choice": "unknown",
+                  "confidence": 0.37,
                   "probabilities": [
                     {
                       "value": "effective",
-                      "probability": 0.01
+                      "probability": 0.04
                     },
                     {
                       "value": "ineffective",
-                      "probability": 0.03
+                      "probability": 0.23
                     },
                     {
                       "value": "absent",
-                      "probability": 0.72
+                      "probability": 0.2
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.24
+                      "probability": 0.53
                     }
                   ]
                 },
                 "xss_all_paths_protected": {
                   "choice": "unknown",
-                  "confidence": 0.89,
+                  "confidence": 0.97,
                   "probabilities": [
                     {
                       "value": "yes",
-                      "probability": 0.01
+                      "probability": 0
                     },
                     {
                       "value": "no",
-                      "probability": 0.06
+                      "probability": 0.02
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.93
+                      "probability": 0.98
                     }
                   ]
                 },
@@ -2939,11 +2919,11 @@
                   "probabilities": [
                     {
                       "value": "vulnerable",
-                      "probability": 0.1
+                      "probability": 0.04
                     },
                     {
                       "value": "protected",
-                      "probability": 0
+                      "probability": 0.02
                     },
                     {
                       "value": "unknown",
@@ -2951,7 +2931,7 @@
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0
+                      "probability": 0.04
                     }
                   ]
                 }
@@ -2960,7 +2940,7 @@
               "blocking_gaps": [
                 {
                   "kind": "render_protection_unresolved",
-                  "detail": "A source transformation, renderer contract or output context remains unresolved.",
+                  "detail": "A value definition or output alternative is unresolved; source availability does not establish a complete value path.",
                   "at": {
                     "file": "vulnerable-flask-app.py",
                     "start_line": 59,
@@ -2983,13 +2963,13 @@
               ],
               "answers": {
                 "encoding_adequacy": "unknown",
-                "output_context": "html_text",
-                "sanitizer_effectiveness": "absent",
+                "output_context": "unknown",
+                "sanitizer_effectiveness": "unknown",
                 "xss_all_paths_protected": "unknown",
                 "xss_exposure": "unknown"
               },
               "usage": {
-                "input_tokens": 3850,
+                "input_tokens": 4509,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -3002,7 +2982,7 @@
             "scan.blockingGaps": [
               {
                 "kind": "render_protection_unresolved",
-                "detail": "A source transformation, renderer contract or output context remains unresolved.",
+                "detail": "A value definition or output alternative is unresolved; source availability does not establish a complete value path.",
                 "at": {
                   "file": "vulnerable-flask-app.py",
                   "start_line": 59,
@@ -3013,6 +2993,17 @@
               }
             ],
             "scan.coverageGaps": [
+              {
+                "kind": "python_value_unresolved",
+                "detail": "Value definition is not resolved: subprocess",
+                "at": {
+                  "file": "vulnerable-flask-app.py",
+                  "start_line": 58,
+                  "end_line": 58,
+                  "start_byte": 1542,
+                  "end_byte": 1552
+                }
+              },
               {
                 "kind": "python_call_unresolved",
                 "detail": "unmodeled return/content effect: subprocess.check_output",
@@ -3040,28 +3031,26 @@
               "use_protection": "Decision XSS exposure: Inconclusive. Scanner policy: The XSS claim has missing or unresolved source-backed evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at vulnerable-flask-app.py:59: data. Its current Review status does not establish a code defect.",
+                  "Resolve render_protection_unresolved at vulnerable-flask-app.py:59: A value definition or output alternative is unresolved; source availability does not establish a complete value path.",
+                  "Resolve xss_context_unresolved at :0: Answers must agree with the established rendering context and protection facts.",
+                  "Reconcile the semantic assessment with this exact source claim: The XSS claim has missing or unresolved source-backed evidence. Answers: context=unknown; encoding=unknown; sanitizer=unknown; all paths protected=unknown; exposure=unknown. Static context=html_text, protection=unknown. Do not infer a code repair from contradictory answers."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at vulnerable-flask-app.py:59: data. Its current Review status does not establish a code defect.",
+                "Resolve render_protection_unresolved at vulnerable-flask-app.py:59: A value definition or output alternative is unresolved; source availability does not establish a complete value path.",
+                "Resolve xss_context_unresolved at :0: Answers must agree with the established rendering context and protection facts.",
+                "Reconcile the semantic assessment with this exact source claim: The XSS claim has missing or unresolved source-backed evidence. Answers: context=unknown; encoding=unknown; sanitizer=unknown; all paths protected=unknown; exposure=unknown. Static context=html_text, protection=unknown. Do not infer a code repair from contradictory answers."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -3345,7 +3334,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Repair this HTML output"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -3366,7 +3355,7 @@
               "answer_details": {
                 "encoding_adequacy": {
                   "choice": "not_present",
-                  "confidence": 0.95,
+                  "confidence": 0.91,
                   "probabilities": [
                     {
                       "value": "adequate",
@@ -3374,11 +3363,11 @@
                     },
                     {
                       "value": "inadequate",
-                      "probability": 0.04
+                      "probability": 0.07
                     },
                     {
                       "value": "not_present",
-                      "probability": 0.96
+                      "probability": 0.93
                     },
                     {
                       "value": "unknown",
@@ -3434,23 +3423,23 @@
                 },
                 "sanitizer_effectiveness": {
                   "choice": "absent",
-                  "confidence": 0.85,
+                  "confidence": 0.32,
                   "probabilities": [
                     {
                       "value": "effective",
-                      "probability": 0
+                      "probability": 0.05
                     },
                     {
                       "value": "ineffective",
-                      "probability": 0.11
+                      "probability": 0.45
                     },
                     {
                       "value": "absent",
-                      "probability": 0.89
+                      "probability": 0.49
                     },
                     {
                       "value": "unknown",
-                      "probability": 0
+                      "probability": 0.01
                     }
                   ]
                 },
@@ -3474,23 +3463,23 @@
                 },
                 "xss_exposure": {
                   "choice": "vulnerable",
-                  "confidence": 1,
+                  "confidence": 0.67,
                   "probabilities": [
                     {
                       "value": "vulnerable",
-                      "probability": 1
+                      "probability": 0.75
                     },
                     {
                       "value": "protected",
-                      "probability": 0
+                      "probability": 0.01
                     },
                     {
                       "value": "unknown",
-                      "probability": 0
+                      "probability": 0.15
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0
+                      "probability": 0.09
                     }
                   ]
                 }
@@ -3504,7 +3493,7 @@
                 "xss_exposure": "vulnerable"
               },
               "usage": {
-                "input_tokens": 3547,
+                "input_tokens": 4115,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -3531,28 +3520,24 @@
               "use_protection": "Decision XSS exposure: vulnerable. Scanner policy: Complete source-backed rendering claim and consistent XSS-specific answers establish an unsafe supported path; this is static analysis, not runtime confirmation.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Repair this HTML output",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "At vulnerable-flask-app.py:62, stop placing the source value into the HTML/template source consumed by data.",
+                  "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+                  "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
                 ],
-                "example_status": ""
+                "example_status": "source-derived candidate; review intended output semantics and test before applying"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Repair this HTML output",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "At vulnerable-flask-app.py:62, stop placing the source value into the HTML/template source consumed by data.",
+                "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+                "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
               ],
-              "example_status": ""
+              "example_status": "source-derived candidate; review intended output semantics and test before applying"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -3716,7 +3701,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -3737,11 +3722,11 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.51,
+                  "confidence": 0.56,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.05
+                      "probability": 0.01
                     },
                     {
                       "value": "insufficient",
@@ -3753,13 +3738,13 @@
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.63
+                      "probability": 0.67
                     }
                   ]
                 },
                 "validation": {
                   "choice": "insufficient",
-                  "confidence": 0.95,
+                  "confidence": 0.65,
                   "probabilities": [
                     {
                       "value": "sufficient",
@@ -3767,15 +3752,15 @@
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.96
+                      "probability": 0.74
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.02
+                      "probability": 0.25
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.01
+                      "probability": 0
                     }
                   ]
                 }
@@ -3799,7 +3784,7 @@
                 "validation": "insufficient"
               },
               "usage": {
-                "input_tokens": 1738,
+                "input_tokens": 2047,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -3837,26 +3822,24 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:56: request.args. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:56: args.hostname: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:56: request.args. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:56: args.hostname: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /get_users",
@@ -3999,7 +3982,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -4020,7 +4003,7 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.57,
+                  "confidence": 0.75,
                   "probabilities": [
                     {
                       "value": "sufficient",
@@ -4028,37 +4011,37 @@
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.19
+                      "probability": 0.14
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.12
+                      "probability": 0.04
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.68
+                      "probability": 0.81
                     }
                   ]
                 },
                 "validation": {
                   "choice": "insufficient",
-                  "confidence": 0.89,
+                  "confidence": 0.8,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0
+                      "probability": 0.02
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.92
+                      "probability": 0.85
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.08
+                      "probability": 0.1
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0
+                      "probability": 0.03
                     }
                   ]
                 }
@@ -4082,7 +4065,7 @@
                 "validation": "insufficient"
               },
               "usage": {
-                "input_tokens": 1844,
+                "input_tokens": 2153,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -4120,26 +4103,24 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:76: request.args. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:76: args.filename: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:76: request.args. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:76: args.filename: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /read_file",
@@ -4297,7 +4278,7 @@
                 }
               ],
               "message": {
-                "text": "Keep credential and personal-data content out of logs"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -4318,15 +4299,15 @@
               "answer_details": {
                 "content_exposure": {
                   "choice": "yes",
-                  "confidence": 0.53,
+                  "confidence": 0.85,
                   "probabilities": [
                     {
                       "value": "yes",
-                      "probability": 0.69
+                      "probability": 0.9
                     },
                     {
                       "value": "no",
-                      "probability": 0.29
+                      "probability": 0.08
                     },
                     {
                       "value": "unknown",
@@ -4336,7 +4317,7 @@
                 },
                 "data_class": {
                   "choice": "other",
-                  "confidence": 0.39,
+                  "confidence": 0.32,
                   "probabilities": [
                     {
                       "value": "credential",
@@ -4344,37 +4325,37 @@
                     },
                     {
                       "value": "personal_data",
-                      "probability": 0.03
+                      "probability": 0.21
                     },
                     {
                       "value": "other",
-                      "probability": 0.54
+                      "probability": 0.49
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.42
+                      "probability": 0.29
                     }
                   ]
                 },
                 "log_exposure": {
                   "choice": "unknown",
-                  "confidence": 0.59,
+                  "confidence": 0.4,
                   "probabilities": [
                     {
                       "value": "vulnerable",
-                      "probability": 0.22
+                      "probability": 0.28
                     },
                     {
                       "value": "protected",
-                      "probability": 0.03
+                      "probability": 0.04
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.69
+                      "probability": 0.55
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.06
+                      "probability": 0.13
                     }
                   ]
                 },
@@ -4422,7 +4403,7 @@
                 "redaction": "no"
               },
               "usage": {
-                "input_tokens": 2755,
+                "input_tokens": 3136,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -4482,30 +4463,24 @@
               "use_protection": "Logging evidence: personal-data field hint: email. Assessed logging exposure: Inconclusive (data class other, content yes, redaction no). logging claim evidence is incomplete",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Keep credential and personal-data content out of logs",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.",
-                  "Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.",
-                  "If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
-                  "Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+                  "Investigate the operation at vulnerable-flask-app.py:109: logging.debug(data). Its current Review status does not establish a code defect.",
+                  "Resolve log_literal_sensitivity_unresolved at vulnerable-flask-app.py:109: Email syntax alone does not establish that a constant address is private or identifies a person",
+                  "Reconcile the semantic assessment with this exact source claim: logging claim evidence is incomplete"
                 ],
-                "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' \u0026\u0026 password.length \u003e 0 });",
-                "example_status": "illustrative_template; not a verified application patch"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "log_sink_candidate",
             "scan.recommendations": {
-              "title": "Keep credential and personal-data content out of logs",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.",
-                "Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.",
-                "If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
-                "Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+                "Investigate the operation at vulnerable-flask-app.py:109: logging.debug(data). Its current Review status does not establish a code defect.",
+                "Resolve log_literal_sensitivity_unresolved at vulnerable-flask-app.py:109: Email syntax alone does not establish that a constant address is private or identifies a person",
+                "Reconcile the semantic assessment with this exact source claim: logging claim evidence is incomplete"
               ],
-              "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' \u0026\u0026 password.length \u003e 0 });",
-              "example_status": "illustrative_template; not a verified application patch"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /get_admin_mail/\u003cstring:control\u003e",
@@ -4658,7 +4633,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -4679,45 +4654,45 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.92,
+                  "confidence": 0.71,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.01
-                    },
-                    {
-                      "value": "insufficient",
-                      "probability": 0.02
-                    },
-                    {
-                      "value": "uncertain",
                       "probability": 0.03
                     },
                     {
+                      "value": "insufficient",
+                      "probability": 0.04
+                    },
+                    {
+                      "value": "uncertain",
+                      "probability": 0.15
+                    },
+                    {
                       "value": "not_applicable",
-                      "probability": 0.94
+                      "probability": 0.78
                     }
                   ]
                 },
                 "validation": {
-                  "choice": "sufficient",
-                  "confidence": 0.23,
+                  "choice": "uncertain",
+                  "confidence": 0.16,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.42
+                      "probability": 0.3
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.28
+                      "probability": 0.25
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.26
+                      "probability": 0.37
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.04
+                      "probability": 0.08
                     }
                   ]
                 }
@@ -4738,10 +4713,10 @@
               ],
               "answers": {
                 "protection": "not_applicable",
-                "validation": "sufficient"
+                "validation": "uncertain"
               },
               "usage": {
-                "input_tokens": 1677,
+                "input_tokens": 1946,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -4775,30 +4750,28 @@
               "status": "needs_evidence",
               "title": "Request-field validation needs review",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.control: assess actual enforcing conditions in handler; no external business policy was supplied Model validation answer: sufficient.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.control: assess actual enforcing conditions in handler; no external business policy was supplied Model validation answer: Inconclusive.",
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:104: control. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:104: query.control: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:104: control. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:104: query.control: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /get_admin_mail/\u003cstring:control\u003e",
@@ -5101,7 +5074,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -5122,7 +5095,7 @@
               "answer_details": {
                 "encoding_adequacy": {
                   "choice": "unknown",
-                  "confidence": 0.56,
+                  "confidence": 0.84,
                   "probabilities": [
                     {
                       "value": "adequate",
@@ -5130,25 +5103,25 @@
                     },
                     {
                       "value": "inadequate",
-                      "probability": 0.02
+                      "probability": 0.06
                     },
                     {
                       "value": "not_present",
-                      "probability": 0.3
+                      "probability": 0.05
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.67
+                      "probability": 0.88
                     }
                   ]
                 },
                 "output_context": {
                   "choice": "unknown",
-                  "confidence": 0.54,
+                  "confidence": 0.51,
                   "probabilities": [
                     {
                       "value": "html_text",
-                      "probability": 0.4
+                      "probability": 0.42
                     },
                     {
                       "value": "html_attribute",
@@ -5156,7 +5129,7 @@
                     },
                     {
                       "value": "url",
-                      "probability": 0
+                      "probability": 0.01
                     },
                     {
                       "value": "script",
@@ -5184,57 +5157,57 @@
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.59
+                      "probability": 0.56
                     }
                   ]
                 },
                 "sanitizer_effectiveness": {
-                  "choice": "absent",
-                  "confidence": 0.79,
+                  "choice": "unknown",
+                  "confidence": 0.28,
                   "probabilities": [
                     {
                       "value": "effective",
-                      "probability": 0
+                      "probability": 0.05
                     },
                     {
                       "value": "ineffective",
-                      "probability": 0.07
+                      "probability": 0.15
                     },
                     {
                       "value": "absent",
-                      "probability": 0.84
+                      "probability": 0.34
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.09
+                      "probability": 0.46
                     }
                   ]
                 },
                 "xss_all_paths_protected": {
                   "choice": "unknown",
-                  "confidence": 0.51,
+                  "confidence": 0.86,
                   "probabilities": [
                     {
                       "value": "yes",
-                      "probability": 0.03
+                      "probability": 0.01
                     },
                     {
                       "value": "no",
-                      "probability": 0.3
+                      "probability": 0.08
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.67
+                      "probability": 0.91
                     }
                   ]
                 },
                 "xss_exposure": {
                   "choice": "unknown",
-                  "confidence": 0.71,
+                  "confidence": 0.92,
                   "probabilities": [
                     {
                       "value": "vulnerable",
-                      "probability": 0.21
+                      "probability": 0.03
                     },
                     {
                       "value": "protected",
@@ -5242,11 +5215,11 @@
                     },
                     {
                       "value": "unknown",
-                      "probability": 0.78
+                      "probability": 0.94
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0
+                      "probability": 0.02
                     }
                   ]
                 }
@@ -5255,7 +5228,7 @@
               "blocking_gaps": [
                 {
                   "kind": "render_protection_unresolved",
-                  "detail": "A source transformation, renderer contract or output context remains unresolved.",
+                  "detail": "A value definition or output alternative is unresolved; source availability does not establish a complete value path.",
                   "at": {
                     "file": "vulnerable-flask-app.py",
                     "start_line": 120,
@@ -5279,12 +5252,12 @@
               "answers": {
                 "encoding_adequacy": "unknown",
                 "output_context": "unknown",
-                "sanitizer_effectiveness": "absent",
+                "sanitizer_effectiveness": "unknown",
                 "xss_all_paths_protected": "unknown",
                 "xss_exposure": "unknown"
               },
               "usage": {
-                "input_tokens": 3845,
+                "input_tokens": 4504,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -5297,7 +5270,7 @@
             "scan.blockingGaps": [
               {
                 "kind": "render_protection_unresolved",
-                "detail": "A source transformation, renderer contract or output context remains unresolved.",
+                "detail": "A value definition or output alternative is unresolved; source availability does not establish a complete value path.",
                 "at": {
                   "file": "vulnerable-flask-app.py",
                   "start_line": 120,
@@ -5308,6 +5281,17 @@
               }
             ],
             "scan.coverageGaps": [
+              {
+                "kind": "python_value_unresolved",
+                "detail": "Value definition is not resolved: subprocess",
+                "at": {
+                  "file": "vulnerable-flask-app.py",
+                  "start_line": 119,
+                  "end_line": 119,
+                  "start_byte": 3334,
+                  "end_byte": 3344
+                }
+              },
               {
                 "kind": "python_call_unresolved",
                 "detail": "unmodeled return/content effect: subprocess.check_output",
@@ -5335,28 +5319,26 @@
               "use_protection": "Decision XSS exposure: Inconclusive. Scanner policy: The XSS claim has missing or unresolved source-backed evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at vulnerable-flask-app.py:120: data. Its current Review status does not establish a code defect.",
+                  "Resolve render_protection_unresolved at vulnerable-flask-app.py:120: A value definition or output alternative is unresolved; source availability does not establish a complete value path.",
+                  "Resolve xss_context_unresolved at :0: Answers must agree with the established rendering context and protection facts.",
+                  "Reconcile the semantic assessment with this exact source claim: The XSS claim has missing or unresolved source-backed evidence. Answers: context=unknown; encoding=unknown; sanitizer=unknown; all paths protected=unknown; exposure=unknown. Static context=html_text, protection=unknown. Do not infer a code repair from contradictory answers."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at vulnerable-flask-app.py:120: data. Its current Review status does not establish a code defect.",
+                "Resolve render_protection_unresolved at vulnerable-flask-app.py:120: A value definition or output alternative is unresolved; source availability does not establish a complete value path.",
+                "Resolve xss_context_unresolved at :0: Answers must agree with the established rendering context and protection facts.",
+                "Reconcile the semantic assessment with this exact source claim: The XSS claim has missing or unresolved source-backed evidence. Answers: context=unknown; encoding=unknown; sanitizer=unknown; all paths protected=unknown; exposure=unknown. Static context=html_text, protection=unknown. Do not infer a code repair from contradictory answers."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -5520,7 +5502,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -5541,45 +5523,45 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.51,
+                  "confidence": 0.84,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.03
+                      "probability": 0
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.32
+                      "probability": 0.11
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.02
+                      "probability": 0.01
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.63
+                      "probability": 0.88
                     }
                   ]
                 },
                 "validation": {
                   "choice": "insufficient",
-                  "confidence": 0.89,
+                  "confidence": 0.84,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.01
+                      "probability": 0
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.92
+                      "probability": 0.88
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.05
+                      "probability": 0.11
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.02
+                      "probability": 0.01
                     }
                   ]
                 }
@@ -5603,7 +5585,7 @@
                 "validation": "insufficient"
               },
               "usage": {
-                "input_tokens": 1733,
+                "input_tokens": 2042,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -5641,26 +5623,24 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:117: request.args. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:117: args.filename: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:117: request.args. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:117: args.filename: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /run_file",
@@ -5803,7 +5783,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -5824,45 +5804,45 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.69,
+                  "confidence": 0.92,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.03
+                      "probability": 0.01
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.18
+                      "probability": 0.04
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.02
+                      "probability": 0.01
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.77
+                      "probability": 0.94
                     }
                   ]
                 },
                 "validation": {
                   "choice": "insufficient",
-                  "confidence": 0.71,
+                  "confidence": 0.33,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.02
+                      "probability": 0.01
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.78
+                      "probability": 0.5
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.17
+                      "probability": 0.48
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.03
+                      "probability": 0.01
                     }
                   ]
                 }
@@ -5886,7 +5866,7 @@
                 "validation": "insufficient"
               },
               "usage": {
-                "input_tokens": 1749,
+                "input_tokens": 2058,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -5924,26 +5904,24 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:127: request.args. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:127: args.filename: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:127: request.args. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:127: args.filename: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /create_file",
@@ -6086,7 +6064,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -6107,29 +6085,29 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.72,
+                  "confidence": 0.87,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.02
+                      "probability": 0.01
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.11
+                      "probability": 0.05
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.08
+                      "probability": 0.04
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.79
+                      "probability": 0.9
                     }
                   ]
                 },
                 "validation": {
                   "choice": "insufficient",
-                  "confidence": 0.31,
+                  "confidence": 0.36,
                   "probabilities": [
                     {
                       "value": "sufficient",
@@ -6137,15 +6115,15 @@
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.48
+                      "probability": 0.52
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.33
+                      "probability": 0.4
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.16
+                      "probability": 0.05
                     }
                   ]
                 }
@@ -6169,7 +6147,7 @@
                 "validation": "insufficient"
               },
               "usage": {
-                "input_tokens": 1749,
+                "input_tokens": 2058,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -6207,26 +6185,24 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:128: request.args. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:128: args.text: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:128: request.args. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:128: args.text: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /create_file",
@@ -6349,7 +6325,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -6370,45 +6346,45 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.49,
+                  "confidence": 0.93,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.2
+                      "probability": 0
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.13
+                      "probability": 0.01
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.05
+                      "probability": 0.04
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.62
+                      "probability": 0.95
                     }
                   ]
                 },
                 "validation": {
-                  "choice": "insufficient",
-                  "confidence": 0.47,
+                  "choice": "uncertain",
+                  "confidence": 0.53,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.02
+                      "probability": 0.07
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.6
+                      "probability": 0.27
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.38
+                      "probability": 0.65
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0
+                      "probability": 0.01
                     }
                   ]
                 }
@@ -6429,10 +6405,10 @@
               ],
               "answers": {
                 "protection": "not_applicable",
-                "validation": "insufficient"
+                "validation": "uncertain"
               },
               "usage": {
-                "input_tokens": 1930,
+                "input_tokens": 2260,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -6466,30 +6442,28 @@
               "status": "needs_evidence",
               "title": "Request-field validation needs review",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.n: assess actual enforcing conditions in handler; no external business policy was supplied Model validation answer: insufficient.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.n: assess actual enforcing conditions in handler; no external business policy was supplied Model validation answer: Inconclusive.",
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:148: n:int. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:148: query.n: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:148: n:int. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:148: query.n: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /factorial/\u003cint:n\u003e",
@@ -6662,7 +6636,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -6683,45 +6657,45 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.61,
+                  "confidence": 0.55,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.06
+                      "probability": 0.03
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.1
+                      "probability": 0.07
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.13
+                      "probability": 0.24
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.71
+                      "probability": 0.66
                     }
                   ]
                 },
                 "validation": {
                   "choice": "uncertain",
-                  "confidence": 0.31,
+                  "confidence": 0.56,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.16
+                      "probability": 0.05
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.33
+                      "probability": 0.28
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.48
+                      "probability": 0.67
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.03
+                      "probability": 0
                     }
                   ]
                 }
@@ -6745,7 +6719,7 @@
                 "validation": "uncertain"
               },
               "usage": {
-                "input_tokens": 1743,
+                "input_tokens": 2051,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -6783,26 +6757,24 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:166: request.args. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:166: args.password: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:166: request.args. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:166: args.password: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /login",
@@ -6945,7 +6917,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -6966,45 +6938,45 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.71,
+                  "confidence": 0.81,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.02
+                      "probability": 0.01
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.09
+                      "probability": 0.01
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.11
+                      "probability": 0.12
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.78
+                      "probability": 0.86
                     }
                   ]
                 },
                 "validation": {
                   "choice": "uncertain",
-                  "confidence": 0.65,
+                  "confidence": 0.85,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.04
+                      "probability": 0.01
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.21
+                      "probability": 0.1
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.74
+                      "probability": 0.89
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.01
+                      "probability": 0
                     }
                   ]
                 }
@@ -7028,7 +7000,7 @@
                 "validation": "uncertain"
               },
               "usage": {
-                "input_tokens": 1743,
+                "input_tokens": 2051,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -7066,26 +7038,24 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:165: request.args. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:165: args.username: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:165: request.args. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:165: args.username: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /login",
@@ -7228,7 +7198,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -7249,29 +7219,29 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.23,
+                  "confidence": 0.4,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.02
+                      "probability": 0.04
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.34
+                      "probability": 0.18
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.22
+                      "probability": 0.23
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.42
+                      "probability": 0.55
                     }
                   ]
                 },
                 "validation": {
                   "choice": "uncertain",
-                  "confidence": 0.63,
+                  "confidence": 0.51,
                   "probabilities": [
                     {
                       "value": "sufficient",
@@ -7279,11 +7249,11 @@
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.27
+                      "probability": 0.36
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.72
+                      "probability": 0.63
                     },
                     {
                       "value": "not_applicable",
@@ -7311,7 +7281,7 @@
                 "validation": "uncertain"
               },
               "usage": {
-                "input_tokens": 1821,
+                "input_tokens": 2129,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -7349,26 +7319,24 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:174: request.args. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:174: args.Content-Type: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:174: request.args. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:174: args.Content-Type: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /route",
@@ -7526,7 +7494,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -7547,45 +7515,45 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.55,
+                  "confidence": 0.71,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.05
+                      "probability": 0.02
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.25
+                      "probability": 0.18
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.04
+                      "probability": 0.02
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.66
+                      "probability": 0.78
                     }
                   ]
                 },
                 "validation": {
-                  "choice": "insufficient",
-                  "confidence": 0.29,
+                  "choice": "uncertain",
+                  "confidence": 0.21,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.09
+                      "probability": 0.11
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.47
+                      "probability": 0.22
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.22
+                      "probability": 0.41
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.22
+                      "probability": 0.26
                     }
                   ]
                 }
@@ -7606,10 +7574,10 @@
               ],
               "answers": {
                 "protection": "not_applicable",
-                "validation": "insufficient"
+                "validation": "uncertain"
               },
               "usage": {
-                "input_tokens": 1731,
+                "input_tokens": 2039,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -7643,30 +7611,28 @@
               "status": "needs_evidence",
               "title": "Request-field validation needs review",
               "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
-              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: args.data: assess actual enforcing conditions in handler; no external business policy was supplied Model validation answer: insufficient.",
+              "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: args.data: assess actual enforcing conditions in handler; no external business policy was supplied Model validation answer: Inconclusive.",
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:183: request.args. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:183: args.data: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:183: request.args. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:183: args.data: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /logs",
@@ -7809,7 +7775,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -7830,45 +7796,45 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.69,
+                  "confidence": 0.92,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.02
+                      "probability": 0
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.12
+                      "probability": 0.02
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.09
+                      "probability": 0.04
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.77
+                      "probability": 0.94
                     }
                   ]
                 },
                 "validation": {
                   "choice": "uncertain",
-                  "confidence": 0.52,
+                  "confidence": 0.44,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.19
+                      "probability": 0.08
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.15
+                      "probability": 0.33
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.64
+                      "probability": 0.58
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.02
+                      "probability": 0.01
                     }
                   ]
                 }
@@ -7892,7 +7858,7 @@
                 "validation": "uncertain"
               },
               "usage": {
-                "input_tokens": 1743,
+                "input_tokens": 2053,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -7930,26 +7896,24 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:194: request.form. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:194: form.password: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:194: request.form. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:194: form.password: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /user_pass_control",
@@ -8092,7 +8056,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -8113,45 +8077,45 @@
               "answer_details": {
                 "protection": {
                   "choice": "not_applicable",
-                  "confidence": 0.59,
+                  "confidence": 0.92,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.05
+                      "probability": 0
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.13
+                      "probability": 0.01
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.13
+                      "probability": 0.05
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.69
+                      "probability": 0.94
                     }
                   ]
                 },
                 "validation": {
                   "choice": "uncertain",
-                  "confidence": 0.27,
+                  "confidence": 0.64,
                   "probabilities": [
                     {
                       "value": "sufficient",
-                      "probability": 0.16
+                      "probability": 0.03
                     },
                     {
                       "value": "insufficient",
-                      "probability": 0.33
+                      "probability": 0.23
                     },
                     {
                       "value": "uncertain",
-                      "probability": 0.45
+                      "probability": 0.73
                     },
                     {
                       "value": "not_applicable",
-                      "probability": 0.06
+                      "probability": 0.01
                     }
                   ]
                 }
@@ -8175,7 +8139,7 @@
                 "validation": "uncertain"
               },
               "usage": {
-                "input_tokens": 1743,
+                "input_tokens": 2053,
                 "output_tokens": 0
               },
               "status": "completed",
@@ -8213,26 +8177,24 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at vulnerable-flask-app.py:193: request.form. Its current Review status does not establish a code defect.",
+                  "Resolve input_validation_unresolved at vulnerable-flask-app.py:193: form.username: assess actual enforcing conditions in handler; no external business policy was supplied",
+                  "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at vulnerable-flask-app.py:193: request.form. Its current Review status does not establish a code defect.",
+                "Resolve input_validation_unresolved at vulnerable-flask-app.py:193: form.username: assess actual enforcing conditions in handler; no external business policy was supplied",
+                "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /user_pass_control",
@@ -8297,8 +8259,8 @@
           "rules": [
             {
               "help": {
-                "markdown": "Separate input data from SQL structure\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Pass untrusted values through the verified driver's parameter-binding API. Keep SQL query, update, and insert structure separate from data. Review NoSQL APIs separately.\n- Restrict each field as far as its business requirement allows. A string or length check is not injection protection. A comment or other free-text field may contain any character, so the sink construction is the injection control.\n- Add regression cases for normal input, rejected malformed input and query-structure preservation; resolve inconclusive guard and binding evidence before applying a fix.\n\nIllustrative example (unverified):\n\n```typescript\n// Illustrative Sequelize binding pattern; adapt schema and full authentication logic.\nconst rows = await sequelize.query(\n  'SELECT id FROM accounts WHERE email = $email',\n  { bind: { email: req.body.email } }\n);\n```\n",
-                "text": "Separate input data from SQL structure. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Pass untrusted values through the verified driver's parameter-binding API. Keep SQL query, update, and insert structure separate from data. Review NoSQL APIs separately. Restrict each field as far as its business requirement allows. A string or length check is not injection protection. A comment or other free-text field may contain any character, so the sink construction is the injection control. Add regression cases for normal input, rejected malformed input and query-structure preservation; resolve inconclusive guard and binding evidence before applying a fix."
+                "markdown": "Bind this sqlite3 statement's values\n\n- At vulnerable-flask-app.py:20, keep the sqlite3 execute SQL operand static and place each request-derived value in its separate parameter operand. Supplying parameters does not protect interpolation already present in the SQL text.\n- Use ? placeholders for values. Column/table names cannot be bound as values: retain an explicit allow-list and reject unlisted identifiers before constructing those SQL fragments.\n- Replace the interpolated SQL construction shown in the evidence with the value-binding candidate below. Verify the resulting data types and preserve wildcard behavior in bound LIKE values.\n- Add a regression test that passes a quote-bearing value and checks the statement text remains unchanged while the complete original value is present only in the bound parameters.\n\nIllustrative example (unverified):\n\n```\ncur.execute(\"select * from test where username = ?\", (name,))\n```\n",
+                "text": "Bind this sqlite3 statement's values. At vulnerable-flask-app.py:20, keep the sqlite3 execute SQL operand static and place each request-derived value in its separate parameter operand. Supplying parameters does not protect interpolation already present in the SQL text. Use ? placeholders for values. Column/table names cannot be bound as values: retain an explicit allow-list and reject unlisted identifiers before constructing those SQL fragments. Replace the interpolated SQL construction shown in the evidence with the value-binding candidate below. Verify the resulting data types and preserve wildcard behavior in bound LIKE values. Add a regression test that passes a quote-bearing value and checks the statement text remains unchanged while the complete original value is present only in the bound parameters."
               },
               "id": "scan/sql-input-protection",
               "properties": {
@@ -8308,13 +8270,13 @@
                 ]
               },
               "shortDescription": {
-                "text": "Separate input data from SQL structure"
+                "text": "Bind this sqlite3 statement's values"
               }
             },
             {
               "help": {
-                "markdown": "Keep credential and personal-data content out of logs\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.\n- Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.\n- If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.\n- Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead.\n\nIllustrative example (unverified):\n\n```typescript\n// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' \u0026\u0026 password.length \u003e 0 });\n```\n",
-                "text": "Keep credential and personal-data content out of logs. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead. Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values. If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value. Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+                "markdown": "Resolve the specific claim blockers\n\n- Investigate the operation at vulnerable-flask-app.py:25: logging.debug(data). Its current Review status does not establish a code defect.\n- Resolve log_transform_unresolved at vulnerable-flask-app.py:25: unmodeled content transformation\n- Reconcile the semantic assessment with this exact source claim: logging claim evidence is incomplete\n",
+                "text": "Resolve the specific claim blockers. Investigate the operation at vulnerable-flask-app.py:25: logging.debug(data). Its current Review status does not establish a code defect. Resolve log_transform_unresolved at vulnerable-flask-app.py:25: unmodeled content transformation Reconcile the semantic assessment with this exact source claim: logging claim evidence is incomplete"
               },
               "id": "scan/sensitive-data-logging",
               "properties": {
@@ -8324,13 +8286,13 @@
                 ]
               },
               "shortDescription": {
-                "text": "Keep credential and personal-data content out of logs"
+                "text": "Resolve the specific claim blockers"
               }
             },
             {
               "help": {
-                "markdown": "Validate and sanitize each request input\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.\n- Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.\n- Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.\n",
-                "text": "Validate and sanitize each request input. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose. Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute. Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "markdown": "Resolve the specific claim blockers\n\n- Investigate the operation at vulnerable-flask-app.py:30: name. Its current Review status does not establish a code defect.\n- Resolve input_validation_unresolved at vulnerable-flask-app.py:30: query.name: assess actual enforcing conditions in handler; no external business policy was supplied\n- Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence\n",
+                "text": "Resolve the specific claim blockers. Investigate the operation at vulnerable-flask-app.py:30: name. Its current Review status does not establish a code defect. Resolve input_validation_unresolved at vulnerable-flask-app.py:30: query.name: assess actual enforcing conditions in handler; no external business policy was supplied Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
               },
               "id": "scan/input-validation",
               "properties": {
@@ -8340,13 +8302,13 @@
                 ]
               },
               "shortDescription": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               }
             },
             {
               "help": {
-                "markdown": "Protect the specific browser rendering context\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.\n- For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.\n- Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.\n- Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.\n",
-                "text": "Protect the specific browser rendering context. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text. For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version. Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them. Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "markdown": "Repair this HTML output\n\n- At vulnerable-flask-app.py:37, stop placing the source value into the HTML/template source consumed by data.\n- Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.\n- Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS.\n",
+                "text": "Repair this HTML output. At vulnerable-flask-app.py:37, stop placing the source value into the HTML/template source consumed by data. Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape. Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
               },
               "id": "scan/xss-output-protection",
               "properties": {
@@ -8356,7 +8318,7 @@
                 ]
               },
               "shortDescription": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Repair this HTML output"
               }
             }
           ]

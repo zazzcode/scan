@@ -246,6 +246,16 @@ func (s *pythonSet) resolve(m *pythonModule, name string, depth int) (*pythonMod
 	if !ok {
 		return m, name
 	}
+	if imp.name != "" {
+		path := imp.module
+		if !strings.HasSuffix(path, ".") {
+			path += "."
+		}
+		path += imp.name
+		if target := s.importModule(m, path); target != nil {
+			return s.resolve(target, strings.Join(parts[1:], "."), depth+1)
+		}
+	}
 	if target := s.importModule(m, imp.module); target != nil {
 		rest := imp.name
 		if len(parts) > 1 {

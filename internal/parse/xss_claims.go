@@ -24,6 +24,11 @@ func assembleXSSClaims(report *graph.StringReport) {
 			}
 		}
 		c.Evidence["render_context"] = []graph.Evidence{u.Sink}
+		for _, e := range u.Context {
+			if e.Kind == "render_markup_context" {
+				c.Evidence["render_context"] = append(c.Evidence["render_context"], e)
+			}
+		}
 		if u.XSS.Protection == "unknown" || u.XSS.OutputContext == "unknown" || u.XSS.OutputContext == "mixed" {
 			c.Blockers = append(c.Blockers, graph.Gap{Kind: "render_protection_unresolved", Detail: u.XSS.ProtectionReason, At: u.Sink.Span})
 		}

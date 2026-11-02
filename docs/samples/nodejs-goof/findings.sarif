@@ -526,7 +526,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -609,28 +609,22 @@
               "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/index.ejs:20: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                  "Resolve storage_origin_unresolved at views/index.ejs:20: No complete source-to-storage write link is established."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/index.ejs:20: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                "Resolve storage_origin_unresolved at views/index.ejs:20: No complete source-to-storage write link is established."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -4427,7 +4421,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Repair this HTML output"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -4510,28 +4504,24 @@
               "use_protection": "Output context: html_text. A source path reaches raw HTML through marked 0.3.5, whose sanitize option has a documented entity/URL bypass (upstream marked PR 592). Per-path protection: path 1 ineffective (written by POST /create); path 2 unknown (written by POST /create); path 3 unknown (written by POST /create); path 4 unknown (written by POST /create); path 5 unknown (written by POST /create); path 6 unknown (written by POST /create); path 7 unknown (written by POST /create); path 8 ineffective (written by POST /create); path 9 ineffective (written by POST /update/:id).",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Repair this HTML output",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "At views/index.ejs:20, stop placing the source value into the HTML/template source consumed by \u003c%- marked(new String(todo.content)) %\u003e.",
+                  "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+                  "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
                 ],
-                "example_status": ""
+                "example_status": "source-derived candidate; review intended output semantics and test before applying"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Repair this HTML output",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "At views/index.ejs:20, stop placing the source value into the HTML/template source consumed by \u003c%- marked(new String(todo.content)) %\u003e.",
+                "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+                "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
               ],
-              "example_status": ""
+              "example_status": "source-derived candidate; review intended output semantics and test before applying"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -4820,7 +4810,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -4903,28 +4893,22 @@
               "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/index.ejs:21: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                  "Resolve storage_origin_unresolved at views/index.ejs:21: No complete source-to-storage write link is established."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/index.ejs:21: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                "Resolve storage_origin_unresolved at views/index.ejs:21: No complete source-to-storage write link is established."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -5193,7 +5177,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Repair this HTML output"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -5391,28 +5375,24 @@
               "use_protection": "Decision XSS exposure: vulnerable. Scanner policy: Complete source-backed rendering claim and consistent XSS-specific answers establish an unsafe supported path; this is static analysis, not runtime confirmation.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Repair this HTML output",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "At views/admin.ejs:17, stop placing the source value into the HTML/template source consumed by \u003c%- redirectPage %\u003e.",
+                  "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+                  "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
                 ],
-                "example_status": ""
+                "example_status": "source-derived candidate; review intended output semantics and test before applying"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Repair this HTML output",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "At views/admin.ejs:17, stop placing the source value into the HTML/template source consumed by \u003c%- redirectPage %\u003e.",
+                "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+                "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
               ],
-              "example_status": ""
+              "example_status": "source-derived candidate; review intended output semantics and test before applying"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -5601,7 +5581,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -5660,26 +5640,22 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at routes/index.js:84: req.query.redirectPage. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at routes/index.js:84: req.query.redirectPage. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /login",
@@ -5918,7 +5894,7 @@
                 }
               ],
               "message": {
-                "text": "Keep request data out of NoSQL query structure"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -6379,26 +6355,30 @@
               "use_protection": "Assessed injection/use protection: Inconclusive. claim-relevant evidence is incomplete; model answers and unrelated coverage gaps are retained",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Keep request data out of NoSQL query structure",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document.",
-                  "Do not concatenate or interpolate request values into $where strings.",
-                  "Inspect numeric conversions and character filters on each actual path before judging their effect. Prefer data-only query APIs over executable $where strings."
+                  "Investigate the operation at routes/index.js:52: User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    }). Its current Review status does not establish a code defect.",
+                  "Resolve applicable_middleware_unresolved at app.js:1: handler is not a directly resolved function",
+                  "Resolve applicable_middleware_unresolved at app.js:42: factory arguments require parameter binding",
+                  "Resolve input_helper_unresolved at routes/index.js:51: call receiving checked input lacks a definition: validator.isEmail",
+                  "Resolve injection_semantic_coverage at :0: guard_coverage: no",
+                  "Reconcile the semantic assessment with this exact source claim: claim-relevant evidence is incomplete; model answers and unrelated coverage gaps are retained"
                 ],
-                "example_status": "not_generated; driver-specific adaptation and tests required"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "nosql_query_candidate",
             "scan.recommendations": {
-              "title": "Keep request data out of NoSQL query structure",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document.",
-                "Do not concatenate or interpolate request values into $where strings.",
-                "Inspect numeric conversions and character filters on each actual path before judging their effect. Prefer data-only query APIs over executable $where strings."
+                "Investigate the operation at routes/index.js:52: User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    }). Its current Review status does not establish a code defect.",
+                "Resolve applicable_middleware_unresolved at app.js:1: handler is not a directly resolved function",
+                "Resolve applicable_middleware_unresolved at app.js:42: factory arguments require parameter binding",
+                "Resolve input_helper_unresolved at routes/index.js:51: call receiving checked input lacks a definition: validator.isEmail",
+                "Resolve injection_semantic_coverage at :0: guard_coverage: no",
+                "Reconcile the semantic assessment with this exact source claim: claim-relevant evidence is incomplete; model answers and unrelated coverage gaps are retained"
               ],
-              "example_status": "not_generated; driver-specific adaptation and tests required"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "request_source",
@@ -6694,7 +6674,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -6775,26 +6755,22 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at routes/index.js:54: req.body.redirectPage. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at routes/index.js:54: req.body.redirectPage. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "POST /login",
@@ -7500,7 +7476,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -7650,28 +7626,22 @@
               "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/account.hbs:6: {{firstname}}. Its current Review status does not establish a code defect.",
+                  "Resolve render_protection_unresolved at views/account.hbs:6: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/account.hbs:6: {{firstname}}. Its current Review status does not establish a code defect.",
+                "Resolve render_protection_unresolved at views/account.hbs:6: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -8428,7 +8398,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -8577,28 +8547,22 @@
               "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/account.hbs:18: {{firstname}}. Its current Review status does not establish a code defect.",
+                  "Resolve render_protection_unresolved at views/account.hbs:18: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/account.hbs:18: {{firstname}}. Its current Review status does not establish a code defect.",
+                "Resolve render_protection_unresolved at views/account.hbs:18: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -9355,7 +9319,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -9504,28 +9468,22 @@
               "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/account.hbs:22: {{lastname}}. Its current Review status does not establish a code defect.",
+                  "Resolve render_protection_unresolved at views/account.hbs:22: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/account.hbs:22: {{lastname}}. Its current Review status does not establish a code defect.",
+                "Resolve render_protection_unresolved at views/account.hbs:22: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -10282,7 +10240,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -10431,28 +10389,22 @@
               "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/account.hbs:26: {{country}}. Its current Review status does not establish a code defect.",
+                  "Resolve render_protection_unresolved at views/account.hbs:26: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/account.hbs:26: {{country}}. Its current Review status does not establish a code defect.",
+                "Resolve render_protection_unresolved at views/account.hbs:26: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -11209,7 +11161,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -11358,28 +11310,22 @@
               "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/account.hbs:30: {{phone}}. Its current Review status does not establish a code defect.",
+                  "Resolve render_protection_unresolved at views/account.hbs:30: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/account.hbs:30: {{phone}}. Its current Review status does not establish a code defect.",
+                "Resolve render_protection_unresolved at views/account.hbs:30: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -12136,7 +12082,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -12285,28 +12231,22 @@
               "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/account.hbs:34: {{email}}. Its current Review status does not establish a code defect.",
+                  "Resolve render_protection_unresolved at views/account.hbs:34: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/account.hbs:34: {{email}}. Its current Review status does not establish a code defect.",
+                "Resolve render_protection_unresolved at views/account.hbs:34: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -12510,7 +12450,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -12591,26 +12531,22 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at routes/index.js:104: req.body. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at routes/index.js:104: req.body. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "POST /account_details",
@@ -15450,7 +15386,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -15676,28 +15612,22 @@
               "use_protection": "Output context: unknown. Rendering context is not established for every value.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at routes/index.js:197: res.status(302).send(todo.content.toString('base64')). Its current Review status does not establish a code defect.",
+                  "Resolve render_protection_unresolved at routes/index.js:197: Rendering context is not established for every value."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at routes/index.js:197: res.status(302).send(todo.content.toString('base64')). Its current Review status does not establish a code defect.",
+                "Resolve render_protection_unresolved at routes/index.js:197: Rendering context is not established for every value."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -15916,7 +15846,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -15986,26 +15916,22 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at routes/index.js:168: req.body.content. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at routes/index.js:168: req.body.content. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "POST /create",
@@ -16193,7 +16119,7 @@
                 }
               ],
               "message": {
-                "text": "Keep request data out of NoSQL query structure"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -16321,26 +16247,24 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Keep request data out of NoSQL query structure",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document.",
-                  "Do not concatenate or interpolate request values into $where strings.",
-                  "Inspect numeric conversions and character filters on each actual path before judging their effect. Prefer data-only query APIs over executable $where strings."
+                  "Investigate the operation at routes/index.js:204: Todo.findById(req.params.id, function (err, todo) {\n\n    try {\n      todo.remove(function (err, todo) {\n        if (err) return next(err);\n        res.redirect('/');\n      });\n    } catch (e) {\n    }\n  }). Its current Review status does not establish a code defect.",
+                  "Resolve applicable_middleware_unresolved at app.js:1: handler is not a directly resolved function",
+                  "Resolve applicable_middleware_unresolved at app.js:42: factory arguments require parameter binding"
                 ],
-                "example_status": "not_generated; driver-specific adaptation and tests required"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "nosql_query_candidate",
             "scan.recommendations": {
-              "title": "Keep request data out of NoSQL query structure",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document.",
-                "Do not concatenate or interpolate request values into $where strings.",
-                "Inspect numeric conversions and character filters on each actual path before judging their effect. Prefer data-only query APIs over executable $where strings."
+                "Investigate the operation at routes/index.js:204: Todo.findById(req.params.id, function (err, todo) {\n\n    try {\n      todo.remove(function (err, todo) {\n        if (err) return next(err);\n        res.redirect('/');\n      });\n    } catch (e) {\n    }\n  }). Its current Review status does not establish a code defect.",
+                "Resolve applicable_middleware_unresolved at app.js:1: handler is not a directly resolved function",
+                "Resolve applicable_middleware_unresolved at app.js:42: factory arguments require parameter binding"
               ],
-              "example_status": "not_generated; driver-specific adaptation and tests required"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "request_source",
@@ -16646,7 +16570,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -16729,28 +16653,22 @@
               "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/edit.ejs:19: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                  "Resolve storage_origin_unresolved at views/edit.ejs:19: No complete source-to-storage write link is established."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/edit.ejs:19: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                "Resolve storage_origin_unresolved at views/edit.ejs:19: No complete source-to-storage write link is established."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -20187,7 +20105,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Preserve the verified protection"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -20258,28 +20176,22 @@
               "use_protection": "Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Preserve the verified protection",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Preserve escaping for \u003c%= todo.content %\u003e at views/edit.ejs:20 in html_attribute. Do not add a trust bypass or disable the verified renderer's autoescape.",
+                  "Keep a regression test with HTML-significant or SQL-significant input, as appropriate to this claim. Input-validation requirements are assessed separately."
                 ],
-                "example_status": ""
+                "example_status": "no repair proposed for a protected claim"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Preserve the verified protection",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Preserve escaping for \u003c%= todo.content %\u003e at views/edit.ejs:20 in html_attribute. Do not add a trust bypass or disable the verified renderer's autoescape.",
+                "Keep a regression test with HTML-significant or SQL-significant input, as appropriate to this claim. Input-validation requirements are assessed separately."
               ],
-              "example_status": ""
+              "example_status": "no repair proposed for a protected claim"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -20568,7 +20480,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -20651,28 +20563,22 @@
               "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/edit.ejs:23: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                  "Resolve storage_origin_unresolved at views/edit.ejs:23: No complete source-to-storage write link is established."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/edit.ejs:23: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                "Resolve storage_origin_unresolved at views/edit.ejs:23: No complete source-to-storage write link is established."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -24109,7 +24015,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Preserve the verified protection"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -24180,28 +24086,22 @@
               "use_protection": "Output context: html_text. The template HTML-escapes this value in HTML text or a quoted non-active attribute.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Preserve the verified protection",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Preserve escaping for \u003c%= todo.content %\u003e at views/edit.ejs:23 in html_text. Do not add a trust bypass or disable the verified renderer's autoescape.",
+                  "Keep a regression test with HTML-significant or SQL-significant input, as appropriate to this claim. Input-validation requirements are assessed separately."
                 ],
-                "example_status": ""
+                "example_status": "no repair proposed for a protected claim"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Preserve the verified protection",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Preserve escaping for \u003c%= todo.content %\u003e at views/edit.ejs:23 in html_text. Do not add a trust bypass or disable the verified renderer's autoescape.",
+                "Keep a regression test with HTML-significant or SQL-significant input, as appropriate to this claim. Input-validation requirements are assessed separately."
               ],
-              "example_status": ""
+              "example_status": "no repair proposed for a protected claim"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -24490,7 +24390,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -24573,28 +24473,22 @@
               "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/edit.ejs:27: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                  "Resolve storage_origin_unresolved at views/edit.ejs:27: No complete source-to-storage write link is established."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/edit.ejs:27: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                "Resolve storage_origin_unresolved at views/edit.ejs:27: No complete source-to-storage write link is established."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -24883,7 +24777,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -24966,28 +24860,22 @@
               "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at views/edit.ejs:29: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                  "Resolve storage_origin_unresolved at views/edit.ejs:29: No complete source-to-storage write link is established."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at views/edit.ejs:29: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.",
+                "Resolve storage_origin_unresolved at views/edit.ejs:29: No complete source-to-storage write link is established."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -25236,7 +25124,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -25295,26 +25183,22 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at routes/index.js:226: req.params.id. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at routes/index.js:226: req.params.id. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /edit/:id",
@@ -25472,7 +25356,7 @@
                 }
               ],
               "message": {
-                "text": "Keep request data out of NoSQL query structure"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -25600,26 +25484,24 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Keep request data out of NoSQL query structure",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document.",
-                  "Do not concatenate or interpolate request values into $where strings.",
-                  "Inspect numeric conversions and character filters on each actual path before judging their effect. Prefer data-only query APIs over executable $where strings."
+                  "Investigate the operation at routes/index.js:232: Todo.findById(req.params.id, function (err, todo) {\n\n    todo.content = req.body.content;\n    todo.updated_at = Date.now();\n    todo.save(function (err, todo, count) {\n      if (err) return next(err);\n\n      res.redirect('/');\n    });\n  }). Its current Review status does not establish a code defect.",
+                  "Resolve applicable_middleware_unresolved at app.js:1: handler is not a directly resolved function",
+                  "Resolve applicable_middleware_unresolved at app.js:42: factory arguments require parameter binding"
                 ],
-                "example_status": "not_generated; driver-specific adaptation and tests required"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "nosql_query_candidate",
             "scan.recommendations": {
-              "title": "Keep request data out of NoSQL query structure",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document.",
-                "Do not concatenate or interpolate request values into $where strings.",
-                "Inspect numeric conversions and character filters on each actual path before judging their effect. Prefer data-only query APIs over executable $where strings."
+                "Investigate the operation at routes/index.js:232: Todo.findById(req.params.id, function (err, todo) {\n\n    todo.content = req.body.content;\n    todo.updated_at = Date.now();\n    todo.save(function (err, todo, count) {\n      if (err) return next(err);\n\n      res.redirect('/');\n    });\n  }). Its current Review status does not establish a code defect.",
+                "Resolve applicable_middleware_unresolved at app.js:1: handler is not a directly resolved function",
+                "Resolve applicable_middleware_unresolved at app.js:42: factory arguments require parameter binding"
               ],
-              "example_status": "not_generated; driver-specific adaptation and tests required"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "request_source",
@@ -25885,7 +25767,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -25944,26 +25826,22 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at routes/index.js:234: req.body.content. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at routes/index.js:234: req.body.content. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "POST /update/:id",
@@ -26141,7 +26019,7 @@
                 }
               ],
               "message": {
-                "text": "Keep credential and personal-data content out of logs"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -26335,30 +26213,22 @@
               "use_protection": "Logging evidence: the whole request query is written to the log and may include credentials or personal data. Assessed logging exposure: Inconclusive (data class Inconclusive, content Inconclusive, redaction no). Logging exposure assessment is missing or inconclusive.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
               "recommendations": {
-                "title": "Keep credential and personal-data content out of logs",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.",
-                  "Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.",
-                  "If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
-                  "Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+                  "Investigate the operation at routes/index.js:312: console.log(JSON.stringify(req.query)). Its current Review status does not establish a code defect.",
+                  "Reconcile the semantic assessment with this exact source claim: Logging exposure assessment is missing or inconclusive."
                 ],
-                "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' \u0026\u0026 password.length \u003e 0 });",
-                "example_status": "illustrative_template; not a verified application patch"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "log_sink_candidate",
             "scan.recommendations": {
-              "title": "Keep credential and personal-data content out of logs",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.",
-                "Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.",
-                "If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
-                "Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+                "Investigate the operation at routes/index.js:312: console.log(JSON.stringify(req.query)). Its current Review status does not establish a code defect.",
+                "Reconcile the semantic assessment with this exact source claim: Logging exposure assessment is missing or inconclusive."
               ],
-              "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' \u0026\u0026 password.length \u003e 0 });",
-              "example_status": "illustrative_template; not a verified application patch"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /about_new",
@@ -26521,7 +26391,7 @@
                 }
               ],
               "message": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -26582,28 +26452,22 @@
               "use_protection": "Output context: unknown. Rendering context is not established for every value.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Protect the specific browser rendering context",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                  "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                  "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                  "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                  "Investigate the operation at routes/index.js:313: res.render(\"about_new.dust\",\n    {\n      title: 'Patch TODO List',\n      subhead: 'Vulnerabilities at their best',\n      device: req.query.device\n    }). Its current Review status does not establish a code defect.",
+                  "Resolve render_protection_unresolved at routes/index.js:313: Rendering context is not established for every value."
                 ],
-                "example_status": ""
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "xss_candidate",
             "scan.recommendations": {
-              "title": "Protect the specific browser rendering context",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-                "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-                "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-                "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "Investigate the operation at routes/index.js:313: res.render(\"about_new.dust\",\n    {\n      title: 'Patch TODO List',\n      subhead: 'Vulnerabilities at their best',\n      device: req.query.device\n    }). Its current Review status does not establish a code defect.",
+                "Resolve render_protection_unresolved at routes/index.js:313: Rendering context is not established for every value."
               ],
-              "example_status": ""
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.requiredEvidence": [
               "render_source",
@@ -26762,7 +26626,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -26821,26 +26685,22 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at routes/index.js:312: req.query. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at routes/index.js:312: req.query. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /about_new",
@@ -26948,7 +26808,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -27007,26 +26867,22 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at routes/index.js:317: req.query.device. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at routes/index.js:317: req.query.device. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "GET /about_new",
@@ -27134,7 +26990,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -27215,26 +27071,22 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at routes/users.js:33: req.body.address. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at routes/users.js:33: req.body.address. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "POST /users",
@@ -27387,7 +27239,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -27468,26 +27320,22 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at routes/users.js:32: req.body.name. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at routes/users.js:32: req.body.name. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "POST /users",
@@ -27640,7 +27488,7 @@
                 }
               ],
               "message": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               },
               "physicalLocation": {
                 "artifactLocation": {
@@ -27721,26 +27569,22 @@
               "use_protection": "Not established from the supplied evidence.",
               "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
               "recommendations": {
-                "title": "Validate and sanitize each request input",
+                "title": "Resolve the specific claim blockers",
                 "actions": [
-                  "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                  "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                  "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                  "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                  "Investigate the operation at routes/users.js:34: req.body.role. Its current Review status does not establish a code defect.",
+                  "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
                 ],
-                "example_status": "not_generated; field policy is route-specific"
+                "example_status": "no patch proposed while the claim is inconclusive"
               }
             },
             "scan.kind": "input_validation_candidate",
             "scan.recommendations": {
-              "title": "Validate and sanitize each request input",
+              "title": "Resolve the specific claim blockers",
               "actions": [
-                "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-                "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-                "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-                "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "Investigate the operation at routes/users.js:34: req.body.role. Its current Review status does not establish a code defect.",
+                "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               ],
-              "example_status": "not_generated; field policy is route-specific"
+              "example_status": "no patch proposed while the claim is inconclusive"
             },
             "scan.reviewStatus": "not_run",
             "scan.route": "POST /users",
@@ -27835,8 +27679,8 @@
           "rules": [
             {
               "help": {
-                "markdown": "Protect the specific browser rendering context\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.\n- For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.\n- Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.\n- Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart.\n",
-                "text": "Protect the specific browser rendering context. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text. For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version. Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them. Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+                "markdown": "Resolve the specific claim blockers\n\n- Investigate the operation at views/index.ejs:20: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect.\n- Resolve storage_origin_unresolved at views/index.ejs:20: No complete source-to-storage write link is established.\n",
+                "text": "Resolve the specific claim blockers. Investigate the operation at views/index.ejs:20: \u003c%= todo._id %\u003e. Its current Review status does not establish a code defect. Resolve storage_origin_unresolved at views/index.ejs:20: No complete source-to-storage write link is established."
               },
               "id": "scan/xss-output-protection",
               "properties": {
@@ -27846,13 +27690,13 @@
                 ]
               },
               "shortDescription": {
-                "text": "Protect the specific browser rendering context"
+                "text": "Resolve the specific claim blockers"
               }
             },
             {
               "help": {
-                "markdown": "Validate and sanitize each request input\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.\n- Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.\n- Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established.\n",
-                "text": "Validate and sanitize each request input. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose. Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute. Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+                "markdown": "Resolve the specific claim blockers\n\n- Investigate the operation at routes/index.js:84: req.query.redirectPage. Its current Review status does not establish a code defect.\n- Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection.\n",
+                "text": "Resolve the specific claim blockers. Investigate the operation at routes/index.js:84: req.query.redirectPage. Its current Review status does not establish a code defect. Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
               },
               "id": "scan/input-validation",
               "properties": {
@@ -27862,13 +27706,13 @@
                 ]
               },
               "shortDescription": {
-                "text": "Validate and sanitize each request input"
+                "text": "Resolve the specific claim blockers"
               }
             },
             {
               "help": {
-                "markdown": "Keep request data out of NoSQL query structure\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document.\n- Do not concatenate or interpolate request values into $where strings.\n- Inspect numeric conversions and character filters on each actual path before judging their effect. Prefer data-only query APIs over executable $where strings.\n",
-                "text": "Keep request data out of NoSQL query structure. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document. Do not concatenate or interpolate request values into $where strings. Inspect numeric conversions and character filters on each actual path before judging their effect. Prefer data-only query APIs over executable $where strings."
+                "markdown": "Resolve the specific claim blockers\n\n- Investigate the operation at routes/index.js:52: User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    }). Its current Review status does not establish a code defect.\n- Resolve applicable_middleware_unresolved at app.js:1: handler is not a directly resolved function\n- Resolve applicable_middleware_unresolved at app.js:42: factory arguments require parameter binding\n- Resolve input_helper_unresolved at routes/index.js:51: call receiving checked input lacks a definition: validator.isEmail\n- Resolve injection_semantic_coverage at :0: guard_coverage: no\n- Reconcile the semantic assessment with this exact source claim: claim-relevant evidence is incomplete; model answers and unrelated coverage gaps are retained\n",
+                "text": "Resolve the specific claim blockers. Investigate the operation at routes/index.js:52: User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    }). Its current Review status does not establish a code defect. Resolve applicable_middleware_unresolved at app.js:1: handler is not a directly resolved function Resolve applicable_middleware_unresolved at app.js:42: factory arguments require parameter binding Resolve input_helper_unresolved at routes/index.js:51: call receiving checked input lacks a definition: validator.isEmail Resolve injection_semantic_coverage at :0: guard_coverage: no Reconcile the semantic assessment with this exact source claim: claim-relevant evidence is incomplete; model answers and unrelated coverage gaps are retained"
               },
               "id": "scan/nosql-input-protection",
               "properties": {
@@ -27878,13 +27722,13 @@
                 ]
               },
               "shortDescription": {
-                "text": "Keep request data out of NoSQL query structure"
+                "text": "Resolve the specific claim blockers"
               }
             },
             {
               "help": {
-                "markdown": "Keep credential and personal-data content out of logs\n\n- Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.\n- Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.\n- Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.\n- If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.\n- Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead.\n\nIllustrative example (unverified):\n\n```typescript\n// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' \u0026\u0026 password.length \u003e 0 });\n```\n",
-                "text": "Keep credential and personal-data content out of logs. Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change. Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead. Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values. If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value. Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+                "markdown": "Resolve the specific claim blockers\n\n- Investigate the operation at routes/index.js:312: console.log(JSON.stringify(req.query)). Its current Review status does not establish a code defect.\n- Reconcile the semantic assessment with this exact source claim: Logging exposure assessment is missing or inconclusive.\n",
+                "text": "Resolve the specific claim blockers. Investigate the operation at routes/index.js:312: console.log(JSON.stringify(req.query)). Its current Review status does not establish a code defect. Reconcile the semantic assessment with this exact source claim: Logging exposure assessment is missing or inconclusive."
               },
               "id": "scan/sensitive-data-logging",
               "properties": {
@@ -27894,7 +27738,7 @@
                 ]
               },
               "shortDescription": {
-                "text": "Keep credential and personal-data content out of logs"
+                "text": "Resolve the specific claim blockers"
               }
             }
           ]

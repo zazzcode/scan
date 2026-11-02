@@ -11,3 +11,6 @@ secrets and SSTI; dependency/secret analysis is out of scope. SSTI is not itself
 
 Existing Semgrep and Bearer snapshots both report zero. This does not negate the source-backed
 HTML/template flow. No runtime exploit or application execution is part of this reference.
+
+The [documented-family inventory](../python-documented-claims.md) records all advertised families,
+additional local/upstream material reviewed, and current unsupported boundaries.

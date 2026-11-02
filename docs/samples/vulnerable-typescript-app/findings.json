@@ -89,7 +89,7 @@
       "coverage": "bounded analysis"
     }
   ],
-  "presentation_version": 3,
+  "presentation_version": 4,
   "findings": [
     {
       "type_ids": [
@@ -106,16 +106,12 @@
       "use_protection": "Logging evidence: request body field password has a credential field-name hint and its content is written to the log.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Keep credential and personal-data content out of logs",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.",
-          "Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.",
-          "If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
-          "Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+          "Investigate the operation at src/server.ts:74: console.log('Query:', query). Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' && password.length > 0 });",
-        "example_status": "illustrative_template; not a verified application patch"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -133,14 +129,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:70: req.body. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -158,14 +152,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:88: req.query.host. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -183,15 +175,13 @@
       "use_protection": "Output context: unknown. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at src/server.ts:108: res.send(data). Its current Review status does not establish a code defect.",
+          "Resolve render_protection_unresolved at src/server.ts:108: A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
+          "Resolve storage_origin_unresolved at src/server.ts:108: No complete source-to-storage write link is established."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -209,14 +199,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:101: req.query.filename. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -234,15 +222,13 @@
       "use_protection": "Output context: html_text. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Repair this HTML output",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "At src/server.ts:117, stop placing the source value into the HTML/template source consumed by res.send(`<h1>Search Results for: ${query}</h1>`).",
+          "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+          "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
         ],
-        "example_status": ""
+        "example_status": "source-derived candidate; review intended output semantics and test before applying"
       }
     },
     {
@@ -260,14 +246,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:115: req.query.query. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -286,14 +270,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Review protection for the named use",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Resolve the source-to-use relationship and applicable guards.",
-          "Apply the destination/API-specific protection and the route's declared field requirements.",
-          "Add vulnerable, protected and inconclusive regression cases."
+          "Investigate the operation at src/server.ts:125: axios.default.get(url). Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "no code example for an unverified library model"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -311,15 +293,12 @@
       "use_protection": "No HTML sink has been established for this data edge.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at src/server.ts:138: res.json({ result }). Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -337,14 +316,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:134: req.body. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -362,14 +339,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:146: req.params.id. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -387,14 +362,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:159: req.params.id. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -412,14 +385,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:171: req.body. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -437,15 +408,12 @@
       "use_protection": "No HTML sink has been established for this data edge.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at src/server.ts:188: res.json(parsed). Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -463,14 +431,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:184: req.body. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -488,15 +454,12 @@
       "use_protection": "No HTML sink has been established for this data edge.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at src/server.ts:225: res.json({ valid: isValid }). Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -514,14 +477,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:221: req.body. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -539,14 +500,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:237: req.query.url. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -564,15 +523,12 @@
       "use_protection": "No HTML sink has been established for this data edge.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at src/server.ts:247: res.json({ result: merged }). Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -590,14 +546,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at src/server.ts:244: req.body. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     }
   ],

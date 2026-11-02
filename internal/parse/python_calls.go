@@ -29,9 +29,11 @@ func (f *pythonFlow) call(n *sitter.Node) pythonValue {
 	}
 
 	if receiver.binding == "db_connection" && method == "cursor" {
-		return pythonValue{binding: "db_cursor", evidence: append(receiver.evidence, m.evidence("sink_binding", n))}
+		return pythonValue{binding: "db_cursor", driver: receiver.driver, evidence: append(receiver.evidence, m.evidence("sink_binding", n))}
 	}
-	if (receiver.binding == "db_connection" || receiver.binding == "db_cursor") && (method == "execute" || method == "executemany" || method == "executescript") {
+	connectionExecution := receiver.binding == "db_connection" && (receiver.driver == "sqlite3" || receiver.driver == "psycopg")
+	operation := method == "execute" || method == "executemany" || (method == "executescript" && receiver.driver == "sqlite3")
+	if (connectionExecution || receiver.binding == "db_cursor") && operation {
 		result := f.sql(n, object, values, receiver)
 		result.binding = "db_cursor"
 		return result
@@ -43,7 +45,12 @@ func (f *pythonFlow) call(n *sitter.Node) pythonValue {
 		return v
 	}
 	if receiver.binding == "jinja_template" && method == "render" {
-		v := pyCombine(receiver, all)
+		arguments := all
+		// Escaping affects substituted variables, never text compiled as template source.
+		if receiver.constant {
+			arguments = pyProtect(arguments, receiver.templateEscape)
+		}
+		v := pyCombine(receiver, arguments)
 		v = pyTransfer(v, m.evidence("template_render", n))
 		v.binding = ""
 		return v
@@ -128,6 +135,16 @@ func (f *pythonFlow) helper(call *sitter.Node, m *pythonModule, fn *sitter.Node,
 	h.imports = map[string]pythonImport{}
 	h.context = append(h.context, m.evidence("helper_definition", fn), f.module.evidence("call_binding", call))
 	params := fn.ChildByFieldName("parameters")
+	for i := uint(0); params != nil && i < params.NamedChildCount(); i++ {
+		p := params.NamedChild(i)
+		if strings.Contains(p.Kind(), "splat") || strings.Contains(pyText(m, p), "*") {
+			v := pythonValue{unknown: true, gaps: []graph.Gap{{Kind: "python_parameter_unresolved", Detail: "variadic helper binding is not modeled", At: spanOf(m.file, p)}}}
+			for _, arg := range values {
+				v = pyCombine(v, arg)
+			}
+			return pyTransfer(pyProtect(v, "unknown"), f.module.evidence("call_argument_dependency", call))
+		}
+	}
 	pos := 0
 	for i := uint(0); params != nil && i < params.NamedChildCount(); i++ {
 		p := params.NamedChild(i)
@@ -155,6 +172,8 @@ func (f *pythonFlow) helper(call *sitter.Node, m *pythonModule, fn *sitter.Node,
 	}
 	h.block(fn.ChildByFieldName("body"))
 	f.mergeGuards(h)
+	f.context = pythonMergeEvidence(f.context, h.context)
+	h.returns.gaps = append(h.returns.gaps, h.gaps...)
 	return pyTransfer(h.returns, f.module.evidence("helper_return", call))
 }
 func (f *pythonFlow) outbound(q string) bool {

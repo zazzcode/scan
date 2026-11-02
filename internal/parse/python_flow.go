@@ -20,8 +20,11 @@ type pythonValue struct {
 	literal         string
 	constant        bool
 	binding, table  string
+	driver          string
+	templateEscape  string
 	evidence        []graph.Evidence
 	built, rendered bool
+	unknown         bool
 }
 type pythonWrite struct {
 	value    pythonValue
@@ -151,7 +154,8 @@ func (f *pythonFlow) merge(branches ...*pythonFlow) {
 	keys := map[string]bool{}
 	for _, b := range branches {
 		f.mergeGuards(b)
-		f.returns = pyCombine(f.returns, b.returns)
+		f.gaps = pythonMergeGaps(f.gaps, b.gaps)
+		f.returns = pyJoin(f.returns, b.returns, 0)
 		for k := range b.env {
 			keys[k] = true
 		}
@@ -159,7 +163,11 @@ func (f *pythonFlow) merge(branches ...*pythonFlow) {
 	for key := range keys {
 		var v pythonValue
 		for _, b := range branches {
-			v = pyCombine(v, b.env[key])
+			if value, ok := b.env[key]; ok {
+				v = pyJoin(v, value, 0)
+			} else {
+				v = pyJoin(v, pythonValue{unknown: true}, 0)
+			}
 		}
 		f.env[key] = v
 	}
@@ -199,7 +207,8 @@ func (f *pythonFlow) finishValidation() {
 	}
 	sort.Strings(keys)
 	for _, key := range keys {
-		if sunk[key] {
+		policy := f.fieldPolicy(key)
+		if sunk[key] && len(policy) == 0 {
 			continue
 		}
 		v := f.inputs[key]
@@ -208,7 +217,11 @@ func (f *pythonFlow) finishValidation() {
 		}
 		sink := v.deps[0].dep.Source
 		u := graph.StringUse{ID: "input:" + f.route.route.ID + ":" + key, RouteID: f.route.route.ID, Kind: "input_validation_candidate", Sink: sink, Context: append([]graph.Evidence{}, f.context...), Gaps: append([]graph.Gap{}, f.gaps...), Assessment: graph.Assessment{Status: "not_run"}, Dependencies: []graph.Dependency{v.deps[0].dep}}
-		u.Gaps = append(u.Gaps, graph.Gap{Kind: "input_validation_unresolved", Detail: key + ": assess actual enforcing conditions in handler; no external business policy was supplied", At: sink.Span})
+		if len(policy) > 0 {
+			f.validationClaim(&u, key, v, policy)
+		} else {
+			u.Gaps = append(u.Gaps, graph.Gap{Kind: "input_validation_unresolved", Detail: key + ": assess actual enforcing conditions in handler; no external business policy was supplied", At: sink.Span})
+		}
 		f.report.Uses = append(f.report.Uses, u)
 	}
 }

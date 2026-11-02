@@ -17,12 +17,13 @@ func (f *pythonFlow) sql(n, object *sitter.Node, values []pythonValue, receiver 
 		return receiver
 	}
 	text := values[0]
-	all := text
+	all := pythonSlot(text, "sql_text")
 	for _, v := range values[1:] {
-		all = pyCombine(all, v)
+		all = pyCombine(all, pythonSlot(v, "sql_parameters"))
 	}
+
 	receiver.table = ""
-	if text.constant {
+	if text.constant && receiver.driver == "sqlite3" {
 		if match := pythonSelect.FindStringSubmatch(text.literal); len(match) > 0 {
 			receiver.table = strings.ToLower(match[1])
 			receiver.evidence = append(receiver.evidence, f.module.evidence("storage_query", n))
@@ -42,7 +43,7 @@ func (f *pythonFlow) sql(n, object *sitter.Node, values []pythonValue, receiver 
 	binding := append([]graph.Evidence{}, receiver.evidence...)
 	binding = append(binding, f.module.evidence("sink_binding", n.ChildByFieldName("function")))
 	u.Context = append(u.Context, binding...)
-	u.APIModel = &graph.APIModel{ID: "python-sqlite-dbapi-v1", Library: "sqlite3", Semantics: "execute SQL text is argument 0; argument 1 binds values only and cannot protect interpolated SQL or identifiers. executescript does not bind values.", Reference: "https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.execute"}
+	u.APIModel = pythonDBAPIModel(receiver.driver)
 	if text.built {
 		u.Gaps = append(u.Gaps, f.gap("query_text_interpolated", "Python expression constructs executable SQL text; parameter tuple protects only separate value slots", n))
 	}
@@ -65,7 +66,7 @@ func (f *pythonFlow) sql(n, object *sitter.Node, values []pythonValue, receiver 
 	}
 	for _, g := range append(append([]graph.Gap{}, f.gaps...), append(text.gaps, f.guardGaps(text)...)...) {
 		switch g.Kind {
-		case "python_call_unresolved", "python_loop_unresolved", "python_comprehension_unresolved", "python_decorator_unresolved", "work_limit", "dependency_limit", "transfer_limit", "input_helper_unresolved", "python_finally_unresolved":
+		case "python_parameter_unresolved", "python_value_unresolved", "python_call_unresolved", "python_loop_unresolved", "python_comprehension_unresolved", "python_decorator_unresolved", "work_limit", "dependency_limit", "transfer_limit", "input_helper_unresolved", "python_finally_unresolved":
 			c.Blockers = append(c.Blockers, g)
 		}
 	}
@@ -224,4 +225,12 @@ func (s *pythonSet) attachChecks(out *graph.StringReport, checks []graph.Check) 
 			out.Gaps = append(out.Gaps, graph.Gap{Kind: "python_check_unresolved", Detail: "No supported operation matched check " + check.ID})
 		}
 	}
+}
+
+func pythonSlot(v pythonValue, slot string) pythonValue {
+	v.deps = append([]pythonDep{}, v.deps...)
+	for i := range v.deps {
+		v.deps[i].dep.SinkSlot = slot
+	}
+	return v
 }

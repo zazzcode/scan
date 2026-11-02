@@ -244,6 +244,11 @@ Prioritization by rule severity and evidence completeness changes processing ord
 
 ## 7. Evidence bundle contract
 
+The implemented [trace and judgment design](architecture/trace-judgment.md) describes the
+shared version-2 evidence wire format, API/browser slices, validation protocol, reporting
+guardrails and replay requirements. This pipeline is language-neutral; adapter coverage
+remains explicit.
+
 A bundle contains a stable candidate ID, rule/version, source and sink spans, ordered witness operations,
 call-site bindings, branch/guard facts, relevant validator definitions, library-model/version facts,
 and explicit gaps. Source snapshots/hashes bind every span to the analyzed revision.

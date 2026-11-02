@@ -2,7 +2,7 @@
 
 **Branch/worktree:** `python-support-base`. **Owner:** human user. **Date:** 2026-11-01.
 **Topology:** one feature branch and one review unit for the Python adapter and evaluation.
-The user authorized implementation, required downloads, `gpt-6-luna` decision requests without a user-imposed count cap, and local commits with a local results report. No push or merge.
+The user authorized implementation, required downloads, `gpt-6-luna` decision requests without a user-imposed count cap, and commits/results. The user subsequently authorized pushing this feature branch and sustained general hardening; no merge.
 Integration remains `stage`, through later human PR review. Local run log:
 `.zazz/ephemeral/python-support-run-log.md`. The lead agent implements and reviews directly.
 
@@ -120,6 +120,40 @@ Verify determinism by repeated normalized output and inspect source spans/hashes
 Skeleton: `pythonSet` owns parsed module snapshots; `pythonModule` owns imports and declarations;
 `pythonFlow` owns route-local values, gaps and uses; rendering and SQL models live in separate files.
 
+## Generalization and guardrail hardening
+
+User steering authorizes sustained iterations beyond the original three-app slice, on the same branch.
+Keep the existing vulnerability families; broaden their source/binding/flow coverage using independently
+specified synthetic cases. No sample-name shortcuts and no new vulnerability-family verdicts.
+
+Additional acceptance evidence:
+
+- Alternative dictionary fields and missing/unresolved values cannot borrow sibling protection.
+- Local package imports, request aliases and supported helper argument binding retain source identity;
+  unsupported parameters, mutation, loops and custom guards remain explicit rather than disappearing.
+- Add verified DB-API connection models for PostgreSQL/MySQL alongside sqlite, with driver-specific
+  contracts; fake/shadowed bindings remain negatives, and SQLite storage correlation stays scoped.
+- Decision bundles include actual guard conditions/helpers and fact/assumption/blocker roles. Model
+  interpretation cannot discharge unresolved source facts. Changed questions require a new version.
+- Audit every README/upstream author vulnerability claim and local test/API-documentation claim into
+  a separate covered/unsupported/out-of-scope inventory; do not put expected labels in model inputs.
+- Add novel synthetic positive/protected/unknown controls, compare the pinned comparator tools on a
+  compatible corpus where useful, and retain actual misses/overclaims instead of asserting broad parity.
+
+New tests: `TestPythonGeneralizationBranches`, `TestPythonPackageImports`,
+`TestPythonDBAPIBindings`, `TestPythonUnknownHelperParameters`, plus targeted policy/bundle tests.
+The existing parser/CLI/race/vet/build and source-integrity checks remain required. Iterate in coherent
+green commits and push `python-support-base`; no integration push, publication or merge is authorized.
+
+## Shared trace and reporting hardening
+
+The user's source-graph-to-Luna design is implemented in the common judge, with versioned
+trace evidence, operand roles, coverage ledger and separate validation policy. Required tests
+cover evidence references, missing roles, unsafe/escaped/unknown alternatives and report gates.
+Only Protected is green; inconclusive content cannot retain a protection title. Remediation
+must identify the operation, field policy and exact supported repair or investigation blocker.
+Architecture, evidence design, functionality and public analysis guides must match the code.
+
 ## Definition of done
 
 Implementation, tests, source keys, all three reports, accuracy iterations, recorded limits and
@@ -129,7 +163,7 @@ Acceptance evidence is recorded by the agent; final acceptance remains with the 
 ## Open questions
 
 Resolved by the user: downloads allowed; `gpt-6-luna` only, count cap removed after increases from 25 to 100;
-local commits/results only; iterate accuracy against other SAST and app documentation.
+feature-branch push allowed; iterate accuracy against other SAST and app documentation.
 No unresolved question blocks implementation.
 
 ## Run log protocol
@@ -142,7 +176,7 @@ under the app-specific `_test-findings` directories. Durable conclusions belong 
 
 Resume in `python-support-base`; read this contract and local run log, inspect branch/status,
 verify sample pins, implement remaining steps directly, preserve invariants and record evidence.
-No paid request without updating the persistent cumulative ledger. Do not merge or push.
+No paid request without updating the persistent cumulative ledger. Push the assigned feature branch only; do not merge or push integration.
 
 ## Implementation and review change log
 
@@ -152,3 +186,9 @@ iteration and raised the live request cap to 100, then removed the count cap dur
 2026-11-01: User emphasized all sample XSS and PII logging. Source review found inline jQuery DOM XSS in ThreatByte; extend the existing browser adapter through snapshot-preserving template-script parsing and verified jQuery CDN bindings. Add source-backed form requirements and literal/database logging sources; retain shared judgment questions.
 
 2026-11-01: Explicit sample-source transmission approved after auto-review requested clarity. Live calibration completed 78 calls across 77 current records; literal-address sensitivity now blocks model overclaims. Results, tests and 22-case evidence are linked from the evaluation and current orientation.
+
+2026-11-01: User authorized branch push and several hours of unattended general algorithm, guardrail, decision-evidence and findings-interpretation hardening. User also requested deeper local/upstream vulnerability documentation review. Added the generalization acceptance matrix; existing family scope remains.
+
+2026-11-02: User requested shared route/browser trace evidence, definite source-supported
+validation/practice judgments, protection-color auditing and specific remediation. Added the
+shared trace/reporting acceptance section and architecture documentation requirement.

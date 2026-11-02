@@ -78,6 +78,55 @@
       "line": 254,
       "kind": "outbound_http_candidate",
       "expect": "candidate"
+    },
+    {
+      "id": "TB-VALIDATION-LOGIN-USER",
+      "file": "server/routes.py",
+      "line": 37,
+      "kind": "input_validation_candidate",
+      "expect": "validation_enforced"
+    },
+    {
+      "id": "TB-VALIDATION-LOGIN-PASSWORD",
+      "file": "server/routes.py",
+      "line": 38,
+      "kind": "input_validation_candidate",
+      "expect": "validation_enforced"
+    },
+    {
+      "id": "TB-VALIDATION-SIGNUP-USER",
+      "file": "server/routes.py",
+      "line": 81,
+      "kind": "input_validation_candidate",
+      "expect": "validation_enforced"
+    },
+    {
+      "id": "TB-VALIDATION-SIGNUP-EMAIL",
+      "file": "server/routes.py",
+      "line": 82,
+      "kind": "input_validation_candidate",
+      "expect": "validation_defect"
+    },
+    {
+      "id": "TB-VALIDATION-SIGNUP-COUNTRY",
+      "file": "server/routes.py",
+      "line": 83,
+      "kind": "input_validation_candidate",
+      "expect": "validation_enforced"
+    },
+    {
+      "id": "TB-VALIDATION-SIGNUP-PASSWORD",
+      "file": "server/routes.py",
+      "line": 84,
+      "kind": "input_validation_candidate",
+      "expect": "validation_enforced"
+    },
+    {
+      "id": "TB-VALIDATION-SIGNUP-CONFIRM",
+      "file": "server/routes.py",
+      "line": 85,
+      "kind": "input_validation_candidate",
+      "expect": "validation_enforced"
     }
   ]
 }

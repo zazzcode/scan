@@ -30,6 +30,10 @@ def evaluate(case, uses):
         return all(u['assessment'].get('finding_status') != 'confirmed_vulnerability' for u in found)
     if expected == 'encoded':
         return all(u.get('xss', {}).get('protection') == 'encoded' for u in found)
+    if expected == 'validation_defect':
+        return any(u.get('completeness', {}).get('claim_kind') == 'validation' and u['assessment'].get('finding_status') == 'poor_practice' for u in found)
+    if expected == 'validation_enforced':
+        return all(u.get('completeness', {}).get('claim_kind') == 'validation' and u['assessment'].get('finding_status') == 'protected_for_claim' for u in found)
     if expected == 'form_policy':
         return any(any(e['kind'] == 'form_field_requirement' and 'email' in e['text']
                        for e in u['context']) for u in found)
@@ -44,7 +48,7 @@ def main():
     cases = json.loads((Path(__file__).parent / args.app / 'cases.json').read_text())
     report = json.loads(args.report.read_text())
     results = [{'id': case['id'], 'pass': evaluate(case, report['uses'])} for case in cases['cases']]
-    positive = [case for case in cases['cases'] if case['expect'] in ('construction', 'raw_xss')]
+    positive = [case for case in cases['cases'] if case['expect'] in ('construction', 'raw_xss', 'validation_defect')]
     print(json.dumps({'app': args.app, 'cases': results,
                       'passed': sum(row['pass'] for row in results), 'total': len(results),
                       'discovered_positive_cases': sum(evaluate(case, report['uses']) for case in positive),

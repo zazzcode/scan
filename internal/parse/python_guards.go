@@ -15,7 +15,7 @@ func (f *pythonFlow) markGuard(n *sitter.Node, v pythonValue) {
 	}
 	unknown := false
 	for _, g := range v.gaps {
-		unknown = unknown || g.Kind == "python_call_unresolved"
+		unknown = unknown || g.Kind == "python_call_unresolved" || g.Kind == "python_parameter_unresolved" || g.Kind == "work_limit"
 	}
 	if !unknown {
 		return

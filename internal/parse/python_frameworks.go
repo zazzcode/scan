@@ -11,8 +11,8 @@ func (f *pythonFlow) frameworkCall(n *sitter.Node, q string, nodes []*sitter.Nod
 	switch q {
 	case "flask.request.get_json":
 		return f.source(n, "json", ""), true
-	case "sqlite3.connect":
-		return pythonValue{binding: "db_connection", evidence: []graph.Evidence{m.evidence("sink_binding", n)}}, true
+	case "sqlite3.connect", "psycopg.connect", "psycopg2.connect", "pymysql.connect", "mysql.connector.connect":
+		return pythonValue{binding: "db_connection", driver: strings.TrimSuffix(q, ".connect"), evidence: []graph.Evidence{m.evidence("sink_binding", n)}}, true
 	case "flask.redirect", "flask.send_file", "flask.send_from_directory":
 		return pythonValue{rendered: true, binding: "non_html"}, true
 	case "flask.jsonify":
@@ -60,7 +60,20 @@ func (f *pythonFlow) frameworkCall(n *sitter.Node, q string, nodes []*sitter.Nod
 		v.rendered = true
 		return v, true
 	case "jinja2.Template":
-		v := all
+		v := pythonValue{}
+		if len(values) > 0 {
+			v = values[0]
+		}
+		v.templateEscape = "raw"
+		if option := pyKeywordIn(m, n, "autoescape"); option != nil {
+			switch pyText(m, option) {
+			case "True":
+				v.templateEscape = "encoded"
+			case "False":
+			default:
+				v.templateEscape = "unknown"
+			}
+		}
 		v.binding = "jinja_template"
 		return pyTransfer(v, m.evidence("template_source_construction", n)), true
 	}
@@ -80,7 +93,11 @@ func (f *pythonFlow) outboundCall(n *sitter.Node, q string, fn *sitter.Node, val
 	if keyword := pyKeywordIn(m, n, "url"); keyword != nil {
 		destination = f.eval(keyword)
 	}
-	if len(destination.deps) > 0 {
+	requestDependent := false
+	for _, d := range destination.deps {
+		requestDependent = requestDependent || d.dep.Source.Kind == "request_source" || d.dep.Source.Kind == "external_response_source" || d.dep.Source.Kind == "storage_source"
+	}
+	if requestDependent {
 		u := f.addUse("outbound_http_candidate", n, destination)
 		u.Context = append(u.Context, m.evidence("sink_binding", fn))
 		u.APIModel = &graph.APIModel{ID: "python-http-destination-v1", Library: strings.Split(q, ".")[0], Semantics: "The URL/destination operand is separate from request body and response; response data is an independent external source."}

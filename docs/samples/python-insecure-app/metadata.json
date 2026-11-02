@@ -19,6 +19,8 @@
     "Semgrep CE 1.183.0 / 20261101 snapshot",
     "Bearer e3753de / rules 82c335f"
   ],
-  "raw_run": "run-3526920264",
-  "verification": "Fresh clean upstream clone at the same pinned revision; initial source hashes matched."
+  "raw_run": "run-827425408",
+  "verification": "Fresh clean upstream clone at the same pinned revision; initial source hashes matched.",
+  "evidence_version": 2,
+  "presentation_version": 4
 }

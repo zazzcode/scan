@@ -23,7 +23,7 @@ func SARIF(report *graph.StringReport) map[string]any {
 	for i, use := range report.Uses {
 		id, cwe := ruleIdentity(use)
 		index, ok := indexes[id]
-		g := guidance(use)
+		g := report.Findings[i].Recommendations
 		if !ok {
 			index = len(rules)
 			indexes[id] = index
@@ -36,7 +36,7 @@ func SARIF(report *graph.StringReport) map[string]any {
 				markdown += "- " + action + "\n"
 			}
 			if g.Example != "" {
-				markdown += "\nIllustrative example (unverified):\n\n```typescript\n" + g.Example + "\n```\n"
+				markdown += "\nIllustrative example (unverified):\n\n```\n" + g.Example + "\n```\n"
 			}
 			rules = append(rules, map[string]any{"id": id, "shortDescription": map[string]string{"text": g.Title}, "help": map[string]string{"text": g.Title + ". " + strings.Join(g.Actions, " "), "markdown": markdown}, "properties": map[string]any{"tags": tags}})
 		}

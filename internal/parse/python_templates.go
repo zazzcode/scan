@@ -70,6 +70,10 @@ func (f *pythonFlow) recordXSS(sink graph.Evidence, v pythonValue, context strin
 			p, reason = "unknown", "A relevant Python control, registration or renderer contract is unresolved."
 		}
 	}
+	if v.unknown && !hasRaw {
+		p = "unknown"
+		reason = "A value definition or output alternative is unresolved; source availability does not establish a complete value path."
+	}
 	if context == "mixed" || context == "unknown" {
 		p = "unknown"
 	}
@@ -210,11 +214,15 @@ func (f *pythonFlow) templateOutputs(call *sitter.Node, file graph.Evidence, loc
 			v = pyProtect(v, "unknown")
 			v.gaps = append(v.gaps, f.gap("render_configuration_unresolved", "custom Jinja settings, tags or filters require review", call))
 		}
+		markup := renderMarkup(file, match[0], match[1])
+		sourceContext := file
 		sink := textRange(file, match[0], match[1], "template_output")
 		if file.Kind == "inline_template" {
 			sink = f.module.evidence("template_output", pyArgs(call)[0])
+			markup = f.module.evidence("render_markup_context", pyArgs(call)[0])
+			sourceContext = f.module.evidence("inline_template", pyArgs(call)[0])
 		}
-		f.recordXSS(sink, v, htmlOutputContext(file.Text[:match[0]]), []graph.Evidence{f.module.evidence("render_binding", call), file})
+		f.recordXSS(sink, v, htmlOutputContext(file.Text[:match[0]]), []graph.Evidence{f.module.evidence("render_binding", call), markup, sourceContext})
 	}
 }
 func pythonMarkupPath(d graph.Dependency) bool {

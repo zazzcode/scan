@@ -89,7 +89,7 @@
       "coverage": "bounded analysis"
     }
   ],
-  "presentation_version": 3,
+  "presentation_version": 4,
   "findings": [
     {
       "type_ids": [
@@ -106,15 +106,13 @@
       "use_protection": "Decision XSS exposure: vulnerable. Scanner policy: Complete source-backed rendering claim and consistent XSS-specific answers establish an unsafe supported path; this is static analysis, not runtime confirmation.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Repair this HTML output",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "At app/main.py:41, stop placing the source value into the HTML/template source consumed by Template(content).render().",
+          "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+          "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
         ],
-        "example_status": ""
+        "example_status": "source-derived candidate; review intended output semantics and test before applying"
       }
     },
     {
@@ -132,14 +130,13 @@
       "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at app/main.py:19: name: str = config.SUPER_SECRET_NAME. Its current Review status does not establish a code defect.",
+          "Resolve input_validation_unresolved at app/main.py:19: query.name: assess actual enforcing conditions in handler; no external business policy was supplied",
+          "Reconcile the semantic assessment with this exact source claim: legacy candidate has no claim-scoped completeness evidence"
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     }
   ],
@@ -312,7 +309,19 @@
           ]
         },
         "blockers": [],
-        "coverage": [],
+        "coverage": [
+          {
+            "kind": "python_value_unresolved",
+            "detail": "Value definition is not resolved: config",
+            "at": {
+              "file": "app/main.py",
+              "start_line": 37,
+              "end_line": 37,
+              "start_byte": 1060,
+              "end_byte": 1066
+            }
+          }
+        ],
         "scope": "Bounded source-to-rendering flow; output context and protections are scoped to this sink."
       },
       "id": "use:route:app/main.py:342:GET:/:app/main.py:1302:xss",
@@ -630,12 +639,24 @@
           "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
         }
       ],
-      "gaps": [],
+      "gaps": [
+        {
+          "kind": "python_value_unresolved",
+          "detail": "Value definition is not resolved: config",
+          "at": {
+            "file": "app/main.py",
+            "start_line": 37,
+            "end_line": 37,
+            "start_byte": 1060,
+            "end_byte": 1066
+          }
+        }
+      ],
       "assessment": {
         "answer_details": {
           "encoding_adequacy": {
             "choice": "not_present",
-            "confidence": 0.93,
+            "confidence": 0.71,
             "probabilities": [
               {
                 "value": "adequate",
@@ -643,11 +664,11 @@
               },
               {
                 "value": "inadequate",
-                "probability": 0.04
+                "probability": 0.21
               },
               {
                 "value": "not_present",
-                "probability": 0.95
+                "probability": 0.78
               },
               {
                 "value": "unknown",
@@ -657,15 +678,15 @@
           },
           "output_context": {
             "choice": "html_text",
-            "confidence": 1,
+            "confidence": 0.98,
             "probabilities": [
               {
                 "value": "html_text",
-                "probability": 1
+                "probability": 0.98
               },
               {
                 "value": "html_attribute",
-                "probability": 0
+                "probability": 0.01
               },
               {
                 "value": "url",
@@ -697,25 +718,25 @@
               },
               {
                 "value": "unknown",
-                "probability": 0
+                "probability": 0.01
               }
             ]
           },
           "sanitizer_effectiveness": {
             "choice": "ineffective",
-            "confidence": 0.71,
+            "confidence": 0.93,
             "probabilities": [
               {
                 "value": "effective",
-                "probability": 0.01
+                "probability": 0
               },
               {
                 "value": "ineffective",
-                "probability": 0.78
+                "probability": 0.95
               },
               {
                 "value": "absent",
-                "probability": 0.21
+                "probability": 0.05
               },
               {
                 "value": "unknown",
@@ -725,7 +746,7 @@
           },
           "xss_all_paths_protected": {
             "choice": "no",
-            "confidence": 1,
+            "confidence": 0.99,
             "probabilities": [
               {
                 "value": "yes",
@@ -733,29 +754,29 @@
               },
               {
                 "value": "no",
-                "probability": 1
+                "probability": 0.99
               },
               {
                 "value": "unknown",
-                "probability": 0
+                "probability": 0.01
               }
             ]
           },
           "xss_exposure": {
             "choice": "vulnerable",
-            "confidence": 1,
+            "confidence": 0.95,
             "probabilities": [
               {
                 "value": "vulnerable",
-                "probability": 1
+                "probability": 0.96
               },
               {
                 "value": "protected",
-                "probability": 0
+                "probability": 0.01
               },
               {
                 "value": "unknown",
-                "probability": 0
+                "probability": 0.03
               },
               {
                 "value": "not_applicable",
@@ -773,7 +794,7 @@
           "xss_exposure": "vulnerable"
         },
         "usage": {
-          "input_tokens": 4272,
+          "input_tokens": 5181,
           "output_tokens": 0
         },
         "status": "completed",
@@ -872,7 +893,7 @@
         "answer_details": {
           "protection": {
             "choice": "not_applicable",
-            "confidence": 0.91,
+            "confidence": 0.88,
             "probabilities": [
               {
                 "value": "sufficient",
@@ -880,37 +901,37 @@
               },
               {
                 "value": "insufficient",
-                "probability": 0.05
+                "probability": 0.06
               },
               {
                 "value": "uncertain",
-                "probability": 0.01
+                "probability": 0.02
               },
               {
                 "value": "not_applicable",
-                "probability": 0.93
+                "probability": 0.91
               }
             ]
           },
           "validation": {
             "choice": "uncertain",
-            "confidence": 0.27,
+            "confidence": 0.92,
             "probabilities": [
               {
                 "value": "sufficient",
-                "probability": 0.08
+                "probability": 0
               },
               {
                 "value": "insufficient",
-                "probability": 0.4
+                "probability": 0.06
               },
               {
                 "value": "uncertain",
-                "probability": 0.45
+                "probability": 0.94
               },
               {
                 "value": "not_applicable",
-                "probability": 0.07
+                "probability": 0
               }
             ]
           }
@@ -934,7 +955,7 @@
           "validation": "uncertain"
         },
         "usage": {
-          "input_tokens": 1844,
+          "input_tokens": 2097,
           "output_tokens": 0
         },
         "status": "completed",

@@ -217,3 +217,18 @@ func TestConfirmedInjectionKeepsValidationAsReviewCategory(t *testing.T) {
 		}
 	}
 }
+
+func TestInconclusiveRenderingNeverUsesProtectedBadge(t *testing.T) {
+	u := graph.StringUse{ID: "x", Kind: "xss_candidate", XSS: &graph.XSSFacts{Type: "stored", OutputContext: "html_text", Protection: "encoded", OriginResolved: true}, Assessment: graph.Assessment{Status: "completed", FindingStatus: "needs_evidence", Protection: "uncertain", Answers: map[string]string{"xss_exposure": "unknown"}}}
+	r := &graph.StringReport{Uses: []graph.StringUse{u}}
+	var out bytes.Buffer
+	if err := HTML(&out, r); err != nil {
+		t.Fatal(err)
+	}
+	if r.Findings[0].RecordType != "analysis" || r.Findings[0].Status != "needs_evidence" {
+		t.Fatalf("inconclusive claim remains Protected: %+v", r.Findings[0])
+	}
+	if strings.Contains(out.String(), `class="badge protection status-needs_evidence"`) {
+		t.Fatal("Inconclusive badge inherits green protection styling")
+	}
+}

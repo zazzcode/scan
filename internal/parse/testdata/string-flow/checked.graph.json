@@ -336,6 +336,7 @@
       },
       "dependencies": [
         {
+          "sink_slot": "sql_text",
           "source": {
             "kind": "request_source",
             "text": "req.body.email",

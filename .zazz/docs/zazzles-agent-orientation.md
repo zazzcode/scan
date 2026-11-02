@@ -20,9 +20,11 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 and tested on three pinned apps. Read the [Python contract](../specifications/python-support.md),
 [results and limits](../evaluation/python-support-results.md), and [user guide](../../docs/python-support.md)
 for resumption. Raw results remain under `_test-findings/<app>/run-<id>/`; source keys, hashes and curated
-reports are in root `docs/samples/`. Seventy-eight Luna calls were completed; saved answers require exact
-request matching and changed evidence cannot inherit them. Current work is local-only, with no push,
-PR publication or merge authorized. Python NoSQL is out of corpus/unimplemented.
+reports are in root `docs/samples/`. 184 Luna calls were completed; saved answers require exact
+request matching and changed evidence cannot inherit them. The user authorized pushing `python-support-base` and continued general hardening;
+PR publication, integration pushes and merge remain unauthorized. Python NoSQL is out of corpus/unimplemented. Shared trace/report hardening and policy-backed
+validation are documented in [trace judgment](../architecture/trace-judgment.md); all 29 independent
+Python case checks pass. Only final Protected records are green.
 
 **Previous XSS worktree: `xss-response`.** The first XSS discovery/reporting pass was
 committed and pushed as `26f50d0`. Verify the actual path, branch and changes with `pwd` and

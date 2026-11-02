@@ -199,6 +199,7 @@ func (f *flow) renderTemplate(call, args *sitter.Node) {
 		}
 		sink := textRange(file, match[0], match[1], "template_output")
 		extra := append(append([]graph.Evidence{}, config...), f.module.evidence("template_render", call))
+		extra = append(extra, renderMarkup(file, match[0], match[1]))
 		before := len(f.uses)
 		f.recordXSS(sink, v, context, "text/html", escaped, extra)
 		if len(f.uses) > before && escaped && requestRenderOptions(f, args.NamedChild(1)) {

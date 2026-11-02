@@ -27,3 +27,16 @@ server inputs. The source's canonical jQuery CDN tag supplies the library bindin
 append(string) is a negative control, because it creates text. The matching signup form declares
 required email/type=email; server presence and password-match guards do not enforce email format.
 TB-VAL-EMAIL keeps that source policy separate from the parameterized insert's injection protection.
+
+The [documented-family inventory](../python-documented-claims.md) records all advertised families,
+additional local/upstream material reviewed, and current unsupported boundaries.
+
+## Named field-policy controls
+
+The login form declares required username/password; the handler's early return at lines 39–40
+enforces presence. Signup requires all five fields; lines 87–90 reject missing values and mismatched
+passwords before persistence. These six required-only claims are protected for that exact policy;
+no password-complexity or length rule is inferred. Signup email also declares `type="email"`, but
+its server guards enforce only presence and equality, not email syntax. This is the separate
+validation defect. The insert at line 99 still binds values correctly. Seven independent cases
+record these positive/protected expectations; they never enter the production detector or model.

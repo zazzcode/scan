@@ -22,6 +22,7 @@ func pyCombine(a, b pythonValue) pythonValue {
 		a.binding = ""
 	}
 	a.rendered = a.rendered && b.rendered
+	a.unknown = a.unknown || b.unknown
 
 	a.deps = pyMergeDeps(a.deps, b.deps)
 	if len(a.deps) > 64 {
@@ -42,7 +43,7 @@ func pyCombine(a, b pythonValue) pythonValue {
 	return a
 }
 func pyEmpty(v pythonValue) bool {
-	return len(v.deps) == 0 && len(v.gaps) == 0 && v.fields == nil && !v.constant && v.binding == "" && len(v.evidence) == 0 && !v.built && !v.rendered
+	return len(v.deps) == 0 && len(v.gaps) == 0 && v.fields == nil && !v.constant && v.binding == "" && len(v.evidence) == 0 && !v.built && !v.rendered && !v.unknown
 }
 func pyMergeDeps(a, b []pythonDep) []pythonDep {
 	out := []pythonDep{}
@@ -98,10 +99,13 @@ func (f *pythonFlow) eval(n *sitter.Node) pythonValue {
 				return pythonValue{binding: "logger", evidence: []graph.Evidence{m.evidence("logger_binding", global)}}
 			}
 		}
+		if f.qualified(pyText(m, n)) == "flask.request" {
+			return pythonValue{binding: "flask_request"}
+		}
 		if f.qualified(pyText(m, n)) == "flask.session" {
 			return f.source(n, "session", "")
 		}
-		return pythonValue{}
+		return pythonValue{unknown: true, gaps: []graph.Gap{f.gap("python_value_unresolved", "Value definition is not resolved: "+pyText(m, n), n)}}
 	case "integer", "float", "true", "false", "none":
 		return pythonValue{literal: pyText(m, n), constant: true}
 	case "string":
@@ -132,7 +136,7 @@ func (f *pythonFlow) eval(n *sitter.Node) pythonValue {
 	case "conditional_expression":
 		if n.NamedChildCount() == 3 {
 			f.eval(n.NamedChild(1))
-			v := pyCombine(f.eval(n.NamedChild(0)), f.eval(n.NamedChild(2)))
+			v := pyJoin(f.eval(n.NamedChild(0)), f.eval(n.NamedChild(2)), 0)
 			return pyTransfer(v, m.evidence("conditional_value", n))
 		}
 		return pythonValue{gaps: []graph.Gap{f.gap("python_expression_unresolved", "unsupported conditional shape", n)}}
@@ -241,7 +245,10 @@ func (f *pythonFlow) projectValue(v pythonValue, key string, n *sitter.Node) pyt
 }
 func (f *pythonFlow) qualified(name string) string {
 	root := strings.Split(name, ".")[0]
-	if _, shadow := f.env[root]; shadow {
+	if value, shadow := f.env[root]; shadow {
+		if value.binding == "flask_request" {
+			return "flask.request" + strings.TrimPrefix(name, root)
+		}
 		return ""
 	}
 	if imp, ok := f.imports[root]; ok {

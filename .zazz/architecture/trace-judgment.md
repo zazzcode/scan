@@ -1,0 +1,103 @@
+# Source traces and claim judgments
+
+[Architecture](../architecture.md#7-evidence-bundle-contract) · [Evidence and claims](evidence-and-claims.md)
+
+## Implemented evidence contract
+
+`internal/judge/bundle.go` emits `evidence_version: 2` for every language adapter. The
+wire format contains a deduplicated source-evidence table, candidate/entry identity,
+ordered dependency witnesses, an explicit trace graph, control edges, evidence-role
+coverage, the exact requirement, library contracts and remaining blockers. Source spans
+and hashes identify the analyzed snapshot. Source is evidence data, never model instructions.
+
+The graph projects supplied dependencies; it does not discover new calls from nearby
+text. Edges distinguish argument-to-parameter binding, helper return, projection, other
+value transfers, sink use and path conditions. Branch conditions constrain a path and
+are not value transformations. Explicit control edges remain separate. Each dependency
+keeps its index, storage key and sink operand role. SQL text and separate value parameters
+are distinct roles; JavaScript query options remain options until their binding semantics
+are established. An options object alone cannot protect interpolated SQL.
+
+Template adapters also supply a bounded `render_markup_context` source slice containing the
+actual surrounding tag/attribute, including multiline attributes. The shared judge indexes it
+as rendering context; a bare interpolation expression need not determine the DOM context.
+
+The coverage ledger says which required roles are supplied or missing. Additional role
+indexes expose actual helper bodies, path conditions and field policies already present
+in adapter evidence. **Supplied means present, not semantically complete or protective.**
+Indexing never changes canonical completeness or resolves a blocker. This distinction
+prevents richer context from becoming an unsupported claim of proof.
+
+## Route and browser slices
+
+For API entries, the bounded slice follows the request field through assignments,
+projections, helper bindings, relevant conditions and operation operands. It includes
+actual helper implementations and import/constructor provenance when resolved. API
+contracts describe verified patterns such as driver value binding; Luna evaluates the
+actual call against the contract, including SQL construction before execution.
+
+For browser entries, the slice starts at a browser input/event or response field and
+ends at a DOM/framework sink in its output context. A server producer is linked only
+when route/response evidence establishes the relation. JSON output alone is not XSS.
+Stored-field correlation remains bounded; table/field matching is not proof of database,
+row or deployment identity. Unresolved origin and configuration facts remain explicit.
+
+## Separate judgments and gates
+
+| Claim | Positive evidence | Outcome distinction |
+| --- | --- | --- |
+| Injection | External source, actual text/selector slot, verified library and supported path | Syntax/operator control versus data separation |
+| Validation | Concrete named-field policy plus relevant enforcement implementation | Established unmet policy versus enforced policy versus missing requirements |
+| Rendering | Source, renderer/sink, context and relevant transformations/paths | Context-appropriate escaping versus raw output versus unknown behavior |
+| Logging | Emitted content, sensitivity and actual log/redaction behavior | Sensitive content exposure versus non-content fact versus unresolved sensitivity |
+
+`validation-use-v2` asks whether a requirement is established, whether enforcement is
+sufficient, and whether relevant enforcement coverage is complete. Both canonical evidence
+roles and consistent answers are necessary. An established unmet policy becomes
+`poor_practice`; enforced policy becomes `protected_for_claim`; missing policy, helper,
+path or relevant downstream constraint stays `needs_evidence`. Form attributes can
+establish intended policy but never server enforcement. Field names cannot invent policy.
+This shared protocol can consume any adapter's validation completeness. The Python
+adapter currently emits named policy claims from matching Flask forms and HTTP methods; this is not
+universal schema/middleware inference across languages.
+
+A construction defect can be definite while exploitability remains unresolved. Parameter
+binding and HTML escaping never establish business validation. Protection requires the
+relevant paths; a vulnerability may use one supported unsafe path with stated conditions.
+An unknown fallback cannot erase a separately supported raw path, and an escaped branch
+cannot lend protection to an unresolved sibling. Unsupported parameters, helper expansion
+limits, loops and unresolved applicable calls retain uncertainty instead of losing input.
+
+Rules and API models capture recommended protective techniques and their preconditions.
+They do not encode app names, challenge answers or arbitrary business restrictions. Luna
+judges the supplied implementation; its confidence cannot close static blockers. Complete
+source availability alone is not complete dispatch, heap, runtime or library knowledge.
+
+## Reporting and reproducibility
+
+Only a final `protected_for_claim` protection record uses green styling. Canonical
+blockers, missing required roles, failed assessments and inconclusive final statuses
+prevent a green protection claim even when a saved model answer says protected. Injection
+status cannot color a separate validation pill green. Raw answers remain auditable.
+
+Guidance is derived from the record and source location. Protected records describe what
+to preserve; Review records name investigation blockers; defects name the operand and
+constraint to change. Narrow SQLite, Jinja and jQuery replacements are labeled unverified
+candidates with preconditions and regression cases. No generated remediation is applied
+or exported as a verified SARIF fix. JSON, HTML and SARIF use the same scoped guidance.
+
+Decision transport remains bounded to 64 KiB/request and 1 MiB/response, explicit per-run
+request limits, selected provider/model and no fallback. Oversized evidence remains
+unassessed; it is not silently truncated into protection. Exact requests/responses are
+retained locally during calibration. Replay requires byte-equivalent compact JSON and
+matching protocol; changed source, roles, questions or trace evidence needs a new judgment.
+Expected labels stay in independent evaluation files and never enter model bundles.
+
+## Verification and limits
+
+Regression pairs cover raw/bound SQL, real/shadowed drivers, escaped/raw/unknown dictionary
+alternatives, request aliases, variadic helper uncertainty and constant Jinja templates
+with autoescape on/off/unknown. Shared tests verify evidence references, graph edge roles,
+missing-role gates, validation outcomes, green-status consistency and scoped remediation.
+HTTP stubs test transport/policy, not model accuracy. Live sample calibration remains a
+bounded evaluation, not runtime exploitation, independent review or Semgrep/Bearer parity.

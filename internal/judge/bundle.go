@@ -37,7 +37,7 @@ func wireBundle(use graph.StringUse) any {
 		for _, e := range d.Transfers {
 			steps = append(steps, ref(e))
 		}
-		dependencies = append(dependencies, map[string]any{"source": ref(d.Source), "transfers": steps})
+		dependencies = append(dependencies, map[string]any{"source": ref(d.Source), "transfers": steps, "sink_slot": d.SinkSlot, "storage_key": d.StorageKey})
 	}
 	roles := map[string][]string{}
 	var required []string
@@ -61,25 +61,30 @@ func wireBundle(use graph.StringUse) any {
 	} else {
 		blockers = use.Gaps
 	}
+	augmentRoles(use, roles, ref)
 	return struct {
-		ID           string              `json:"candidate_id"`
-		Kind         string              `json:"kind"`
-		Check        *graph.Check        `json:"declared_requirement,omitempty"`
-		Sink         string              `json:"sink_evidence"`
-		Context      []string            `json:"context_evidence"`
-		Dependencies []map[string]any    `json:"dependencies"`
-		Required     []string            `json:"required_evidence"`
-		Roles        map[string][]string `json:"evidence_roles"`
-		Blockers     []graph.Gap         `json:"blocking_gaps"`
-		Coverage     []graph.Gap         `json:"coverage_gaps"`
-		Scope        string              `json:"scope"`
-		Evidence     []graph.Evidence    `json:"evidence"`
-		ControlEdges []map[string]string `json:"control_edges"`
-		ModelFacts   []string            `json:"model_facts,omitempty"`
-		Resolved     []graph.Gap         `json:"resolved_gaps,omitempty"`
-		APIModel     *graph.APIModel     `json:"api_model,omitempty"`
-		XSS          *graph.XSSFacts     `json:"xss,omitempty"`
-	}{use.ID, use.Kind, use.Check, sink, context, dependencies, required, roles, blockers, coverage, scope, table, edges, modelFacts(use), resolvedGaps(use), use.APIModel, use.XSS}
+		EvidenceVersion int                 `json:"evidence_version"`
+		TraceGraph      traceGraph          `json:"trace_graph"`
+		CoverageLedger  []evidenceCoverage  `json:"evidence_coverage"`
+		ClaimKind       string              `json:"claim_kind"`
+		ID              string              `json:"candidate_id"`
+		Kind            string              `json:"kind"`
+		Check           *graph.Check        `json:"declared_requirement,omitempty"`
+		Sink            string              `json:"sink_evidence"`
+		Context         []string            `json:"context_evidence"`
+		Dependencies    []map[string]any    `json:"dependencies"`
+		Required        []string            `json:"required_evidence"`
+		Roles           map[string][]string `json:"evidence_roles"`
+		Blockers        []graph.Gap         `json:"blocking_gaps"`
+		Coverage        []graph.Gap         `json:"coverage_gaps"`
+		Scope           string              `json:"scope"`
+		Evidence        []graph.Evidence    `json:"evidence"`
+		ControlEdges    []map[string]string `json:"control_edges"`
+		ModelFacts      []string            `json:"model_facts,omitempty"`
+		Resolved        []graph.Gap         `json:"resolved_gaps,omitempty"`
+		APIModel        *graph.APIModel     `json:"api_model,omitempty"`
+		XSS             *graph.XSSFacts     `json:"xss,omitempty"`
+	}{2, buildTraceGraph(use, ref), coverageLedger(required, roles), claimKind(use), use.ID, use.Kind, use.Check, sink, context, dependencies, required, roles, blockers, coverage, scope, table, edges, modelFacts(use), resolvedGaps(use), use.APIModel, use.XSS}
 }
 
 func modelFacts(use graph.StringUse) []string {
@@ -93,4 +98,11 @@ func resolvedGaps(use graph.StringUse) []graph.Gap {
 		return nil
 	}
 	return use.Completeness.Resolved
+}
+
+func claimKind(use graph.StringUse) string {
+	if use.Completeness != nil {
+		return use.Completeness.ClaimKind
+	}
+	return "candidate_only"
 }

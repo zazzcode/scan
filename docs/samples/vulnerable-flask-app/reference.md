@@ -23,3 +23,6 @@ The logging slice now records the literal internal admin address as a candidate.
 emission, but email-shaped syntax alone does not prove a private or person-identifying value.
 The initial Luna pass classified it as personal data; the final static policy retains Review until
 sensitivity is established independently. This is an accuracy correction, not a target-name rule.
+
+The [documented-family inventory](../python-documented-claims.md) records all advertised families,
+additional local/upstream material reviewed, and current unsupported boundaries.

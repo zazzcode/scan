@@ -89,7 +89,7 @@
       "coverage": "bounded analysis"
     }
   ],
-  "presentation_version": 3,
+  "presentation_version": 4,
   "findings": [
     {
       "type_ids": [
@@ -106,15 +106,12 @@
       "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/index.ejs:20: <%= todo._id %>. Its current Review status does not establish a code defect.",
+          "Resolve storage_origin_unresolved at views/index.ejs:20: No complete source-to-storage write link is established."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -132,15 +129,13 @@
       "use_protection": "Output context: html_text. A source path reaches raw HTML through marked 0.3.5, whose sanitize option has a documented entity/URL bypass (upstream marked PR 592). Per-path protection: path 1 ineffective (written by POST /create); path 2 unknown (written by POST /create); path 3 unknown (written by POST /create); path 4 unknown (written by POST /create); path 5 unknown (written by POST /create); path 6 unknown (written by POST /create); path 7 unknown (written by POST /create); path 8 ineffective (written by POST /create); path 9 ineffective (written by POST /update/:id).",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run. Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Repair this HTML output",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "At views/index.ejs:20, stop placing the source value into the HTML/template source consumed by <%- marked(new String(todo.content)) %>.",
+          "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+          "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
         ],
-        "example_status": ""
+        "example_status": "source-derived candidate; review intended output semantics and test before applying"
       }
     },
     {
@@ -158,15 +153,12 @@
       "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/index.ejs:21: <%= todo._id %>. Its current Review status does not establish a code defect.",
+          "Resolve storage_origin_unresolved at views/index.ejs:21: No complete source-to-storage write link is established."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -184,15 +176,13 @@
       "use_protection": "Decision XSS exposure: vulnerable. Scanner policy: Complete source-backed rendering claim and consistent XSS-specific answers establish an unsafe supported path; this is static analysis, not runtime confirmation.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Repair this HTML output",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "At views/admin.ejs:17, stop placing the source value into the HTML/template source consumed by <%- redirectPage %>.",
+          "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.",
+          "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."
         ],
-        "example_status": ""
+        "example_status": "source-derived candidate; review intended output semantics and test before applying"
       }
     },
     {
@@ -210,14 +200,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at routes/index.js:84: req.query.redirectPage. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -236,14 +224,16 @@
       "use_protection": "Assessed injection/use protection: Inconclusive. claim-relevant evidence is incomplete; model answers and unrelated coverage gaps are retained",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
       "recommendations": {
-        "title": "Keep request data out of NoSQL query structure",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document.",
-          "Do not concatenate or interpolate request values into $where strings.",
-          "Inspect numeric conversions and character filters on each actual path before judging their effect. Prefer data-only query APIs over executable $where strings."
+          "Investigate the operation at routes/index.js:52: User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    }). Its current Review status does not establish a code defect.",
+          "Resolve applicable_middleware_unresolved at app.js:1: handler is not a directly resolved function",
+          "Resolve applicable_middleware_unresolved at app.js:42: factory arguments require parameter binding",
+          "Resolve input_helper_unresolved at routes/index.js:51: call receiving checked input lacks a definition: validator.isEmail",
+          "Resolve injection_semantic_coverage at :0: guard_coverage: no",
+          "Reconcile the semantic assessment with this exact source claim: claim-relevant evidence is incomplete; model answers and unrelated coverage gaps are retained"
         ],
-        "example_status": "not_generated; driver-specific adaptation and tests required"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -261,14 +251,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at routes/index.js:54: req.body.redirectPage. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -286,15 +274,12 @@
       "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/account.hbs:6: {{firstname}}. Its current Review status does not establish a code defect.",
+          "Resolve render_protection_unresolved at views/account.hbs:6: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -312,15 +297,12 @@
       "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/account.hbs:18: {{firstname}}. Its current Review status does not establish a code defect.",
+          "Resolve render_protection_unresolved at views/account.hbs:18: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -338,15 +320,12 @@
       "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/account.hbs:22: {{lastname}}. Its current Review status does not establish a code defect.",
+          "Resolve render_protection_unresolved at views/account.hbs:22: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -364,15 +343,12 @@
       "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/account.hbs:26: {{country}}. Its current Review status does not establish a code defect.",
+          "Resolve render_protection_unresolved at views/account.hbs:26: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -390,15 +366,12 @@
       "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/account.hbs:30: {{phone}}. Its current Review status does not establish a code defect.",
+          "Resolve render_protection_unresolved at views/account.hbs:30: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -416,15 +389,12 @@
       "use_protection": "Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/account.hbs:34: {{email}}. Its current Review status does not establish a code defect.",
+          "Resolve render_protection_unresolved at views/account.hbs:34: Escaped field syntax is observed, but the complete request object also controls render locals/options. Template selection and option effects are unresolved."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -442,14 +412,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at routes/index.js:104: req.body. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -467,15 +435,12 @@
       "use_protection": "Output context: unknown. Rendering context is not established for every value.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at routes/index.js:197: res.status(302).send(todo.content.toString('base64')). Its current Review status does not establish a code defect.",
+          "Resolve render_protection_unresolved at routes/index.js:197: Rendering context is not established for every value."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -493,14 +458,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at routes/index.js:168: req.body.content. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -519,14 +482,13 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Keep request data out of NoSQL query structure",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document.",
-          "Do not concatenate or interpolate request values into $where strings.",
-          "Inspect numeric conversions and character filters on each actual path before judging their effect. Prefer data-only query APIs over executable $where strings."
+          "Investigate the operation at routes/index.js:204: Todo.findById(req.params.id, function (err, todo) {\n\n    try {\n      todo.remove(function (err, todo) {\n        if (err) return next(err);\n        res.redirect('/');\n      });\n    } catch (e) {\n    }\n  }). Its current Review status does not establish a code defect.",
+          "Resolve applicable_middleware_unresolved at app.js:1: handler is not a directly resolved function",
+          "Resolve applicable_middleware_unresolved at app.js:42: factory arguments require parameter binding"
         ],
-        "example_status": "not_generated; driver-specific adaptation and tests required"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -544,15 +506,12 @@
       "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/edit.ejs:19: <%= todo._id %>. Its current Review status does not establish a code defect.",
+          "Resolve storage_origin_unresolved at views/edit.ejs:19: No complete source-to-storage write link is established."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -570,15 +529,12 @@
       "use_protection": "Output context: html_attribute. The template HTML-escapes this value in HTML text or a quoted non-active attribute.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Preserve the verified protection",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Preserve escaping for <%= todo.content %> at views/edit.ejs:20 in html_attribute. Do not add a trust bypass or disable the verified renderer's autoescape.",
+          "Keep a regression test with HTML-significant or SQL-significant input, as appropriate to this claim. Input-validation requirements are assessed separately."
         ],
-        "example_status": ""
+        "example_status": "no repair proposed for a protected claim"
       }
     },
     {
@@ -596,15 +552,12 @@
       "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/edit.ejs:23: <%= todo._id %>. Its current Review status does not establish a code defect.",
+          "Resolve storage_origin_unresolved at views/edit.ejs:23: No complete source-to-storage write link is established."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -622,15 +575,12 @@
       "use_protection": "Output context: html_text. The template HTML-escapes this value in HTML text or a quoted non-active attribute.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Preserve the verified protection",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Preserve escaping for <%= todo.content %> at views/edit.ejs:23 in html_text. Do not add a trust bypass or disable the verified renderer's autoescape.",
+          "Keep a regression test with HTML-significant or SQL-significant input, as appropriate to this claim. Input-validation requirements are assessed separately."
         ],
-        "example_status": ""
+        "example_status": "no repair proposed for a protected claim"
       }
     },
     {
@@ -648,15 +598,12 @@
       "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/edit.ejs:27: <%= todo._id %>. Its current Review status does not establish a code defect.",
+          "Resolve storage_origin_unresolved at views/edit.ejs:27: No complete source-to-storage write link is established."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -674,15 +621,12 @@
       "use_protection": "Output context: url. A source path reaches raw output without modeled context-appropriate encoding or sanitization; unresolved sibling paths remain in the evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at views/edit.ejs:29: <%= todo._id %>. Its current Review status does not establish a code defect.",
+          "Resolve storage_origin_unresolved at views/edit.ejs:29: No complete source-to-storage write link is established."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -700,14 +644,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at routes/index.js:226: req.params.id. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -726,14 +668,13 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Keep request data out of NoSQL query structure",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Reject objects and operators in fields that should be scalars before they reach a query, update, or insert document.",
-          "Do not concatenate or interpolate request values into $where strings.",
-          "Inspect numeric conversions and character filters on each actual path before judging their effect. Prefer data-only query APIs over executable $where strings."
+          "Investigate the operation at routes/index.js:232: Todo.findById(req.params.id, function (err, todo) {\n\n    todo.content = req.body.content;\n    todo.updated_at = Date.now();\n    todo.save(function (err, todo, count) {\n      if (err) return next(err);\n\n      res.redirect('/');\n    });\n  }). Its current Review status does not establish a code defect.",
+          "Resolve applicable_middleware_unresolved at app.js:1: handler is not a directly resolved function",
+          "Resolve applicable_middleware_unresolved at app.js:42: factory arguments require parameter binding"
         ],
-        "example_status": "not_generated; driver-specific adaptation and tests required"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -751,14 +692,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at routes/index.js:234: req.body.content. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -776,16 +715,12 @@
       "use_protection": "Logging evidence: the whole request query is written to the log and may include credentials or personal data. Assessed logging exposure: Inconclusive (data class Inconclusive, content Inconclusive, redaction no). Logging exposure assessment is missing or inconclusive.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
       "recommendations": {
-        "title": "Keep credential and personal-data content out of logs",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Remove the value from the log entry, or log a non-revealing fact (presence, length, match result, or a non-reversible identifier) instead.",
-          "Log an allowlist of fields rather than whole request bodies, queries, or header sets. Never log Authorization or Cookie header values.",
-          "If redaction is required, apply a verified redaction before the logger call or in the logger's configuration, and test that emitted lines no longer contain the value.",
-          "Do not send credentials in URL query strings; access logs, proxies, and browser history record URLs. Use a request body or header instead."
+          "Investigate the operation at routes/index.js:312: console.log(JSON.stringify(req.query)). Its current Review status does not establish a code defect.",
+          "Reconcile the semantic assessment with this exact source claim: Logging exposure assessment is missing or inconclusive."
         ],
-        "illustrative_example": "// Illustrative: log a fact about the credential, not the credential.\nconsole.info('login attempt', { username, passwordProvided: typeof password === 'string' \u0026\u0026 password.length \u003e 0 });",
-        "example_status": "illustrative_template; not a verified application patch"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -803,15 +738,12 @@
       "use_protection": "Output context: unknown. Rendering context is not established for every value.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Protect the specific browser rendering context",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
-          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
-          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
-          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+          "Investigate the operation at routes/index.js:313: res.render(\"about_new.dust\",\n    {\n      title: 'Patch TODO List',\n      subhead: 'Vulnerabilities at their best',\n      device: req.query.device\n    }). Its current Review status does not establish a code defect.",
+          "Resolve render_protection_unresolved at routes/index.js:313: Rendering context is not established for every value."
         ],
-        "example_status": ""
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -829,14 +761,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at routes/index.js:312: req.query. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -854,14 +784,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at routes/index.js:317: req.query.device. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -879,14 +807,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at routes/users.js:33: req.body.address. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -904,14 +830,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at routes/users.js:32: req.body.name. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     },
     {
@@ -929,14 +853,12 @@
       "use_protection": "Not established from the supplied evidence.",
       "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed. Semantic assessment was not run.",
       "recommendations": {
-        "title": "Validate and sanitize each request input",
+        "title": "Resolve the specific claim blockers",
         "actions": [
-          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
-          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
-          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
-          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+          "Investigate the operation at routes/users.js:34: req.body.role. Its current Review status does not establish a code defect.",
+          "Identify the actual field requirement and the enforced guard before this operation, including rejection/return behavior and any helper body. Assess that requirement separately from the destination's protection."
         ],
-        "example_status": "not_generated; field policy is route-specific"
+        "example_status": "no patch proposed while the claim is inconclusive"
       }
     }
   ],
@@ -1120,7 +1042,7 @@
       },
       "resolved_handler": {
         "kind": "handler",
-        "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+        "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
         "span": {
           "file": "routes/index.js",
           "start_line": 50,
@@ -1343,7 +1265,7 @@
       },
       "resolved_handler": {
         "kind": "handler",
-        "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+        "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
         "span": {
           "file": "routes/index.js",
           "start_line": 102,
@@ -1499,7 +1421,7 @@
       },
       "resolved_handler": {
         "kind": "handler",
-        "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' \u0026\u0026 item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
+        "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
         "span": {
           "file": "routes/index.js",
           "start_line": 165,
@@ -1778,7 +1700,7 @@
       },
       "resolved_handler": {
         "kind": "handler",
-        "text": "{\n  if (!req.files) {\n    res.send('No files were uploaded.');\n    return;\n  }\n\n  var importFile = req.files.importFile;\n  var data;\n  var importedFileType = fileType(importFile.data);\n  var zipFileExt = { ext: \"zip\", mime: \"application/zip\" };\n  if (importedFileType === null) {\n    importedFileType = { ext: \"txt\", mime: \"text/plain\" };\n  }\n  if (importedFileType[\"mime\"] === zipFileExt[\"mime\"]) {\n    var zip = AdmZip(importFile.data);\n    var extracted_path = \"/tmp/extracted_files\";\n    zip.extractAllTo(extracted_path, true);\n    data = \"No backup.txt file found\";\n    fs.readFile('backup.txt', 'ascii', function (err, data) {\n      if (!err) {\n        data = data;\n      }\n    });\n  } else {\n    data = importFile.data.toString('ascii');\n  }\n  var lines = data.split('\\n');\n  lines.forEach(function (line) {\n    var parts = line.split(',');\n    var what = parts[0];\n    console.log('importing ' + what);\n    var when = parts[1];\n    var locale = parts[2];\n    var format = parts[3];\n    var item = what;\n    if (!isBlank(what)) {\n      if (!isBlank(when) \u0026\u0026 !isBlank(locale) \u0026\u0026 !isBlank(format)) {\n        console.log('setting locale ' + parts[1]);\n        moment.locale(locale);\n        var d = moment(when);\n        console.log('formatting ' + d);\n        item += ' [' + d.format(format) + ']';\n      }\n\n      new Todo({\n        content: item,\n        updated_at: Date.now(),\n      }).save(function (err, todo, count) {\n        if (err) return next(err);\n        console.log('added ' + todo);\n      });\n    }\n  });\n\n  res.redirect('/');\n}",
+        "text": "{\n  if (!req.files) {\n    res.send('No files were uploaded.');\n    return;\n  }\n\n  var importFile = req.files.importFile;\n  var data;\n  var importedFileType = fileType(importFile.data);\n  var zipFileExt = { ext: \"zip\", mime: \"application/zip\" };\n  if (importedFileType === null) {\n    importedFileType = { ext: \"txt\", mime: \"text/plain\" };\n  }\n  if (importedFileType[\"mime\"] === zipFileExt[\"mime\"]) {\n    var zip = AdmZip(importFile.data);\n    var extracted_path = \"/tmp/extracted_files\";\n    zip.extractAllTo(extracted_path, true);\n    data = \"No backup.txt file found\";\n    fs.readFile('backup.txt', 'ascii', function (err, data) {\n      if (!err) {\n        data = data;\n      }\n    });\n  } else {\n    data = importFile.data.toString('ascii');\n  }\n  var lines = data.split('\\n');\n  lines.forEach(function (line) {\n    var parts = line.split(',');\n    var what = parts[0];\n    console.log('importing ' + what);\n    var when = parts[1];\n    var locale = parts[2];\n    var format = parts[3];\n    var item = what;\n    if (!isBlank(what)) {\n      if (!isBlank(when) && !isBlank(locale) && !isBlank(format)) {\n        console.log('setting locale ' + parts[1]);\n        moment.locale(locale);\n        var d = moment(when);\n        console.log('formatting ' + d);\n        item += ' [' + d.format(format) + ']';\n      }\n\n      new Todo({\n        content: item,\n        updated_at: Date.now(),\n      }).save(function (err, todo, count) {\n        if (err) return next(err);\n        console.log('added ' + todo);\n      });\n    }\n  });\n\n  res.redirect('/');\n}",
         "span": {
           "file": "routes/index.js",
           "start_line": 254,
@@ -2407,7 +2329,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "\u003c%= todo._id %\u003e",
+              "text": "<%= todo._id %>",
               "span": {
                 "file": "views/index.ejs",
                 "start_line": 20,
@@ -2488,7 +2410,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "\u003c%= todo._id %\u003e",
+        "text": "<%= todo._id %>",
         "span": {
           "file": "views/index.ejs",
           "start_line": 20,
@@ -2848,7 +2770,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "\u003c%- marked(new String(todo.content)) %\u003e",
+              "text": "<%- marked(new String(todo.content)) %>",
               "span": {
                 "file": "views/index.ejs",
                 "start_line": 20,
@@ -3024,7 +2946,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "\u003c%- marked(new String(todo.content)) %\u003e",
+        "text": "<%- marked(new String(todo.content)) %>",
         "span": {
           "file": "views/index.ejs",
           "start_line": 20,
@@ -3063,7 +2985,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -3283,7 +3205,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -3319,7 +3241,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -3503,7 +3425,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -3539,7 +3461,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -3855,7 +3777,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -3891,7 +3813,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -4159,7 +4081,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -4195,7 +4117,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -4391,7 +4313,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -4427,7 +4349,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -4587,7 +4509,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -4623,7 +4545,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -4783,7 +4705,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -5235,7 +5157,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "\u003c%= todo._id %\u003e",
+              "text": "<%= todo._id %>",
               "span": {
                 "file": "views/index.ejs",
                 "start_line": 21,
@@ -5316,7 +5238,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "\u003c%= todo._id %\u003e",
+        "text": "<%= todo._id %>",
         "span": {
           "file": "views/index.ejs",
           "start_line": 21,
@@ -5624,7 +5546,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "\u003c%- redirectPage %\u003e",
+              "text": "<%- redirectPage %>",
               "span": {
                 "file": "views/admin.ejs",
                 "start_line": 17,
@@ -5671,7 +5593,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "\u003c%- redirectPage %\u003e",
+        "text": "<%- redirectPage %>",
         "span": {
           "file": "views/admin.ejs",
           "start_line": 17,
@@ -6060,7 +5982,7 @@
           },
           "to": {
             "kind": "statement",
-            "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });",
+            "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });",
             "span": {
               "file": "routes/index.js",
               "start_line": 52,
@@ -6125,7 +6047,7 @@
           "control_flow": [
             {
               "kind": "handler",
-              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 50,
@@ -6139,7 +6061,7 @@
           "control_statement": [
             {
               "kind": "control_statement",
-              "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
+              "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 51,
@@ -6153,7 +6075,7 @@
           "handler": [
             {
               "kind": "handler",
-              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 50,
@@ -6281,7 +6203,7 @@
           "nosql_query_candidate": [
             {
               "kind": "nosql_query_candidate",
-              "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    })",
+              "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    })",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 52,
@@ -6335,7 +6257,7 @@
           "route_handler": [
             {
               "kind": "route_handler",
-              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+              "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 50,
@@ -6536,7 +6458,7 @@
       "kind": "nosql_query_candidate",
       "sink": {
         "kind": "nosql_query_candidate",
-        "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    })",
+        "text": "User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    })",
         "span": {
           "file": "routes/index.js",
           "start_line": 52,
@@ -6715,7 +6637,7 @@
         },
         {
           "kind": "route_handler",
-          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 50,
@@ -6751,7 +6673,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 50,
@@ -6763,7 +6685,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
+          "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 51,
@@ -7177,7 +7099,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
+          "text": "{\n  if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 50,
@@ -7189,7 +7111,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length \u003e 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
+          "text": "if (validator.isEmail(req.body.username)) {\n    User.find({ username: req.body.username, password: req.body.password }, function (err, users) {\n      if (users.length > 0) {\n        const redirectPage = req.body.redirectPage\n        const session = req.session\n        const username = req.body.username\n        return adminLoginSuccess(redirectPage, session, username, res)\n      } else {\n        return res.status(401).send()\n      }\n    });\n  } else {\n    return res.status(401).send()\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 51,
@@ -7786,7 +7708,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -7798,7 +7720,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -8487,7 +8409,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -8499,7 +8421,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -9187,7 +9109,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -9199,7 +9121,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -9887,7 +9809,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -9899,7 +9821,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -10587,7 +10509,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -10599,7 +10521,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -11287,7 +11209,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -11299,7 +11221,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -11523,7 +11445,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
+          "text": "{\n  // get the profile details from the JSON\n\tconst profile = req.body\n  // validate the input\n  if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 102,
@@ -11535,7 +11457,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name \u003cemail-address\u003e\n    // which we consider valid too\n    \u0026\u0026 validator.isMobilePhone(profile.phone, 'he-IL')\n    \u0026\u0026 validator.isAscii(profile.firstname)\n    \u0026\u0026 validator.isAscii(profile.lastname)\n    \u0026\u0026 validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
+          "text": "if (validator.isEmail(profile.email, { allow_display_name: true })\n    // allow_display_name allows us to receive input as:\n    // Display Name <email-address>\n    // which we consider valid too\n    && validator.isMobilePhone(profile.phone, 'he-IL')\n    && validator.isAscii(profile.firstname)\n    && validator.isAscii(profile.lastname)\n    && validator.isAscii(profile.country)\n  ) {\n    // trim any extra spaces on the right of the name\n    profile.firstname = validator.rtrim(profile.firstname)\n    profile.lastname = validator.rtrim(profile.lastname)\n\n    // render the view\n    return res.render('account.hbs', profile)\n  } else {\n    // if input validation fails, we just render the view as is\n    console.log('error in form details')\n    return res.render('account.hbs')\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 106,
@@ -11989,7 +11911,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -12161,7 +12083,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -12197,7 +12119,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -12333,7 +12255,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -12369,7 +12291,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -12637,7 +12559,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -12673,7 +12595,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -12893,7 +12815,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -12929,7 +12851,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -13077,7 +12999,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -13113,7 +13035,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -13225,7 +13147,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -13261,7 +13183,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -13373,7 +13295,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -13425,7 +13347,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' \u0026\u0026 item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
+          "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 165,
@@ -13437,7 +13359,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (typeof (item) == 'string' \u0026\u0026 item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }",
+          "text": "if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 170,
@@ -13449,7 +13371,7 @@
         },
         {
           "kind": "helper_definition",
-          "text": "function parse(todo) {\n  var t = todo;\n\n  var remindToken = ' in ';\n  var reminder = t.toString().indexOf(remindToken);\n  if (reminder \u003e 0) {\n    var time = t.slice(reminder + remindToken.length);\n    time = time.replace(/\\n$/, '');\n\n    var period = hms(time);\n\n    console.log('period: ' + period);\n\n    // remove it\n    t = t.slice(0, reminder);\n    if (typeof period != 'undefined') {\n      t += ' [' + ms(period) + ']';\n    }\n  }\n  return t;\n}",
+          "text": "function parse(todo) {\n  var t = todo;\n\n  var remindToken = ' in ';\n  var reminder = t.toString().indexOf(remindToken);\n  if (reminder > 0) {\n    var time = t.slice(reminder + remindToken.length);\n    time = time.replace(/\\n$/, '');\n\n    var period = hms(time);\n\n    console.log('period: ' + period);\n\n    // remove it\n    t = t.slice(0, reminder);\n    if (typeof period != 'undefined') {\n      t += ' [' + ms(period) + ']';\n    }\n  }\n  return t;\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 143,
@@ -13750,7 +13672,7 @@
         },
         {
           "kind": "handler",
-          "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' \u0026\u0026 item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
+          "text": "{\n  // console.log('req.body: ' + JSON.stringify(req.body));\n\n  var item = req.body.content;\n  var imgRegex = /\\!\\[alt text\\]\\((http.*)\\s\\\".*/;\n  if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }\n\n  new Todo({\n    content: item,\n    updated_at: Date.now(),\n  }).save(function (err, todo, count) {\n    if (err) return next(err);\n\n    /*\n    res.setHeader('Data', todo.content.toString('base64'));\n    res.redirect('/');\n    */\n\n    res.setHeader('Location', '/');\n    res.status(302).send(todo.content.toString('base64'));\n\n    // res.redirect('/#' + todo.content.toString('base64'));\n  });\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 165,
@@ -13762,7 +13684,7 @@
         },
         {
           "kind": "control_statement",
-          "text": "if (typeof (item) == 'string' \u0026\u0026 item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }",
+          "text": "if (typeof (item) == 'string' && item.match(imgRegex)) {\n    var url = item.match(imgRegex)[1];\n    console.log('found img: ' + url);\n\n    exec('identify ' + url, function (err, stdout, stderr) {\n      console.log(err);\n      if (err !== null) {\n        console.log('Error (' + err + '):' + stderr);\n      }\n    });\n\n  } else {\n    item = parse(item);\n  }",
           "span": {
             "file": "routes/index.js",
             "start_line": 170,
@@ -13774,7 +13696,7 @@
         },
         {
           "kind": "helper_definition",
-          "text": "function parse(todo) {\n  var t = todo;\n\n  var remindToken = ' in ';\n  var reminder = t.toString().indexOf(remindToken);\n  if (reminder \u003e 0) {\n    var time = t.slice(reminder + remindToken.length);\n    time = time.replace(/\\n$/, '');\n\n    var period = hms(time);\n\n    console.log('period: ' + period);\n\n    // remove it\n    t = t.slice(0, reminder);\n    if (typeof period != 'undefined') {\n      t += ' [' + ms(period) + ']';\n    }\n  }\n  return t;\n}",
+          "text": "function parse(todo) {\n  var t = todo;\n\n  var remindToken = ' in ';\n  var reminder = t.toString().indexOf(remindToken);\n  if (reminder > 0) {\n    var time = t.slice(reminder + remindToken.length);\n    time = time.replace(/\\n$/, '');\n\n    var period = hms(time);\n\n    console.log('period: ' + period);\n\n    // remove it\n    t = t.slice(0, reminder);\n    if (typeof period != 'undefined') {\n      t += ' [' + ms(period) + ']';\n    }\n  }\n  return t;\n}",
           "span": {
             "file": "routes/index.js",
             "start_line": 143,
@@ -14534,7 +14456,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "\u003c%= todo._id %\u003e",
+              "text": "<%= todo._id %>",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 19,
@@ -14615,7 +14537,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "\u003c%= todo._id %\u003e",
+        "text": "<%= todo._id %>",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 19,
@@ -14928,7 +14850,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "\u003c%= todo.content %\u003e",
+              "text": "<%= todo.content %>",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 20,
@@ -15093,7 +15015,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "\u003c%= todo.content %\u003e",
+        "text": "<%= todo.content %>",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 20,
@@ -15132,7 +15054,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -15328,7 +15250,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -15364,7 +15286,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -15524,7 +15446,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -15560,7 +15482,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -15852,7 +15774,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -15888,7 +15810,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -16132,7 +16054,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -16168,7 +16090,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -16340,7 +16262,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -16376,7 +16298,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -16512,7 +16434,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -16548,7 +16470,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -16684,7 +16606,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -17076,7 +16998,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "\u003c%= todo._id %\u003e",
+              "text": "<%= todo._id %>",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 23,
@@ -17157,7 +17079,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "\u003c%= todo._id %\u003e",
+        "text": "<%= todo._id %>",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 23,
@@ -17470,7 +17392,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "\u003c%= todo.content %\u003e",
+              "text": "<%= todo.content %>",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 23,
@@ -17635,7 +17557,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "\u003c%= todo.content %\u003e",
+        "text": "<%= todo.content %>",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 23,
@@ -17674,7 +17596,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -17870,7 +17792,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -17906,7 +17828,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -18066,7 +17988,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -18102,7 +18024,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -18394,7 +18316,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -18430,7 +18352,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -18674,7 +18596,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -18710,7 +18632,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -18882,7 +18804,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -18918,7 +18840,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -19054,7 +18976,7 @@
             },
             {
               "kind": "branch_consequence",
-              "text": "(reminder \u003e 0)",
+              "text": "(reminder > 0)",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 148,
@@ -19090,7 +19012,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -19226,7 +19148,7 @@
             },
             {
               "kind": "branch_alternative",
-              "text": "(typeof (item) == 'string' \u0026\u0026 item.match(imgRegex))",
+              "text": "(typeof (item) == 'string' && item.match(imgRegex))",
               "span": {
                 "file": "routes/index.js",
                 "start_line": 170,
@@ -19618,7 +19540,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "\u003c%= todo._id %\u003e",
+              "text": "<%= todo._id %>",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 27,
@@ -19699,7 +19621,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "\u003c%= todo._id %\u003e",
+        "text": "<%= todo._id %>",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 27,
@@ -20007,7 +19929,7 @@
           "render_context": [
             {
               "kind": "template_output",
-              "text": "\u003c%= todo._id %\u003e",
+              "text": "<%= todo._id %>",
               "span": {
                 "file": "views/edit.ejs",
                 "start_line": 29,
@@ -20088,7 +20010,7 @@
       "kind": "xss_candidate",
       "sink": {
         "kind": "template_output",
-        "text": "\u003c%= todo._id %\u003e",
+        "text": "<%= todo._id %>",
         "span": {
           "file": "views/edit.ejs",
           "start_line": 29,
@@ -21941,7 +21863,7 @@
       "context": [
         {
           "kind": "registration",
-          "text": "router.post('/', async (req, res, next) =\u003e {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
+          "text": "router.post('/', async (req, res, next) => {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
           "span": {
             "file": "routes/users.js",
             "start_line": 26,
@@ -22086,7 +22008,7 @@
       "context": [
         {
           "kind": "registration",
-          "text": "router.post('/', async (req, res, next) =\u003e {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
+          "text": "router.post('/', async (req, res, next) => {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
           "span": {
             "file": "routes/users.js",
             "start_line": 26,
@@ -22231,7 +22153,7 @@
       "context": [
         {
           "kind": "registration",
-          "text": "router.post('/', async (req, res, next) =\u003e {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
+          "text": "router.post('/', async (req, res, next) => {\n  try {\n    const mongoConnection = typeorm.getConnection('mysql')\n    const repo = mongoConnection.getRepository(\"Users\")\n\n    const user = {}\n    user.name = req.body.name\n    user.address = req.body.address\n    user.role = req.body.role\n\n    const savedRecord = await repo.save(user)\n    console.log(\"Post has been saved: \", savedRecord)\n    return res.sendStatus(200)\n\n  } catch (err) {\n    console.error(err)\n    console.log({}.where)\n    next();\n  }\n})",
           "span": {
             "file": "routes/users.js",
             "start_line": 26,

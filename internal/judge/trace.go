@@ -22,13 +22,7 @@ type DecisionTrace struct {
 // Replay applies the current decoder/policy to a saved decision only when its
 // exact request still matches the supplied use. It makes no network request.
 func (c *Client) Replay(use graph.StringUse, trace DecisionTrace) graph.Assessment {
-	version := questionVersion
-	if logUse(use) {
-		version = logQuestionVersion
-	}
-	if use.Kind == "xss_candidate" {
-		version = xssQuestionVersion
-	}
+	version := protocolVersion(use)
 	a := graph.Assessment{Status: "failed", Provider: c.provider, Model: c.model, QuestionVersion: version}
 	payload, err := c.payload(use)
 	if err != nil || !sameRequest(payload, trace.Request) || trace.HTTPStatus != 200 || trace.QuestionVersion != version {
@@ -53,13 +47,7 @@ func (c *Client) Replay(use graph.StringUse, trace DecisionTrace) graph.Assessme
 // Preview prepares the exact JSON request without making a network call.
 func (c *Client) Preview(use graph.StringUse) (DecisionTrace, error) {
 	payload, err := c.payload(use)
-	version := questionVersion
-	if logUse(use) {
-		version = logQuestionVersion
-	}
-	if use.Kind == "xss_candidate" {
-		version = xssQuestionVersion
-	}
+	version := protocolVersion(use)
 	return DecisionTrace{QuestionVersion: version, Request: payload, RequestBytes: len(payload)}, err
 }
 

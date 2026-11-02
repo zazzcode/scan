@@ -9,7 +9,7 @@ import (
 // Enrich adds deterministic display records while preserving raw evidence and assessments.
 // Rebuilding from uses also lets older saved reports use the current presentation rules.
 func Enrich(r *graph.StringReport) {
-	r.PresentationVersion = 3
+	r.PresentationVersion = 4
 	r.FindingTypes = append([]graph.FindingType(nil), findingTypes...)
 	r.Findings = make([]graph.Finding, 0, len(r.Uses))
 	for _, u := range r.Uses {
@@ -107,7 +107,9 @@ func describe(u graph.StringUse) graph.Finding {
 		if answer := a.Answers["validation"]; answer != "" {
 			f.Validation += " Model validation answer: " + displayLabel(answer) + "."
 		}
-		if u.Kind == "xss_candidate" {
+		if u.Kind == "input_validation_candidate" && u.Completeness != nil && u.Completeness.ClaimKind == "validation" {
+			f.Protection = "Field-policy enforcement: " + displayLabel(a.Protection) + ". " + a.Reason
+		} else if u.Kind == "xss_candidate" {
 			f.Protection = "Decision XSS exposure: " + displayLabel(a.Answers["xss_exposure"]) + ". Scanner policy: " + a.Reason
 		} else if u.Kind == "log_sink_candidate" {
 			f.Protection += " Assessed logging exposure: " + displayLabel(a.Answers["log_exposure"]) + " (data class " + displayLabel(a.Answers["data_class"]) + ", content " + displayLabel(a.Answers["content_exposure"]) + ", redaction " + displayLabel(a.Answers["redaction"]) + "). " + a.Reason
@@ -139,12 +141,22 @@ func describe(u graph.StringUse) graph.Finding {
 			if u.Completeness != nil && len(u.Completeness.Evidence["conditional_value"]) > 0 {
 				f.Uncertainty += " Conditional value paths are present. This static vulnerability judgment is scoped to an unsafe supported path under its configuration/branch precondition, not every runtime configuration; inspect the conditional-expression evidence."
 			}
+		case "poor_practice":
+			if u.Kind == "input_validation_candidate" && a.QuestionVersion == "validation-use-v2" && len(a.BlockingGaps) == 0 && a.Answers["field_requirement"] == "established" && a.Answers["enforcement_coverage"] == "complete" && a.Answers["validation"] == "insufficient" {
+				f.RecordType, f.Status = "finding", "poor_practice"
+				f.Title = "Declared field validation is not enforced"
+				f.Summary = "A source-backed requirement for the named field is not enforced on a supported server path. This is a validation-practice defect; exploitability at a downstream operation is assessed separately."
+			}
 		case "supported_potential":
 			if f.Status != "poor_practice" {
 				f.RecordType = "analysis"
 				f.Status = "supported_potential"
 			}
 		case "protected_for_claim":
+			if u.Kind == "input_validation_candidate" && u.Completeness != nil && u.Completeness.ClaimKind == "validation" {
+				f.Title = "Declared field policy is enforced"
+				f.Summary = "The supplied implementation and validation assessment support enforcement of the exact named field constraints. Downstream sink protection remains a separate claim."
+			}
 			if f.Status != "poor_practice" {
 				f.RecordType = "protection"
 				f.Status = "protected_for_claim"
@@ -160,17 +172,45 @@ func describe(u graph.StringUse) graph.Finding {
 			}
 		}
 	}
+	if f.RecordType == "protection" && (a.Status == "failed" || protectionBlocked(u)) {
+		f.Status = "needs_evidence"
+	}
+	if f.RecordType == "protection" && f.Status != "protected_for_claim" {
+		f.RecordType = "analysis"
+		f.Title = "Protection evidence is inconclusive"
+		f.Summary = "Some protective behavior was observed, but the complete claim remains unresolved. Review the named source, path and assessment gaps before relying on this output."
+	}
 	if f.Status == "poor_practice" && u.Kind == "log_sink_candidate" {
 		f.Uncertainty += " Who can read the log destination and how long it is retained have not been assessed; that does not remove this remediation task."
-	} else if f.Status == "poor_practice" {
+	} else if f.Status == "poor_practice" && u.Kind != "input_validation_candidate" {
 		f.Uncertainty += " Exploitability is separate from the established construction practice; a missing or inconclusive semantic assessment does not remove this remediation task."
 	}
+	f.Recommendations = scopedGuidance(u, f)
 	return f
 }
 func hasGap(u graph.StringUse, kind string) bool {
 	for _, g := range u.Gaps {
 		if g.Kind == kind {
 			return true
+		}
+	}
+	return false
+}
+
+// Display must not inherit a safe label from an old assessment whose source claim
+// still declares blockers. The raw model answer remains available for audit.
+func protectionBlocked(u graph.StringUse) bool {
+	if len(u.Assessment.BlockingGaps) > 0 {
+		return true
+	}
+	if c := u.Completeness; c != nil {
+		if len(c.Blockers) > 0 {
+			return true
+		}
+		for _, role := range c.Required {
+			if len(c.Evidence[role]) == 0 {
+				return true
+			}
 		}
 	}
 	return false

@@ -7,7 +7,7 @@
 
 The Python adapter uses Tree-sitter Python v0.23.6 and supplies the existing graph, versioned decision
 protocols and JSON/HTML/SARIF pipeline. It discovers Flask/Blueprint, RESTX Resource and FastAPI routes,
-tracks a bounded value-flow subset, verifies sqlite3/logging/HTTP bindings and models Flask/Jinja and
+tracks a bounded value-flow subset, verifies DB-API/logging/HTTP bindings and models Flask/Jinja and
 explicit FastAPI HTML. Inline template scripts reuse the browser adapter, including verified jQuery
 input-to-HTML flow. No application code, dependency installation, database query or outbound request
 from the targets was executed.
@@ -16,20 +16,22 @@ Input validation remains separate from SQL/XSS protection. Source-backed forms c
 for the matching handler; client constraints do not establish server enforcement. For ThreatByte
 signup, the form declares email syntax, while the backend shows presence/password-match checks.
 The live assessment reports insufficient validation on the insert, independently of its sufficient
-SQL parameter binding. Missing business requirements remain Review. Current per-use validation
-facets are not independent confirmed per-field defect counts.
+SQL parameter binding. Missing business requirements remain Review. Policy-backed standalone validation now reports that exact email-format defect independently,
+while six required-only fields retain protected presence-enforcement claims. Query validation
+facets are not additional independent defects.
 
 ## Pinned corpus and final results
 
 | Target | Revision | Route/method entries | Browser entries | Records / assessed | Static SQL/XSS findings | Other outcomes |
 | --- | --- | --- | --- | --- | --- | --- |
-| ThreatByte | `ede28f2` | 23 | 1 | 51 / 51 | 4 | 32 protected, 13 needs-evidence, 1 construction-practice, 1 destination-review |
+| ThreatByte | `ede28f2` | 23 | 1 | 56 / 56 | 4 | 41 protected, 8 needs-evidence, 1 construction-practice, 1 validation-practice, 1 destination-review |
 | python-insecure-app | `b188493` | 1 | 0 | 2 / 2 | 1 | 1 validation-review |
 | vulnerable-flask-app | `a67cbe5` | 19 | 0 | 24 / 24 | 4 | 20 needs-evidence |
 
 The nine static findings match source-reviewed positive discovery cases: two SQL injection cases,
 ThreatByte reflected/stored/DOM XSS, FastAPI HTML/template-source XSS, and three Erlik raw-response
-paths. All [22 scoped case checks](../../docs/samples/evaluate-python.py) pass. This is case discovery
+paths. One additional source-backed email-format practice defect is assessed separately.
+All [29 scoped case checks](../../docs/samples/evaluate-python.py) pass. This is case discovery
 and classification evidence, not exhaustive recall, zero false positives on every operation, runtime
 exploitation, or independent human findings review. The same agent reviewed source and implemented
 the adapter; expected labels were kept separate from detector code and model evidence.
@@ -56,10 +58,9 @@ the adapter; expected labels were kept separate from detector code and model evi
 
 ## Live calibration and disagreement
 
-The user authorized `gpt-6-luna` only and ultimately removed the request-count cap. There were **78
-live requests**, all HTTP 200, totaling **306,362 reported input/total tokens** and zero reported
-output tokens for this Decisions endpoint. Every current record has a completed assessment. The
-extra request is the changed literal-email logging claim. Exact request/response traces and the
+The user authorized `gpt-6-luna` only and ultimately removed the request-count cap. There were **184
+live requests**, all HTTP 200, totaling **833,272 reported input/total tokens** and zero reported
+output tokens for this Decisions endpoint. Every current record has a completed assessment. The original pass used 78 calls; shared trace hardening and scoped validation calibration added 106. Exact request/response traces and the
 append-only attempt ledger are local; reports retain answers, probabilities/confidence and usage.
 Confidence never establishes a verdict. Unchanged requests were replayed only after exact payload,
 model and question-version matching; changed evidence received a fresh assessment.
@@ -78,6 +79,31 @@ Two model overclaims were caught by structural policy:
 Some escaped stored fields received model answers inconsistent with static facts or lacked complete
 origins. They remain needs-evidence. Unknown subprocess return content is not converted into XSS
 confirmation. Lack of model agreement does not erase an established construction-practice concern.
+
+## Shared trace hardening and validation correction
+
+The [implemented design](../architecture/trace-judgment.md) now supplies an explicit static trace,
+SQL operand roles, storage keys and a supplied/missing role ledger for all language adapters.
+Focused surrounding template markup is available for Python and JS/TS; it resolved the two
+previous unknown attribute contexts in ThreatByte. A richer bundle cannot close a canonical blocker.
+
+The first validation calibration overclaimed five required-only fields despite actual rejecting
+presence guards. That iteration remains in raw logs. `validation-use-v2` supplies the complete
+named-field constraint list, excludes unrelated field policies and rejects invented stronger
+requirements. Fresh answers now match seven independent source controls: one unmet email-format
+policy and six enforced required-only policies. This correction improves precision; extra findings
+are not treated as success. All original nine SQL/XSS positives remain supported.
+
+Additional generic controls cover nested dictionary alternatives, unresolved values, relative
+package helpers, request aliases, unsupported variadic parameters, real/shadowed PostgreSQL/MySQL
+bindings, SQL text/parameter roles and constant Jinja templates with autoescape on/off/unknown.
+Alternative bindings cannot borrow a sibling driver contract or escaping setting. These are scanner
+fixtures, not edits to benchmark apps. The report guardrails prevent inconclusive/blocked claims
+from retaining green styling or a protection title. Scoped guidance is shared by HTML/JSON/SARIF.
+
+The [documentation inventory](../../docs/samples/python-documented-claims.md) maps every advertised
+README family, additional local test/Swagger material and author articles to supported or unsupported
+scope. It does not imply all advertised vulnerabilities are implemented or precisely located.
 
 ## Comparator observations
 
@@ -99,7 +125,7 @@ Native Go 1.27.3 darwin/arm64, with `GOTOOLCHAIN=local`, `GOPROXY=off` and a loc
 - `go vet ./...` and `go build ./...` pass; changed Go files are gofmt-clean.
 - Python route golden, mixed-language CLI/bundle test, deterministic evidence, paired precision
   controls and a local HTTP-stub Python evidence→decision→report test pass.
-- All 22 case checks pass on curated reports. Source excerpt byte ranges and hashes were checked;
+- All 29 case checks pass on curated reports. Source excerpt byte ranges and hashes were checked;
   canonical JSON/SARIF parse, every record has an assessment, and public roots contain no local paths.
 - ThreatByte and Erlik remained clean at their pins. Finder metadata appeared in the original FastAPI
   checkout during final verification; it was preserved. Final analysis used a fresh clean upstream
@@ -107,7 +133,7 @@ Native Go 1.27.3 darwin/arm64, with `GOTOOLCHAIN=local`, `GOPROXY=off` and a loc
 
 Raw runs remain under `_test-findings/<app>/run-<id>/`; the local results report names exact runs and
 records source checks. The source clones were not remediated or dependency-modified. Work is committed
-locally on `python-support-base`; there is no integration push, PR publication or merge.
+and pushed on `python-support-base`; there is no integration push, PR publication or merge.
 
 ## Remaining boundaries
 

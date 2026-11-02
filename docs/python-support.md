@@ -23,7 +23,7 @@ Structural findings remain useful without a model; neither mode certifies an app
 | Sources | Flask args/form/values/JSON/cookies/headers/session, RESTX payload, FastAPI parameters; HTTP response text is a separate source |
 | Flow | Assignments/reassignments, f-strings, percent/format/concatenation, output alternatives, bounded direct helpers and local imports; explicit request-method guards exclude impossible method branches |
 | SQL | sqlite3 connection/cursor provenance, SQL text versus parameter tuple/list, statement construction and separate validation evidence |
-| Validation | Field review records and SQL facets; actual handler/helper guards and matching forms' field requirements are evidence. A browser constraint is not server enforcement. Missing policy stays uncertain. |
+| Validation | Policy-backed standalone field judgments and SQL facets; actual handler/helper guards and matching forms' field requirements are evidence. A browser constraint is not server enforcement. Missing policy stays uncertain. |
 | Logging | Unshadowed print/logging bindings, credential/personal field hints, HTTP credentials, literal email and verified database-result candidates; length/presence/comparison controls |
 | XSS | Flask HTML string returns, render_template/render_template_string, Jinja template variables and source construction, safe/Markup/escape/forceescape, autoescape blocks, explicit FastAPI HTML, bounded sqlite table/field stored-origin links |
 | Browser XSS | Literal inline scripts in resolved templates reuse the browser adapter. Canonical versioned code.jquery.com script tags establish bounded jQuery bindings; input val() → append()/html() and nested callbacks are modeled. Native DOM append(string) is text. |
@@ -58,3 +58,12 @@ Library contracts: [Flask templates](https://flask.palletsprojects.com/en/stable
 [sqlite3 parameters](https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.execute),
 [FastAPI HTML responses](https://fastapi.tiangolo.com/advanced/custom-response/#html-response),
 [MarkupSafe escaping](https://markupsafe.palletsprojects.com/en/stable/escaping/).
+
+The shared [trace judgment design](../.zazz/architecture/trace-judgment.md) documents evidence
+roles, trace/control edges, exact named-field policies, model consistency gates and reporting.
+Verified Psycopg 2/3, PyMySQL and MySQL Connector cursor bindings now use driver-specific
+parameter contracts. SQLite storage correlation remains SQLite-only. Request aliases and
+relative package imports are bounded; variadic helper binding stays explicit uncertainty.
+Constant Jinja templates require autoescaping for substituted HTML variables; `.render()` alone
+does not establish XSS protection. Reports provide source-specific preservation, repair or
+investigation guidance according to the final claim status. Only Protected is green.

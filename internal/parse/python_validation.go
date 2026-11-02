@@ -10,6 +10,7 @@ import (
 )
 
 var pythonForm = regexp.MustCompile(`(?is)<form\b([^>]*)>(.*?)</form\s*>`)
+var pythonRequiredAttr = regexp.MustCompile(`(?i)\srequired(?:\s|=|/?>)`)
 var pythonInput = regexp.MustCompile(`(?is)<input\b[^>]*>`)
 var pythonHTMLAttr = regexp.MustCompile(`(?i)([a-z][a-z0-9_-]*)\s*=\s*["']([^"']*)["']`)
 
@@ -39,6 +40,15 @@ func (s *pythonSet) formPolicies(r pythonRoute) []graph.Evidence {
 		}
 		for _, form := range pythonForm.FindAllStringSubmatchIndex(file.Text, -1) {
 			tag := file.Text[form[2]:form[3]]
+			method := "GET"
+			for _, a := range pythonHTMLAttr.FindAllStringSubmatch(tag, -1) {
+				if strings.EqualFold(a[1], "method") {
+					method = a[2]
+				}
+			}
+			if !strings.EqualFold(method, r.route.Method) {
+				continue
+			}
 			handler := pyText(r.module, r.fn.ChildByFieldName("name"))
 			actionMatches := strings.Contains(tag, "url_for('"+handler+"')") || strings.Contains(tag, `url_for("`+handler+`")`)
 			if !actionMatches {
@@ -54,7 +64,7 @@ func (s *pythonSet) formPolicies(r pythonRoute) []graph.Evidence {
 				if attributes["name"] == "" {
 					continue
 				}
-				policy := attributes["type"] == "email" || strings.Contains(strings.ToLower(text), "required")
+				policy := attributes["type"] == "email" || pythonRequiredAttr.MatchString(text)
 				for _, key := range []string{"pattern", "minlength", "maxlength", "min", "max"} {
 					policy = policy || attributes[key] != ""
 				}
@@ -71,4 +81,58 @@ func (s *pythonSet) formPolicies(r pythonRoute) []graph.Evidence {
 		}
 	})
 	return result
+}
+
+// fieldPolicy matches the actual input name, rather than borrowing a sibling's
+// requirements. Browser policy is applicable only to the modeled form operand.
+func (f *pythonFlow) fieldPolicy(key string) []graph.Evidence {
+	if !strings.HasPrefix(key, "form.") {
+		return nil
+	}
+	name := strings.TrimPrefix(key, "form.")
+	var result []graph.Evidence
+	for _, e := range f.context {
+		if e.Kind != "form_field_requirement" {
+			continue
+		}
+		for _, a := range pythonHTMLAttr.FindAllStringSubmatch(e.Text, -1) {
+			if strings.EqualFold(a[1], "name") && a[2] == name {
+				result = append(result, e)
+				break
+			}
+		}
+	}
+	return result
+}
+func (f *pythonFlow) validationClaim(u *graph.StringUse, key string, v pythonValue, policy []graph.Evidence) {
+	context := []graph.Evidence{}
+	for _, e := range u.Context {
+		if e.Kind != "form_field_requirement" {
+			context = append(context, e)
+		}
+	}
+	context = append(context, policy...)
+	u.Context = context
+	handler := f.route.module.evidence("route_handler", f.route.fn)
+	blockers := append([]graph.Gap{}, f.gaps...)
+	blockers = append(blockers, v.gaps...)
+	blockers = append(blockers, f.guardGaps(v)...)
+	constraints := []string{}
+	for _, e := range policy {
+		if pythonRequiredAttr.MatchString(e.Text) {
+			constraints = append(constraints, "required presence: reject a missing or empty value before sensitive use; a truthiness guard followed by return on failure satisfies this requirement")
+		}
+		for _, a := range pythonHTMLAttr.FindAllStringSubmatch(e.Text, -1) {
+			switch strings.ToLower(a[1]) {
+			case "type":
+				if a[2] == "email" {
+					constraints = append(constraints, "email format: enforce syntactic email validity on the server, separately from required presence")
+				}
+			case "pattern", "minlength", "maxlength", "min", "max":
+				constraints = append(constraints, strings.ToLower(a[1])+"="+a[2])
+			}
+		}
+	}
+	u.Check = &graph.Check{ID: "source-field-policy", Method: f.route.route.Method, Path: f.route.route.PathPattern, Kind: "validation", Fields: []string{key}, Validation: "The complete policy for " + key + " in this claim is ONLY: " + strings.Join(constraints, "; ") + ". Do not demand password complexity, email syntax on a username, length/type/range restrictions, trimming or other constraints absent from this list. SQL binding, hashing and authorization are separate claims. Judge direct HTTP enforcement before sensitive use; returning a form/error before the operation enforces rejection even with HTTP status 200."}
+	u.Completeness = &graph.Completeness{ClaimKind: "validation", Required: []string{"request_source", "field_policy", "route_handler", "control_flow"}, Evidence: map[string][]graph.Evidence{"request_source": {u.Sink}, "field_policy": policy, "route_handler": {handler}, "control_flow": append([]graph.Evidence{handler}, context...)}, Blockers: blockers, Coverage: []graph.Gap{}, Scope: "Bounded source-declared form policy and linked handler/helper implementation. Missing enforcement semantics remain blockers; no field-name policy inference."}
 }
