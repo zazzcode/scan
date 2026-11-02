@@ -1,8 +1,10 @@
 # Proposed phased implementation plan
 
-**Long-term planning, 2026-10-19; near-term route/string sequence updated 2026-10-31.** Phases 0–13 below are
+**Long-term planning, 2026-10-19; capability checklist and delivery order updated 2026-11-02.** Phases 0–13 below are
 not approved for execution. This is a decomposition for later spec sessions, not a specification,
-calendar schedule, or claim of completed functionality.
+calendar schedule, or blanket claim of completed functionality. The [capability checklist](#supported-capability-checklist)
+and delivery list below own current status and ordering; older phase/increment sections are references,
+not instructions to repeat delivered work.
 
 ## First build
 
@@ -131,47 +133,80 @@ primary user introduction. No consumer skills are implemented by this planning u
 
 ## Future capability branches
 
-This branch's exit is input validation plus string-built SQL and NoSQL query, update, and insert
-findings. The comparison is [query and validation results](../evaluation/query-validation-comparison.md).
-Each row below is a later worktree and its own coding session. Do not implement that row on this branch.
+### Supported capability checklist
 
-**Delivered in `logger-leak` (merged into `stage`):** the
-[sensitive-data logging contract](../specifications/sensitive-data-logging.md) — explicit logger calls,
-morgan access logs of URL query credentials, and the `log-use-v1` judgment protocol. Live calibration
-of that protocol and the three re-judgments it made necessary remain follow-up work.
+**Status update, 2026-11-02 (user).** Keep the complete list, including delivered work. A checked
+cell means a bounded implementation exists with regression/evaluation evidence; it does not promise
+all frameworks, paths or vulnerability instances are covered. An unchecked cell remains explicit work.
+JavaScript, TypeScript and Python are the supported source languages. Every future capability must
+include extraction/models, evidence/judgment, reporting and positive/protected/unknown tests for all
+three; Python is no longer an additional-language milestone.
 
-**Next, chosen by the user on 2026-11-01:** `xss-response`, in its new worktree from `stage`, created
-after `logger-leak` merged and the project was renamed to Zazzles. The [XSS detection scope](xss-detection-scope.md)
-records the four XSS types, sinks, protections, evidence rules, Juice Shop and TypeScript targets, and
-delivery increments. Rows are listed in the intended order.
+| Capability | JavaScript | TypeScript | Python | Evidence and remaining limits |
+|---|---|---|---|---|
+| Input validation | [x] | [x] | [x] | Source-backed field-policy and enforcing-guard claims; missing business requirements remain Review |
+| SQL injection | [x] | [x] | [x] | Verified operation/operand models and source traces; Python DB-API support is bounded |
+| NoSQL injection | [x] | [x] | [ ] | Bounded JS/TS selector/expression analysis; Python driver/model coverage remains pending |
+| Logger leaks | [x] | [x] | [x] | Sensitive-content emission and redaction judgments; whole containers/unknown sensitivity remain Review |
+| Reflected/server-output XSS | [x] | [x] | [x] | Verified response/template context and encoding; unsupported engines/configuration remain gaps |
+| Stored XSS | [x] | [x] | [x] | Bounded source/write/read/render links; exact origin/row identity is not universally resolved |
+| Client-side/DOM/framework XSS | [x] | [x] | [x] | JS/TS browser analysis also handles selected inline scripts in Python templates; not every browser framework |
+| API-to-browser XSS linkage | [x] | [x] | [ ] | Bounded JS/TS cross-tier evidence; general Python linkage remains pending |
+| Python language adapter | — | — | [x] | Delivered bounded adapter; dynamic registration/dispatch and framework parity remain explicit gaps |
 
-**Sequence decision, 2026-11-01 (user):** after `xss-response`, (1) Python support next: a Python
-adapter for the delivered families (input validation, SQL/NoSQL, logging, XSS) against a selected
-vulnerable Python app, reusing the language-neutral source/context/protection/storage facts; (2) then
-the remaining vulnerability-type rows below, in order, for JavaScript, TypeScript and Python; (3) then
-SCA library auditing for JavaScript/TypeScript and Python; (4) only after all OWASP attack types and that
-SCA work, other languages such as Go and Java. This supersedes the Go-after-Python ordering of Phases 11–13.
+References: [query/validation results](../evaluation/query-validation-comparison.md),
+[logging contract](../specifications/sensitive-data-logging.md),
+[XSS scope](xss-detection-scope.md), [XSS results](../evaluation/xss-implementation-results.md), and
+[Python contract/results](../evaluation/python-support-results.md). The original three Python apps
+have 29 passing case checks. VulnPy adds six known SQL/XSS positive misses and four passing coverage
+warning controls; those misses are not passed findings or a claim of complete Python coverage.
 
-| Future branch | First acceptance target |
-|---|---|
-| `xss-response` | All XSS in one worktree, backend first: (1) HTML responses on the vulnerable TypeScript app `/api/search`; (2) Juice Shop server templates; (3) API-side stored and echoed data; (4) judgment; (5) browser side last, including Angular template parsing. JSON responses and encoded output stay negatives. See the [scope](xss-detection-scope.md) |
-| `python-support` | Python adapter for the delivered families on a selected vulnerable Python app; same report and judgment facts as JS/TS |
-| `hardcoded-secrets` | Private material in source; public verification keys stay negatives |
-| `command-injection` | `exec` of request input on the vulnerable TypeScript app `/api/ping` |
-| `path-traversal` | `fs.readFile` of a request path on `/api/files` |
-| `code-injection` | `eval` of a request expression on `/api/calculate` |
-| `xxe` | XML parse of a request body on `/api/parse-xml` |
-| `open-redirect` | `res.redirect` of a request URL |
-| `weak-randomness` | `Math.random` used as a token |
-| `cookie-session-headers` | `httpOnly`, `secure`, session secret, and missing baseline headers |
-| `ssrf-destination` | Judge the existing `axios.default.get` candidate; Bearer missed this call |
-| `prototype-pollution` | `_.merge` of request objects; Bearer did not flag it |
-| `sca-library-audit` | Dependency vulnerability auditing for JS/TS (npm/pnpm) and Python (pip-audit) inputs |
-| `other-languages` | Go, Java and others, only after all OWASP attack types and SCA; baselines and CI alongside |
+### Complete delivery list
 
-## Next concrete case: registration validation
+**Sequence decision, 2026-11-02 (user):** command injection is next after Python support, followed
+by dynamic-route support and XSS hardening. Keep the other planned classes. SCA remains after the
+vulnerability-type work. Secret scanning is last before additional languages. Go, Java and other
+new source languages wait until this work for JavaScript, TypeScript and Python is delivered.
+This order supersedes earlier sequence notes and the historical language-phase dependencies below.
 
-The user-selected next acceptance case is account registration. The
+Each unchecked row is a future bounded contract/worktree, not implementation authorized by this
+plan edit. Preserve current capabilities and their unresolved coverage while implementing new ones.
+
+| Status | Branch / capability | Acceptance target or delivered reference |
+|---|---|---|
+| [x] | `input-validation` | Bounded source-backed policy/enforcement judgments; retain separate destination protection |
+| [x] | `sql-injection` | Bounded SQL construction, binding and injection judgments on verified APIs |
+| Partial | `nosql-injection` | JS/TS delivered subset; Python support remains unchecked in the language matrix |
+| [x] | `logger-leak` | Explicit sensitive logger calls, access-log URL credentials and logging-specific judgment; see the contract |
+| [x] | `xss-response` | Delivered bounded reflected, stored, browser and cross-tier analysis; retain hardening gaps rather than claiming universal coverage |
+| [x] | `python-support` | Delivered adapter and shared trace/report guardrails; same claim architecture as JS/TS |
+| [ ] Next | `command-injection` | Request-to-process execution and protective patterns in JS/TS and Python; start with TypeScript `/api/ping` and source-reviewed Python sinks |
+| [ ] | `dynamic-route-support` | Resolve bounded generated routes for Python and Node.js; report static versus dynamic route origin separately from resolution/coverage; recover VulnPy trigger paths |
+| [ ] | `xss-hardening` | General renderer/configuration, factory/helper and cross-tier coverage; retain raw/escaped/unknown controls, including VulnPy's Jinja Environment/template case |
+| [ ] | `path-traversal` | Request-influenced file paths, starting with `/api/files`; include JS/TS/Python containment controls |
+| [ ] | `code-injection` | Request-to-eval/code-generation paths, starting with `/api/calculate`, across supported languages |
+| [ ] | `xxe` | Request-to-XML parsing and verified parser configuration across supported languages |
+| [ ] | `open-redirect` | Request-influenced redirect targets and actual destination policy |
+| [ ] | `weak-randomness` | Randomness used for security-sensitive tokens; ordinary non-security randomness stays a negative |
+| [ ] | `cookie-session-headers` | httpOnly, secure, session configuration and source-backed baseline header requirements |
+| [ ] | `ssrf-destination` | Complete judgment of existing outbound candidates, including axios.default.get; verify URL slots and restrictions |
+| [ ] | `prototype-pollution` | JS/TS object/prototype operations such as _.merge; test Python's non-applicability rather than inventing equivalent prototype semantics |
+| [ ] | `sca-library-audit` | Resolved dependency/advisory auditing for JS/TS npm/pnpm and Python pip-audit, with failures and reachability separate |
+| [ ] | `hardcoded-secrets` / secret scanning | Private material in source; public verification keys and placeholders remain controls; immediately before additional languages |
+| [ ] | `other-languages` | Go, Java and others only after current-language vulnerability work, SCA and secret scanning; baselines and CI alongside |
+
+Dynamic-route reporting must not turn an unresolved factory into a fabricated concrete endpoint.
+Static/dynamic describes registration origin, not vulnerability status; both kinds can be resolved,
+unresolved, protected or vulnerable. Broader corpus expansion and the living
+[ThreatByte](../evaluation/threatbyte-detection-guide.md),
+[FastAPI](../evaluation/python-insecure-app-detection-guide.md), and
+[VulnPy](../evaluation/vulnpy-detection-guide.md) answer guides accompany each future capability.
+
+<a id="next-concrete-case-registration-validation"></a>
+
+## Registration validation acceptance reference
+
+The earlier user-selected acceptance case was account registration. The
 [registration case design](07-registration-validation-case.md) records pinned Juice Shop source,
 actual conditional checks, bypass shapes, generated persistence endpoints, test-label limitations,
 and exact structural/prompt improvements. The original offline scan emitted no registration candidate; checked mode now
@@ -215,7 +250,8 @@ Phase 0 below audits their fitness; their presence does not establish an accepte
 
 Every phase uses Go for zazzles-authored scanner, code-analysis, integration, and evaluation-harness code,
 following the [implementation boundary](../architecture.md#1-architecture-premise). Target-language
-fixtures and later Python/Go/Java adapters refer to languages being analyzed. Reference tools such
+fixtures and maintained JavaScript/TypeScript/Python adapters refer to languages being analyzed;
+Go/Java remain later language work. Reference tools such
 as IRIS inform the design without introducing their runtimes into zazzles.
 
 Before the next implementation spec, select its JS/TS/framework slice, OWASP edition, analysis limits,
@@ -309,8 +345,8 @@ reference, not Bearer output. This study does not change the chosen Decision Ass
 | 8 | 7 + live feasibility from 1 | Decision Assessment, LLM Findings Reviewer, and reconciliation policy |
 | 9 | 4, 6–8 | Unified reporting, identity, baseline, CI behavior |
 | 10 | 9 | Correct incremental caches and resource/performance evidence |
-| 11 | 10 + release-scope decision | Python adapter with its declared analysis coverage |
-| 12 | 11 + Go-scope decision | Go adapter in a separate contract |
+| 11 | Delivered under the Python contract | Existing bounded Python adapter; retained historical phase reference, not a future language |
+| 12 | Current-language capability list, SCA, secret scanning; Go-scope decision | Go adapter in a separate future contract |
 | 13 | Separate proposal + relevant foundation | Optional scope checks, coverage expansion, and additional languages such as Java |
 
 Phases 4 and 5 are independent after their prerequisites. Offline phases 0–7 can progress after their
@@ -319,7 +355,8 @@ key does not justify inventing benchmark results or an automatic provider substi
 
 ## Ordered specification backlog
 
-**These specs are planned, not authored or greenlit.** IDs below are planning references, not files.
+**These are historical planning IDs, not proof of authored/accepted specs.** The current capability
+checklist above owns delivery status and order; S29–S30 are superseded by the delivered Python contract.
 Follow this recommended sequence, but start a spec only after its listed prerequisites are accepted.
 Rows describe independently reviewable outcomes; related rows may be delivered in the assigned
 worktree when explicitly requested by the user.
@@ -356,9 +393,9 @@ separate worktrees when authorized. An explicit user implementation request is s
 | S26 | 10 | `dependency-aware-cache` | S25 | Cache correctness across source/model/policy changes |
 | S27 | 10 | `resource-and-performance-validation` | S26 | Measured latency, resource, spend, and cancellation limits |
 | S28 | 10 | `release-packaging-and-readiness` | S27; release-scope decision | Reproducible selected-platform release evidence |
-| S29 | 11 | `python-extraction-and-resolution` | S28; language-scope decision | Python adapter extraction/resolution |
-| S30 | 11 | `python-flow-and-rules` | S29 | Python flow, rules, and assessment/review evaluation |
-| S31 | 12 | `go-resolution-and-lowering` | S30; Go-scope decision | Go receiver/interface/lowering subset |
+| S29 | 11 | `python-extraction-and-resolution` (historical) | Superseded by [Python contract](../specifications/python-support.md) | Bounded Python extraction/resolution delivered |
+| S30 | 11 | `python-flow-and-rules` (historical) | Superseded by the delivered Python contract | Bounded Python flow/rules/judgment delivered; coverage gaps retained |
+| S31 | 12 | `go-resolution-and-lowering` | Current-language capability list, SCA and secret scanning; Go-scope decision | Go receiver/interface/lowering subset |
 | S32 | 12 | `go-flow-and-rules` | S31 | Go flow, rules, and assessment/review evaluation |
 | S33 | 13 | `java-resolution-and-lowering` | S32; Java-scope decision | Java types, annotations, overloads, lowering |
 | S34 | 13 | `java-flow-and-rules` | S33 | Java flow, rules, and assessment/review evaluation |
@@ -524,22 +561,22 @@ RSS, latency and spend; documented rule/language coverage and limitations; repro
 **Halt/replan:** stale caches alter findings, resource bounds fail, or the chosen release scope lacks
 acceptance evidence. Humans alone promote `stage` to `main` and tag a release.
 
-## Phase 11 — Python adapter
+## Phase 11 — Python adapter (delivered reference)
 
-**Future specs:** `python-extraction-and-resolution`; `python-flow-and-rules`.
-Model the declared decorators, imports, `self`, and framework patterns. Reuse the core where semantics
-fit; record IR gaps and amend the governing contract before changing shared semantics.
+The bounded adapter was delivered under the [Python contract](../specifications/python-support.md),
+with [evaluation evidence and limits](../evaluation/python-support-results.md). The old S29/S30
+split is retained only for historical navigation. Python is a supported source language, not a future
+language-addition task. Future functionality must include JS, TS and Python acceptance evidence.
 
-**Evidence/exit:** Python safe/vulnerable and unknown cases pass through the agreed pipeline; coverage
-matrix and bundle quality are reviewed; re-evaluate model questions on Python examples.
-**Exclude:** automatic parity with all JS/TS constructs or a promise of zero core changes.
-**Halt/replan:** the adapter would silently reinterpret core operations or claim unsupported dispatch.
+Dynamic routes, callbacks, custom frameworks and remaining per-family gaps are ongoing hardening,
+not a reason to mark the entire adapter as unimplemented or to claim universal parity.
 
 ## Phase 12 — Go adapter
 
-**Sequence update, 2026-10-31.** The committed languages are JavaScript, TypeScript, Python, and Go.
-This phase is Go. Java is not in that sequence. **2026-11-01:** Go is deferred until all OWASP attack
-types and SCA for JS/TS and Python are delivered (see the sequence decision above).
+**Sequence update, 2026-11-02.** JavaScript, TypeScript and Python are currently supported.
+Go is an additional-language phase, deferred until current-language vulnerability capabilities,
+SCA and secret scanning are delivered (see the capability list above). Java and other languages
+remain later additions under their own contracts.
 
 **Future specs:** `go-resolution-and-lowering`; `go-flow-and-rules`.
 Go stresses receivers and interfaces.
@@ -563,8 +600,8 @@ positive/negative corpus, uncertainty routing, and evidence of benefit beyond pa
 ## Follow-on phase — SCA ecosystem auditing
 
 After the accepted route/source-to-use milestone, add ecosystem audit adapters and dependency
-findings. Per the 2026-11-01 sequence decision, SCA for JS/TS and Python follows the remaining
-vulnerability types and precedes other source languages. The
+findings. Per the 2026-11-02 sequence decision, SCA for JS/TS and Python follows the remaining
+vulnerability types, then secret scanning precedes additional source languages. The
 [SCA design](../architecture/sca-design.md) owns SCA-1 schema/tool selection, SCA-2 bounded audit
 execution/reporting, and SCA-3 optional route-reachability correlation. Start with npm/pnpm audit for
 JS/TS targets and add pip-audit for Python inputs under its own verified adapter contract. Preserve
@@ -573,8 +610,8 @@ silently dismiss dependency findings because a route path was not resolved.
 
 ## Progress and decision records
 
-The phase list contains no checked-off security work. Update completion only from accepted spec
-outcomes and evidence. Durable conclusions go into the proposal/architecture/scope docs; run logs and
+The capability checklist records bounded delivered work; unchecked items and partial language
+coverage remain visible. Update completion only from accepted contract outcomes and evidence. Durable conclusions go into the proposal/architecture/scope docs; run logs and
 resumption notes stay in `.zazz/ephemeral/`. Measure filtered/unexamined candidates alongside findings,
 so cost reduction cannot conceal lost coverage. Revisit scope after each accepted capability instead
 of treating this long-term plan as fixed.

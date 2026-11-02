@@ -187,7 +187,7 @@ and preserve human authority. Assigned process changes do not authorize scanner 
 Commands and contributor checks: [README](../../README.md#contributing). Current live-model setup:
 [OpenAI Decisions setup](openai-decisions-setup.md). Offline extraction and fixture work need no key.
 The decision-model key is already configured in the local ignored `.env`; agents MUST NOT print it.
-The scanner does not auto-load that file; see the [README](../../README.md#optional-decision-model-setup).
+The scanner does not auto-load that file; see the [README](../../README.md#required-decision-model-setup).
 API setup is separate from permission to transmit target source or execute a paid evaluation.
 Live requests remain restricted to OpenAI Decisions with `gpt-6-luna`, small explicit request caps,
 and no provider/model fallback. The previously reported $10 funding is context, not a spending authorization.

@@ -53,4 +53,5 @@ The scanner reads environment variables and does not auto-load `.env`. This samp
 shell use; CI should set environment variables and secrets through its workflow configuration.
 
 
-For optional paid assessment, continue with [decision-model setup](decision-models.md).
+Continue with [required decision-model setup](decision-models.md) before a security assessment.
+Luna judgment is core to that workflow; evidence-only inspection and rendering do not require API calls.

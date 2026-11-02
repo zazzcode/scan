@@ -7,13 +7,22 @@ it is not cloned, installed, or started by zazzles.
 
 ## Run
 
-After compiling, configure a results root outside the worktree and run a local scan:
+After compiling and [configuring required model assessment](decision-models.md), set a results root
+outside the worktree and run a model-assessed scan:
 
 ```bash
 export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-findings"
-./bin/scan --strings --entry server.ts /path/to/juice-shop
-./bin/scan --strings --entry src/server.ts /path/to/vulnerable-typescript-app
+./bin/scan --strings --entry server.ts \
+  --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/juice-shop
+./bin/scan --strings --entry src/server.ts \
+  --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/vulnerable-typescript-app
+./bin/scan --strings --entry server/routes.py \
+  --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/ThreatByte
 ```
+
+Decision-model assessment is core to security judgment. The explicit request cap bounds a run;
+uses beyond it remain unassessed and the report is incomplete. Inventory, evidence-only inspection
+and saved-report rendering can run without calls, but do not complete model assessment.
 
 Each command prints a new run folder. The layout keeps repositories and successive runs separate:
 
@@ -58,7 +67,7 @@ or external assets are required; without JavaScript the default findings-first v
 the standard interchange format for security-tool integrations. Generated reports contain source
 excerpts, so keep them with the same access controls as that source.
 
-Without an output root, existing stdout modes still work. You can also regenerate views from JSON:
+Without an output root, stdout modes still work. For evidence-only inspection and offline rendering:
 
 ```bash
 ./bin/scan --strings --json --output-dir "" --entry server.ts /path/to/app > findings.json
@@ -91,10 +100,11 @@ go run ./cmd/scan --routes --json /path/to/app > graph.json
 
 ## What the graph contains
 
-`scan --routes` parses `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.tsx`, `.mts`, and `.cts`.
-It skips `node_modules`, `vendor`, `dist`, `build`, and the other dependency and output
-directories listed in `internal/walk`. `--list` still counts Python, Go, and Java files.
-Those files are not mined for routes.
+`scan --routes` parses supported JavaScript/TypeScript extensions and `.py` files. Python route
+extraction covers a bounded Flask/Blueprint, RESTX and FastAPI subset; generated registration and
+unresolved dispatch remain explicit coverage work. It skips `node_modules`, `vendor`, `dist`, `build`
+and other dependency/output directories listed in `internal/walk`. `--list` also recognizes Go and
+Java files; those languages do not yet have route analysis. See [Python limits](python-support.md).
 
 A route is a member call named `get`, `post`, `put`, `patch`, `delete`, `all`, or `use`
 whose path is a string literal starting with `/`, or an array of such strings.
