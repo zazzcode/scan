@@ -1,0 +1,8 @@
+{
+  "revision": "a67cbe590698dc4a0422f28e2495a40af559e257",
+  "files": {
+    "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "README.md": "e09d68a5949a32cc3c18271c5414448a98d58de0e1d5785f460fb57311b934ef",
+    "vulnerable-flask-app.py": "b5b577aeae87401dc0bde1cedb9fec8de1f63f2139b1f6de425857f5de66c4db"
+  }
+}

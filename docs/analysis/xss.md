@@ -87,5 +87,6 @@ Unknown middleware and unsupported paths remain visible. No output or finding is
 HTML has separate Server/API and Browser/client headings. Hide protected results changes the view
 only; canonical JSON/SARIF retain all records. Reusable source-reviewed sample references belong in
 [the sample baseline documentation](../samples/reference-policy.md), outside detector/model inputs.
-The shared facts use language-neutral source/context/protection/storage/entry fields. Python
-security extraction remains unimplemented; it will supply the same facts through a separate adapter.
+The shared facts use language-neutral source/context/protection/storage/entry fields. The [Python adapter](../python-support.md) supplies those facts for bounded Flask/Jinja/FastAPI
+flows and literal inline browser scripts. Unresolved renderer settings, template constructs and
+storage origins remain Review.

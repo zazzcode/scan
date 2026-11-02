@@ -33,3 +33,5 @@ remediation context. The files are snapshots; regenerate views after changing th
 
 This root `docs/` directory is for users and contributors. `.zazz/` contains internal engineering
 design, project planning, evaluation records, implementation contracts, and SDLC standards.
+
+[Python analysis and limits](python-support.md) describes the Flask, RESTX, FastAPI and sqlite3 adapter.

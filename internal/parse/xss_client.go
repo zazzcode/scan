@@ -44,7 +44,7 @@ func (s *moduleSet) browser(report *graph.StringReport) error {
 			return err
 		}
 		text := string(m.src)
-		if !strings.Contains(text, "document") && !strings.Contains(text, "location") && !strings.Contains(text, "@angular") && !strings.Contains(text, "react") && !strings.Contains(text, "innerHTML") && !strings.Contains(text, "postMessage") && !strings.Contains(text, "setTimeout") {
+		if !strings.Contains(text, "document") && !strings.Contains(text, "location") && !strings.Contains(text, "@angular") && !strings.Contains(text, "react") && !strings.Contains(text, "innerHTML") && !strings.Contains(text, "postMessage") && !strings.Contains(text, "setTimeout") && !strings.Contains(text, "jquery") {
 			continue
 		}
 		if m.tree.RootNode().HasError() {

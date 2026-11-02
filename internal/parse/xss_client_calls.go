@@ -13,9 +13,14 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 	}
 	if fn.Kind() == "identifier" {
 		name := fn.Utf8Text(f.module.src)
+		if binding, ok := f.module.browserGlobals[name]; ok && browserGlobal(f.module, n, name) && !bindingReassigned(f.module, name) {
+			f.context = append(f.context, binding)
+			return value{domNode: true, jqueryNode: true}, true
+		}
+
 		if imp, ok := f.module.imports[name]; ok && imp.module == "jquery" && !shadowed(n, name, f.module.src) {
 			f.context = append(f.context, f.module.evidence("render_binding", imp.declaration))
-			return value{domNode: true}, true
+			return value{domNode: true, jqueryNode: true}, true
 		}
 		if (name == "setTimeout" || name == "setInterval" || name == "eval") && browserGlobal(f.module, n, name) && args.NamedChildCount() > 0 && !isFunction(args.NamedChild(0)) {
 			v := f.eval(args.NamedChild(0))
@@ -91,6 +96,26 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 			}
 		}
 	}
+
+	if method == "find" || method == "closest" || method == "val" || method == "ready" || method == "each" || method == "submit" || method == "click" {
+		receiver := f.eval(obj)
+		if receiver.jqueryNode {
+			switch method {
+			case "find", "closest":
+				return value{domNode: true, jqueryNode: true}, true
+			case "val":
+				if args.NamedChildCount() == 0 {
+					return f.browserSource(n), true
+				}
+				return value{}, true
+			default:
+				if args.NamedChildCount() > 0 && isFunction(args.NamedChild(0)) {
+					f.clientCallback(args.NamedChild(0), value{})
+					return value{}, true
+				}
+			}
+		}
+	}
 	if method == "subscribe" || method == "then" || method == "pipe" || method == "get" || method == "trim" || method == "json" || method == "addEventListener" || method == "insertAdjacentHTML" || method == "createContextualFragment" || method == "html" || method == "append" {
 		receiver := f.eval(obj)
 		switch method {
@@ -130,7 +155,7 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 				}
 			}
 		case "insertAdjacentHTML", "createContextualFragment", "html", "append":
-			if receiver.domNode {
+			if receiver.domNode && ((method != "append" && method != "html") || receiver.jqueryNode) {
 				index := uint(0)
 				if method == "insertAdjacentHTML" {
 					index = 1

@@ -1,0 +1,62 @@
+{
+  "revision": "a67cbe590698dc4a0422f28e2495a40af559e257",
+  "scope": "Source-reviewed case inventory, not an exhaustive vulnerability count. Labels are never detector or model inputs.",
+  "cases": [
+    {
+      "id": "VF-SQL-01",
+      "file": "vulnerable-flask-app.py",
+      "line": 20,
+      "kind": "sql_query_candidate",
+      "expect": "construction"
+    },
+    {
+      "id": "VF-XSS-02",
+      "file": "vulnerable-flask-app.py",
+      "line": 37,
+      "kind": "xss_candidate",
+      "expect": "raw_xss"
+    },
+    {
+      "id": "VF-XSS-03",
+      "file": "vulnerable-flask-app.py",
+      "line": 51,
+      "kind": "xss_candidate",
+      "expect": "raw_xss"
+    },
+    {
+      "id": "VF-XSS-04",
+      "file": "vulnerable-flask-app.py",
+      "line": 62,
+      "kind": "xss_candidate",
+      "expect": "raw_xss"
+    },
+    {
+      "id": "VF-XSS-JSON",
+      "file": "vulnerable-flask-app.py",
+      "line": 32,
+      "kind": "xss_candidate",
+      "expect": "absent"
+    },
+    {
+      "id": "VF-LOG-ROW",
+      "file": "vulnerable-flask-app.py",
+      "line": 25,
+      "kind": "log_sink_candidate",
+      "expect": "not_confirmed"
+    },
+    {
+      "id": "VF-LOG-LITERAL",
+      "file": "vulnerable-flask-app.py",
+      "line": 109,
+      "kind": "log_sink_candidate",
+      "expect": "not_confirmed"
+    },
+    {
+      "id": "VF-LOG-ARBITRARY",
+      "file": "vulnerable-flask-app.py",
+      "line": 188,
+      "kind": "log_sink_candidate",
+      "expect": "absent"
+    }
+  ]
+}

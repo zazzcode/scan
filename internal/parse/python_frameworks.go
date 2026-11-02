@@ -1,0 +1,89 @@
+package parse
+
+import (
+	sitter "github.com/tree-sitter/go-tree-sitter"
+	"github.com/zazzcode/zazzles/internal/graph"
+	"strings"
+)
+
+func (f *pythonFlow) frameworkCall(n *sitter.Node, q string, nodes []*sitter.Node, values []pythonValue, all pythonValue) (pythonValue, bool) {
+	m := f.module
+	switch q {
+	case "flask.request.get_json":
+		return f.source(n, "json", ""), true
+	case "sqlite3.connect":
+		return pythonValue{binding: "db_connection", evidence: []graph.Evidence{m.evidence("sink_binding", n)}}, true
+	case "flask.redirect", "flask.send_file", "flask.send_from_directory":
+		return pythonValue{rendered: true, binding: "non_html"}, true
+	case "flask.jsonify":
+		v := all
+		v.binding = "json"
+		v.rendered = true
+		return v, true
+	case "flask.render_template":
+		f.renderTemplate(n)
+		return pythonValue{rendered: true}, true
+	case "flask.render_template_string":
+		if len(values) > 0 {
+			v := values[0]
+			if len(v.deps) > 0 {
+				f.recordXSS(m.evidence("template_source", nodes[0]), v, "html_text", []graph.Evidence{m.evidence("render_binding", n)})
+			} else if v.constant {
+				f.renderInline(n, v.literal)
+			}
+		}
+		return pythonValue{rendered: true}, true
+	case "markupsafe.escape", "html.escape":
+		result := all
+		result.deps = append([]pythonDep{}, all.deps...)
+		for i := range result.deps {
+			d := &result.deps[i]
+			if q == "markupsafe.escape" && pythonMarkupPath(d.dep) {
+				continue
+			}
+			d.protection = "encoded"
+			if option := pyKeywordIn(m, n, "quote"); q == "html.escape" && option != nil && pyText(m, option) != "True" {
+				d.protection = "text_encoded"
+			}
+		}
+		return pyTransfer(result, m.evidence("html_encoder", n)), true
+	case "markupsafe.Markup":
+		return pyTransfer(all, m.evidence("trusted_html_wrapper", n)), true
+	case "fastapi.responses.HTMLResponse", "starlette.responses.HTMLResponse":
+		v := all
+		f.recordXSS(m.evidence("html_response", n), v, "html_text", nil)
+		v.rendered = true
+		return v, true
+	case "fastapi.responses.JSONResponse", "starlette.responses.JSONResponse":
+		v := all
+		v.binding = "json"
+		v.rendered = true
+		return v, true
+	case "jinja2.Template":
+		v := all
+		v.binding = "jinja_template"
+		return pyTransfer(v, m.evidence("template_source_construction", n)), true
+	}
+	return pythonValue{}, false
+}
+
+func (f *pythonFlow) outboundCall(n *sitter.Node, q string, fn *sitter.Node, values []pythonValue) pythonValue {
+	m := f.module
+	destination := pythonValue{}
+	index := 0
+	if strings.HasSuffix(q, ".request") {
+		index = 1
+	}
+	if len(values) > index {
+		destination = values[index]
+	}
+	if keyword := pyKeywordIn(m, n, "url"); keyword != nil {
+		destination = f.eval(keyword)
+	}
+	if len(destination.deps) > 0 {
+		u := f.addUse("outbound_http_candidate", n, destination)
+		u.Context = append(u.Context, m.evidence("sink_binding", fn))
+		u.APIModel = &graph.APIModel{ID: "python-http-destination-v1", Library: strings.Split(q, ".")[0], Semantics: "The URL/destination operand is separate from request body and response; response data is an independent external source."}
+	}
+	return pythonValue{binding: "http_response", evidence: []graph.Evidence{m.evidence("external_exchange", n)}}
+}

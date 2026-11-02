@@ -1,0 +1,48 @@
+{
+  "tool": "semgrep",
+  "run": "semgrep-20261101-1",
+  "findings": [
+    {
+      "rule": "semgrep-rules.20261101.dockerfile.security.missing-user.missing-user",
+      "path": "Dockerfile",
+      "line": 19,
+      "message": "By not specifying a USER, a program in the container may run as 'root'. This is a security hazard. If an attacker can control a process running as root, they may have control over the container. Ensure that the last USER in a Dockerfile is a USER other than 'root'."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5",
+      "path": "db/create_dummy_data.py",
+      "line": 8,
+      "message": "Detected MD5 hash algorithm which is considered insecure. MD5 is not collision resistant and is therefore not suitable as a cryptographic signature. Use SHA256 or SHA3 instead."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.lang.security.audit.md5-used-as-password.md5-used-as-password",
+      "path": "db/create_dummy_data.py",
+      "line": 8,
+      "message": "It looks like MD5 is used as a password hash. MD5 is not considered a secure password hash because it can be cracked by an attacker in a short amount of time. Use a suitable password hashing function such as scrypt. You can use `hashlib.scrypt`."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.django.security.injection.sql.sql-injection-using-db-cursor-execute.sql-injection-db-cursor-execute",
+      "path": "server/routes.py",
+      "line": 126,
+      "message": "User-controlled data from a request is passed to 'execute()'. This could lead to a SQL injection and therefore protected information could be leaked. Instead, use django's QuerySets, which are built with query parameterization and therefore not vulnerable to sql injection. For example, you could use `Entry.objects.filter(date=2006)`."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.flask.security.injection.tainted-sql-string.tainted-sql-string",
+      "path": "server/routes.py",
+      "line": 137,
+      "message": "Detected user input used to manually construct a SQL string. This is usually bad practice because manual construction could accidentally result in a SQL injection. An attacker could use a SQL injection to steal or modify contents of the database. Instead, use a parameterized query which is available by default in most database engines. Alternatively, consider using an object-relational mapper (ORM) such as SQLAlchemy which will protect your queries."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5",
+      "path": "server/routes.py",
+      "line": 403,
+      "message": "Detected MD5 hash algorithm which is considered insecure. MD5 is not collision resistant and is therefore not suitable as a cryptographic signature. Use SHA256 or SHA3 instead."
+    },
+    {
+      "rule": "semgrep-rules.20261101.python.lang.security.audit.md5-used-as-password.md5-used-as-password",
+      "path": "server/routes.py",
+      "line": 403,
+      "message": "It looks like MD5 is used as a password hash. MD5 is not considered a secure password hash because it can be cracked by an attacker in a short amount of time. Use a suitable password hashing function such as scrypt. You can use `hashlib.scrypt`."
+    }
+  ]
+}

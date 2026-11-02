@@ -1,0 +1,1030 @@
+{
+  "finding_types": [
+    {
+      "id": "dom-xss",
+      "label": "Client-side XSS",
+      "description": "Browser or API data reaches a DOM or framework rendering operation in an active output context.",
+      "interpretation": "Client entries identify browser sources and verified sinks. Raw flows are construction findings; unknown origin, trust-to-template linkage or API response mapping remains Review. Framework defaults can protect a specific output.",
+      "remediation": "Prefer text APIs and default framework escaping/sanitization. Sanitize rich HTML before rendering, remove unnecessary trust bypasses and verify API origins.",
+      "coverage": "bounded browser DOM and Angular/React/Vue analysis"
+    },
+    {
+      "id": "rendering-flow-review",
+      "label": "Rendering Flow Review",
+      "description": "Data returned by an API needs its browser consumer linked before a rendering claim can be assessed.",
+      "interpretation": "JSON output alone is not an XSS sink or a vulnerability. This record is incomplete flow context for further analysis.",
+      "remediation": "Locate the browser consumer, establish its output context and protections, and assess that rendering flow before changing API data handling.",
+      "coverage": "bounded API response evidence"
+    },
+    {
+      "id": "sql-injection",
+      "label": "SQL Injection",
+      "description": "Input changes executable SQL structure instead of remaining a data value, potentially changing what the database reads or writes.",
+      "interpretation": "An SQL Injection pill identifies the risk family being reviewed. String-built executable SQL is poor practice to remediate even without a proven exploit; a library-managed search value may remain unresolved. The finding status and evidence determine the actual claim. The pill alone does not confirm injection.",
+      "remediation": "Use the verified driver's parameter-binding API for values. Review dynamic identifiers separately. Keep business-field validation independent of query-structure protection.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "nosql-injection",
+      "label": "NoSQL Injection",
+      "description": "Untrusted input changes a NoSQL query's operators, selector structure, or executable expression rather than remaining an allowed data value.",
+      "interpretation": "Executable $where string construction is poor practice to refactor even without a proven exploit. An unmodeled document constraint alone is Review, not an established defect. Inspect actual value types, keys, transformations, library behavior, and the named status.",
+      "remediation": "Prefer data-only query APIs, constrain scalar slots and permitted keys/operators, and avoid building executable $where strings from input.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "input-validation",
+      "label": "Input Validation",
+      "description": "Server-side checks enforce the business requirements for a field, such as required presence, runtime type, permitted format, range, or length.",
+      "interpretation": "Poor input validation means an applicable requirement is not adequately enforced. This neutral family label also covers unresolved checks and supported protection: no validator identified in an analyzed slice is not proof that every execution path lacks validation. Free-text punctuation is not itself a defect.",
+      "remediation": "Define field-specific requirements and enforce them before use on all applicable paths. Verify guard behavior and middleware. Apply destination-specific protection separately.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "account-creation-validation",
+      "label": "Account Creation Validation",
+      "description": "Required account fields and enforcing guards must be checked before an account is persisted.",
+      "interpretation": "Review field requirements, conditional bypasses, and generated persistence behavior. A modeled create operation alone does not prove a registration bypass.",
+      "remediation": "Enforce required fields before persistence, terminate rejected paths, add appropriate database constraints, and test the persisted result.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "outbound-request-safety",
+      "label": "Outbound Request Safety",
+      "description": "Input used in an outbound request may affect its destination, headers, or other request values. Unrestricted destination control can lead to server-side request forgery (SSRF).",
+      "interpretation": "The current scanner records bounded outbound-use evidence. A pill does not establish SSRF, destination reachability, or complete response-flow analysis.",
+      "remediation": "Verify allowed destinations and protocols, redirect handling, network boundaries, and sensitive request values for the specific HTTP client.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "reflected-xss",
+      "label": "Reflected XSS",
+      "description": "Request-controlled content is reflected into a browser response in a context that allows it to execute as script.",
+      "interpretation": "Request input reaches an HTML response or template output. Raw output is a construction finding; unknown context or sanitizers remain Review. Escaping protects only its modeled output context. Runtime exploitation is not implied.",
+      "remediation": "Use context-appropriate output encoding and safe template or DOM APIs. Input validation alone does not replace correct output handling.",
+      "coverage": "bounded server response and template analysis"
+    },
+    {
+      "id": "stored-xss",
+      "label": "Stored XSS",
+      "description": "Untrusted data is persisted and later rendered in an active browser context.",
+      "interpretation": "A matching model and field link source writes to rendering reads. Unresolved write origins remain Review; a verified raw path is a construction finding. A dependency version alone does not establish a reachable XSS flow.",
+      "remediation": "Preserve the intended stored data; apply context-appropriate escaping or maintained sanitization at every rendering sink, and review existing stored content.",
+      "coverage": "bounded model-field write/read and server template analysis"
+    },
+    {
+      "id": "sensitive-data-logging",
+      "label": "Sensitive Data Logging",
+      "description": "Logs expose credentials, tokens, personal information, or other sensitive values to readers or storage that should not receive them.",
+      "interpretation": "Covers verified console and winston calls in analyzed route handlers that receive request values with credential or personal-data evidence. A field name is a hint for review, not proof; Authorization and Cookie headers are credentials by HTTP semantics. Morgan request logging that records URLs is checked against credentials read from the query string. Constant messages are not leaks. Non-request secrets and logger redaction configuration are not yet analyzed.",
+      "remediation": "Avoid logging secrets; minimize sensitive fields and apply verified redaction before emission. Review log access and retention.",
+      "coverage": "bounded analysis"
+    },
+    {
+      "id": "sensitive-operation-review",
+      "label": "Sensitive Operation Review",
+      "description": "A possible sensitive use was recorded but does not yet map to a more specific supported risk family.",
+      "interpretation": "This is an analysis category. Inspect the evidence and missing operation semantics before making a security claim.",
+      "remediation": "Resolve the source, operation, API behavior, and required protection before selecting a fix.",
+      "coverage": "bounded analysis"
+    }
+  ],
+  "presentation_version": 3,
+  "findings": [
+    {
+      "type_ids": [
+        "reflected-xss"
+      ],
+      "id": "finding:use:route:app/main.py:342:GET:/:app/main.py:1302:xss",
+      "use_id": "use:route:app/main.py:342:GET:/:app/main.py:1302:xss",
+      "route_id": "route:app/main.py:342:GET:/",
+      "record_type": "finding",
+      "status": "confirmed_vulnerability",
+      "title": "Cross-site scripting supported by source analysis",
+      "summary": "A complete rendering claim and consistent XSS-specific assessment establish an unsafe source-to-sink path. This is a static judgment; independent runtime confirmation remains separate.",
+      "input_validation": "Input validation is separate from context-appropriate output encoding and sanitization.",
+      "use_protection": "Decision XSS exposure: vulnerable. Scanner policy: Complete source-backed rendering claim and consistent XSS-specific answers establish an unsafe supported path; this is static analysis, not runtime confirmation.",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
+      "recommendations": {
+        "title": "Protect the specific browser rendering context",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Use escaped template output for HTML text and quoted non-active attributes; use textContent for plain DOM text.",
+          "For intentional rich HTML, apply a verified maintained sanitizer before every sink; inspect its configuration and version.",
+          "Treat script, URL, event-handler and unquoted-attribute contexts separately. HTML entity encoding alone does not protect them.",
+          "Preserve source, storage and output links when fixing reflected or stored flows; test the protected counterpart."
+        ],
+        "example_status": ""
+      }
+    },
+    {
+      "type_ids": [
+        "input-validation"
+      ],
+      "id": "finding:input:route:app/main.py:342:GET:/:query.name",
+      "use_id": "input:route:app/main.py:342:GET:/:query.name",
+      "route_id": "route:app/main.py:342:GET:/",
+      "record_type": "analysis",
+      "status": "needs_evidence",
+      "title": "Request-field validation needs review",
+      "summary": "Scan identified a request field used by the handler. Review it against the route's actual business requirements, separately from database protection.",
+      "input_validation": "The value reaches a call or middleware whose validation effect has not been established. Inspect the actual check and whether it runs before this use. Evidence: query.name: assess actual enforcing conditions in handler; no external business policy was supplied Model validation answer: Inconclusive.",
+      "use_protection": "Assessed injection/use protection: Inconclusive. legacy candidate has no claim-scoped completeness evidence",
+      "uncertainty": "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.",
+      "recommendations": {
+        "title": "Validate and sanitize each request input",
+        "actions": [
+          "Remediate established vulnerabilities and poor practice. For Review items, resolve the named evidence before deciding whether or how behavior needs to change.",
+          "Define the server-side field policy, then enforce applicable type, presence, length, range, and format constraints before use. Free text must remain valid for its business purpose.",
+          "Use destination-specific protection independently of field validation: SQL parameter binding or a verified NoSQL document API with constrained keys and scalar types. Do not apply a generic sanitizer as a substitute.",
+          "Preserve an explicit Inconclusive result when a call receives the field but its effect has not been established."
+        ],
+        "example_status": "not_generated; field policy is route-specific"
+      }
+    }
+  ],
+  "schema_version": 1,
+  "root": "python-insecure-app",
+  "entries": [
+    {
+      "route": {
+        "id": "route:app/main.py:342:GET:/",
+        "method": "GET",
+        "path_pattern": "/",
+        "framework": "fastapi",
+        "registration": {
+          "file": "app/main.py",
+          "start_line": 18,
+          "end_line": 18,
+          "start_byte": 342,
+          "end_byte": 384
+        },
+        "handler": {
+          "name": "try_hack_me",
+          "kind": "function",
+          "span": {
+            "file": "app/main.py",
+            "start_line": 19,
+            "end_line": 41,
+            "start_byte": 385,
+            "end_byte": 1328
+          }
+        },
+        "steps": [
+          {
+            "kind": "registration",
+            "symbol": {
+              "name": "app.get",
+              "kind": "decorator",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 18,
+                "end_line": 18,
+                "start_byte": 342,
+                "end_byte": 384
+              }
+            }
+          },
+          {
+            "kind": "handler",
+            "symbol": {
+              "name": "try_hack_me",
+              "kind": "function",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 19,
+                "end_line": 41,
+                "start_byte": 385,
+                "end_byte": 1328
+              }
+            }
+          }
+        ]
+      },
+      "resolved_handler": {
+        "kind": "route_handler",
+        "text": "async def try_hack_me(name: str = config.SUPER_SECRET_NAME):\n    \"\"\"\n    Root endpoint that greets the user and provides a random text.\n\n    Args:\n        name (str, optional): Name of the user. Defaults to SUPER_SECRET_NAME.\n\n    Returns:\n        str: HTML content with a greeting and a public ip response.\n    \"\"\"\n    try:\n        # Get the public IP address from an external service\n        public_ip_response = requests.get(config.PUBLIC_IP_SERVICE_URL)\n        public_ip_response.raise_for_status()\n    except (requests.HTTPError, requests.exceptions.InvalidSchema):\n        public_ip = \"Unknown\"\n    else:\n        public_ip = public_ip_response.text\n    name = name or config.SUPER_SECRET_NAME\n    content = f\"<h1>Hello, {name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>\"\n    # https://fastapi.tiangolo.com/advanced/custom-response/#return-a-response\n    # FIXME: return HTMLResponse(content)\n    return Template(content).render()",
+        "span": {
+          "file": "app/main.py",
+          "start_line": 19,
+          "end_line": 41,
+          "start_byte": 385,
+          "end_byte": 1328
+        },
+        "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+      },
+      "gaps": []
+    }
+  ],
+  "uses": [
+    {
+      "xss": {
+        "type": "reflected",
+        "entry_kind": "server",
+        "output_context": "html_text",
+        "content_type": "text/html",
+        "protection": "raw",
+        "protection_reason": "A supported source path reaches HTML without context-appropriate escaping; unknown siblings remain explicit.",
+        "origin_resolved": true,
+        "paths": [
+          {
+            "dependency": 0,
+            "protection": "raw"
+          },
+          {
+            "dependency": 1,
+            "protection": "raw"
+          }
+        ]
+      },
+      "api_model": {
+        "id": "python-html-output-v1",
+        "library": "fastapi",
+        "semantics": "Flask string returns use HTML; FastAPI HTML is explicit. Jinja autoescape protects template variables, not request text compiled as template source.",
+        "reference": "https://flask.palletsprojects.com/en/stable/templating/"
+      },
+      "completeness": {
+        "model_facts": [
+          "output_context=html_text",
+          "protection=raw",
+          "origin_resolved=true"
+        ],
+        "claim_kind": "xss",
+        "required": [
+          "render_source",
+          "render_binding",
+          "render_context"
+        ],
+        "evidence": {
+          "render_binding": [
+            {
+              "kind": "render_binding",
+              "text": "app.get(\"/\", response_class=HTMLResponse)",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 18,
+                "end_line": 18,
+                "start_byte": 343,
+                "end_byte": 384
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            }
+          ],
+          "render_context": [
+            {
+              "kind": "html_return",
+              "text": "Template(content).render()",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 41,
+                "end_line": 41,
+                "start_byte": 1302,
+                "end_byte": 1328
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            }
+          ],
+          "render_source": [
+            {
+              "kind": "request_source",
+              "text": "name: str = config.SUPER_SECRET_NAME",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 19,
+                "end_line": 19,
+                "start_byte": 407,
+                "end_byte": 443
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "external_response_source",
+              "text": "public_ip_response.text",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 36,
+                "end_line": 36,
+                "start_byte": 1017,
+                "end_byte": 1040
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            }
+          ]
+        },
+        "blockers": [],
+        "coverage": [],
+        "scope": "Bounded source-to-rendering flow; output context and protections are scoped to this sink."
+      },
+      "id": "use:route:app/main.py:342:GET:/:app/main.py:1302:xss",
+      "route_id": "route:app/main.py:342:GET:/",
+      "kind": "xss_candidate",
+      "sink": {
+        "kind": "html_return",
+        "text": "Template(content).render()",
+        "span": {
+          "file": "app/main.py",
+          "start_line": 41,
+          "end_line": 41,
+          "start_byte": 1302,
+          "end_byte": 1328
+        },
+        "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "name: str = config.SUPER_SECRET_NAME",
+            "span": {
+              "file": "app/main.py",
+              "start_line": 19,
+              "end_line": 19,
+              "start_byte": 407,
+              "end_byte": 443
+            },
+            "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+          },
+          "transfers": [
+            {
+              "kind": "value_reference",
+              "text": "name",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 37,
+                "end_line": 37,
+                "start_byte": 1052,
+                "end_byte": 1056
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "expression",
+              "text": "name or config.SUPER_SECRET_NAME",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 37,
+                "end_line": 37,
+                "start_byte": 1052,
+                "end_byte": 1084
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "assignment",
+              "text": "name = name or config.SUPER_SECRET_NAME",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 37,
+                "end_line": 37,
+                "start_byte": 1045,
+                "end_byte": 1084
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "value_reference",
+              "text": "name",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 38,
+                "end_line": 38,
+                "start_byte": 1113,
+                "end_byte": 1117
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "string_interpolation",
+              "text": "{name}",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 38,
+                "end_line": 38,
+                "start_byte": 1112,
+                "end_byte": 1118
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "string_interpolation",
+              "text": "f\"<h1>Hello, {name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>\"",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 38,
+                "end_line": 38,
+                "start_byte": 1099,
+                "end_byte": 1169
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "assignment",
+              "text": "content = f\"<h1>Hello, {name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>\"",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 38,
+                "end_line": 38,
+                "start_byte": 1089,
+                "end_byte": 1169
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "value_reference",
+              "text": "content",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 41,
+                "end_line": 41,
+                "start_byte": 1311,
+                "end_byte": 1318
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "template_source_construction",
+              "text": "Template(content)",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 41,
+                "end_line": 41,
+                "start_byte": 1302,
+                "end_byte": 1319
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "template_render",
+              "text": "Template(content).render()",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 41,
+                "end_line": 41,
+                "start_byte": 1302,
+                "end_byte": 1328
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            }
+          ]
+        },
+        {
+          "source": {
+            "kind": "external_response_source",
+            "text": "public_ip_response.text",
+            "span": {
+              "file": "app/main.py",
+              "start_line": 36,
+              "end_line": 36,
+              "start_byte": 1017,
+              "end_byte": 1040
+            },
+            "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+          },
+          "transfers": [
+            {
+              "kind": "assignment",
+              "text": "public_ip = public_ip_response.text",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 36,
+                "end_line": 36,
+                "start_byte": 1005,
+                "end_byte": 1040
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "value_reference",
+              "text": "public_ip",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 38,
+                "end_line": 38,
+                "start_byte": 1146,
+                "end_byte": 1155
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "string_interpolation",
+              "text": "{public_ip}",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 38,
+                "end_line": 38,
+                "start_byte": 1145,
+                "end_byte": 1156
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "string_interpolation",
+              "text": "f\"<h1>Hello, {name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>\"",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 38,
+                "end_line": 38,
+                "start_byte": 1099,
+                "end_byte": 1169
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "assignment",
+              "text": "content = f\"<h1>Hello, {name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>\"",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 38,
+                "end_line": 38,
+                "start_byte": 1089,
+                "end_byte": 1169
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "value_reference",
+              "text": "content",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 41,
+                "end_line": 41,
+                "start_byte": 1311,
+                "end_byte": 1318
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "template_source_construction",
+              "text": "Template(content)",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 41,
+                "end_line": 41,
+                "start_byte": 1302,
+                "end_byte": 1319
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            },
+            {
+              "kind": "template_render",
+              "text": "Template(content).render()",
+              "span": {
+                "file": "app/main.py",
+                "start_line": 41,
+                "end_line": 41,
+                "start_byte": 1302,
+                "end_byte": 1328
+              },
+              "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "kind": "route_handler",
+          "text": "async def try_hack_me(name: str = config.SUPER_SECRET_NAME):\n    \"\"\"\n    Root endpoint that greets the user and provides a random text.\n\n    Args:\n        name (str, optional): Name of the user. Defaults to SUPER_SECRET_NAME.\n\n    Returns:\n        str: HTML content with a greeting and a public ip response.\n    \"\"\"\n    try:\n        # Get the public IP address from an external service\n        public_ip_response = requests.get(config.PUBLIC_IP_SERVICE_URL)\n        public_ip_response.raise_for_status()\n    except (requests.HTTPError, requests.exceptions.InvalidSchema):\n        public_ip = \"Unknown\"\n    else:\n        public_ip = public_ip_response.text\n    name = name or config.SUPER_SECRET_NAME\n    content = f\"<h1>Hello, {name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>\"\n    # https://fastapi.tiangolo.com/advanced/custom-response/#return-a-response\n    # FIXME: return HTMLResponse(content)\n    return Template(content).render()",
+          "span": {
+            "file": "app/main.py",
+            "start_line": 19,
+            "end_line": 41,
+            "start_byte": 385,
+            "end_byte": 1328
+          },
+          "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+        },
+        {
+          "kind": "route_registration",
+          "text": "app.get(\"/\", response_class=HTMLResponse)",
+          "span": {
+            "file": "app/main.py",
+            "start_line": 18,
+            "end_line": 18,
+            "start_byte": 343,
+            "end_byte": 384
+          },
+          "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+        },
+        {
+          "kind": "receiver_binding",
+          "text": "FastAPI(\n    title=\"Try Hack Me\",\n    description=\"A sample project that will be hacked soon.\",\n    version=\"0.0.1337\",\n    debug=config.DEBUG,\n)",
+          "span": {
+            "file": "app/main.py",
+            "start_line": 10,
+            "end_line": 15,
+            "start_byte": 194,
+            "end_byte": 339
+          },
+          "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+        },
+        {
+          "kind": "render_binding",
+          "text": "app.get(\"/\", response_class=HTMLResponse)",
+          "span": {
+            "file": "app/main.py",
+            "start_line": 18,
+            "end_line": 18,
+            "start_byte": 343,
+            "end_byte": 384
+          },
+          "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+        }
+      ],
+      "gaps": [],
+      "assessment": {
+        "answer_details": {
+          "encoding_adequacy": {
+            "choice": "not_present",
+            "confidence": 0.93,
+            "probabilities": [
+              {
+                "value": "adequate",
+                "probability": 0
+              },
+              {
+                "value": "inadequate",
+                "probability": 0.04
+              },
+              {
+                "value": "not_present",
+                "probability": 0.95
+              },
+              {
+                "value": "unknown",
+                "probability": 0.01
+              }
+            ]
+          },
+          "output_context": {
+            "choice": "html_text",
+            "confidence": 1,
+            "probabilities": [
+              {
+                "value": "html_text",
+                "probability": 1
+              },
+              {
+                "value": "html_attribute",
+                "probability": 0
+              },
+              {
+                "value": "url",
+                "probability": 0
+              },
+              {
+                "value": "script",
+                "probability": 0
+              },
+              {
+                "value": "style",
+                "probability": 0
+              },
+              {
+                "value": "unquoted_attribute",
+                "probability": 0
+              },
+              {
+                "value": "active_attribute",
+                "probability": 0
+              },
+              {
+                "value": "html_tag",
+                "probability": 0
+              },
+              {
+                "value": "template_code",
+                "probability": 0
+              },
+              {
+                "value": "unknown",
+                "probability": 0
+              }
+            ]
+          },
+          "sanitizer_effectiveness": {
+            "choice": "ineffective",
+            "confidence": 0.71,
+            "probabilities": [
+              {
+                "value": "effective",
+                "probability": 0.01
+              },
+              {
+                "value": "ineffective",
+                "probability": 0.78
+              },
+              {
+                "value": "absent",
+                "probability": 0.21
+              },
+              {
+                "value": "unknown",
+                "probability": 0
+              }
+            ]
+          },
+          "xss_all_paths_protected": {
+            "choice": "no",
+            "confidence": 1,
+            "probabilities": [
+              {
+                "value": "yes",
+                "probability": 0
+              },
+              {
+                "value": "no",
+                "probability": 1
+              },
+              {
+                "value": "unknown",
+                "probability": 0
+              }
+            ]
+          },
+          "xss_exposure": {
+            "choice": "vulnerable",
+            "confidence": 1,
+            "probabilities": [
+              {
+                "value": "vulnerable",
+                "probability": 1
+              },
+              {
+                "value": "protected",
+                "probability": 0
+              },
+              {
+                "value": "unknown",
+                "probability": 0
+              },
+              {
+                "value": "not_applicable",
+                "probability": 0
+              }
+            ]
+          }
+        },
+        "finding_status": "confirmed_vulnerability",
+        "answers": {
+          "encoding_adequacy": "not_present",
+          "output_context": "html_text",
+          "sanitizer_effectiveness": "ineffective",
+          "xss_all_paths_protected": "no",
+          "xss_exposure": "vulnerable"
+        },
+        "usage": {
+          "input_tokens": 4272,
+          "output_tokens": 0
+        },
+        "status": "completed",
+        "provider": "openai",
+        "model": "gpt-6-luna",
+        "question_version": "xss-use-v1",
+        "protection": "insufficient",
+        "reason": "Complete source-backed rendering claim and consistent XSS-specific answers establish an unsafe supported path; this is static analysis, not runtime confirmation."
+      }
+    },
+    {
+      "id": "input:route:app/main.py:342:GET:/:query.name",
+      "route_id": "route:app/main.py:342:GET:/",
+      "kind": "input_validation_candidate",
+      "sink": {
+        "kind": "request_source",
+        "text": "name: str = config.SUPER_SECRET_NAME",
+        "span": {
+          "file": "app/main.py",
+          "start_line": 19,
+          "end_line": 19,
+          "start_byte": 407,
+          "end_byte": 443
+        },
+        "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+      },
+      "dependencies": [
+        {
+          "source": {
+            "kind": "request_source",
+            "text": "name: str = config.SUPER_SECRET_NAME",
+            "span": {
+              "file": "app/main.py",
+              "start_line": 19,
+              "end_line": 19,
+              "start_byte": 407,
+              "end_byte": 443
+            },
+            "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+          },
+          "transfers": []
+        }
+      ],
+      "context": [
+        {
+          "kind": "route_handler",
+          "text": "async def try_hack_me(name: str = config.SUPER_SECRET_NAME):\n    \"\"\"\n    Root endpoint that greets the user and provides a random text.\n\n    Args:\n        name (str, optional): Name of the user. Defaults to SUPER_SECRET_NAME.\n\n    Returns:\n        str: HTML content with a greeting and a public ip response.\n    \"\"\"\n    try:\n        # Get the public IP address from an external service\n        public_ip_response = requests.get(config.PUBLIC_IP_SERVICE_URL)\n        public_ip_response.raise_for_status()\n    except (requests.HTTPError, requests.exceptions.InvalidSchema):\n        public_ip = \"Unknown\"\n    else:\n        public_ip = public_ip_response.text\n    name = name or config.SUPER_SECRET_NAME\n    content = f\"<h1>Hello, {name}!</h1><h2>Public IP: <code>{public_ip}</code></h2>\"\n    # https://fastapi.tiangolo.com/advanced/custom-response/#return-a-response\n    # FIXME: return HTMLResponse(content)\n    return Template(content).render()",
+          "span": {
+            "file": "app/main.py",
+            "start_line": 19,
+            "end_line": 41,
+            "start_byte": 385,
+            "end_byte": 1328
+          },
+          "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+        },
+        {
+          "kind": "route_registration",
+          "text": "app.get(\"/\", response_class=HTMLResponse)",
+          "span": {
+            "file": "app/main.py",
+            "start_line": 18,
+            "end_line": 18,
+            "start_byte": 343,
+            "end_byte": 384
+          },
+          "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+        },
+        {
+          "kind": "receiver_binding",
+          "text": "FastAPI(\n    title=\"Try Hack Me\",\n    description=\"A sample project that will be hacked soon.\",\n    version=\"0.0.1337\",\n    debug=config.DEBUG,\n)",
+          "span": {
+            "file": "app/main.py",
+            "start_line": 10,
+            "end_line": 15,
+            "start_byte": 194,
+            "end_byte": 339
+          },
+          "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "input_validation_unresolved",
+          "detail": "query.name: assess actual enforcing conditions in handler; no external business policy was supplied",
+          "at": {
+            "file": "app/main.py",
+            "start_line": 19,
+            "end_line": 19,
+            "start_byte": 407,
+            "end_byte": 443
+          }
+        }
+      ],
+      "assessment": {
+        "answer_details": {
+          "protection": {
+            "choice": "not_applicable",
+            "confidence": 0.91,
+            "probabilities": [
+              {
+                "value": "sufficient",
+                "probability": 0.01
+              },
+              {
+                "value": "insufficient",
+                "probability": 0.05
+              },
+              {
+                "value": "uncertain",
+                "probability": 0.01
+              },
+              {
+                "value": "not_applicable",
+                "probability": 0.93
+              }
+            ]
+          },
+          "validation": {
+            "choice": "uncertain",
+            "confidence": 0.27,
+            "probabilities": [
+              {
+                "value": "sufficient",
+                "probability": 0.08
+              },
+              {
+                "value": "insufficient",
+                "probability": 0.4
+              },
+              {
+                "value": "uncertain",
+                "probability": 0.45
+              },
+              {
+                "value": "not_applicable",
+                "probability": 0.07
+              }
+            ]
+          }
+        },
+        "finding_status": "needs_evidence",
+        "blocking_gaps": [
+          {
+            "kind": "input_validation_unresolved",
+            "detail": "query.name: assess actual enforcing conditions in handler; no external business policy was supplied",
+            "at": {
+              "file": "app/main.py",
+              "start_line": 19,
+              "end_line": 19,
+              "start_byte": 407,
+              "end_byte": 443
+            }
+          }
+        ],
+        "answers": {
+          "protection": "not_applicable",
+          "validation": "uncertain"
+        },
+        "usage": {
+          "input_tokens": 1844,
+          "output_tokens": 0
+        },
+        "status": "completed",
+        "provider": "openai",
+        "model": "gpt-6-luna",
+        "question_version": "string-use-v8",
+        "protection": "uncertain",
+        "reason": "legacy candidate has no claim-scoped completeness evidence"
+      }
+    }
+  ],
+  "gaps": [],
+  "files": [
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "app/__init__.py",
+        "start_line": 1,
+        "end_line": 1,
+        "start_byte": 0,
+        "end_byte": 0
+      },
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "app/config.py",
+        "start_line": 1,
+        "end_line": 16,
+        "start_byte": 0,
+        "end_byte": 435
+      },
+      "sha256": "b4d91ced6138a38e91a55764e40e5c2f22ac4f5152d56c21a95345793b137b47"
+    },
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "app/main.py",
+        "start_line": 1,
+        "end_line": 42,
+        "start_byte": 0,
+        "end_byte": 1329
+      },
+      "sha256": "2c276fac071346e10eee895beb21de3ad49ac9652f4f4723cef4de6c3378f890"
+    },
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "tests/__init__.py",
+        "start_line": 1,
+        "end_line": 1,
+        "start_byte": 0,
+        "end_byte": 0
+      },
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "kind": "file",
+      "text": "",
+      "span": {
+        "file": "tests/test_main.py",
+        "start_line": 1,
+        "end_line": 47,
+        "start_byte": 0,
+        "end_byte": 1576
+      },
+      "sha256": "af865141823482b7f55e83e9250150432f37c81e00ad3a7ebec6229724a2979c"
+    }
+  ],
+  "limitations": [
+    "ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain",
+    "Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
+    "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
+    "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities",
+    "Python adapter v1: static Flask/Blueprint, RESTX Resource and FastAPI routes; dynamic registration, custom decorators and response overrides remain gaps",
+    "Python helper expansion is bounded to depth 3 and 24 calls per route; loops, comprehensions, mutation, exceptions and external dispatch are conservative",
+    "Jinja output requires a verified Flask template binding; unresolved configuration, includes/macros and stored origins remain Review; no runtime execution or SCA"
+  ],
+  "practice": [
+    {
+      "id": "python",
+      "version": "2",
+      "languages": [
+        "python"
+      ]
+    }
+  ]
+}

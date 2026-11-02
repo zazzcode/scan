@@ -10,6 +10,7 @@ import (
 
 type value struct {
 	domNode            bool
+	jqueryNode         bool
 	urlParams          bool
 	trustedContext     string
 	apiPath, apiMethod string
@@ -463,6 +464,7 @@ func combine(a, b value) value {
 	}
 	a.outputHTML = a.outputHTML || b.outputHTML
 	a.domNode = a.domNode || b.domNode
+	a.jqueryNode = a.jqueryNode || b.jqueryNode
 	a.urlParams = a.urlParams || b.urlParams
 	if a.trustedContext == "" {
 		a.trustedContext = b.trustedContext

@@ -35,3 +35,8 @@ rejected, boundary, protected, and inconclusive cases where relevant.
 
 Current validation answers are facets of use records. Separate established per-field defect counting
 is incomplete; do not add overlapping category pills together as independent findings.
+
+The [Python adapter](../python-support.md) includes relevant handler/helper code, branch preconditions
+and source-backed input constraints from a form posting to the same handler. Client constraints
+establish declared policy; they do not prove server enforcement. Standalone fields remain Review
+when no business policy is established. Query records retain separate validation and injection facets.

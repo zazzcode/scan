@@ -1,10 +1,10 @@
 id: python
-version: 1
+version: 2
 languages: python
 
 # Python practice
 
-This standard is applied when a Python file is assessed. The current route scanner does not yet emit Python sink candidates.
+This standard applies to Python route, SQL, logging, rendering and outbound evidence.
 
 ## Posture
 
@@ -12,7 +12,7 @@ Report a confirmed injection and weak or poor practice. An agent can harden both
 
 ## Validation
 
-Restrict each field as far as its business requirement allows. A missing check is insufficient. `isinstance(value, str)` or a length check is insufficient when a tighter check would still meet the business need. A name, a comment, or an unshown helper is not validation.
+Restrict each field as far as its business requirement allows. A missing check alone does not establish a business requirement or a validation defect. Assess required presence, type, format, range and other constraints only when the supplied code or explicit scan check establishes that policy. Unknown business requirements stay uncertain. A type or length check does not replace sink-specific protection. A name, a comment, or an unshown helper is not validation.
 
 ## Free text
 
@@ -25,3 +25,17 @@ Do not build SQL or NoSQL text with f-strings, `%` formatting, `+`, or `format`.
 ## Do not claim
 
 Do not invent a guard, a parameter binding, or a branch that the evidence does not show.
+
+## Rendering
+
+Flask string returns are HTML unless an explicit response contract says otherwise. JSON is not an
+HTML sink. Jinja autoescaping protects substituted variables in supported contexts; it does not
+escape input that was interpolated into template source before compilation. Safe/Markup bypasses
+and disabled autoescape need separate analysis. HTML escaping does not establish script/URL safety.
+
+## Logging
+
+Identify actual credential or personal-data content, its source and logger binding. A password/email
+field name is a hint, not proof. A source-backed literal email or verified database field can also
+be a personal-data source. Whole containers and unknown transformations remain uncertain. Length,
+presence and comparison facts do not expose content; do not infer remote log retention/exposure.

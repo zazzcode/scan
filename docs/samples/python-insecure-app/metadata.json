@@ -1,0 +1,24 @@
+{
+  "target": "python-insecure-app",
+  "revision": "b188493768ca2c1ef003e08148fb2e4577219c36",
+  "adapter": "python-adapter-v1",
+  "assessment": "gpt-6-luna; exact-request replay only",
+  "entries": 1,
+  "client_entries": 0,
+  "records": 2,
+  "assessed": 2,
+  "outcomes": {
+    "confirmed_vulnerability": 1,
+    "needs_evidence": 1
+  },
+  "runtime_confirmation": false,
+  "independent_findings_review": "Source-reviewed cases; not exhaustive audit",
+  "source_reference": "reference.md",
+  "case_inventory": "cases.json",
+  "baseline_tools": [
+    "Semgrep CE 1.183.0 / 20261101 snapshot",
+    "Bearer e3753de / rules 82c335f"
+  ],
+  "raw_run": "run-3526920264",
+  "verification": "Fresh clean upstream clone at the same pinned revision; initial source hashes matched."
+}

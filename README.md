@@ -37,7 +37,7 @@ SAST and developer-workflow capabilities with fewer false positives, measured at
 coverage on independently labeled cases. Bearer and Semgrep Community Edition serve as local comparison
 tools. That is a project objective; broad parity is not established.
 
-Today, Zazzles analyzes local JavaScript and TypeScript source. It inventories Express-style routes
+Today, Zazzles analyzes local JavaScript, TypeScript and a [bounded Python subset](docs/python-support.md). It inventories Express-style routes
 (including CommonJS exports and static router mounts) and browser entries, follows a bounded subset of
 handlers, helpers, branches and promise continuations, and exports source evidence as JSON, standalone
 HTML, or SARIF. Supported capabilities:
@@ -53,7 +53,7 @@ HTML, or SARIF. Supported capabilities:
 
 See the [XSS analysis guide](docs/analysis/xss.md) for the exact contracts and limits.
 
-Full control-flow and whole-program interprocedural analysis, independent findings review, Python and Go
+Full control-flow and whole-program interprocedural analysis, independent findings review, Go
 analysis, and dependency vulnerability scanning remain planned. Recognizing a file extension in the file list
 does not establish analysis support. A clean scan does not certify that an application is secure.
 
@@ -61,8 +61,7 @@ does not establish analysis support. A clean scan does not certify that an appli
 
 Each type is delivered as its own bounded increment with source-reviewed answer keys, paired
 protected/unknown controls, and fresh sample reports. The order follows the
-[implementation plan](.zazz/project/implementation-plan.md#future-capability-branches): Python support
-comes next, then the remaining types below for JavaScript, TypeScript and Python.
+[implementation plan](.zazz/project/implementation-plan.md#future-capability-branches): the remaining types below follow the bounded Python adapter, for JavaScript, TypeScript and Python.
 
 | Vulnerability type | Status | First acceptance target |
 |---|---|---|
@@ -72,7 +71,7 @@ comes next, then the remaining types below for JavaScript, TypeScript and Python
 | Sensitive-data logging | Delivered | Credentials and request data reaching verified loggers and access logs |
 | Outbound request destinations | Review records | Request-influenced `fetch`/`axios` targets; SSRF judgment is planned below |
 | Cross-site scripting (XSS) | In progress | Reflected, stored, template, DOM and cross-tier cases across all three samples; Juice Shop stored/JWT/dialog origins remain |
-| **Python support** | **Next** | Python adapter for the delivered types above on a vulnerable Python app, with the same reports and judgment |
+| **Python support** | **Bounded subset implemented** | Flask/RESTX/FastAPI, sqlite3, Jinja/HTML, logging and outbound evidence on three pinned apps; [limits](docs/python-support.md); Python NoSQL is out of corpus |
 | Hard-coded secrets | Planned | Private material in source; public verification keys stay negatives |
 | Command injection | Planned | `exec` of request input (TypeScript app `/api/ping`) |
 | Path traversal | Planned | `fs.readFile` of a request path (`/api/files`) |

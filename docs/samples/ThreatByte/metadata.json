@@ -1,0 +1,26 @@
+{
+  "target": "ThreatByte",
+  "revision": "ede28f27e7e5061866a67b19b6088df4dd11c569",
+  "adapter": "python-adapter-v1",
+  "assessment": "gpt-6-luna; exact-request replay only",
+  "entries": 23,
+  "client_entries": 1,
+  "records": 51,
+  "assessed": 51,
+  "outcomes": {
+    "protected_for_claim": 32,
+    "needs_evidence": 13,
+    "poor_practice": 1,
+    "needs_review": 1,
+    "confirmed_vulnerability": 4
+  },
+  "runtime_confirmation": false,
+  "independent_findings_review": "Source-reviewed cases; not exhaustive audit",
+  "source_reference": "reference.md",
+  "case_inventory": "cases.json",
+  "baseline_tools": [
+    "Semgrep CE 1.183.0 / 20261101 snapshot",
+    "Bearer e3753de / rules 82c335f"
+  ],
+  "raw_run": "run-2595692128"
+}

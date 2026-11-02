@@ -80,3 +80,14 @@ paired control is also flagged. See [calibration](calibration.md) for evaluation
 [winston](https://github.com/winstonjs/winston#creating-your-own-logger) loggers are created with
 `createLogger`. [morgan](https://github.com/expressjs/morgan#predefined-formats) predefined formats
 include the request URL with its query string.
+
+## Python sources and bindings
+
+The [Python adapter](../python-support.md) supports unshadowed print, imported logging methods and
+logging.getLogger objects. Request credentials and personal-data hints retain their exact fields;
+whole sessions remain Review. Source-backed literal email and verified database-field/result reads
+can also produce logging candidates. Email syntax alone does not establish that a constant address
+is private or identifies a person, so literal-address sensitivity remains a blocker. A whole result set does not establish which sensitive fields
+it contains. These source kinds are eligible for the same logging questions; a model still must
+establish data class, content and lack of effective redaction consistently. Length, presence and
+comparison facts are separate from content. Arbitrary request logging is not automatically a PII leak.

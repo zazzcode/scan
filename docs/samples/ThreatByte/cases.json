@@ -1,0 +1,83 @@
+{
+  "revision": "ede28f27e7e5061866a67b19b6088df4dd11c569",
+  "scope": "Source-reviewed case inventory, not an exhaustive vulnerability count. Labels are never detector or model inputs.",
+  "cases": [
+    {
+      "id": "TB-SQL-01",
+      "file": "server/routes.py",
+      "line": 138,
+      "kind": "sql_query_candidate",
+      "expect": "construction"
+    },
+    {
+      "id": "TB-XSS-01",
+      "file": "client/templates/dashboard.html",
+      "line": 64,
+      "kind": "xss_candidate",
+      "expect": "raw_xss"
+    },
+    {
+      "id": "TB-XSS-02",
+      "file": "client/templates/profile.html",
+      "line": 41,
+      "kind": "xss_candidate",
+      "expect": "raw_xss"
+    },
+    {
+      "id": "TB-XSS-04",
+      "file": "client/templates/dashboard.html",
+      "line": 123,
+      "kind": "xss_candidate",
+      "expect": "raw_xss"
+    },
+    {
+      "id": "TB-SQL-BOUND",
+      "file": "server/routes.py",
+      "line": 99,
+      "kind": "sql_query_candidate",
+      "expect": "bound"
+    },
+    {
+      "id": "TB-SQL-KEYS",
+      "file": "server/api/v1/api_v1.py",
+      "line": 207,
+      "kind": "sql_query_candidate",
+      "expect": "not_confirmed"
+    },
+    {
+      "id": "TB-LOG-SESSION",
+      "file": "server/api/v1/api_v1.py",
+      "line": 182,
+      "kind": "log_sink_candidate",
+      "expect": "not_confirmed"
+    },
+    {
+      "id": "TB-VAL-EMAIL",
+      "file": "server/routes.py",
+      "line": 99,
+      "kind": "sql_query_candidate",
+      "expect": "form_policy"
+    },
+    {
+      "id": "TB-XSS-ESCAPED",
+      "file": "client/templates/profile.html",
+      "line": 39,
+      "kind": "xss_candidate",
+      "expect": "encoded"
+    },
+    {
+      "id": "TB-XSS-UNKNOWN-ORIGIN",
+      "file": "client/templates/profile.html",
+      "line": 42,
+      "kind": "xss_candidate",
+      "expect": "not_confirmed"
+    },
+    {
+      "id": "TB-OUT-01",
+      "file": "server/api/v1/api_v1.py",
+      "line": 254,
+      "kind": "outbound_http_candidate",
+      "expect": "candidate"
+    }
+  ]
+}

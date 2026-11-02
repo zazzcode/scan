@@ -86,3 +86,11 @@ These bounded judgments still require calibration: consistent model answers can 
 [Sequelize raw queries](https://sequelize.org/docs/v6/core-concepts/raw-queries/) describes query
 arguments and value binding. [MarsDB DocumentMatcher](https://github.com/c58/marsdb/blob/master/lib/DocumentMatcher.js)
 is the primary implementation reference for executable predicates and operator matching.
+
+## Python adapter
+
+[Python analysis](../python-support.md) verifies sqlite3 connection/cursor provenance and keeps
+SQL text separate from the parameter operand. Percent/f-string/format/concatenation construction
+remains a practice concern; bound values do not protect dynamic identifiers. Unknown pre-use calls
+on the SQL value block an injection claim; transformations of unrelated bound values do not turn
+literal SQL into executable interpolation. Python NoSQL is unimplemented and out of the current corpus.

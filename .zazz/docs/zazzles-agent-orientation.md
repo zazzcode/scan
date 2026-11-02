@@ -16,15 +16,23 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 
 ## Current work
 
-**Active worktree, 2026-11-01: `xss-response`.** The first XSS discovery/reporting pass was
+**Active worktree, 2026-11-01: `python-support-base`.** The bounded Python adapter is implemented
+and tested on three pinned apps. Read the [Python contract](../specifications/python-support.md),
+[results and limits](../evaluation/python-support-results.md), and [user guide](../../docs/python-support.md)
+for resumption. Raw results remain under `_test-findings/<app>/run-<id>/`; source keys, hashes and curated
+reports are in root `docs/samples/`. Seventy-eight Luna calls were completed; saved answers require exact
+request matching and changed evidence cannot inherit them. Current work is local-only, with no push,
+PR publication or merge authorized. Python NoSQL is out of corpus/unimplemented.
+
+**Previous XSS worktree: `xss-response`.** The first XSS discovery/reporting pass was
 committed and pushed as `26f50d0`. Verify the actual path, branch and changes with `pwd` and
 `git status --short --branch`; later work may have advanced the branch.
 
-For the next analysis/judging hardening session, read in this order:
+For a later JS/TS XSS hardening session, read in this order:
 
 1. [Implementation results](../evaluation/xss-implementation-results.md) for delivered behavior,
    current sample counts, actual model observations and verification limits.
-2. The local, gitignored [XSS handoff](../ephemeral/xss-analysis-handoff.md), if present, for prioritized
+2. The local, gitignored XSS handoff (`.zazz/ephemeral/xss-analysis-handoff.md`), if present, for prioritized
    investigations, code entry points and the suggested first bounded task. Handoffs MUST stay under
    `.zazz/ephemeral/` and MUST NOT be committed. A fresh clone will not contain them; resume from
    the tracked results, contract and reference documents instead.
@@ -40,12 +48,12 @@ scanner parity. Cross-tier origin, helper/control-flow and protection completene
 work; unsupported paths stay Review. The [results](../evaluation/xss-implementation-results.md) own
 current details; historical reports may contain superseded protection labels.
 
-**Next-session boundaries:** further XSS hardening uses this same worktree, one bounded case at a
+**XSS follow-up boundaries:** further XSS hardening uses `xss-response`, one bounded case at a
 time. Preserve all implemented analyzers and compare against independent source references.
 Baseline vulnerable apps MUST remain unchanged; remediation uses copies. Five approved Luna calls
 are complete and saved for offline inspection/replay. They authorize no additional paid requests.
-Changed evidence MUST NOT reuse old model answers. Python vulnerable-app support follows XSS, then the remaining vulnerability types, then SCA for JS/TS and
-Python; other languages come after all OWASP attack types and SCA;
+Changed evidence MUST NOT reuse old model answers. The bounded Python adapter is now documented above; remaining vulnerability types follow, then SCA
+for JS/TS and Python; other languages come after all OWASP attack types and SCA;
 shared graph/judgment/report facts remain language-neutral. No merge or integration push is authorized.
 
 **Sample applications are read-only scan targets.** Zazzles detects vulnerabilities; agents do not

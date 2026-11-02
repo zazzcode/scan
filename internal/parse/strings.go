@@ -21,6 +21,18 @@ func Strings(root, entry string) (*graph.StringReport, error) {
 
 // CheckedStrings assembles route-level evidence for explicitly declared checks.
 func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringReport, error) {
+	entry = filepath.ToSlash(filepath.Clean(entry))
+	if entry == "." {
+		entry = ""
+	}
+	if strings.EqualFold(filepath.Ext(entry), ".py") {
+		py, err := newPythonSet(root)
+		if err != nil {
+			return nil, err
+		}
+		defer py.close()
+		return py.report(entry, checks)
+	}
 	files, err := walk.Walk(root, walk.Options{})
 	if err != nil {
 		return nil, err
@@ -112,6 +124,26 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 	}
 	for _, item := range rules.ForPaths(keys) {
 		out.Practice = append(out.Practice, graph.PracticeRef{ID: item.ID, Version: item.Version, Languages: item.Languages})
+	}
+	if entry == "" {
+		py, err := newPythonSet(root)
+		if err != nil {
+			return nil, err
+		}
+		defer py.close()
+		more, err := py.report("", checks)
+		if err != nil {
+			return nil, err
+		}
+		out.ClientEntries = append(out.ClientEntries, more.ClientEntries...)
+		out.Entries = append(out.Entries, more.Entries...)
+		out.Uses = append(out.Uses, more.Uses...)
+		out.Gaps = append(out.Gaps, more.Gaps...)
+		out.Files = append(out.Files, more.Files...)
+		if len(more.Entries) > 0 {
+			out.Limitations = append(out.Limitations, more.Limitations...)
+			out.Practice = append(out.Practice, more.Practice...)
+		}
 	}
 	return out, nil
 }

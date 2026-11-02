@@ -1,4 +1,4 @@
-// Package parse turns a JavaScript or TypeScript tree into a route graph.
+// Package parse turns JavaScript, TypeScript and Python source into route evidence.
 //
 // Routes records syntactic registrations. Strings adds bounded handler resolution
 // and local dependency evidence. Neither mode decides validation adequacy locally.
@@ -69,6 +69,15 @@ func Routes(root string) (*graph.Graph, error) {
 		out.Gaps = append(out.Gaps, gaps...)
 	}
 
+	py, err := newPythonSet(root)
+	if err != nil {
+		return nil, err
+	}
+	defer py.close()
+	for _, r := range py.routeEntries() {
+		out.Routes = append(out.Routes, r.route)
+	}
+	out.Gaps = append(out.Gaps, py.gaps...)
 	sort.Slice(out.Routes, func(i, j int) bool {
 		if out.Routes[i].Registration.File != out.Routes[j].Registration.File {
 			return out.Routes[i].Registration.File < out.Routes[j].Registration.File

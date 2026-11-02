@@ -62,6 +62,12 @@ func applyLogPolicy(use graph.StringUse, a *graph.Assessment) {
 		a.Protection = "uncertain"
 	}
 	var blockers []graph.Gap
+	for _, g := range use.Gaps {
+		switch g.Kind {
+		case "log_literal_sensitivity_unresolved", "log_transform_unresolved", "input_helper_unresolved", "python_decorator_unresolved", "route_mount_unresolved", "work_limit", "dependency_limit", "transfer_limit":
+			blockers = append(blockers, g)
+		}
+	}
 	binding := false
 	for _, e := range use.Context {
 		binding = binding || e.Kind == "logger_binding"
@@ -71,10 +77,10 @@ func applyLogPolicy(use graph.StringUse, a *graph.Assessment) {
 	}
 	source := false
 	for _, d := range use.Dependencies {
-		source = source || d.Source.Kind == "request_source"
+		source = source || d.Source.Kind == "request_source" || d.Source.Kind == "literal_sensitive_source" || d.Source.Kind == "storage_source"
 	}
 	if !source {
-		blockers = append(blockers, graph.Gap{Kind: "log_source_missing", Detail: "request source evidence is required"})
+		blockers = append(blockers, graph.Gap{Kind: "log_source_missing", Detail: "request, literal personal-data or verified storage source evidence is required"})
 	}
 	a.BlockingGaps = blockers
 	if len(blockers) > 0 {
@@ -94,7 +100,7 @@ func applyLogPolicy(use graph.StringUse, a *graph.Assessment) {
 			return
 		}
 		a.FindingStatus = "confirmed_vulnerability"
-		a.Reason = "Verified logger binding and request source evidence, with consistent answers that sensitive content reaches the log without redaction; this is a static judgment, not runtime confirmation."
+		a.Reason = "Verified logger binding and source evidence, with consistent answers that sensitive content reaches the log without redaction; this is a static judgment, not runtime confirmation."
 	case "protected":
 		if ans["content_exposure"] != "no" && ans["redaction"] != "yes" && ans["data_class"] != "other" {
 			a.FindingStatus = "needs_evidence"

@@ -1,0 +1,18 @@
+{
+  "tool": "bearer",
+  "run": "bearer-20261101-1",
+  "findings": [
+    {
+      "rule": "python_lang_avoid_pickle",
+      "path": "vulnerable-flask-app.py",
+      "line": 97,
+      "message": "Usage of unsafe Pickle libraries"
+    },
+    {
+      "rule": "python_lang_sql_injection",
+      "path": "vulnerable-flask-app.py",
+      "line": 20,
+      "message": "Unsanitized external input in SQL query"
+    }
+  ]
+}

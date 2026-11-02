@@ -15,7 +15,7 @@ type Graph struct {
 	Gaps          []Gap   `json:"gaps"`
 }
 
-// Route is one Express-style registration.
+// Route is one framework registration with its source-backed handler.
 type Route struct {
 	ID           string `json:"id"`
 	Method       string `json:"method"`

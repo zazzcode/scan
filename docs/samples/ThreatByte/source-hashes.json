@@ -1,0 +1,25 @@
+{
+  "revision": "ede28f27e7e5061866a67b19b6088df4dd11c569",
+  "files": {
+    "LICENSE": "e3f602035f2f4ecaed5d3e29e4e667a137cc4c08faf1eca69f9e85ffd90986ce",
+    "README.md": "a15c57353bb2b2a4f1fafe866a6e2f148df4441b2a6ce9716f8fcd9046d66b94",
+    "client/templates/dashboard.html": "783fe770d5a1a168798e0a990398f85c0718a6d204660b6a2612fb1cf5142d0d",
+    "client/templates/edit_profile.html": "8596939d57fd62e4d765f9c733a06b275ccc814692e37b27222ef1e50a359301",
+    "client/templates/index.html": "abca89e8769b93ce5eb6aa48b80a7aa97d5f1621785e5d1ec993f4a70578e3c6",
+    "client/templates/login.html": "f3b393fb61159f45113fbba8ff9f8c45ef8fe85b216ae9d0b46075af2d997208",
+    "client/templates/profile.html": "3a1ae1ee08a6fe52bc896546729335d10ba922004798e75ad378d9ea47df031f",
+    "client/templates/signup.html": "e11e0d3d9c746f85cf502c92d5c07acdceedff48accc7e81d8f3a5d666dfcf88",
+    "client/templates/upload.html": "995cc6fd8249b37f90c796eac5e6eecd1455d8d57d03612ea03743e8ad33c1a4",
+    "db/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "db/create_db_tables.py": "57b1f85f5ffc4ee8c5122d03ddfc8f0b810b7ba387a0ba0c375f88c4888bec52",
+    "db/create_dummy_data.py": "079cf71c36fd24a6ce0d274a553fc06b0dff60a1712a2f343f8dfff56c2c793b",
+    "db/initialize_db.py": "d5369fef79bffc06a32ef5c5071c9966321cc7d7806ac4dcb94e66725e9b541b",
+    "run.py": "94eeac986017adc5eb0da1f767f48665f4a823c4c16f7111ab12366b55cb8606",
+    "server/__init__.py": "94e7e3f9f4b795ecf0475498c11ca8a93a287ac88f8276201b949f8abecf0aad",
+    "server/api/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "server/api/v1/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "server/api/v1/api_v1.py": "4e5206674c8a378afd079a979134c6431cb3711e3c0815a6d3de94d0134db09a",
+    "server/config.py": "a0b4c5e0beae83f9a75ec85d2d34cb42e37239c2be2953662c25ab785125c866",
+    "server/routes.py": "f2061e3b7dd73df51b02a7a37ae78bb736810696ac50ab921d836f72ec81c75e"
+  }
+}
