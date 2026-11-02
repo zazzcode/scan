@@ -6,6 +6,12 @@ for dynamic routes, GraphQL resolvers and gRPC handlers. The exact framework/lan
 coverage limits belong in the next tracked implementation contract. Command injection follows as
 the next new vulnerability family. These capabilities are planned, not currently implemented.
 
+gRPC handlers are an entry/dispatch capability independent of source language. The model should
+facilitate their registration, callable binding and invocation context without HTTP-route assumptions.
+**Go is the next source language when language expansion begins**, after the existing coverage/SCA/
+secret-scanning prerequisites. Go-specific adapters will supply their own binding and flow evidence;
+this activity does not implement Go source analysis merely by adding gRPC or the common model.
+
 ## Governing design
 
 Read [AGENTS.md](../../AGENTS.md), the [orientation](../docs/zazzles-agent-orientation.md), then
