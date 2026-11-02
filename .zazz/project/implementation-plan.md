@@ -163,18 +163,20 @@ warning controls; those misses are not passed findings or a claim of complete Py
 
 ### Common entry/dispatch foundation
 
-**2026-11-02 architecture follow-up:** keep the Python/terminology PR bounded and implement the
-[common entry/dispatch model](common-entry-dispatch.md) in a separate feature branch using current
-HTTP and browser consumers. The [architecture decision](../architecture.md#multiple-entry-and-dispatch-mechanisms)
-separates entry kind, registration, dispatch, callable, invocation context and optional transport.
-This foundation MUST precede dynamic-route and GraphQL entry-framework expansion. Command injection
-remains the next vulnerability family; no new entry adapter or vulnerability coverage is included
-in this foundation decision. Its implementation needs a tracked bounded contract and independent PR.
+**2026-11-02 updated user priority:** the next activity is the
+[common entry/dispatch model](common-entry-dispatch.md), including bounded dynamic-route,
+GraphQL resolver and gRPC handler support. Start with current HTTP and browser consumers, then
+add the selected framework adapters through the shared model. The
+[architecture decision](../architecture.md#multiple-entry-and-dispatch-mechanisms) separates entry
+kind, registration, dispatch, callable, invocation context and optional transport. The next tracked
+contract must name framework/language subsets and explicit coverage limits before implementation.
+Command injection follows this activity and remains the next new vulnerability family.
 
 ### Complete delivery list
 
-**Sequence decision, 2026-11-02 (user):** command injection is next after Python support, followed
-by dynamic-route support and XSS hardening. Keep the other planned classes. SCA remains after the
+**Sequence decision, 2026-11-02 (updated user direction):** common entry/dispatch with bounded
+dynamic-route, GraphQL and gRPC support is next after Python support. Command injection and XSS
+hardening follow. Keep the other planned classes. SCA remains after the
 vulnerability-type work. Secret scanning is last before additional languages. Go, Java and other
 new source languages wait until this work for JavaScript, TypeScript and Python is delivered.
 This order supersedes earlier sequence notes and the historical language-phase dependencies below.
@@ -190,8 +192,8 @@ plan edit. Preserve current capabilities and their unresolved coverage while imp
 | [x] | `logger-leak` | Explicit sensitive logger calls, access-log URL credentials and logging-specific judgment; see the contract |
 | [x] | `xss-response` | Delivered bounded reflected, stored, browser and cross-tier analysis; retain hardening gaps rather than claiming universal coverage |
 | [x] | `python-support` | Delivered adapter and shared trace/report guardrails; same claim architecture as JS/TS |
-| [ ] Next | `command-injection` | Request-to-process execution and protective patterns in JS/TS and Python; start with TypeScript `/api/ping` and source-reviewed Python sinks |
-| [ ] | `dynamic-route-support` | Resolve bounded generated routes for Python and Node.js; report static versus dynamic route origin separately from resolution/coverage; recover VulnPy trigger paths |
+| [ ] Next | `common-entry-dispatch` | Shared entry/registration/dispatch/callable model; migrate HTTP/browser consumers and add bounded dynamic-route, GraphQL resolver and gRPC handler adapters with explicit unknown controls |
+| [ ] | `command-injection` | Request-to-process execution and protective patterns in JS/TS and Python; start with TypeScript `/api/ping` and source-reviewed Python sinks |
 | [ ] | `xss-hardening` | General renderer/configuration, factory/helper and cross-tier coverage; retain raw/escaped/unknown controls, including VulnPy's Jinja Environment/template case |
 | [ ] | `path-traversal` | Request-influenced file paths, starting with `/api/files`; include JS/TS/Python containment controls |
 | [ ] | `code-injection` | Request-to-eval/code-generation paths, starting with `/api/calculate`, across supported languages |

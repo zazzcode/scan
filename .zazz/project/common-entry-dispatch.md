@@ -1,9 +1,10 @@
 # Common entry and dispatch model — follow-up scope
 
-**Decision, 2026-11-02:** implement this as a separate foundation refactor after the Python/terminology
-PR, using existing HTTP and browser consumers. The current branch records the architecture decision;
-it does not implement a common entry/dispatch model. Command injection remains the next vulnerability
-family; this foundation MUST precede dynamic-route or GraphQL entry-framework expansion.
+**Updated user priority, 2026-11-02:** this is the next activity after the merged Python/terminology
+work. Implement the common model using existing HTTP and browser consumers, with bounded support
+for dynamic routes, GraphQL resolvers and gRPC handlers. The exact framework/language subsets and
+coverage limits belong in the next tracked implementation contract. Command injection follows as
+the next new vulnerability family. These capabilities are planned, not currently implemented.
 
 ## Governing design
 
@@ -35,6 +36,10 @@ or an output projection of unchanged route-only internals does not meet the outc
   relationships and partial/unknown resolution without inventing target callables.
 - Migrate existing JS/TS HTTP, Python HTTP and browser analysis to that representation. Keep
   method/path and mount details as HTTP metadata. Preserve source/hash evidence and bounded flows.
+- Add bounded generated/factory-route registration, GraphQL schema-field/resolver binding and
+  gRPC service/method/handler binding through the common model. Select actual frameworks and
+  source-reviewed cases in the contract; name unresolved generation, runtime schema composition,
+  generated stubs and unsupported streaming behavior explicitly. No universal framework coverage claim.
 - Carry entry/dispatch invocation context through candidate identity and claim completeness. A guard,
   value binding or protection fact in one registration context cannot protect another context.
 - Make checks/selectors and judgment-required roles work without an HTTP route. Preserve old HTTP
@@ -54,8 +59,11 @@ or an output projection of unchanged route-only internals does not meet the outc
 - An entry with two supported callable targets retains both; an unresolved additional target prevents
   an all-path protection conclusion when relevant. Discovery gaps remain visible even with zero uses.
 - A non-HTTP entry fixture exercises the real shared candidate, completeness and JSON/HTML/SARIF
-  paths without setting method/path, RouteID or ClientID. A hand-built model fixture is sufficient;
-  this is not a new GraphQL/queue analyzer. Reachability alone does not fabricate a value dependency.
+  paths without setting HTTP method/path, RouteID or ClientID. Exercise actual bounded GraphQL
+  and gRPC adapter output as well as model fixtures. Reachability alone does not fabricate a value dependency.
+- Selected dynamic-route, GraphQL and gRPC cases have positive/protected/unknown controls and
+  declared per-language/framework coverage. Unknown registration/dispatch remains visible and cannot
+  establish protection. Keep generated-route origin separate from resolution and finding status.
 - Selection and source provenance remain explicit. Unknown input is not automatically attacker-controlled;
   schema/type validation does not automatically establish application policy or sink protection.
 - Saved old reports export without changing files/answers. Current serialized records have one
@@ -68,7 +76,8 @@ or an output projection of unchanged route-only internals does not meet the outc
 
 ## Exclusions
 
-No dynamic-route discovery, GraphQL schema/resolver adapter, new vulnerability family, authorization
-engine, queue/CLI/scheduler analyzer, full IR replacement, graph database, independent reviewer,
-automatic cache, sample remediation or paid calibration is part of this foundation refactor.
-Future adapters need their own source/binding/flow contracts and acceptance evidence.
+New vulnerability families, a general authorization engine, queue/CLI/scheduler adapters, a full IR
+replacement, graph database, independent reviewer, automatic cache, sample remediation and paid
+calibration are outside this activity. Dynamic-route, GraphQL and gRPC support is bounded by the
+selected source/binding/flow contracts and acceptance evidence; unsupported frameworks and runtime
+behavior remain explicit gaps.

@@ -88,8 +88,8 @@ contains the detailed per-language checklist and delivery order.
 
 **Next and planned work**
 
-- [ ] **Command injection — next:** process/shell execution and protective patterns across JavaScript, TypeScript and Python.
-- [ ] Dynamic-route support — generated/factory routes in Python and Node.js; distinguish static/dynamic registration and resolution in reports.
+- [ ] **Common entry and dispatch model — next:** shared analysis entry points with support for dynamic routes, GraphQL resolvers and gRPC handlers.
+- [ ] Command injection — process/shell execution and protective patterns across JavaScript, TypeScript and Python.
 - [ ] XSS hardening — renderer configuration, helpers, generated routes, stored/cross-tier origins and VulnPy coverage gaps.
 - [ ] Complete Python NoSQL and API-to-browser XSS linkage coverage.
 - [ ] Path traversal — request-influenced paths and enforced containment.

@@ -17,8 +17,9 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 ## Current work
 
 **Follow-up foundation:** the [common entry/dispatch brief](../project/common-entry-dispatch.md)
-records a separate implementation activity before dynamic-route/GraphQL adapters. Current code
-still has HTTP-shaped entry/check records; naming changes do not implement the generalized model.
+records the next activity: the shared model with bounded dynamic-route, GraphQL resolver and gRPC
+handler support. Current code still has HTTP-shaped entry/check records; naming changes do not
+implement the generalized model or these adapters.
 Use the current reviewed Python/terminology revision as the prerequisite, not the old pre-rename API.
 
 **Architecture/terminology closeout:** embedded documents are **Analysis Guidelines**
