@@ -91,7 +91,6 @@ contains the detailed per-language checklist and delivery order.
 - [ ] **Common entry and dispatch model — next:** shared analysis entry points with support for dynamic routes, GraphQL resolvers and gRPC handlers.
 - [ ] Command injection — process/shell execution and protective patterns across JavaScript, TypeScript and Python.
 - [ ] XSS hardening — renderer configuration, helpers, generated routes, stored/cross-tier origins and VulnPy coverage gaps.
-- [ ] Complete Python NoSQL and API-to-browser XSS linkage coverage.
 - [ ] Path traversal — request-influenced paths and enforced containment.
 - [ ] Code injection — request-to-eval/code-generation paths.
 - [ ] XML external entities (XXE) — actual parsers and their security configuration.
@@ -100,6 +99,7 @@ contains the detailed per-language checklist and delivery order.
 - [ ] Cookie, session and security headers — configuration and source-backed baseline requirements.
 - [ ] Server-side request forgery (SSRF) — assess existing outbound-destination candidates and restrictions.
 - [ ] Prototype pollution — JS/TS prototype/object operations; document Python non-applicability.
+- [ ] Complete Python NoSQL and API-to-browser XSS linkage coverage.
 - [ ] Dependency vulnerability scanning (SCA) — resolved JavaScript/TypeScript and Python packages and advisories.
 - [ ] Secret scanning — private material in source, with public keys and placeholders as controls.
 - [ ] Additional languages — **Go first**, then Java and others, after current-language capabilities, SCA and secret scanning.

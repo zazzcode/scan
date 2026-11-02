@@ -176,7 +176,8 @@ Command injection follows this activity and remains the next new vulnerability f
 
 **Sequence decision, 2026-11-02 (updated user direction):** common entry/dispatch with bounded
 dynamic-route, GraphQL and gRPC support is next after Python support. Command injection and XSS
-hardening follow. Keep the other planned classes. SCA remains after the
+hardening follow. Keep the other planned classes. Complete Python NoSQL and API-to-browser XSS
+linkage coverage immediately before dependency vulnerability scanning (SCA), after the other planned
 vulnerability-type work. Secret scanning is last before additional languages. **Go is the next
 source language when language expansion begins**, followed by Java and others. These wait until
 this work for JavaScript, TypeScript and Python is delivered; gRPC entry support is a separate
@@ -205,6 +206,7 @@ plan edit. Preserve current capabilities and their unresolved coverage while imp
 | [ ] | `cookie-session-headers` | httpOnly, secure, session configuration and source-backed baseline header requirements |
 | [ ] | `ssrf-destination` | Complete judgment of existing outbound candidates, including axios.default.get; verify URL slots and restrictions |
 | [ ] | `prototype-pollution` | JS/TS object/prototype operations such as _.merge; test Python's non-applicability rather than inventing equivalent prototype semantics |
+| [ ] | `python-coverage-completion` | Complete Python NoSQL and API-to-browser XSS linkage coverage immediately before SCA; retain separate binding, origin and rendering claims with paired controls |
 | [ ] | `sca-library-audit` | Resolved dependency/advisory auditing for JS/TS npm/pnpm and Python pip-audit, with failures and reachability separate |
 | [ ] | `hardcoded-secrets` / secret scanning | Private material in source; public verification keys and placeholders remain controls; immediately before additional languages |
 | [ ] | `other-languages` | Go first, then Java and others, after current-language vulnerability work, SCA and secret scanning; baselines and CI alongside |
