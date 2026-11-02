@@ -3,7 +3,7 @@ package parse
 import (
 	"encoding/json"
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"strings"
 )
 
@@ -27,16 +27,16 @@ func pyCombine(a, b pythonValue) pythonValue {
 	a.deps = pyMergeDeps(a.deps, b.deps)
 	if len(a.deps) > 64 {
 		a.deps = a.deps[:64]
-		a.gaps = append(a.gaps, graph.Gap{Kind: "dependency_limit", Detail: "Python value exceeds 64 dependency paths", At: a.deps[0].dep.Source.Span})
+		a.gaps = append(a.gaps, analysis.Gap{Kind: "dependency_limit", Detail: "Python value exceeds 64 dependency paths", At: a.deps[0].dep.Source.Span})
 	}
 
-	a.gaps = append(append([]graph.Gap{}, a.gaps...), b.gaps...)
+	a.gaps = append(append([]analysis.Gap{}, a.gaps...), b.gaps...)
 	a.built = a.built || b.built
 
 	if a.table == "" {
 		a.table = b.table
 	}
-	a.evidence = append(append([]graph.Evidence{}, a.evidence...), b.evidence...)
+	a.evidence = append(append([]analysis.Evidence{}, a.evidence...), b.evidence...)
 	if a.fields == nil {
 		a.fields = b.fields
 	}
@@ -58,13 +58,13 @@ func pyMergeDeps(a, b []pythonDep) []pythonDep {
 	}
 	return out
 }
-func pyTransfer(v pythonValue, e graph.Evidence) pythonValue {
+func pyTransfer(v pythonValue, e analysis.Evidence) pythonValue {
 	v.deps = append([]pythonDep{}, v.deps...)
 	for i := range v.deps {
-		v.deps[i].dep.Transfers = append(append([]graph.Evidence{}, v.deps[i].dep.Transfers...), e)
+		v.deps[i].dep.Transfers = append(append([]analysis.Evidence{}, v.deps[i].dep.Transfers...), e)
 		if len(v.deps[i].dep.Transfers) > 48 {
 			v.deps[i].dep.Transfers = v.deps[i].dep.Transfers[:48]
-			v.gaps = append(v.gaps, graph.Gap{Kind: "transfer_limit", Detail: "Python path exceeds 48 transfers", At: e.Span})
+			v.gaps = append(v.gaps, analysis.Gap{Kind: "transfer_limit", Detail: "Python path exceeds 48 transfers", At: e.Span})
 		}
 
 	}
@@ -96,7 +96,7 @@ func (f *pythonFlow) eval(n *sitter.Node) pythonValue {
 		}
 		if global := m.vars[pyText(m, n)]; global != nil && global.Kind() == "call" {
 			if q := f.qualified(pyText(m, global.ChildByFieldName("function"))); q == "logging.getLogger" {
-				return pythonValue{binding: "logger", evidence: []graph.Evidence{m.evidence("logger_binding", global)}}
+				return pythonValue{binding: "logger", evidence: []analysis.Evidence{m.evidence("logger_binding", global)}}
 			}
 		}
 		if f.qualified(pyText(m, n)) == "flask.request" {
@@ -105,12 +105,12 @@ func (f *pythonFlow) eval(n *sitter.Node) pythonValue {
 		if f.qualified(pyText(m, n)) == "flask.session" {
 			return f.source(n, "session", "")
 		}
-		return pythonValue{unknown: true, gaps: []graph.Gap{f.gap("python_value_unresolved", "Value definition is not resolved: "+pyText(m, n), n)}}
+		return pythonValue{unknown: true, gaps: []analysis.Gap{f.gap("python_value_unresolved", "Value definition is not resolved: "+pyText(m, n), n)}}
 	case "integer", "float", "true", "false", "none":
 		return pythonValue{literal: pyText(m, n), constant: true}
 	case "string":
 		if text, ok := pyLiteral(m, n); ok {
-			return pythonValue{literal: text, constant: true, evidence: []graph.Evidence{m.evidence("literal", n)}}
+			return pythonValue{literal: text, constant: true, evidence: []analysis.Evidence{m.evidence("literal", n)}}
 		}
 		v := f.evalChildren(n)
 		v.built = true
@@ -139,13 +139,13 @@ func (f *pythonFlow) eval(n *sitter.Node) pythonValue {
 			v := pyJoin(f.eval(n.NamedChild(0)), f.eval(n.NamedChild(2)), 0)
 			return pyTransfer(v, m.evidence("conditional_value", n))
 		}
-		return pythonValue{gaps: []graph.Gap{f.gap("python_expression_unresolved", "unsupported conditional shape", n)}}
+		return pythonValue{gaps: []analysis.Gap{f.gap("python_expression_unresolved", "unsupported conditional shape", n)}}
 	case "binary_operator", "boolean_operator", "comparison_operator":
 		if n.Kind() == "binary_operator" && pyText(m, n.ChildByFieldName("operator")) == "+" {
 			a, aok := pyStaticString(m, n.ChildByFieldName("left"))
 			b, bok := pyStaticString(m, n.ChildByFieldName("right"))
 			if aok && bok {
-				return pythonValue{literal: a + b, constant: true, evidence: []graph.Evidence{m.evidence("literal", n)}}
+				return pythonValue{literal: a + b, constant: true, evidence: []analysis.Evidence{m.evidence("literal", n)}}
 			}
 		}
 
@@ -206,7 +206,7 @@ func (f *pythonFlow) project(n *sitter.Node) pythonValue {
 		v := f.eval(obj)
 		if v.binding == "http_response" && (key == "text" || key == "content") {
 			e := m.evidence("external_response_source", n)
-			return pythonValue{deps: []pythonDep{{dep: graph.Dependency{Source: e, Transfers: []graph.Evidence{}}, protection: "raw"}}}
+			return pythonValue{deps: []pythonDep{{dep: analysis.Dependency{Source: e, Transfers: []analysis.Evidence{}}, protection: "raw"}}}
 		}
 		return f.projectValue(v, key, n)
 	}
@@ -226,14 +226,14 @@ func (f *pythonFlow) projectValue(v pythonValue, key string, n *sitter.Node) pyt
 	}
 	if v.binding == "db_row" && v.table != "" {
 		e := f.module.evidence("storage_source", n)
-		return pythonValue{deps: []pythonDep{{dep: graph.Dependency{Source: e, StorageKey: "python-sql:" + v.table + "." + key, Transfers: append([]graph.Evidence{}, v.evidence...)}, protection: "raw"}}}
+		return pythonValue{deps: []pythonDep{{dep: analysis.Dependency{Source: e, StorageKey: "python-sql:" + v.table + "." + key, Transfers: append([]analysis.Evidence{}, v.evidence...)}, protection: "raw"}}}
 	}
 	v = pyTransfer(v, f.module.evidence("field_projection", n))
 	v.deps = append([]pythonDep{}, v.deps...)
 	for i := range v.deps {
 		if v.deps[i].key == "" {
 			v.deps[i].key = key
-			v.deps[i].dep.Transfers = append(v.deps[i].dep.Transfers, graph.Evidence{Kind: "field_projection", Text: key, Span: spanOf(f.module.file, n), SHA256: f.module.hash})
+			v.deps[i].dep.Transfers = append(v.deps[i].dep.Transfers, analysis.Evidence{Kind: "field_projection", Text: key, Span: spanOf(f.module.file, n), SHA256: f.module.hash})
 		}
 	}
 	for _, d := range v.deps {

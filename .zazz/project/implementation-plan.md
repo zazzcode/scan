@@ -161,6 +161,16 @@ References: [query/validation results](../evaluation/query-validation-comparison
 have 29 passing case checks. VulnPy adds six known SQL/XSS positive misses and four passing coverage
 warning controls; those misses are not passed findings or a claim of complete Python coverage.
 
+### Common entry/dispatch foundation
+
+**2026-11-02 architecture follow-up:** keep the Python/terminology PR bounded and implement the
+[common entry/dispatch model](common-entry-dispatch.md) in a separate feature branch using current
+HTTP and browser consumers. The [architecture decision](../architecture.md#multiple-entry-and-dispatch-mechanisms)
+separates entry kind, registration, dispatch, callable, invocation context and optional transport.
+This foundation MUST precede dynamic-route and GraphQL entry-framework expansion. Command injection
+remains the next vulnerability family; no new entry adapter or vulnerability coverage is included
+in this foundation decision. Its implementation needs a tracked bounded contract and independent PR.
+
 ### Complete delivery list
 
 **Sequence decision, 2026-11-02 (user):** command injection is next after Python support, followed

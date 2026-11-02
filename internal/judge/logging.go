@@ -1,6 +1,6 @@
 package judge
 
-import "github.com/zazzcode/zazzles/internal/graph"
+import "github.com/zazzcode/zazzles/internal/analysis"
 
 // logQuestionVersion is versioned separately so query assessments keep their protocol.
 const logQuestionVersion = "log-use-v1"
@@ -45,11 +45,11 @@ func logChoices(name string) []map[string]string {
 	return nil
 }
 
-func logUse(use graph.StringUse) bool { return use.Kind == "log_sink_candidate" }
+func logUse(use analysis.CandidateUse) bool { return use.Kind == "log_sink_candidate" }
 
 // applyLogPolicy requires binding and source evidence and answers that agree with
 // each other and with the scanner's own content facts before a definitive status.
-func applyLogPolicy(use graph.StringUse, a *graph.Assessment) {
+func applyLogPolicy(use analysis.CandidateUse, a *analysis.Assessment) {
 	ans := a.Answers
 	switch ans["log_exposure"] {
 	case "vulnerable":
@@ -61,7 +61,7 @@ func applyLogPolicy(use graph.StringUse, a *graph.Assessment) {
 	default:
 		a.Protection = "uncertain"
 	}
-	var blockers []graph.Gap
+	var blockers []analysis.Gap
 	for _, g := range use.Gaps {
 		switch g.Kind {
 		case "log_literal_sensitivity_unresolved", "log_transform_unresolved", "input_helper_unresolved", "python_decorator_unresolved", "route_mount_unresolved", "work_limit", "dependency_limit", "transfer_limit":
@@ -73,14 +73,14 @@ func applyLogPolicy(use graph.StringUse, a *graph.Assessment) {
 		binding = binding || e.Kind == "logger_binding"
 	}
 	if !binding {
-		blockers = append(blockers, graph.Gap{Kind: "logger_binding_missing", Detail: "verified logger or request-logging binding is required"})
+		blockers = append(blockers, analysis.Gap{Kind: "logger_binding_missing", Detail: "verified logger or request-logging binding is required"})
 	}
 	source := false
 	for _, d := range use.Dependencies {
 		source = source || d.Source.Kind == "request_source" || d.Source.Kind == "literal_sensitive_source" || d.Source.Kind == "storage_source"
 	}
 	if !source {
-		blockers = append(blockers, graph.Gap{Kind: "log_source_missing", Detail: "request, literal personal-data or verified storage source evidence is required"})
+		blockers = append(blockers, analysis.Gap{Kind: "log_source_missing", Detail: "request, literal personal-data or verified storage source evidence is required"})
 	}
 	a.BlockingGaps = blockers
 	if len(blockers) > 0 {
@@ -125,7 +125,7 @@ func applyLogPolicy(use graph.StringUse, a *graph.Assessment) {
 	}
 }
 
-func hasLogGap(use graph.StringUse, kinds ...string) bool {
+func hasLogGap(use analysis.CandidateUse, kinds ...string) bool {
 	for _, g := range use.Gaps {
 		for _, k := range kinds {
 			if g.Kind == k {

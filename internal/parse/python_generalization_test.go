@@ -15,7 +15,7 @@ func TestPythonGeneralizationBranches(t *testing.T) {
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			root := pythonFixture(t, map[string]string{"main.py": "from flask import Flask,request\nfrom markupsafe import escape\napp=Flask(__name__)\n@app.get('/')\ndef entry():\n    name=request.args.get('name')\n    mode=request.args.get('mode')\n    " + tt.body + "\n"})
-			r, err := Strings(root, "")
+			r, err := Analyze(root, "")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -40,7 +40,7 @@ app=Flask(__name__)
 def index():
     return helpers.echo(request.args.get('name'))
 `})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,7 +62,7 @@ def signup():
     c.execute('INSERT INTO users (email) VALUES (?)',(email,))
     return render_template('signup.html')
 `, "templates/signup.html": `<form method="POST" action="{{ url_for('signup') }}"><input name="email" type="email" required><input name="note"></form>`})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,7 +92,7 @@ func TestPythonDBAPIBindings(t *testing.T) {
 	for _, driver := range []string{"sqlite3", "psycopg", "psycopg2", "pymysql", "mysql.connector"} {
 		t.Run(driver, func(t *testing.T) {
 			root := pythonFixture(t, map[string]string{"main.py": "from flask import Flask,request\nimport " + driver + "\napp=Flask(__name__)\n@app.get('/')\ndef entry():\n    c=" + driver + ".connect('demo')\n    cur=c.cursor()\n    cur.execute('select * from users where name = %s',(request.args.get('name'),))\n    cur.execute(\"select * from users where name = '%s'\" % request.args.get('name'))\n    return 'ok'\n"})
-			r, err := Strings(root, "")
+			r, err := Analyze(root, "")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -128,7 +128,7 @@ def entry():
     c.cursor().execute(request.args.get('name'))
     return 'ok'
 `})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -146,7 +146,7 @@ def entry():
     r=request
     return r.args.get('name')
 `})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -164,7 +164,7 @@ def helper(*args):
 def entry():
     return helper(request.args.get('name'))
 `})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,7 +178,7 @@ func TestPythonJinjaConstantTemplateRepair(t *testing.T) {
 	for _, tt := range []struct{ option, want string }{{"", "raw"}, {",autoescape=True", "encoded"}, {",autoescape=False", "raw"}, {",autoescape=configuration", "unknown"}} {
 		t.Run(tt.option, func(t *testing.T) {
 			root := pythonFixture(t, map[string]string{"main.py": "from flask import Flask,request\nfrom jinja2 import Template\napp=Flask(__name__)\n@app.get('/')\ndef entry():\n    return Template('<p>{{ name }}</p>'" + tt.option + ").render(name=request.args.get('name'))\n"})
-			r, err := Strings(root, "")
+			r, err := Analyze(root, "")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -197,7 +197,7 @@ app=Flask(__name__)
 def entry():
     return render_template('view.html',name=request.args.get('name'))
 `, "templates/view.html": "<input\n name=\"name\"\n value=\"{{ name }}\">\n"})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -238,7 +238,7 @@ def signup():
     email=request.form.get('email')
     return render_template('signup.html')
 `, "templates/signup.html": `<form method="GET" action="{{ url_for('signup') }}"><input name="email" type="email" required></form>`})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -261,7 +261,7 @@ func TestPythonKeywordPathsAndRegistrationCoverage(t *testing.T) {
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			root := pythonFixture(t, map[string]string{"main.py": tt.source})
-			r, err := Strings(root, "")
+			r, err := Analyze(root, "")
 			if err != nil {
 				t.Fatal(err)
 			}

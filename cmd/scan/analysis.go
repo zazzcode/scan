@@ -8,13 +8,13 @@ import (
 	"os"
 	"sort"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"github.com/zazzcode/zazzles/internal/judge"
 	"github.com/zazzcode/zazzles/internal/parse"
 	reportpkg "github.com/zazzcode/zazzles/internal/report"
 )
 
-func runStrings(root, entry, routeFilter, checksFile, provider, model string, limit int, asJSON, asSARIF bool, outputDir string, stdout, stderr io.Writer) int {
+func runAnalysis(root, entry, routeFilter, checksFile, provider, model string, limit int, asJSON, asSARIF bool, outputDir string, stdout, stderr io.Writer) int {
 	var client *judge.Client
 	if provider != "" {
 		key := ""
@@ -36,14 +36,14 @@ func runStrings(root, entry, routeFilter, checksFile, provider, model string, li
 		fmt.Fprintf(stderr, "scan: %v\n", err)
 		return exitError
 	}
-	report, err := parse.CheckedStrings(root, entry, checks)
+	report, err := parse.AnalyzeWithChecks(root, entry, checks)
 	if err != nil {
 		fmt.Fprintf(stderr, "scan: %v\n", err)
 		return exitError
 	}
 	if routeFilter != "" {
 		report.SelectedRoute = routeFilter
-		selected := []graph.Entry{}
+		selected := []analysis.Entry{}
 		ids := map[string]bool{}
 		for _, e := range report.Entries {
 			if e.Route.PathPattern == routeFilter {
@@ -55,7 +55,7 @@ func runStrings(root, entry, routeFilter, checksFile, provider, model string, li
 			fmt.Fprintln(stderr, "scan: selected route was not found in the supported entry inventory")
 			return exitError
 		}
-		uses := []graph.StringUse{}
+		uses := []analysis.CandidateUse{}
 		for _, u := range report.Uses {
 			if ids[u.RouteID] {
 				uses = append(uses, u)
@@ -129,6 +129,6 @@ func runStrings(root, entry, routeFilter, checksFile, provider, model string, li
 	return exitOK
 }
 
-func queryUse(use graph.StringUse) bool {
+func queryUse(use analysis.CandidateUse) bool {
 	return use.Kind == "sql_query_candidate" || use.Kind == "nosql_query_candidate"
 }

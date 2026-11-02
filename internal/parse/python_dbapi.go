@@ -1,10 +1,10 @@
 package parse
 
-import "github.com/zazzcode/zazzles/internal/graph"
+import "github.com/zazzcode/zazzles/internal/analysis"
 
 // Contracts apply only after import/connection/cursor provenance resolves.
 // Parameter values cannot replace identifiers or repair SQL assembled earlier.
-func pythonDBAPIModel(driver string) *graph.APIModel {
+func pythonDBAPIModel(driver string) *analysis.APIModel {
 	reference, placeholder := "", "%s or %(name)s"
 	switch driver {
 	case "sqlite3":
@@ -21,5 +21,5 @@ func pythonDBAPIModel(driver string) *graph.APIModel {
 	default:
 		return nil
 	}
-	return &graph.APIModel{ID: "python-" + driver + "-dbapi-v1", Library: driver, Reference: reference, Semantics: "execute/executemany SQL text is argument 0; argument 1 supplies separate value parameters using " + placeholder + " placeholders for this driver. Placeholders must not be quoted. Bound values cannot protect SQL already interpolated or dynamic identifiers. SQLite executescript does not bind parameters. Connection/cursor provenance is supplied separately; this contract is not evidence that the caller uses it correctly."}
+	return &analysis.APIModel{ID: "python-" + driver + "-dbapi-v1", Library: driver, Reference: reference, Semantics: "execute/executemany SQL text is argument 0; argument 1 supplies separate value parameters using " + placeholder + " placeholders for this driver. Placeholders must not be quoted. Bound values cannot protect SQL already interpolated or dynamic identifiers. SQLite executescript does not bind parameters. Connection/cursor provenance is supplied separately; this contract is not evidence that the caller uses it correctly."}
 }

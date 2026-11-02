@@ -24,7 +24,7 @@ global guarantee. This produces type facts for semantic assessment, not a hardco
 
 ## Semantic questions and policy
 
-Protocol `string-use-v8` retains validation and construction-practice questions, plus a distinct
+Protocol `candidate-use-v9` retains validation and construction-practice questions, plus a distinct
 injection_protection question. SQL/NoSQL use vulnerable/protected/unknown/not_applicable choices for
 injection. NoSQL additionally assesses source/library/guard/path coverage and all_paths_protected.
 Strict response decoding rejects missing, duplicate, unexpected, or invalid answers.

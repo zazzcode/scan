@@ -5,13 +5,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func TestClientResultsHaveSeparateHeadingsAndIdentity(t *testing.T) {
-	r := &graph.StringReport{SchemaVersion: 1,
-		ClientEntries: []graph.ClientEntry{{ID: "client:view", Kind: "component", Name: "SearchComponent", Framework: "angular", Location: graph.Span{File: "search.component.ts", StartLine: 10}}},
-		Uses:          []graph.StringUse{{ID: "x", ClientID: "client:view", Kind: "xss_candidate", XSS: &graph.XSSFacts{Type: "dom", EntryKind: "client", Protection: "raw", OutputContext: "html_text", OriginResolved: true}, Sink: graph.Evidence{Text: `[innerHTML]="value"`, Span: graph.Span{File: "search.component.html", StartLine: 5}}, Assessment: graph.Assessment{Status: "not_run"}}}}
+	r := &analysis.AnalysisReport{SchemaVersion: 1,
+		ClientEntries: []analysis.ClientEntry{{ID: "client:view", Kind: "component", Name: "SearchComponent", Framework: "angular", Location: analysis.Span{File: "search.component.ts", StartLine: 10}}},
+		Uses:          []analysis.CandidateUse{{ID: "x", ClientID: "client:view", Kind: "xss_candidate", XSS: &analysis.XSSFacts{Type: "dom", EntryKind: "client", Protection: "raw", OutputContext: "html_text", OriginResolved: true}, Sink: analysis.Evidence{Text: `[innerHTML]="value"`, Span: analysis.Span{File: "search.component.html", StartLine: 5}}, Assessment: analysis.Assessment{Status: "not_run"}}}}
 	var html bytes.Buffer
 	if err := HTML(&html, r); err != nil {
 		t.Fatal(err)

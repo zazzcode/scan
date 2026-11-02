@@ -167,7 +167,7 @@ func TestRunMissingPath(t *testing.T) {
 func TestStringsCLI(t *testing.T) {
 	root := filepath.Join("..", "..", "internal", "parse", "testdata", "string-flow")
 	var out, errOut bytes.Buffer
-	if code := run([]string{"--strings", "--json", "--entry", "server.ts", root}, &out, &errOut); code != exitOK {
+	if code := run([]string{"--analyze", "--json", "--entry", "server.ts", root}, &out, &errOut); code != exitOK {
 		t.Fatalf("code=%d stderr=%s", code, errOut.String())
 	}
 	var report struct {
@@ -183,16 +183,16 @@ func TestStringsCLI(t *testing.T) {
 	if len(report.Uses) != 1 || report.Uses[0].Assessment.Status != "not_run" {
 		t.Fatalf("report=%s", out.String())
 	}
-	for _, args := range [][]string{{"--strings", "--routes", root}, {"--routes", "--entry", "server.ts", root}, {"--strings", "--judge-model", "m", root}, {"--strings", "--judge-limit", "0", root}} {
+	for _, args := range [][]string{{"--analyze", "--routes", root}, {"--routes", "--entry", "server.ts", root}, {"--analyze", "--judge-model", "m", root}, {"--analyze", "--judge-limit", "0", root}} {
 		if code := run(args, &out, &errOut); code != exitUsage {
 			t.Errorf("%v: code=%d", args, code)
 		}
 	}
 	t.Setenv("OPENAI_API_KEY", "")
-	if code := run([]string{"--strings", "--judge", "openai", root}, &out, &errOut); code != exitError {
+	if code := run([]string{"--analyze", "--judge", "openai", root}, &out, &errOut); code != exitError {
 		t.Fatal("missing key accepted")
 	}
-	if code := run([]string{"--strings", "--entry", "../outside.ts", root}, &out, &errOut); code != exitError {
+	if code := run([]string{"--analyze", "--entry", "../outside.ts", root}, &out, &errOut); code != exitError {
 		t.Fatal("outside entry accepted")
 	}
 }
@@ -200,13 +200,13 @@ func TestStringsCLI(t *testing.T) {
 func TestStringsRouteFilter(t *testing.T) {
 	root := filepath.Join("..", "..", "internal", "parse", "testdata", "string-flow")
 	var out, errOut bytes.Buffer
-	if code := run([]string{"--strings", "--json", "--entry", "server.ts", "--route", "/login", root}, &out, &errOut); code != exitOK {
+	if code := run([]string{"--analyze", "--json", "--entry", "server.ts", "--route", "/login", root}, &out, &errOut); code != exitOK {
 		t.Fatalf("code %d: %s", code, errOut.String())
 	}
 	if !strings.Contains(out.String(), `"selected_route": "/login"`) {
 		t.Fatal("selection scope is not reported")
 	}
-	if code := run([]string{"--strings", "--route", "/absent", root}, &out, &errOut); code != exitError {
+	if code := run([]string{"--analyze", "--route", "/absent", root}, &out, &errOut); code != exitError {
 		t.Fatal("absent selection silently accepted")
 	}
 }
@@ -238,7 +238,7 @@ func TestCheckFileValidation(t *testing.T) {
 func TestSARIFCLI(t *testing.T) {
 	root := filepath.Join("..", "..", "internal", "parse", "testdata", "string-flow")
 	var out, errOut bytes.Buffer
-	if code := run([]string{"--strings", "--sarif", "--entry", "server.ts", root}, &out, &errOut); code != exitOK {
+	if code := run([]string{"--analyze", "--sarif", "--entry", "server.ts", root}, &out, &errOut); code != exitOK {
 		t.Fatalf("code=%d stderr=%s", code, errOut.String())
 	}
 	var doc struct {
@@ -251,7 +251,7 @@ func TestSARIFCLI(t *testing.T) {
 	if doc.Version != "2.1.0" || len(doc.Runs) != 1 {
 		t.Fatal("invalid SARIF envelope")
 	}
-	for _, args := range [][]string{{"--strings", "--json", "--sarif", root}, {"--routes", "--sarif", root}} {
+	for _, args := range [][]string{{"--analyze", "--json", "--sarif", root}, {"--routes", "--sarif", root}} {
 		if code := run(args, &out, &errOut); code != exitUsage {
 			t.Fatalf("invalid flags accepted: %v", args)
 		}

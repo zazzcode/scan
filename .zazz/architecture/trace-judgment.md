@@ -28,6 +28,12 @@ in adapter evidence. **Supplied means present, not semantically complete or prot
 Indexing never changes canonical completeness or resolves a blocker. This distinction
 prevents richer context from becoming an unsupported claim of proof.
 
+The model envelope supplies language Analysis Guidelines from `internal/guidelines` under
+`analysis_guidelines`. This scanner-authored guidance is separate from source data and API contracts.
+Guideline versions and full text participate in exact-request identity; historical reports remain
+readable without making their old answers reusable for changed inputs. See
+[naming and compatibility](../architecture.md#naming-and-compatibility).
+
 ## Route and browser slices
 
 For API entries, the bounded slice follows the request field through assignments,

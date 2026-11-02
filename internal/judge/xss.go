@@ -1,6 +1,6 @@
 package judge
 
-import "github.com/zazzcode/zazzles/internal/graph"
+import "github.com/zazzcode/zazzles/internal/analysis"
 
 const xssQuestionVersion = "xss-use-v1"
 
@@ -35,26 +35,26 @@ func xssChoices(name string) []map[string]string {
 	return out
 }
 
-func applyXSSPolicy(use graph.StringUse, a *graph.Assessment) {
+func applyXSSPolicy(use analysis.CandidateUse, a *analysis.Assessment) {
 	a.FindingStatus, a.Protection = "needs_evidence", "uncertain"
-	var blockers []graph.Gap
+	var blockers []analysis.Gap
 	if a.QuestionVersion != xssQuestionVersion {
-		blockers = append(blockers, graph.Gap{Kind: "xss_protocol_missing", Detail: "XSS-specific versioned answers are required."})
+		blockers = append(blockers, analysis.Gap{Kind: "xss_protocol_missing", Detail: "XSS-specific versioned answers are required."})
 	}
 	if use.XSS == nil || use.Completeness == nil || use.Completeness.ClaimKind != "xss" || use.APIModel == nil {
-		blockers = append(blockers, graph.Gap{Kind: "xss_claim_missing", Detail: "Source-backed rendering facts, binding contract and completeness are required."})
+		blockers = append(blockers, analysis.Gap{Kind: "xss_claim_missing", Detail: "Source-backed rendering facts, binding contract and completeness are required."})
 	} else {
 		blockers = append(blockers, use.Completeness.Blockers...)
 		for _, role := range []string{"render_source", "render_binding", "render_context"} {
 			if len(use.Completeness.Evidence[role]) == 0 {
-				blockers = append(blockers, graph.Gap{Kind: "xss_evidence_missing", Detail: role})
+				blockers = append(blockers, analysis.Gap{Kind: "xss_evidence_missing", Detail: role})
 			}
 		}
 		if (use.XSS.Type == "stored" || use.XSS.Type == "cross_tier") && !use.XSS.OriginResolved {
-			blockers = append(blockers, graph.Gap{Kind: "storage_origin_unresolved", Detail: "Stored rendering origin is unresolved."})
+			blockers = append(blockers, analysis.Gap{Kind: "storage_origin_unresolved", Detail: "Stored rendering origin is unresolved."})
 		}
 		if a.Answers["output_context"] != use.XSS.OutputContext || use.XSS.Protection == "unknown" {
-			blockers = append(blockers, graph.Gap{Kind: "xss_context_unresolved", Detail: "Answers must agree with the established rendering context and protection facts."})
+			blockers = append(blockers, analysis.Gap{Kind: "xss_context_unresolved", Detail: "Answers must agree with the established rendering context and protection facts."})
 		}
 	}
 	a.BlockingGaps = blockers

@@ -2,7 +2,7 @@ package parse
 
 import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"regexp"
 	"strings"
 )
@@ -16,7 +16,7 @@ func (f *pythonFlow) logValue(n *sitter.Node, v pythonValue) pythonValue {
 			source = v.evidence[0]
 			source.Kind = "literal_sensitive_source"
 		}
-		v.deps = append(v.deps, pythonDep{dep: graph.Dependency{Source: source, Transfers: []graph.Evidence{f.module.evidence("log_argument", n)}}, protection: "raw", container: "literal", key: "email"})
+		v.deps = append(v.deps, pythonDep{dep: analysis.Dependency{Source: source, Transfers: []analysis.Evidence{f.module.evidence("log_argument", n)}}, protection: "raw", container: "literal", key: "email"})
 	}
 	if v.binding == "db_row" && len(v.deps) == 0 {
 		source := f.module.evidence("storage_source", n)
@@ -24,7 +24,7 @@ func (f *pythonFlow) logValue(n *sitter.Node, v pythonValue) pythonValue {
 			source = v.evidence[len(v.evidence)-1]
 			source.Kind = "storage_source"
 		}
-		v.deps = append(v.deps, pythonDep{dep: graph.Dependency{Source: source, Transfers: append([]graph.Evidence{}, v.evidence...)}, protection: "unknown", container: "body", key: ""})
+		v.deps = append(v.deps, pythonDep{dep: analysis.Dependency{Source: source, Transfers: append([]analysis.Evidence{}, v.evidence...)}, protection: "unknown", container: "body", key: ""})
 	}
 	for i := range v.deps {
 		d := &v.deps[i]

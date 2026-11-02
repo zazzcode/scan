@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var pythonScript = regexp.MustCompile(`(?is)<script\b([^>]*)>(.*?)</script\s*>`)
@@ -15,7 +15,7 @@ var pythonJQueryCDN = regexp.MustCompile(`(?i)\bsrc\s*=\s*["']https://code\.jque
 
 // browserTemplates hands literal inline JavaScript to the existing browser
 // adapter. Masking preserves the original file offsets, lines and snapshot hash.
-func (s *pythonSet) browserTemplates(out *graph.StringReport) error {
+func (s *pythonSet) browserTemplates(out *analysis.AnalysisReport) error {
 	parsers, err := newParsers()
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func (s *pythonSet) browserTemplates(out *graph.StringReport) error {
 				masked[i] = b
 			}
 		}
-		globals := map[string]graph.Evidence{}
+		globals := map[string]analysis.Evidence{}
 		hasScript := false
 		firstInline := false
 		for _, match := range matches {

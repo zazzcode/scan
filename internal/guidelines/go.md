@@ -1,10 +1,10 @@
 id: go
-version: 1
+version: 2
 languages: go
 
-# Go practice
+# Go analysis guidelines
 
-This standard is applied when a Go file is assessed. The current route scanner does not yet emit Go sink candidates.
+These analysis guidelines are supplied when a Go file is assessed. The current route scanner does not yet emit Go sink candidates.
 
 ## Posture
 

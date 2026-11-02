@@ -41,7 +41,7 @@ Confirm the target root, entry file, selected route, and allowed source evidence
   set -a
   . ./.env
   set +a
-  ./bin/scan --strings --json --entry server.ts \
+  ./bin/scan --analyze --json --entry server.ts \
     --route /rest/user/login --judge openai --judge-model gpt-6-luna \
     --judge-limit 1 /path/to/app
 )

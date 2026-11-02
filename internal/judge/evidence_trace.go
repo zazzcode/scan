@@ -1,7 +1,7 @@
 package judge
 
 import (
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"strings"
 )
 
@@ -20,9 +20,9 @@ type traceGraph struct {
 	Scope     string      `json:"scope"`
 }
 
-// buildTraceGraph projects adapter-supplied witnesses into the shared wire graph.
+// buildTraceGraph projects adapter-supplied witnesses into the shared wire analysis.
 // Context proximity alone never creates a call, flow or guard edge.
-func buildTraceGraph(use graph.StringUse, ref func(graph.Evidence) string) traceGraph {
+func buildTraceGraph(use analysis.CandidateUse, ref func(analysis.Evidence) string) traceGraph {
 	entry, kind := use.RouteID, "http_route"
 	if use.ClientID != "" {
 		entry, kind = use.ClientID, "browser_entry"

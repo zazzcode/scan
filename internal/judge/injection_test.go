@@ -2,7 +2,7 @@ package judge
 
 import (
 	"encoding/json"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"strings"
 	"testing"
 )
@@ -19,15 +19,15 @@ func TestInjectionPolicySeparatesPracticeAndActualProtection(t *testing.T) {
 		{"vulnerable", "insufficient", "needs_evidence", true, false},
 		{"vulnerable", "insufficient", "needs_evidence", false, true},
 	} {
-		c := &graph.Completeness{ClaimKind: "injection", Required: []string{"request_source", "sink_binding", "control_flow"}, Evidence: map[string][]graph.Evidence{"request_source": {{Text: "request value"}}, "sink_binding": {{Text: "verified API"}}, "control_flow": {{Text: "guard/path context"}}, "route_handler": {{Text: "handler"}}}}
+		c := &analysis.Completeness{ClaimKind: "injection", Required: []string{"request_source", "sink_binding", "control_flow"}, Evidence: map[string][]analysis.Evidence{"request_source": {{Text: "request value"}}, "sink_binding": {{Text: "verified API"}}, "control_flow": {{Text: "guard/path context"}}, "route_handler": {{Text: "handler"}}}}
 		if tt.missing {
 			delete(c.Evidence, "sink_binding")
 		}
 		if tt.block {
-			c.Blockers = []graph.Gap{{Kind: "unknown_guard"}}
+			c.Blockers = []analysis.Gap{{Kind: "unknown_guard"}}
 		}
-		a := graph.Assessment{Status: "completed", Answers: map[string]string{"injection_protection": tt.injection, "protection": tt.practice}}
-		applyPolicy(graph.StringUse{Completeness: c, APIModel: &graph.APIModel{ID: "test-contract"}}, &a)
+		a := analysis.Assessment{Status: "completed", Answers: map[string]string{"injection_protection": tt.injection, "protection": tt.practice}}
+		applyPolicy(analysis.CandidateUse{Completeness: c, APIModel: &analysis.APIModel{ID: "test-contract"}}, &a)
 		if a.FindingStatus != tt.want {
 			t.Fatalf("case=%+v result=%+v", tt, a)
 		}
@@ -35,7 +35,7 @@ func TestInjectionPolicySeparatesPracticeAndActualProtection(t *testing.T) {
 }
 
 func TestInjectionQuestionAndStrictDecoding(t *testing.T) {
-	u := graph.StringUse{Kind: "sql_query_candidate"}
+	u := analysis.CandidateUse{Kind: "sql_query_candidate"}
 	c, _ := New("openai", "test-model", "test-key")
 	payload, err := c.payload(u)
 	if err != nil {
@@ -71,8 +71,8 @@ func TestNoSQLAllPathProtectionGate(t *testing.T) {
 	for _, tt := range []struct{ answer, all, want string }{
 		{"vulnerable", "no", "confirmed_vulnerability"}, {"vulnerable", "yes", "needs_evidence"}, {"protected", "yes", "protected_for_claim"}, {"protected", "unknown", "needs_evidence"}, {"protected", "no", "needs_evidence"},
 	} {
-		use := graph.StringUse{Kind: "nosql_query_candidate", APIModel: &graph.APIModel{ID: "marsdb-collection-v1"}, Completeness: &graph.Completeness{ClaimKind: "injection", Evidence: map[string][]graph.Evidence{"request_source": {{Text: "value"}}, "sink_binding": {{Text: "binding"}}, "route_handler": {{Text: "handler"}}, "control_flow": {{Text: "paths"}}}}}
-		a := graph.Assessment{Status: "completed", Answers: map[string]string{"protection": "insufficient", "injection_protection": tt.answer, "all_paths_protected": tt.all, "source_coverage": "yes", "library_coverage": "yes", "guard_coverage": "yes", "path_coverage": "yes"}}
+		use := analysis.CandidateUse{Kind: "nosql_query_candidate", APIModel: &analysis.APIModel{ID: "marsdb-collection-v1"}, Completeness: &analysis.Completeness{ClaimKind: "injection", Evidence: map[string][]analysis.Evidence{"request_source": {{Text: "value"}}, "sink_binding": {{Text: "binding"}}, "route_handler": {{Text: "handler"}}, "control_flow": {{Text: "paths"}}}}}
+		a := analysis.Assessment{Status: "completed", Answers: map[string]string{"protection": "insufficient", "injection_protection": tt.answer, "all_paths_protected": tt.all, "source_coverage": "yes", "library_coverage": "yes", "guard_coverage": "yes", "path_coverage": "yes"}}
 		applyPolicy(use, &a)
 		if a.FindingStatus != tt.want {
 			t.Fatalf("%+v -> %+v", tt, a)

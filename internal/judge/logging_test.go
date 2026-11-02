@@ -5,15 +5,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func logClaim(gaps ...string) graph.StringUse {
-	u := graph.StringUse{Kind: "log_sink_candidate", Sink: graph.Evidence{Span: graph.Span{File: "server.ts"}},
-		Context:      []graph.Evidence{{Kind: "logger_binding", Text: "global console.log"}},
-		Dependencies: []graph.Dependency{{Source: graph.Evidence{Kind: "request_source", Text: "req.body.password"}}}}
+func logClaim(gaps ...string) analysis.CandidateUse {
+	u := analysis.CandidateUse{Kind: "log_sink_candidate", Sink: analysis.Evidence{Span: analysis.Span{File: "server.ts"}},
+		Context:      []analysis.Evidence{{Kind: "logger_binding", Text: "global console.log"}},
+		Dependencies: []analysis.Dependency{{Source: analysis.Evidence{Kind: "request_source", Text: "req.body.password"}}}}
 	for _, g := range gaps {
-		u.Gaps = append(u.Gaps, graph.Gap{Kind: g})
+		u.Gaps = append(u.Gaps, analysis.Gap{Kind: g})
 	}
 	return u
 }
@@ -21,7 +21,7 @@ func logClaim(gaps ...string) graph.StringUse {
 func TestLogPolicy(t *testing.T) {
 	cases := []struct {
 		name                               string
-		use                                graph.StringUse
+		use                                analysis.CandidateUse
 		class, content, redaction, verdict string
 		want                               string
 	}{
@@ -37,7 +37,7 @@ func TestLogPolicy(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			a := graph.Assessment{Status: "completed", Answers: map[string]string{"data_class": tt.class, "content_exposure": tt.content, "redaction": tt.redaction, "log_exposure": tt.verdict}}
+			a := analysis.Assessment{Status: "completed", Answers: map[string]string{"data_class": tt.class, "content_exposure": tt.content, "redaction": tt.redaction, "log_exposure": tt.verdict}}
 			applyPolicy(tt.use, &a)
 			if a.FindingStatus != tt.want {
 				t.Fatalf("got %s: %+v", a.FindingStatus, a)
@@ -47,7 +47,7 @@ func TestLogPolicy(t *testing.T) {
 	t.Run("missing binding blocks", func(t *testing.T) {
 		u := logClaim("log_sensitive_field_hint")
 		u.Context = nil
-		a := graph.Assessment{Answers: map[string]string{"data_class": "credential", "content_exposure": "yes", "redaction": "no", "log_exposure": "vulnerable"}}
+		a := analysis.Assessment{Answers: map[string]string{"data_class": "credential", "content_exposure": "yes", "redaction": "no", "log_exposure": "vulnerable"}}
 		applyPolicy(u, &a)
 		if a.FindingStatus != "needs_evidence" || len(a.BlockingGaps) == 0 {
 			t.Fatalf("binding not required: %+v", a)

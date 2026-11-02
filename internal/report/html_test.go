@@ -5,14 +5,14 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	htmlstd "html"
 	"strings"
 	"testing"
 )
 
 func TestHTMLPinsOnlyBundledSortingScript(t *testing.T) {
-	r := &graph.StringReport{Entries: []graph.Entry{{Route: graph.Route{ID: "r", Method: "GET", PathPattern: `/path/"<script>bad()</script>`}}}}
+	r := &analysis.AnalysisReport{Entries: []analysis.Entry{{Route: analysis.Route{ID: "r", Method: "GET", PathPattern: `/path/"<script>bad()</script>`}}}}
 	var out bytes.Buffer
 	if err := HTML(&out, r); err != nil {
 		t.Fatal(err)
@@ -44,11 +44,11 @@ func TestInconclusiveDisplayPreservesRawAssessment(t *testing.T) {
 			if got := displayLabel(value); got != "Inconclusive" {
 				t.Fatalf("displayLabel(%q) = %q", value, got)
 			}
-			u := graph.StringUse{ID: "u", Kind: "outbound_http_candidate", Assessment: graph.Assessment{
+			u := analysis.CandidateUse{ID: "u", Kind: "outbound_http_candidate", Assessment: analysis.Assessment{
 				Status: "completed", FindingStatus: "needs_evidence", Protection: value,
 				Answers: map[string]string{"validation": value},
 			}}
-			r := &graph.StringReport{Uses: []graph.StringUse{u}}
+			r := &analysis.AnalysisReport{Uses: []analysis.CandidateUse{u}}
 			before, _ := json.Marshal(r.Uses)
 			var b bytes.Buffer
 			if err := HTML(&b, r); err != nil {
@@ -79,9 +79,9 @@ func TestHumanFindingsPreserveEvidenceAndSeparateUncertainty(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			u := graph.StringUse{ID: "u", RouteID: "r", Kind: tt.kind, Sink: graph.Evidence{Text: tt.text}, Gaps: []graph.Gap{{Kind: tt.gap}}, Assessment: graph.Assessment{Status: "not_run"}}
+			u := analysis.CandidateUse{ID: "u", RouteID: "r", Kind: tt.kind, Sink: analysis.Evidence{Text: tt.text}, Gaps: []analysis.Gap{{Kind: tt.gap}}, Assessment: analysis.Assessment{Status: "not_run"}}
 			before, _ := json.Marshal(u)
-			r := &graph.StringReport{Uses: []graph.StringUse{u}}
+			r := &analysis.AnalysisReport{Uses: []analysis.CandidateUse{u}}
 			Enrich(r)
 			f := r.Findings[0]
 			if f.RecordType != tt.record || !strings.Contains(f.Title, tt.title) || len(f.Recommendations.Actions) == 0 || !strings.Contains(f.Uncertainty, "not run") {
@@ -100,7 +100,7 @@ func TestHumanFindingsPreserveEvidenceAndSeparateUncertainty(t *testing.T) {
 
 func TestHumanFindingAssessmentStatus(t *testing.T) {
 	for _, tt := range []struct{ assessment, finding, record string }{{"completed", "protected_for_claim", "protection"}, {"completed", "supported_potential", "analysis"}, {"failed", "protected_for_claim", "analysis"}, {"not_run", "supported_potential", "analysis"}} {
-		u := graph.StringUse{Kind: "outbound_http_candidate", Assessment: graph.Assessment{Status: tt.assessment, FindingStatus: tt.finding}}
+		u := analysis.CandidateUse{Kind: "outbound_http_candidate", Assessment: analysis.Assessment{Status: tt.assessment, FindingStatus: tt.finding}}
 		f := describe(u)
 		if f.RecordType != tt.record {
 			t.Fatalf("%+v -> %+v", tt, f)
@@ -110,12 +110,12 @@ func TestHumanFindingAssessmentStatus(t *testing.T) {
 
 func TestStandaloneHTMLGroupsAndEscapesSavedEvidence(t *testing.T) {
 	hostile := `<script>alert('source')</script><img src="https://example.invalid/beacon">`
-	r := &graph.StringReport{SchemaVersion: 1, Root: hostile, Entries: []graph.Entry{
-		{Route: graph.Route{ID: "one", Method: "GET", PathPattern: "/same", Registration: graph.Span{File: hostile, StartLine: 1}}},
-		{Route: graph.Route{ID: "two", Method: "POST", PathPattern: "/same"}},
-		{Route: graph.Route{ID: "empty", Method: "GET", PathPattern: "/empty"}},
-	}, Uses: []graph.StringUse{
-		{ID: "u1", RouteID: "one", Kind: "nosql_query_candidate", Sink: graph.Evidence{Text: hostile}, Gaps: []graph.Gap{{Kind: "query_text_interpolated"}}},
+	r := &analysis.AnalysisReport{SchemaVersion: 1, Root: hostile, Entries: []analysis.Entry{
+		{Route: analysis.Route{ID: "one", Method: "GET", PathPattern: "/same", Registration: analysis.Span{File: hostile, StartLine: 1}}},
+		{Route: analysis.Route{ID: "two", Method: "POST", PathPattern: "/same"}},
+		{Route: analysis.Route{ID: "empty", Method: "GET", PathPattern: "/empty"}},
+	}, Uses: []analysis.CandidateUse{
+		{ID: "u1", RouteID: "one", Kind: "nosql_query_candidate", Sink: analysis.Evidence{Text: hostile}, Gaps: []analysis.Gap{{Kind: "query_text_interpolated"}}},
 		{ID: "u2", RouteID: "two", Kind: "input_validation_candidate"},
 		{ID: "u3", RouteID: "missing", Kind: "outbound_http_candidate"},
 	}}
@@ -156,9 +156,9 @@ func TestPoorPracticeRemainsActionableAcrossModelOutcomes(t *testing.T) {
 	for _, tt := range []struct{ status, finding, protection string }{
 		{"not_run", "", ""}, {"failed", "", ""}, {"completed", "needs_evidence", "uncertain"}, {"completed", "supported_potential", "insufficient"}, {"completed", "protected_for_claim", "sufficient"},
 	} {
-		u := graph.StringUse{ID: "u", Kind: "sql_query_candidate", Sink: graph.Evidence{Text: "db.query(`SELECT ${value}`)"}, Gaps: []graph.Gap{{Kind: "query_text_interpolated"}}, Assessment: graph.Assessment{Status: tt.status, FindingStatus: tt.finding, Protection: tt.protection}}
+		u := analysis.CandidateUse{ID: "u", Kind: "sql_query_candidate", Sink: analysis.Evidence{Text: "db.query(`SELECT ${value}`)"}, Gaps: []analysis.Gap{{Kind: "query_text_interpolated"}}, Assessment: analysis.Assessment{Status: tt.status, FindingStatus: tt.finding, Protection: tt.protection}}
 		original, _ := json.Marshal(u.Assessment)
-		r := &graph.StringReport{Uses: []graph.StringUse{u}}
+		r := &analysis.AnalysisReport{Uses: []analysis.CandidateUse{u}}
 		Enrich(r)
 		f := r.Findings[0]
 		if f.RecordType != "finding" || f.Status != "poor_practice" {
@@ -176,16 +176,16 @@ func TestPoorPracticeRemainsActionableAcrossModelOutcomes(t *testing.T) {
 }
 
 func TestHTMLDefaultsToGroupedCountsThenRoutePath(t *testing.T) {
-	r := &graph.StringReport{Entries: []graph.Entry{
-		{Route: graph.Route{ID: "z", Method: "DELETE", PathPattern: "/z"}},
-		{Route: graph.Route{ID: "b", Method: "GET", PathPattern: "/b"}},
-		{Route: graph.Route{ID: "a-post", Method: "POST", PathPattern: "/a"}},
-		{Route: graph.Route{ID: "a-get", Method: "GET", PathPattern: "/a"}},
-	}, Uses: []graph.StringUse{
-		{ID: "finding", RouteID: "z", Kind: "sql_query_candidate", Gaps: []graph.Gap{{Kind: "query_text_interpolated"}}},
+	r := &analysis.AnalysisReport{Entries: []analysis.Entry{
+		{Route: analysis.Route{ID: "z", Method: "DELETE", PathPattern: "/z"}},
+		{Route: analysis.Route{ID: "b", Method: "GET", PathPattern: "/b"}},
+		{Route: analysis.Route{ID: "a-post", Method: "POST", PathPattern: "/a"}},
+		{Route: analysis.Route{ID: "a-get", Method: "GET", PathPattern: "/a"}},
+	}, Uses: []analysis.CandidateUse{
+		{ID: "finding", RouteID: "z", Kind: "sql_query_candidate", Gaps: []analysis.Gap{{Kind: "query_text_interpolated"}}},
 		{ID: "orphan", RouteID: "unresolved", Kind: "outbound_http_candidate"},
 		{ID: "review", RouteID: "a-post", Kind: "outbound_http_candidate"},
-		{ID: "protected", RouteID: "b", Kind: "outbound_http_candidate", Assessment: graph.Assessment{Status: "completed", FindingStatus: "protected_for_claim"}},
+		{ID: "protected", RouteID: "b", Kind: "outbound_http_candidate", Assessment: analysis.Assessment{Status: "completed", FindingStatus: "protected_for_claim"}},
 	}}
 	var out bytes.Buffer
 	if err := HTML(&out, r); err != nil {
@@ -202,7 +202,7 @@ func TestHTMLDefaultsToGroupedCountsThenRoutePath(t *testing.T) {
 }
 
 func TestConfirmedInjectionKeepsValidationAsReviewCategory(t *testing.T) {
-	u := graph.StringUse{ID: "u", RouteID: "r", Kind: "sql_query_candidate", Sink: graph.Evidence{Text: "query text"}, Gaps: []graph.Gap{{Kind: "query_text_interpolated"}, {Kind: "input_validation_absent"}}, APIModel: &graph.APIModel{ID: "sequelize-raw-query-v1"}, Completeness: &graph.Completeness{ClaimKind: "injection"}, Assessment: graph.Assessment{Status: "completed", FindingStatus: "confirmed_vulnerability", Answers: map[string]string{"injection_protection": "vulnerable"}}}
+	u := analysis.CandidateUse{ID: "u", RouteID: "r", Kind: "sql_query_candidate", Sink: analysis.Evidence{Text: "query text"}, Gaps: []analysis.Gap{{Kind: "query_text_interpolated"}, {Kind: "input_validation_absent"}}, APIModel: &analysis.APIModel{ID: "sequelize-raw-query-v1"}, Completeness: &analysis.Completeness{ClaimKind: "injection"}, Assessment: analysis.Assessment{Status: "completed", FindingStatus: "confirmed_vulnerability", Answers: map[string]string{"injection_protection": "vulnerable"}}}
 	f := describe(u)
 	if f.Status != "confirmed_vulnerability" || f.RecordType != "finding" {
 		t.Fatalf("finding=%+v", f)
@@ -219,8 +219,8 @@ func TestConfirmedInjectionKeepsValidationAsReviewCategory(t *testing.T) {
 }
 
 func TestInconclusiveRenderingNeverUsesProtectedBadge(t *testing.T) {
-	u := graph.StringUse{ID: "x", Kind: "xss_candidate", XSS: &graph.XSSFacts{Type: "stored", OutputContext: "html_text", Protection: "encoded", OriginResolved: true}, Assessment: graph.Assessment{Status: "completed", FindingStatus: "needs_evidence", Protection: "uncertain", Answers: map[string]string{"xss_exposure": "unknown"}}}
-	r := &graph.StringReport{Uses: []graph.StringUse{u}}
+	u := analysis.CandidateUse{ID: "x", Kind: "xss_candidate", XSS: &analysis.XSSFacts{Type: "stored", OutputContext: "html_text", Protection: "encoded", OriginResolved: true}, Assessment: analysis.Assessment{Status: "completed", FindingStatus: "needs_evidence", Protection: "uncertain", Answers: map[string]string{"xss_exposure": "unknown"}}}
+	r := &analysis.AnalysisReport{Uses: []analysis.CandidateUse{u}}
 	var out bytes.Buffer
 	if err := HTML(&out, r); err != nil {
 		t.Fatal(err)

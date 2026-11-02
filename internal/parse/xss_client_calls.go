@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
@@ -75,7 +75,7 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 			if context != "" {
 				v := f.eval(args.NamedChild(0))
 				if len(v.deps) == 0 {
-					v.deps = []graph.Dependency{{Source: f.module.evidence("unresolved_source", args.NamedChild(0))}}
+					v.deps = []analysis.Dependency{{Source: f.module.evidence("unresolved_source", args.NamedChild(0))}}
 				}
 				v = f.transfer(v, "trust_bypass", n)
 				v.trustedContext = context
@@ -139,7 +139,7 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 				}
 				if isFunction(callback) {
 					if len(receiver.deps) == 0 {
-						receiver.deps = []graph.Dependency{{Source: f.module.evidence("unresolved_source", n)}}
+						receiver.deps = []analysis.Dependency{{Source: f.module.evidence("unresolved_source", n)}}
 					}
 					f.clientCallback(callback, receiver)
 					return receiver, true

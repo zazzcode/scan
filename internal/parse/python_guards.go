@@ -3,10 +3,10 @@ package parse
 import (
 	"fmt"
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func pythonSourceKey(d graph.Dependency) string {
+func pythonSourceKey(d analysis.Dependency) string {
 	return fmt.Sprintf("%s:%s:%d:%s", d.Source.SHA256, d.Source.Span.File, d.Source.Span.StartByte, d.StorageKey)
 }
 func (f *pythonFlow) markGuard(n *sitter.Node, v pythonValue) {
@@ -26,8 +26,8 @@ func (f *pythonFlow) markGuard(n *sitter.Node, v pythonValue) {
 		f.guards[key] = append(f.guards[key], f.gap("input_helper_unresolved", "A pre-use call receives this value; its enforcing or transforming effect is unmodeled", n))
 	}
 }
-func (f *pythonFlow) guardGaps(v pythonValue) []graph.Gap {
-	var out []graph.Gap
+func (f *pythonFlow) guardGaps(v pythonValue) []analysis.Gap {
+	var out []analysis.Gap
 	seen := map[string]bool{}
 	for _, d := range v.deps {
 		for _, g := range f.guards[pythonSourceKey(d.dep)] {

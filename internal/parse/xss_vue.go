@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var vueScript = regexp.MustCompile(`(?is)<script\b[^>]*>(.*?)</script\s*>`)
@@ -34,7 +34,7 @@ func (s *moduleSet) vueOutputs(f *flow) {
 	if len(match) == 0 {
 		return
 	}
-	file := graph.Evidence{Kind: "template", Text: source, SHA256: f.module.hash, Span: spanOf(f.module.file, f.module.tree.RootNode())}
+	file := analysis.Evidence{Kind: "template", Text: source, SHA256: f.module.hash, Span: spanOf(f.module.file, f.module.tree.RootNode())}
 	markup := source[match[2]:match[3]]
 	for _, binding := range vueHTML.FindAllStringSubmatchIndex(markup, -1) {
 		start, end := match[2]+binding[0], match[2]+binding[1]
@@ -47,7 +47,7 @@ func (s *moduleSet) vueOutputs(f *flow) {
 			v = f.env["this."+expression]
 		}
 		sink := textRange(file, start, end, "vue_output")
-		f.recordXSS(sink, v, "html_text", "text/html", false, []graph.Evidence{{Kind: "render_binding", Text: "Vue single-file template v-html", Span: sink.Span, SHA256: file.SHA256}})
+		f.recordXSS(sink, v, "html_text", "text/html", false, []analysis.Evidence{{Kind: "render_binding", Text: "Vue single-file template v-html", Span: sink.Span, SHA256: file.SHA256}})
 	}
 	for _, binding := range handlebarsOutput.FindAllStringSubmatchIndex(markup, -1) {
 		start, end := match[2]+binding[0], match[2]+binding[1]
@@ -57,7 +57,7 @@ func (s *moduleSet) vueOutputs(f *flow) {
 		name := strings.TrimSpace(markup[binding[4]:binding[5]])
 		v := f.env[name]
 		sink := textRange(file, start, end, "vue_text_output")
-		f.recordXSS(sink, v, "html_text", "text/html", true, []graph.Evidence{{Kind: "render_binding", Text: "Vue escaped text interpolation", Span: sink.Span, SHA256: file.SHA256}})
+		f.recordXSS(sink, v, "html_text", "text/html", true, []analysis.Evidence{{Kind: "render_binding", Text: "Vue escaped text interpolation", Span: sink.Span, SHA256: file.SHA256}})
 	}
 }
 

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var pythonSelect = regexp.MustCompile(`(?is)^\s*select\s+.+?\s+from\s+([a-zA-Z_][a-zA-Z0-9_]*)\b`)
@@ -40,7 +40,7 @@ func (f *pythonFlow) sql(n, object *sitter.Node, values []pythonValue, receiver 
 		return receiver
 	}
 	u := f.addUse("sql_query_candidate", n, all)
-	binding := append([]graph.Evidence{}, receiver.evidence...)
+	binding := append([]analysis.Evidence{}, receiver.evidence...)
 	binding = append(binding, f.module.evidence("sink_binding", n.ChildByFieldName("function")))
 	u.Context = append(u.Context, binding...)
 	u.APIModel = pythonDBAPIModel(receiver.driver)
@@ -54,17 +54,17 @@ func (f *pythonFlow) sql(n, object *sitter.Node, values []pythonValue, receiver 
 		}
 		u.Gaps = append(u.Gaps, f.gap(kind, "No complete business-policy enforcement established for "+d.container+"."+d.key, n))
 	}
-	c := &graph.Completeness{ClaimKind: "injection", Required: []string{"request_source", "sink_binding", "route_handler", "control_flow"}, Evidence: map[string][]graph.Evidence{"sink_binding": binding, "route_handler": {f.route.module.evidence("route_handler", f.route.fn)}, "control_flow": append([]graph.Evidence{f.module.evidence("operation", n)}, f.context...)}, Blockers: []graph.Gap{}, Coverage: append([]graph.Gap{}, u.Gaps...), Scope: "Bounded Python DB-API source-to-operation flow; SQL text and bound parameters have separate roles."}
+	c := &analysis.Completeness{ClaimKind: "injection", Required: []string{"request_source", "sink_binding", "route_handler", "control_flow"}, Evidence: map[string][]analysis.Evidence{"sink_binding": binding, "route_handler": {f.route.module.evidence("route_handler", f.route.fn)}, "control_flow": append([]analysis.Evidence{f.module.evidence("operation", n)}, f.context...)}, Blockers: []analysis.Gap{}, Coverage: append([]analysis.Gap{}, u.Gaps...), Scope: "Bounded Python DB-API source-to-operation flow; SQL text and bound parameters have separate roles."}
 	for _, d := range all.deps {
 		if d.dep.Source.Kind == "request_source" {
 			c.Evidence["request_source"] = append(c.Evidence["request_source"], d.dep.Source)
 		}
 	}
-	c.Evidence["query_text"] = []graph.Evidence{f.module.evidence("query_text", pyArgs(n)[0])}
+	c.Evidence["query_text"] = []analysis.Evidence{f.module.evidence("query_text", pyArgs(n)[0])}
 	if len(pyArgs(n)) > 1 {
-		c.Evidence["bound_parameters"] = []graph.Evidence{f.module.evidence("bound_parameters", pyArgs(n)[1])}
+		c.Evidence["bound_parameters"] = []analysis.Evidence{f.module.evidence("bound_parameters", pyArgs(n)[1])}
 	}
-	for _, g := range append(append([]graph.Gap{}, f.gaps...), append(text.gaps, f.guardGaps(text)...)...) {
+	for _, g := range append(append([]analysis.Gap{}, f.gaps...), append(text.gaps, f.guardGaps(text)...)...) {
 		switch g.Kind {
 		case "python_parameter_unresolved", "python_value_unresolved", "python_call_unresolved", "python_loop_unresolved", "python_comprehension_unresolved", "python_decorator_unresolved", "work_limit", "dependency_limit", "transfer_limit", "input_helper_unresolved", "python_finally_unresolved":
 			c.Blockers = append(c.Blockers, g)
@@ -79,7 +79,7 @@ func (f *pythonFlow) sql(n, object *sitter.Node, values []pythonValue, receiver 
 			fields = appendUniqueString(fields, d.key)
 		}
 	}
-	u.Check = &graph.Check{ID: "automatic-python-query", Method: f.route.route.Method, Path: f.route.route.PathPattern, Kind: "sql_query", Fields: fields, Validation: "Assess only requirements established by supplied server code and source-backed form-field policy. A browser form can declare a requirement but does not enforce it on direct HTTP requests. Missing business requirements remain uncertain.", Protection: "Request values must remain data and must not change SQL syntax. Bound values and dynamic identifiers are separate slots."}
+	u.Check = &analysis.Check{ID: "automatic-python-query", Method: f.route.route.Method, Path: f.route.route.PathPattern, Kind: "sql_query", Fields: fields, Validation: "Assess only requirements established by supplied server code and source-backed form-field policy. A browser form can declare a requirement but does not enforce it on direct HTTP requests. Missing business requirements remain uncertain.", Protection: "Request values must remain data and must not change SQL syntax. Bound values and dynamic identifiers are separate slots."}
 	u.Completeness = c
 	return receiver
 }
@@ -120,14 +120,14 @@ func (f *pythonFlow) storageWrite(n *sitter.Node, sql string, nodes []*sitter.No
 		f.set.writes[storage] = append(f.set.writes[storage], pythonWrite{v, f.route.route.ID, f.module.evidence("storage_write", n)})
 	}
 }
-func (s *pythonSet) linkStorage(out *graph.StringReport) {
+func (s *pythonSet) linkStorage(out *analysis.AnalysisReport) {
 	for i := range out.Uses {
 		u := &out.Uses[i]
 		if u.XSS == nil {
 			continue
 		}
-		var deps []graph.Dependency
-		var paths []graph.XSSPath
+		var deps []analysis.Dependency
+		var paths []analysis.XSSPath
 		var related []string
 		resolved := true
 		stored := false
@@ -149,7 +149,7 @@ func (s *pythonSet) linkStorage(out *graph.StringReport) {
 				for _, source := range w.value.deps {
 					nd := source.dep
 					nd.StorageKey = d.StorageKey
-					nd.Transfers = append(append([]graph.Evidence{}, nd.Transfers...), d.Transfers...)
+					nd.Transfers = append(append([]analysis.Evidence{}, nd.Transfers...), d.Transfers...)
 					deps = append(deps, nd)
 					p := u.XSS.Protection
 					if source.protection == "unknown" {
@@ -157,14 +157,14 @@ func (s *pythonSet) linkStorage(out *graph.StringReport) {
 					} else if p == "raw" && (source.protection == "encoded" || source.protection == "numeric" || source.protection == "non_content") {
 						p = "encoded"
 					}
-					paths = append(paths, graph.XSSPath{Dependency: len(deps) - 1, Entry: w.entry, Protection: p})
+					paths = append(paths, analysis.XSSPath{Dependency: len(deps) - 1, Entry: w.entry, Protection: p})
 				}
 			}
 		}
 		if stored {
 			if len(deps) > 64 {
 				deps = deps[:64]
-				u.Gaps = append(u.Gaps, graph.Gap{Kind: "dependency_limit", Detail: "Stored origin expansion exceeds 64 paths", At: u.Sink.Span})
+				u.Gaps = append(u.Gaps, analysis.Gap{Kind: "dependency_limit", Detail: "Stored origin expansion exceeds 64 paths", At: u.Sink.Span})
 				u.XSS.Protection = "unknown"
 				resolved = false
 			}
@@ -193,7 +193,7 @@ func (s *pythonSet) linkStorage(out *graph.StringReport) {
 		}
 	}
 }
-func (s *pythonSet) attachChecks(out *graph.StringReport, checks []graph.Check) {
+func (s *pythonSet) attachChecks(out *analysis.AnalysisReport, checks []analysis.Check) {
 	for _, check := range checks {
 		matched := false
 		for i := range out.Uses {
@@ -222,7 +222,7 @@ func (s *pythonSet) attachChecks(out *graph.StringReport, checks []graph.Check) 
 			}
 		}
 		if !matched {
-			out.Gaps = append(out.Gaps, graph.Gap{Kind: "python_check_unresolved", Detail: "No supported operation matched check " + check.ID})
+			out.Gaps = append(out.Gaps, analysis.Gap{Kind: "python_check_unresolved", Detail: "No supported operation matched check " + check.ID})
 		}
 	}
 }

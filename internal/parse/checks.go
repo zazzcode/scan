@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check) {
-	selected := []graph.StringUse{}
+func (s *moduleSet) buildChecks(report *analysis.AnalysisReport, checks []analysis.Check) {
+	selected := []analysis.CandidateUse{}
 	for _, check := range checks {
 		s.contextLimits = nil
 		s.contextFields = check.Fields
 		context, chainGaps := s.chainEvidence(report, check)
 		if len(context) == 0 {
-			report.Gaps = append(report.Gaps, graph.Gap{Kind: "check_route_missing", Detail: check.ID + ": declared method/path was not resolved"})
+			report.Gaps = append(report.Gaps, analysis.Gap{Kind: "check_route_missing", Detail: check.ID + ": declared method/path was not resolved"})
 			continue
 		}
 		if check.Kind == "sql_query" || check.Kind == "nosql_query" {
@@ -32,8 +32,8 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 				use.ID += "/" + check.ID
 				use.Check = &check
 				use.Context = append(context, use.Context...)
-				use.Completeness = &graph.Completeness{ClaimKind: "injection", Required: []string{"request_source", candidateKind, "route_handler", "sink_binding"}, Evidence: evidenceRoles(use.Context), Blockers: append([]graph.Gap{}, chainGaps...), Coverage: []graph.Gap{}, Scope: "injection claim over the supplied route, relevant request values, verified operation contract and guard/transfer context"}
-				use.Completeness.Evidence[candidateKind] = []graph.Evidence{use.Sink}
+				use.Completeness = &analysis.Completeness{ClaimKind: "injection", Required: []string{"request_source", candidateKind, "route_handler", "sink_binding"}, Evidence: evidenceRoles(use.Context), Blockers: append([]analysis.Gap{}, chainGaps...), Coverage: []analysis.Gap{}, Scope: "injection claim over the supplied route, relevant request values, verified operation contract and guard/transfer context"}
+				use.Completeness.Evidence[candidateKind] = []analysis.Evidence{use.Sink}
 				for _, d := range use.Dependencies {
 					if fieldDependency(d, check.Fields) {
 						use.Completeness.Evidence["request_source"] = append(use.Completeness.Evidence["request_source"], d.Source)
@@ -56,7 +56,7 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 					use.ControlEdges = append(use.ControlEdges, edges...)
 					use.Completeness.Blockers = append(use.Completeness.Blockers, missing...)
 					controlComplete = len(missing) == 0
-					use.Completeness.Evidence["control_flow"] = []graph.Evidence{e}
+					use.Completeness.Evidence["control_flow"] = []analysis.Evidence{e}
 				}
 				binding := s.queryBinding(use)
 				if check.Kind == "nosql_query" {
@@ -64,7 +64,7 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 				}
 				if len(binding) > 0 {
 					if check.Kind == "nosql_query" {
-						use.APIModel = &graph.APIModel{ID: "marsdb-collection-v1", Library: "marsdb", Semantics: "MarsDB Collection uses Mongo-style selector matching. $where string values are executable JavaScript predicates, not bound data. A request object in a selector field can introduce matching operators such as $ne. Ordinary scalar values in document data slots are not executable expressions. Review each selector versus update-value slot and constraints separately.", Reference: "https://github.com/c58/marsdb/blob/master/lib/DocumentMatcher.js"}
+						use.APIModel = &analysis.APIModel{ID: "marsdb-collection-v1", Library: "marsdb", Semantics: "MarsDB Collection uses Mongo-style selector matching. $where string values are executable JavaScript predicates, not bound data. A request object in a selector field can introduce matching operators such as $ne. Ordinary scalar values in document data slots are not executable expressions. Review each selector versus update-value slot and constraints separately.", Reference: "https://github.com/c58/marsdb/blob/master/lib/DocumentMatcher.js"}
 						if module := s.modules[use.Sink.Span.File]; module != nil {
 							call := nodeAt(module.tree.RootNode(), use.Sink.Span.StartByte, use.Sink.Span.EndByte)
 							if call != nil {
@@ -72,13 +72,13 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 								if fn != nil {
 									obj := fn.ChildByFieldName("object")
 									if obj != nil && strings.HasPrefix(s.modelIdentity(module, obj.Utf8Text(module.src), 0), "mongoose:") {
-										use.APIModel = &graph.APIModel{ID: "mongoose-model-query-v1", Library: "mongoose", Semantics: "Mongoose model selectors depend on schema casting, scalar constraints and permitted query operators. Input objects can carry selectors; findById has ObjectId casting semantics. A model binding alone does not establish injection or protection. Inspect the actual operation, schema/version and input constraints.", Reference: "https://mongoosejs.com/docs/tutorials/query_casting.html"}
+										use.APIModel = &analysis.APIModel{ID: "mongoose-model-query-v1", Library: "mongoose", Semantics: "Mongoose model selectors depend on schema casting, scalar constraints and permitted query operators. Input objects can carry selectors; findById has ObjectId casting semantics. A model binding alone does not establish injection or protection. Inspect the actual operation, schema/version and input constraints.", Reference: "https://mongoosejs.com/docs/tutorials/query_casting.html"}
 									}
 								}
 							}
 						}
 					} else {
-						use.APIModel = &graph.APIModel{ID: "sequelize-raw-query-v1", Library: "sequelize", Semantics: "Sequelize query takes executable SQL text as its first argument. bind and replacements supply separated data values according to their API. model, plain and result-format options do not parameterize an already-interpolated SQL string.", Reference: "https://sequelize.org/docs/v6/core-concepts/raw-queries/"}
+						use.APIModel = &analysis.APIModel{ID: "sequelize-raw-query-v1", Library: "sequelize", Semantics: "Sequelize query takes executable SQL text as its first argument. bind and replacements supply separated data values according to their API. model, plain and result-format options do not parameterize an already-interpolated SQL string.", Reference: "https://sequelize.org/docs/v6/core-concepts/raw-queries/"}
 					}
 					use.Context = append(use.Context, binding...)
 					use.Completeness.Evidence["sink_binding"] = binding
@@ -142,9 +142,9 @@ func (s *moduleSet) buildChecks(report *graph.StringReport, checks []graph.Check
 
 // missingSQLSink keeps a declared SQL check visible when discovery found no query.
 // An empty use list would be indistinguishable from a protected route.
-func missingSQLSink(report *graph.StringReport, c graph.Check, context []graph.Evidence, chainGaps []graph.Gap) graph.StringUse {
-	var route graph.Route
-	blockers := append([]graph.Gap{}, chainGaps...)
+func missingSQLSink(report *analysis.AnalysisReport, c analysis.Check, context []analysis.Evidence, chainGaps []analysis.Gap) analysis.CandidateUse {
+	var route analysis.Route
+	blockers := append([]analysis.Gap{}, chainGaps...)
 	for _, e := range report.Entries {
 		if e.Route.Method != c.Method || e.Route.PathPattern != c.Path {
 			continue
@@ -157,21 +157,21 @@ func missingSQLSink(report *graph.StringReport, c graph.Check, context []graph.E
 			}
 		}
 	}
-	gap := graph.Gap{Kind: "sql_sink_missing", Detail: c.ID + ": declared SQL check produced no candidate sink", At: route.Registration}
+	gap := analysis.Gap{Kind: "sql_sink_missing", Detail: c.ID + ": declared SQL check produced no candidate sink", At: route.Registration}
 	blockers = append(blockers, gap)
-	return graph.StringUse{
+	return analysis.CandidateUse{
 		ID:           fmt.Sprintf("check:%s:%s:missing-sink", route.ID, c.ID),
 		RouteID:      route.ID,
 		Kind:         "sql_sink_missing",
 		Check:        &c,
 		Context:      context,
-		Gaps:         []graph.Gap{gap},
-		Assessment:   graph.Assessment{Status: "not_run"},
-		Completeness: &graph.Completeness{Required: []string{"request_source", "sql_query_candidate", "route_handler", "sink_binding"}, Evidence: evidenceRoles(context), Blockers: blockers, Coverage: []graph.Gap{}, Scope: "declared SQL check produced no candidate sink in the supported handler and helper slice"},
+		Gaps:         []analysis.Gap{gap},
+		Assessment:   analysis.Assessment{Status: "not_run"},
+		Completeness: &analysis.Completeness{Required: []string{"request_source", "sql_query_candidate", "route_handler", "sink_binding"}, Evidence: evidenceRoles(context), Blockers: blockers, Coverage: []analysis.Gap{}, Scope: "declared SQL check produced no candidate sink in the supported handler and helper slice"},
 	}
 }
 
-func checkRoute(report *graph.StringReport, id string, c graph.Check) bool {
+func checkRoute(report *analysis.AnalysisReport, id string, c analysis.Check) bool {
 	for _, e := range report.Entries {
 		if e.Route.ID == id {
 			return e.Route.Method == c.Method && e.Route.PathPattern == c.Path
@@ -180,12 +180,12 @@ func checkRoute(report *graph.StringReport, id string, c graph.Check) bool {
 	return false
 }
 
-func gapTouchesSQLSource(g graph.Gap, use graph.StringUse, fields []string) bool {
+func gapTouchesSQLSource(g analysis.Gap, use analysis.CandidateUse, fields []string) bool {
 	for _, d := range use.Dependencies {
 		if !fieldDependency(d, fields) {
 			continue
 		}
-		for _, e := range append([]graph.Evidence{d.Source}, d.Transfers...) {
+		for _, e := range append([]analysis.Evidence{d.Source}, d.Transfers...) {
 			// Enclosing concatenations include sibling operands; only an actual
 			// transfer on this source's path makes a call-result gap relevant.
 			if e.Kind != "request_source" && e.Kind != "call_argument_dependency" {
@@ -199,16 +199,16 @@ func gapTouchesSQLSource(g graph.Gap, use graph.StringUse, fields []string) bool
 	return false
 }
 
-func (s *moduleSet) registrationCheck(report *graph.StringReport, c graph.Check, context []graph.Evidence, gaps []graph.Gap) graph.StringUse {
-	var route graph.Route
+func (s *moduleSet) registrationCheck(report *analysis.AnalysisReport, c analysis.Check, context []analysis.Evidence, gaps []analysis.Gap) analysis.CandidateUse {
+	var route analysis.Route
 	for _, e := range report.Entries {
 		if e.Route.Method == c.Method && e.Route.PathPattern == c.Path {
 			route = e.Route
 			break
 		}
 	}
-	use := graph.StringUse{ID: fmt.Sprintf("check:%s:%s", route.ID, c.ID), RouteID: route.ID, Kind: "account_creation_candidate", Check: &c, Context: context, Dependencies: []graph.Dependency{}, Gaps: []graph.Gap{}, Assessment: graph.Assessment{Status: "not_run"}}
-	use.Completeness = &graph.Completeness{Required: []string{"route_handler", "persistence_mapping", "model_constraints"}, Evidence: evidenceRoles(context), Blockers: append([]graph.Gap{}, gaps...), Coverage: []graph.Gap{}, Scope: "registration middleware and generated persistence under the declared framework model"}
+	use := analysis.CandidateUse{ID: fmt.Sprintf("check:%s:%s", route.ID, c.ID), RouteID: route.ID, Kind: "account_creation_candidate", Check: &c, Context: context, Dependencies: []analysis.Dependency{}, Gaps: []analysis.Gap{}, Assessment: analysis.Assessment{Status: "not_run"}}
+	use.Completeness = &analysis.Completeness{Required: []string{"route_handler", "persistence_mapping", "model_constraints"}, Evidence: evidenceRoles(context), Blockers: append([]analysis.Gap{}, gaps...), Coverage: []analysis.Gap{}, Scope: "registration middleware and generated persistence under the declared framework model"}
 	m := s.modules[route.Registration.File]
 	generated, models := s.persistenceEvidence(m, c.Path)
 	use.Context = append(use.Context, generated...)
@@ -218,7 +218,7 @@ func (s *moduleSet) registrationCheck(report *graph.StringReport, c graph.Check,
 	if len(generated) > 0 {
 		use.Sink = generated[len(generated)-1]
 	} else {
-		use.Completeness.Blockers = append(use.Completeness.Blockers, graph.Gap{Kind: "persistence_unresolved", Detail: "no supported framework creation mapping for this route", At: route.Registration})
+		use.Completeness.Blockers = append(use.Completeness.Blockers, analysis.Gap{Kind: "persistence_unresolved", Detail: "no supported framework creation mapping for this route", At: route.Registration})
 	}
 	// Each supported middleware body contributes explicit branch/successor edges.
 	for _, e := range context {
@@ -243,7 +243,7 @@ func (s *moduleSet) registrationCheck(report *graph.StringReport, c graph.Check,
 	return use
 }
 
-func (s *moduleSet) queryBinding(use graph.StringUse) []graph.Evidence {
+func (s *moduleSet) queryBinding(use analysis.CandidateUse) []analysis.Evidence {
 	m := s.modules[use.Sink.Span.File]
 	if m == nil {
 		return nil

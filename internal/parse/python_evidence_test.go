@@ -3,7 +3,7 @@ package parse
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"testing"
 )
 
@@ -45,11 +45,11 @@ def branch():
 def unknown():
     return custom_mask(request.args.get('name'))
 `, "templates/view.html": `<p>{{ name }}</p><p>{{ name | safe }}</p><script>{{ name }}</script>`})
-	r, err := Strings(root, "app.py")
+	r, err := Analyze(root, "app.py")
 	if err != nil {
 		t.Fatal(err)
 	}
-	byPath := map[string][]graph.StringUse{}
+	byPath := map[string][]analysis.CandidateUse{}
 	for _, u := range r.Uses {
 		for _, e := range r.Entries {
 			if u.RouteID == e.Route.ID {
@@ -131,7 +131,7 @@ def connect():
 def html(name):
     return escape(name)
 `})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -154,8 +154,8 @@ def html(name):
 	}
 }
 
-func pythonXSSOnly(uses []graph.StringUse) []graph.StringUse {
-	var out []graph.StringUse
+func pythonXSSOnly(uses []analysis.CandidateUse) []analysis.CandidateUse {
+	var out []analysis.CandidateUse
 	for _, u := range uses {
 		if u.XSS != nil {
 			out = append(out, u)
@@ -177,7 +177,7 @@ func TestPythonBindingControls(t *testing.T) {
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			root := pythonFixture(t, map[string]string{"app.py": "from flask import Flask,request\nfrom markupsafe import escape,Markup\napp=Flask(__name__)\n" + tt.prefix + "@app.get('/input')\ndef input():\n    " + tt.body + "\n"})
-			r, err := Strings(root, "")
+			r, err := Analyze(root, "")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -205,7 +205,7 @@ def logs():
     logging.info(request.args.get('ordinary'))
     return 'ok'
 `})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -238,11 +238,11 @@ def lookup(name):
     c=sqlite3.connect(':memory:')
     c.execute('select * from people where name = ' + name)
 `})
-	first, err := Strings(root, "")
+	first, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	second, err := Strings(root, "")
+	second, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -268,7 +268,7 @@ def index():
     httpx.get(url=request.args.get('url2'))
     return 'ok'
 `})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -294,7 +294,7 @@ def signup():
     c.execute('INSERT INTO users (email) VALUES (?)',(email,))
     return render_template('signup.html')
 `, "templates/signup.html": `<form method="POST" action="{{ url_for('signup') }}"><input name="email" type="email" required></form>`})
-	r, err := Strings(root, "a.py")
+	r, err := Analyze(root, "a.py")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -322,7 +322,7 @@ def input():
         c.execute('select ' + request.form.get('value'))
     return 'ok'
 `})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -365,7 +365,7 @@ def unrelated():
     c.execute('select ' + name)
     return echo(value=name)
 `})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -405,7 +405,7 @@ def override():
     finally:
         return 'overridden'
 `})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -10,9 +10,9 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	python "github.com/tree-sitter/tree-sitter-python/bindings/go"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/guidelines"
 	"github.com/zazzcode/zazzles/internal/lang"
-	"github.com/zazzcode/zazzles/internal/rules"
 	"github.com/zazzcode/zazzles/internal/walk"
 )
 
@@ -33,7 +33,7 @@ type pythonSet struct {
 	parser  *sitter.Parser
 	modules map[string]*pythonModule
 	files   []string
-	gaps    []graph.Gap
+	gaps    []analysis.Gap
 	text    *moduleSet
 	writes  map[string][]pythonWrite
 }
@@ -47,7 +47,7 @@ func newPythonSet(root string) (*pythonSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	s := &pythonSet{root: root, parser: p, modules: map[string]*pythonModule{}, writes: map[string][]pythonWrite{}, text: &moduleSet{root: root, textSources: map[string]graph.Evidence{}}}
+	s := &pythonSet{root: root, parser: p, modules: map[string]*pythonModule{}, writes: map[string][]pythonWrite{}, text: &moduleSet{root: root, textSources: map[string]analysis.Evidence{}}}
 	for _, f := range manifest.Files {
 		if f.Language == lang.Python {
 			s.files = append(s.files, f.Path)
@@ -60,7 +60,7 @@ func newPythonSet(root string) (*pythonSet, error) {
 			return nil, err
 		}
 		if len(src) > 2<<20 {
-			s.gaps = append(s.gaps, graph.Gap{Kind: "work_limit", Detail: "Python source exceeds 2 MiB", At: graph.Span{File: file, StartLine: 1}})
+			s.gaps = append(s.gaps, analysis.Gap{Kind: "work_limit", Detail: "Python source exceeds 2 MiB", At: analysis.Span{File: file, StartLine: 1}})
 			continue
 		}
 		tree := p.Parse(src, nil)
@@ -70,7 +70,7 @@ func newPythonSet(root string) (*pythonSet, error) {
 		m := &pythonModule{file: file, src: src, hash: fmt.Sprintf("%x", sha256.Sum256(src)), tree: tree, imports: map[string]pythonImport{}, vars: map[string]*sitter.Node{}, funcs: map[string]*sitter.Node{}}
 		s.modules[file] = m
 		if tree.RootNode().HasError() {
-			s.gaps = append(s.gaps, graph.Gap{Kind: "parse_error", Detail: "Python syntax errors; module omitted", At: spanOf(file, tree.RootNode())})
+			s.gaps = append(s.gaps, analysis.Gap{Kind: "parse_error", Detail: "Python syntax errors; module omitted", At: spanOf(file, tree.RootNode())})
 			continue
 		}
 		m.declarations(tree.RootNode(), true)
@@ -83,11 +83,11 @@ func (s *pythonSet) close() {
 	}
 	s.parser.Close()
 }
-func (m *pythonModule) evidence(kind string, n *sitter.Node) graph.Evidence {
+func (m *pythonModule) evidence(kind string, n *sitter.Node) analysis.Evidence {
 	if n == nil {
-		return graph.Evidence{Kind: kind, SHA256: m.hash, Span: graph.Span{File: m.file}}
+		return analysis.Evidence{Kind: kind, SHA256: m.hash, Span: analysis.Span{File: m.file}}
 	}
-	return graph.Evidence{Kind: kind, Text: n.Utf8Text(m.src), Span: spanOf(m.file, n), SHA256: m.hash}
+	return analysis.Evidence{Kind: kind, Text: n.Utf8Text(m.src), Span: spanOf(m.file, n), SHA256: m.hash}
 }
 func pyWalk(n *sitter.Node, fn func(*sitter.Node)) {
 	if n == nil {
@@ -289,12 +289,12 @@ func (s *pythonSet) qualified(m *pythonModule, name string) string {
 	}
 	return ""
 }
-func (s *pythonSet) report(entry string, checks []graph.Check) (*graph.StringReport, error) {
+func (s *pythonSet) report(entry string, checks []analysis.Check) (*analysis.AnalysisReport, error) {
 	if entry != "" && s.modules[entry] == nil {
 		return nil, fmt.Errorf("entry must be a selected JS/TS/Python file relative to target root: %s", entry)
 	}
 	routes := s.routeEntries()
-	out := &graph.StringReport{SchemaVersion: 1, Root: s.root, Entries: []graph.Entry{}, Uses: []graph.StringUse{}, Gaps: append([]graph.Gap{}, s.gaps...), Files: []graph.Evidence{}, Limitations: []string{
+	out := &analysis.AnalysisReport{SchemaVersion: analysis.ReportSchemaVersion, Root: s.root, Entries: []analysis.Entry{}, Uses: []analysis.CandidateUse{}, Gaps: append([]analysis.Gap{}, s.gaps...), Files: []analysis.Evidence{}, Limitations: []string{
 		"Python adapter v1: static Flask/Blueprint, RESTX Resource and FastAPI routes; dynamic registration, custom decorators and response overrides remain gaps",
 		"Python helper expansion is bounded to depth 3 and 24 calls per route; loops, comprehensions, mutation, exceptions and external dispatch are conservative",
 		"Jinja output requires a verified Flask template binding; unresolved configuration, includes/macros and stored origins remain Review; no runtime execution or SCA",
@@ -330,8 +330,8 @@ func (s *pythonSet) report(entry string, checks []graph.Check) (*graph.StringRep
 		e.Text = ""
 		out.Files = append(out.Files, e)
 	}
-	for _, r := range rules.ForPaths(s.files) {
-		out.Practice = append(out.Practice, graph.PracticeRef{ID: r.ID, Version: r.Version, Languages: r.Languages})
+	for _, r := range guidelines.ForPaths(s.files) {
+		out.AnalysisGuidelines = append(out.AnalysisGuidelines, analysis.GuidelinesRef{ID: r.ID, Version: r.Version, Languages: r.Languages})
 	}
 	return out, nil
 }

@@ -1,7 +1,7 @@
 package judge
 
 import (
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"sort"
 	"strings"
 )
@@ -15,8 +15,8 @@ type evidenceCoverage struct {
 
 // augmentRoles exposes actual supplied code by semantic role across all adapters.
 // It indexes evidence; it never invents a flow edge or discharges a blocker.
-func augmentRoles(use graph.StringUse, roles map[string][]string, ref func(graph.Evidence) string) {
-	add := func(role string, e graph.Evidence) {
+func augmentRoles(use analysis.CandidateUse, roles map[string][]string, ref func(analysis.Evidence) string) {
+	add := func(role string, e analysis.Evidence) {
 		id := ref(e)
 		for _, existing := range roles[role] {
 			if existing == id {

@@ -1,5 +1,8 @@
 # Route identification and string-validation assessment
 
+Historical contract/evidence below retains its original names. Current package, CLI and report
+names are documented in the [implemented architecture](../architecture.md#naming-and-compatibility).
+
 **Reviewed 2026-10-31 on `route-string-validation`, scanner commit `5836908`.** This records initial verification
 and planning. The user subsequently authorized implementation in this worktree; see the
 [current contract](../specifications/route-string-validation.md). The [implementation plan](implementation-plan.md#route-string-validation-delivery-sequence)

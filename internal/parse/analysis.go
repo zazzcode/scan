@@ -7,20 +7,20 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/guidelines"
 	"github.com/zazzcode/zazzles/internal/lang"
-	"github.com/zazzcode/zazzles/internal/rules"
 	"github.com/zazzcode/zazzles/internal/walk"
 )
 
-// Strings resolves selected route handlers and extracts bounded string-use evidence.
+// Analyze resolves route and browser entries and extracts bounded security evidence.
 // Entry limits registration files; dependency modules remain inside the target manifest.
-func Strings(root, entry string) (*graph.StringReport, error) {
-	return CheckedStrings(root, entry, nil)
+func Analyze(root, entry string) (*analysis.AnalysisReport, error) {
+	return AnalyzeWithChecks(root, entry, nil)
 }
 
-// CheckedStrings assembles route-level evidence for explicitly declared checks.
-func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringReport, error) {
+// AnalyzeWithChecks assembles security evidence with optional declared requirements.
+func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (*analysis.AnalysisReport, error) {
 	entry = filepath.ToSlash(filepath.Clean(entry))
 	if entry == "." {
 		entry = ""
@@ -57,7 +57,7 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 		}
 		selected = []string{entry}
 	}
-	out := &graph.StringReport{SchemaVersion: 1, Root: root, Entries: []graph.Entry{}, Uses: []graph.StringUse{}, Gaps: []graph.Gap{}, Files: []graph.Evidence{}, Limitations: []string{
+	out := &analysis.AnalysisReport{SchemaVersion: analysis.ReportSchemaVersion, Root: root, Entries: []analysis.Entry{}, Uses: []analysis.CandidateUse{}, Gaps: []analysis.Gap{}, Files: []analysis.Evidence{}, Limitations: []string{
 		"ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain",
 		"Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
 		"Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
@@ -69,7 +69,7 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 			return nil, err
 		}
 		if m.tree.RootNode().HasError() {
-			out.Gaps = append(out.Gaps, graph.Gap{Kind: "parse_error", Detail: "registration file has syntax errors", At: spanOf(file, m.tree.RootNode())})
+			out.Gaps = append(out.Gaps, analysis.Gap{Kind: "parse_error", Detail: "registration file has syntax errors", At: spanOf(file, m.tree.RootNode())})
 			continue
 		}
 		locals := map[string]*sitter.Node{}
@@ -122,8 +122,8 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 		e.Kind, e.Text = "file", ""
 		out.Files = append(out.Files, e)
 	}
-	for _, item := range rules.ForPaths(keys) {
-		out.Practice = append(out.Practice, graph.PracticeRef{ID: item.ID, Version: item.Version, Languages: item.Languages})
+	for _, item := range guidelines.ForPaths(keys) {
+		out.AnalysisGuidelines = append(out.AnalysisGuidelines, analysis.GuidelinesRef{ID: item.ID, Version: item.Version, Languages: item.Languages})
 	}
 	if entry == "" {
 		py, err := newPythonSet(root)
@@ -142,30 +142,30 @@ func CheckedStrings(root, entry string, checks []graph.Check) (*graph.StringRepo
 		out.Files = append(out.Files, more.Files...)
 		if len(more.Entries) > 0 {
 			out.Limitations = append(out.Limitations, more.Limitations...)
-			out.Practice = append(out.Practice, more.Practice...)
+			out.AnalysisGuidelines = append(out.AnalysisGuidelines, more.AnalysisGuidelines...)
 		}
 	}
 	return out, nil
 }
 
-func (m *sourceModule) evidence(kind string, n *sitter.Node) graph.Evidence {
+func (m *sourceModule) evidence(kind string, n *sitter.Node) analysis.Evidence {
 	text := n.Utf8Text(m.src)
 	if kind == "file" {
 		text = ""
 	}
-	return graph.Evidence{Kind: kind, Text: text, Span: spanOf(m.file, n), SHA256: m.hash}
+	return analysis.Evidence{Kind: kind, Text: text, Span: spanOf(m.file, n), SHA256: m.hash}
 }
 
-func (s *moduleSet) handler(m *sourceModule, n *sitter.Node) (*sourceModule, *sitter.Node, string, []graph.Gap) {
-	gaps := []graph.Gap{}
+func (s *moduleSet) handler(m *sourceModule, n *sitter.Node) (*sourceModule, *sitter.Node, string, []analysis.Gap) {
+	gaps := []analysis.Gap{}
 	if n == nil {
-		return nil, nil, "", []graph.Gap{{Kind: "unresolved_handler", Detail: "no supported handler argument"}}
+		return nil, nil, "", []analysis.Gap{{Kind: "unresolved_handler", Detail: "no supported handler argument"}}
 	}
 	if n.Kind() == "call_expression" {
 		fn := n.ChildByFieldName("function")
 		args := n.ChildByFieldName("arguments")
 		if fn != nil && fn.Kind() == "member_expression" && args != nil && args.NamedChildCount() == 1 {
-			gaps = append(gaps, graph.Gap{Kind: "unresolved_wrapper", Detail: "wrapper semantics not modeled", At: spanOf(m.file, n)})
+			gaps = append(gaps, analysis.Gap{Kind: "unresolved_wrapper", Detail: "wrapper semantics not modeled", At: spanOf(m.file, n)})
 			n = args.NamedChild(0)
 		}
 	}
@@ -173,7 +173,7 @@ func (s *moduleSet) handler(m *sourceModule, n *sitter.Node) (*sourceModule, *si
 	if factory {
 		args := n.ChildByFieldName("arguments")
 		if args == nil || args.NamedChildCount() != 0 {
-			return nil, nil, "", append(gaps, graph.Gap{Kind: "unresolved_factory", Detail: "factory arguments require parameter binding", At: spanOf(m.file, n)})
+			return nil, nil, "", append(gaps, analysis.Gap{Kind: "unresolved_factory", Detail: "factory arguments require parameter binding", At: spanOf(m.file, n)})
 		}
 		n = n.ChildByFieldName("function")
 	}
@@ -181,15 +181,15 @@ func (s *moduleSet) handler(m *sourceModule, n *sitter.Node) (*sourceModule, *si
 	if n != nil && (n.Kind() == "identifier" || n.Kind() == "member_expression") {
 		name := n.Utf8Text(m.src)
 		if shadowed(n, strings.Split(name, ".")[0], m.src) {
-			return nil, nil, "", append(gaps, graph.Gap{Kind: "unresolved_handler", Detail: "handler binding is shadowed", At: spanOf(m.file, n)})
+			return nil, nil, "", append(gaps, analysis.Gap{Kind: "unresolved_handler", Detail: "handler binding is shadowed", At: spanOf(m.file, n)})
 		}
 		target, n = s.resolve(m, name)
 	}
 	if target == nil || n == nil || (!isFunction(n) && n.Kind() != "function_declaration") {
-		return nil, nil, "", append(gaps, graph.Gap{Kind: "unresolved_handler", Detail: "handler is not a directly resolved function", At: spanOf(m.file, m.tree.RootNode())})
+		return nil, nil, "", append(gaps, analysis.Gap{Kind: "unresolved_handler", Detail: "handler is not a directly resolved function", At: spanOf(m.file, m.tree.RootNode())})
 	}
 	if target.tree.RootNode().HasError() {
-		return nil, nil, "", append(gaps, graph.Gap{Kind: "parse_error", Detail: "handler module has syntax errors", At: spanOf(target.file, n)})
+		return nil, nil, "", append(gaps, analysis.Gap{Kind: "parse_error", Detail: "handler module has syntax errors", At: spanOf(target.file, n)})
 	}
 	if factory {
 		body := n.ChildByFieldName("body")
@@ -202,7 +202,7 @@ func (s *moduleSet) handler(m *sourceModule, n *sitter.Node) (*sourceModule, *si
 				c := body.NamedChild(i)
 				if c.Kind() == "return_statement" && c.NamedChildCount() == 1 && isFunction(c.NamedChild(0)) {
 					if returned != nil {
-						return nil, nil, "", append(gaps, graph.Gap{Kind: "unresolved_factory", Detail: "multiple returned handlers", At: spanOf(target.file, body)})
+						return nil, nil, "", append(gaps, analysis.Gap{Kind: "unresolved_factory", Detail: "multiple returned handlers", At: spanOf(target.file, body)})
 					}
 					returned = c.NamedChild(0)
 				}
@@ -211,7 +211,7 @@ func (s *moduleSet) handler(m *sourceModule, n *sitter.Node) (*sourceModule, *si
 		n = returned
 	}
 	if n == nil {
-		return nil, nil, "", append(gaps, graph.Gap{Kind: "unresolved_factory", Detail: "no direct returned function", At: spanOf(target.file, target.tree.RootNode())})
+		return nil, nil, "", append(gaps, analysis.Gap{Kind: "unresolved_factory", Detail: "no direct returned function", At: spanOf(target.file, target.tree.RootNode())})
 	}
 	params := n.ChildByFieldName("parameters")
 	req := ""
@@ -225,7 +225,7 @@ func (s *moduleSet) handler(m *sourceModule, n *sitter.Node) (*sourceModule, *si
 		}
 	}
 	if req == "" {
-		return target, n.ChildByFieldName("body"), "", append(gaps, graph.Gap{Kind: "request_projection_unresolved", Detail: "request parameter uses an unsupported projection", At: spanOf(target.file, n)})
+		return target, n.ChildByFieldName("body"), "", append(gaps, analysis.Gap{Kind: "request_projection_unresolved", Detail: "request parameter uses an unsupported projection", At: spanOf(target.file, n)})
 	}
 	return target, n.ChildByFieldName("body"), req, gaps
 }

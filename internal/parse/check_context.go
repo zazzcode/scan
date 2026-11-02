@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func nodeAt(n *sitter.Node, start, end int) *sitter.Node {
@@ -24,7 +24,7 @@ func nodeAt(n *sitter.Node, start, end int) *sitter.Node {
 
 // includeHelpers includes definitions even for pre-use calls that return no value,
 // since such helpers can validate or mutate the request in place.
-func (s *moduleSet) includeHelpers(m *sourceModule, n *sitter.Node, out *[]graph.Evidence, seen map[string]bool, depth int) {
+func (s *moduleSet) includeHelpers(m *sourceModule, n *sitter.Node, out *[]analysis.Evidence, seen map[string]bool, depth int) {
 	names := map[string]bool{}
 	for _, field := range s.contextFields {
 		names[field] = true
@@ -71,9 +71,9 @@ func (s *moduleSet) includeHelpers(m *sourceModule, n *sitter.Node, out *[]graph
 	s.inputHelpers(m, n, out, seen, depth, names)
 }
 
-func (s *moduleSet) chainEvidence(report *graph.StringReport, check graph.Check) ([]graph.Evidence, []graph.Gap) {
-	context := []graph.Evidence{}
-	gaps := []graph.Gap{}
+func (s *moduleSet) chainEvidence(report *analysis.AnalysisReport, check analysis.Check) ([]analysis.Evidence, []analysis.Gap) {
+	context := []analysis.Evidence{}
+	gaps := []analysis.Gap{}
 	middlewareFiles := map[string]bool{}
 	seen := map[string]bool{}
 	for _, entry := range report.Entries {
@@ -120,7 +120,7 @@ func (s *moduleSet) chainEvidence(report *graph.StringReport, check graph.Check)
 	return context, gaps
 }
 
-func fieldDependency(d graph.Dependency, fields []string) bool {
+func fieldDependency(d analysis.Dependency, fields []string) bool {
 	for _, field := range fields {
 		if strings.HasSuffix(d.Source.Text, ".body."+field) || strings.HasSuffix(d.Source.Text, ".query."+field) || strings.HasSuffix(d.Source.Text, ".params."+field) {
 			return true
@@ -129,8 +129,8 @@ func fieldDependency(d graph.Dependency, fields []string) bool {
 	return false
 }
 
-func evidenceRoles(context []graph.Evidence) map[string][]graph.Evidence {
-	out := map[string][]graph.Evidence{}
+func evidenceRoles(context []analysis.Evidence) map[string][]analysis.Evidence {
+	out := map[string][]analysis.Evidence{}
 	for _, e := range context {
 		out[e.Kind] = append(out[e.Kind], e)
 	}

@@ -2,13 +2,13 @@ package parse
 
 import (
 	"encoding/json"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func pythonMergeGaps(a, b []graph.Gap) []graph.Gap {
-	out := []graph.Gap{}
-	seen := map[graph.Gap]bool{}
-	for _, g := range append(append([]graph.Gap{}, a...), b...) {
+func pythonMergeGaps(a, b []analysis.Gap) []analysis.Gap {
+	out := []analysis.Gap{}
+	seen := map[analysis.Gap]bool{}
+	for _, g := range append(append([]analysis.Gap{}, a...), b...) {
 		if !seen[g] {
 			seen[g] = true
 			out = append(out, g)
@@ -16,10 +16,10 @@ func pythonMergeGaps(a, b []graph.Gap) []graph.Gap {
 	}
 	return out
 }
-func pythonMergeEvidence(a, b []graph.Evidence) []graph.Evidence {
-	out := []graph.Evidence{}
+func pythonMergeEvidence(a, b []analysis.Evidence) []analysis.Evidence {
+	out := []analysis.Evidence{}
 	seen := map[string]bool{}
-	for _, e := range append(append([]graph.Evidence{}, a...), b...) {
+	for _, e := range append(append([]analysis.Evidence{}, a...), b...) {
 		raw, _ := json.Marshal(e)
 		key := string(raw)
 		if !seen[key] {

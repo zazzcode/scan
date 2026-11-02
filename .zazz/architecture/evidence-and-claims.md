@@ -60,7 +60,7 @@ context, not expected-answer instructions; held-out original fixtures are requir
 ## Discovery on novel target repositories
 
 The product must discover checks without prior knowledge of a target's challenge routes. Current
-`--strings` already discovers supported SQL/outbound call shapes and route dependencies without a
+`--analyze` already discovers supported SQL/outbound call shapes and route dependencies without a
 requirements file; full claim-scoped automatic assessment is still incomplete. `--checks` files are
 explicit business-policy inputs and evaluation selectors, not the intended prerequisite for scanning
 a novel repository.

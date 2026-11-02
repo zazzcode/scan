@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 type value struct {
@@ -17,13 +17,13 @@ type value struct {
 	// responseField is the JSON path read from an API response ("data[].id"); "*" when ambiguous.
 	responseField string
 	model         string
-	read          *graph.Evidence
+	read          *analysis.Evidence
 	fields        map[string]value
 	templateFile  string
 	outputHTML    bool
 	outputContext string
-	deps          []graph.Dependency
-	gaps          []graph.Gap
+	deps          []analysis.Dependency
+	gaps          []analysis.Gap
 }
 type flow struct {
 	client       *clientContext
@@ -32,12 +32,12 @@ type flow struct {
 	registration *sourceModule
 	module       *sourceModule
 	set          *moduleSet
-	route        graph.Route
+	route        analysis.Route
 	request      string
 	env          map[string]value
-	context      []graph.Evidence
-	gaps         []graph.Gap
-	uses         []graph.StringUse
+	context      []analysis.Evidence
+	gaps         []analysis.Gap
+	uses         []analysis.CandidateUse
 	returns      []value
 	work         int
 	depth        int
@@ -47,8 +47,8 @@ type flow struct {
 	parts map[string]string
 }
 
-func (f *flow) gap(kind, detail string, n *sitter.Node) graph.Gap {
-	g := graph.Gap{Kind: kind, Detail: detail}
+func (f *flow) gap(kind, detail string, n *sitter.Node) analysis.Gap {
+	g := analysis.Gap{Kind: kind, Detail: detail}
 	if n != nil {
 		g.At = spanOf(f.module.file, n)
 	}
@@ -142,12 +142,12 @@ func (f *flow) branches(n *sitter.Node) {
 	}
 	type exit struct {
 		env    map[string]value
-		branch *graph.Evidence
+		branch *analysis.Evidence
 	}
 	saved := copyValues(f.env)
 	var exits []exit
 	runs := 0
-	run := func(body *sitter.Node, branch *graph.Evidence) {
+	run := func(body *sitter.Node, branch *analysis.Evidence) {
 		runs++
 		f.env = copyValues(saved)
 		if !f.statement(body) {
@@ -215,7 +215,7 @@ func (f *flow) branches(n *sitter.Node) {
 		for _, e := range exits {
 			branch := e.env[key]
 			if e.branch != nil {
-				branch = tagBranch(branch, *e.branch, func(d graph.Dependency) bool { return count[dependencyKey(d)] < len(exits) }, 0)
+				branch = tagBranch(branch, *e.branch, func(d analysis.Dependency) bool { return count[dependencyKey(d)] < len(exits) }, 0)
 			}
 			v = combine(v, branch)
 		}
@@ -239,7 +239,7 @@ func (f *flow) eval(n *sitter.Node) value {
 		if f.work == 10001 {
 			f.gaps = append(f.gaps, gap)
 		}
-		return value{gaps: []graph.Gap{gap}}
+		return value{gaps: []analysis.Gap{gap}}
 	}
 	src := f.module.src
 	if f.client != nil {
@@ -258,9 +258,9 @@ func (f *flow) eval(n *sitter.Node) value {
 		if f.parts[n.Utf8Text(src)] != "" {
 			source := f.module.evidence("request_source", n)
 			f.rememberInput(source)
-			return value{deps: []graph.Dependency{{Source: source, Transfers: []graph.Evidence{}}}}
+			return value{deps: []analysis.Dependency{{Source: source, Transfers: []analysis.Evidence{}}}}
 		}
-		return value{gaps: []graph.Gap{f.gap("unknown_value", "unresolved local value: "+n.Utf8Text(src), n)}}
+		return value{gaps: []analysis.Gap{f.gap("unknown_value", "unresolved local value: "+n.Utf8Text(src), n)}}
 	case "member_expression", "subscript_expression":
 		partField := f.partField(n)
 		if partField != nil || isRequestField(n, src, f.request) {
@@ -272,7 +272,7 @@ func (f *flow) eval(n *sitter.Node) value {
 			}
 			source := f.module.evidence("request_source", sourceNode)
 			f.rememberInput(source)
-			v := value{deps: []graph.Dependency{{Source: source, Transfers: []graph.Evidence{}}}}
+			v := value{deps: []analysis.Dependency{{Source: source, Transfers: []analysis.Evidence{}}}}
 			// A length read directly on the field is a derived fact, not its content.
 			if obj, prop := n.ChildByFieldName("object"), n.ChildByFieldName("property"); n.Kind() == "member_expression" && obj != nil && prop != nil &&
 				prop.Utf8Text(src) == "length" && obj.StartByte() == sourceNode.StartByte() && obj.EndByte() == sourceNode.EndByte() {
@@ -380,7 +380,7 @@ func (f *flow) eval(n *sitter.Node) value {
 		return f.transfer(v, "expression", n)
 	case "arrow_function", "function_expression", "function":
 		f.enterQueryCallback(n)
-		return value{gaps: []graph.Gap{f.gap("unsupported_callback", "callback/closure body not traversed", n)}}
+		return value{gaps: []analysis.Gap{f.gap("unsupported_callback", "callback/closure body not traversed", n)}}
 	case "number", "string", "true", "false", "null", "undefined", "property_identifier", "type_identifier", "comment", "string_fragment", "escape_sequence":
 		return value{}
 	case "ternary_expression":
@@ -439,14 +439,14 @@ func (f *flow) children(n *sitter.Node) value {
 func (f *flow) transfer(v value, kind string, n *sitter.Node) value {
 	out := v
 	out.deps = nil
-	out.gaps = append([]graph.Gap{}, v.gaps...)
+	out.gaps = append([]analysis.Gap{}, v.gaps...)
 	for _, d := range v.deps {
 		if len(d.Transfers) >= 64 {
 			out.gaps = append(out.gaps, f.gap("transfer_limit", "dependency exceeds 64 transfer steps", n))
 			out.deps = append(out.deps, d)
 			continue
 		}
-		d.Transfers = append(append([]graph.Evidence{}, d.Transfers...), f.module.evidence(kind, n))
+		d.Transfers = append(append([]analysis.Evidence{}, d.Transfers...), f.module.evidence(kind, n))
 		out.deps = append(out.deps, d)
 	}
 	return out
@@ -479,7 +479,7 @@ func combine(a, b value) value {
 	}
 	// An identical source path reached twice (for example an unchanged value on
 	// two merged branches) is one path; distinct transfer sequences stay separate.
-	deps := append([]graph.Dependency{}, a.deps...)
+	deps := append([]analysis.Dependency{}, a.deps...)
 	seen := map[string]bool{}
 	for _, d := range deps {
 		seen[dependencyKey(d)] = true
@@ -491,13 +491,13 @@ func combine(a, b value) value {
 		}
 	}
 	a.deps = deps
-	a.gaps = append(append([]graph.Gap{}, a.gaps...), b.gaps...)
+	a.gaps = append(append([]analysis.Gap{}, a.gaps...), b.gaps...)
 	if len(a.deps) > 64 {
 		a.deps = a.deps[:64]
-		a.gaps = append(a.gaps, graph.Gap{Kind: "dependency_limit", Detail: "more than 64 dependencies; remaining paths unexamined", At: a.deps[0].Source.Span})
+		a.gaps = append(a.gaps, analysis.Gap{Kind: "dependency_limit", Detail: "more than 64 dependencies; remaining paths unexamined", At: a.deps[0].Source.Span})
 	}
 	if len(a.gaps) > 64 {
-		a.gaps = append(a.gaps[:63], graph.Gap{Kind: "gap_limit", Detail: "additional uncertainty reasons omitted", At: a.gaps[0].At})
+		a.gaps = append(a.gaps[:63], analysis.Gap{Kind: "gap_limit", Detail: "additional uncertainty reasons omitted", At: a.gaps[0].At})
 	}
 	return a
 }
@@ -551,7 +551,7 @@ func (f *flow) call(n *sitter.Node) value {
 	// A verified logger is an emission sink, not a validator of its arguments.
 	if binding, ok := f.logSink(n, fn); ok {
 		f.recordLogSink(n, binding, values)
-		return value{gaps: []graph.Gap{f.gap("unknown_call_result", "logger return value is not modeled", n)}}
+		return value{gaps: []analysis.Gap{f.gap("unknown_call_result", "logger return value is not modeled", n)}}
 	}
 	kind := queryKind(name, args, f.module.src, values)
 	if kind == "" && modelCall && strings.HasPrefix(modelValue.model, "mongoose:") && requestDeps(values) {
@@ -563,7 +563,7 @@ func (f *flow) call(n *sitter.Node) value {
 		}
 	}
 	if kind == "" && collectionWrite(name) && requestDeps(values) && f.set != nil {
-		probe := graph.StringUse{Sink: f.module.evidence("nosql_query_candidate", n)}
+		probe := analysis.CandidateUse{Sink: f.module.evidence("nosql_query_candidate", n)}
 		if len(f.set.collectionBinding(probe)) > 0 {
 			kind = "nosql_query_candidate"
 		}
@@ -575,7 +575,7 @@ func (f *flow) call(n *sitter.Node) value {
 		v := value{}
 		for i, a := range values {
 			if kind == "sql_query_candidate" {
-				a.deps = append([]graph.Dependency{}, a.deps...)
+				a.deps = append([]analysis.Dependency{}, a.deps...)
 				slot := "sql_options"
 				if i == 0 {
 					slot = "sql_text"
@@ -587,20 +587,20 @@ func (f *flow) call(n *sitter.Node) value {
 			v = combine(v, a)
 		}
 		if len(v.deps) > 0 || len(v.gaps) > 0 || kind == "outbound_http_candidate" {
-			gaps := append(append([]graph.Gap{}, f.gaps...), v.gaps...)
+			gaps := append(append([]analysis.Gap{}, f.gaps...), v.gaps...)
 			gaps = append(gaps, f.structureGaps(kind, args, values, n)...)
 			gaps = append(gaps, f.gap("sink_binding_unverified", "candidate API shape; library binding/argument roles require review", n))
 			if kind == "outbound_http_candidate" {
 				gaps = append(gaps, f.gap("external_response_unresolved", "remote response and asynchronous continuation are not modeled", n))
 			}
-			context := append([]graph.Evidence{}, f.context...)
-			f.uses = append(f.uses, graph.StringUse{ID: fmt.Sprintf("use:%s:%s:%d", f.route.ID, f.module.file, n.StartByte()), RouteID: f.route.ID, Kind: kind, Sink: f.module.evidence(kind, n), Dependencies: v.deps, Context: context, Gaps: gaps, Assessment: graph.Assessment{Status: "not_run"}})
+			context := append([]analysis.Evidence{}, f.context...)
+			f.uses = append(f.uses, analysis.CandidateUse{ID: fmt.Sprintf("use:%s:%s:%d", f.route.ID, f.module.file, n.StartByte()), RouteID: f.route.ID, Kind: kind, Sink: f.module.evidence(kind, n), Dependencies: v.deps, Context: context, Gaps: gaps, Assessment: analysis.Assessment{Status: "not_run"}})
 		}
 		// Response values are new external sources, never aliases of request arguments.
 		if modelCall {
 			return modelValue
 		}
-		return value{gaps: []graph.Gap{f.gap("unknown_call_result", "sink/transport return value is not modeled", n)}}
+		return value{gaps: []analysis.Gap{f.gap("unknown_call_result", "sink/transport return value is not modeled", n)}}
 	}
 	if modelCall {
 		return modelValue
@@ -643,11 +643,11 @@ func (f *flow) call(n *sitter.Node) value {
 
 // tagBranch appends a branch condition to the selected dependencies of a value
 // and of its nested fields, so a field read later keeps the same precondition.
-func tagBranch(v value, branch graph.Evidence, selected func(graph.Dependency) bool, depth int) value {
-	v.deps = append([]graph.Dependency{}, v.deps...)
+func tagBranch(v value, branch analysis.Evidence, selected func(analysis.Dependency) bool, depth int) value {
+	v.deps = append([]analysis.Dependency{}, v.deps...)
 	for i, d := range v.deps {
 		if selected(d) {
-			d.Transfers = append(append([]graph.Evidence{}, d.Transfers...), branch)
+			d.Transfers = append(append([]analysis.Evidence{}, d.Transfers...), branch)
 			v.deps[i] = d
 		}
 	}
@@ -661,9 +661,9 @@ func tagBranch(v value, branch graph.Evidence, selected func(graph.Dependency) b
 	return v
 }
 
-func dependencyKey(d graph.Dependency) string {
+func dependencyKey(d analysis.Dependency) string {
 	var b strings.Builder
-	key := func(e graph.Evidence) {
+	key := func(e analysis.Evidence) {
 		fmt.Fprintf(&b, "%s:%s:%d:%d;", e.Kind, e.Span.File, e.Span.StartByte, e.Span.EndByte)
 	}
 	b.WriteString(d.StorageKey + "|" + d.SinkSlot + "|")
@@ -779,13 +779,13 @@ func (f *flow) enterContinuation(fn *sitter.Node) {
 	}
 	child := *f
 	child.env = copyValues(f.env)
-	child.context = append(append([]graph.Evidence{}, f.context...), f.module.evidence("async_continuation", fn))
-	child.gaps = append(append([]graph.Gap{}, f.gaps...), f.gap("async_continuation", "promise continuation traversed; scheduling and rejection paths are not modeled", fn))
+	child.context = append(append([]analysis.Evidence{}, f.context...), f.module.evidence("async_continuation", fn))
+	child.gaps = append(append([]analysis.Gap{}, f.gaps...), f.gap("async_continuation", "promise continuation traversed; scheduling and rejection paths are not modeled", fn))
 	child.uses, child.returns = nil, nil
 	child.depth = f.depth + 1
 	if params, ok := functionParameters(fn, f.module.src); ok {
 		for _, p := range params {
-			child.env[p.name] = value{gaps: []graph.Gap{{Kind: "async_result_unresolved", Detail: "continuation argument is an external result: " + p.name, At: spanOf(f.module.file, p.node)}}}
+			child.env[p.name] = value{gaps: []analysis.Gap{{Kind: "async_result_unresolved", Detail: "continuation argument is an external result: " + p.name, At: spanOf(f.module.file, p.node)}}}
 			if p.name == child.request {
 				child.request = ""
 			}

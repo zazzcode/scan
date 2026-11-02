@@ -8,7 +8,7 @@ func TestMountedCommonJSRoutesRetainValidationAndNoSQLResults(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "app.js", "const express=require('express');const app=express();const users=require('./users');app.use('/users',users)")
 			writeSource(t, root, "users.js", "const express=require('express');const mongoose=require('mongoose');const User=mongoose.model('User');const router=express.Router();module.exports=router;router.post('/login',(req,res)=>{User.find({password:req.body.password},function(err,users){res.json(users)})});router.post('/',(req,res)=>{const role=req.body.role;res.json({role})})")
-			r, err := Strings(root, entry)
+			r, err := Analyze(root, entry)
 			if err != nil {
 				t.Fatal(err)
 			}

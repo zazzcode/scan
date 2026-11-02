@@ -6,46 +6,46 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 type pythonDep struct {
-	dep                               graph.Dependency
+	dep                               analysis.Dependency
 	protection, container, key, entry string
 }
 type pythonValue struct {
 	deps            []pythonDep
-	gaps            []graph.Gap
+	gaps            []analysis.Gap
 	fields          map[string]pythonValue
 	literal         string
 	constant        bool
 	binding, table  string
 	driver          string
 	templateEscape  string
-	evidence        []graph.Evidence
+	evidence        []analysis.Evidence
 	built, rendered bool
 	unknown         bool
 }
 type pythonWrite struct {
 	value    pythonValue
 	entry    string
-	evidence graph.Evidence
+	evidence analysis.Evidence
 }
 type pythonFlow struct {
 	set     *pythonSet
 	module  *pythonModule
 	route   pythonRoute
-	report  *graph.StringReport
+	report  *analysis.AnalysisReport
 	env     map[string]pythonValue
-	context []graph.Evidence
-	gaps    []graph.Gap
+	context []analysis.Evidence
+	gaps    []analysis.Gap
 	depth   int
 	work    *int
 	stack   map[string]bool
 	returns pythonValue
 	imports map[string]pythonImport
 	inputs  map[string]pythonValue
-	guards  map[string][]graph.Gap
+	guards  map[string][]analysis.Gap
 }
 
 func pyBody(n *sitter.Node) *sitter.Node {
@@ -61,24 +61,24 @@ func pyBody(n *sitter.Node) *sitter.Node {
 	}
 	return nil
 }
-func (f *pythonFlow) gap(kind, detail string, n *sitter.Node) graph.Gap {
-	return graph.Gap{Kind: kind, Detail: detail, At: spanOf(f.module.file, n)}
+func (f *pythonFlow) gap(kind, detail string, n *sitter.Node) analysis.Gap {
+	return analysis.Gap{Kind: kind, Detail: detail, At: spanOf(f.module.file, n)}
 }
 func (f *pythonFlow) source(n *sitter.Node, container, key string) pythonValue {
 	e := f.module.evidence("request_source", n)
-	v := pythonValue{deps: []pythonDep{{dep: graph.Dependency{Source: e, Transfers: []graph.Evidence{}}, protection: "raw", container: container, key: key}}}
+	v := pythonValue{deps: []pythonDep{{dep: analysis.Dependency{Source: e, Transfers: []analysis.Evidence{}}, protection: "raw", container: container, key: key}}}
 	if key != "" && container != "session" && f.inputs != nil {
 		f.inputs[container+"."+key] = v
 	}
 	return v
 }
-func (s *pythonSet) analyze(out *graph.StringReport, r pythonRoute) {
+func (s *pythonSet) analyze(out *analysis.AnalysisReport, r pythonRoute) {
 	m := r.module
 	handler := m.evidence("route_handler", r.fn)
-	out.Entries = append(out.Entries, graph.Entry{Route: r.route, Handler: &handler, Gaps: append([]graph.Gap{}, r.gaps...)})
+	out.Entries = append(out.Entries, analysis.Entry{Route: r.route, Handler: &handler, Gaps: append([]analysis.Gap{}, r.gaps...)})
 	work := 0
-	f := &pythonFlow{set: s, module: m, route: r, report: out, env: map[string]pythonValue{}, context: append([]graph.Evidence{handler, m.evidence("route_registration", r.decorator)}, r.receiver.evidence...), gaps: append([]graph.Gap{}, r.gaps...), work: &work, stack: map[string]bool{}}
-	f.guards = map[string][]graph.Gap{}
+	f := &pythonFlow{set: s, module: m, route: r, report: out, env: map[string]pythonValue{}, context: append([]analysis.Evidence{handler, m.evidence("route_registration", r.decorator)}, r.receiver.evidence...), gaps: append([]analysis.Gap{}, r.gaps...), work: &work, stack: map[string]bool{}}
+	f.guards = map[string][]analysis.Gap{}
 	f.inputs = map[string]pythonValue{}
 	f.imports = map[string]pythonImport{}
 	f.context = append(f.context, s.formPolicies(r)...)
@@ -137,11 +137,11 @@ func (f *pythonFlow) clone() *pythonFlow {
 	for k, v := range f.env {
 		c.env[k] = v
 	}
-	c.gaps = append([]graph.Gap{}, f.gaps...)
-	c.context = append([]graph.Evidence{}, f.context...)
-	c.guards = map[string][]graph.Gap{}
+	c.gaps = append([]analysis.Gap{}, f.gaps...)
+	c.context = append([]analysis.Evidence{}, f.context...)
+	c.guards = map[string][]analysis.Gap{}
 	for k, v := range f.guards {
-		c.guards[k] = append([]graph.Gap{}, v...)
+		c.guards[k] = append([]analysis.Gap{}, v...)
 	}
 	c.returns = pythonValue{}
 	c.imports = map[string]pythonImport{}
@@ -174,13 +174,13 @@ func (f *pythonFlow) merge(branches ...*pythonFlow) {
 }
 
 // block returns true when the modeled path cannot fall through.
-func (f *pythonFlow) addUse(kind string, n *sitter.Node, v pythonValue) *graph.StringUse {
+func (f *pythonFlow) addUse(kind string, n *sitter.Node, v pythonValue) *analysis.CandidateUse {
 	v.gaps = append(v.gaps, f.guardGaps(v)...)
-	deps := []graph.Dependency{}
+	deps := []analysis.Dependency{}
 	for _, d := range v.deps {
 		deps = append(deps, d.dep)
 	}
-	u := graph.StringUse{ID: fmt.Sprintf("use:%s:%s:%d:%s", f.route.route.ID, f.module.file, n.StartByte(), kind), RouteID: f.route.route.ID, Kind: kind, Sink: f.module.evidence(kind, n), Dependencies: deps, Context: append([]graph.Evidence{}, f.context...), Gaps: append(append([]graph.Gap{}, f.gaps...), v.gaps...), Assessment: graph.Assessment{Status: "not_run"}}
+	u := analysis.CandidateUse{ID: fmt.Sprintf("use:%s:%s:%d:%s", f.route.route.ID, f.module.file, n.StartByte(), kind), RouteID: f.route.route.ID, Kind: kind, Sink: f.module.evidence(kind, n), Dependencies: deps, Context: append([]analysis.Evidence{}, f.context...), Gaps: append(append([]analysis.Gap{}, f.gaps...), v.gaps...), Assessment: analysis.Assessment{Status: "not_run"}}
 	f.report.Uses = append(f.report.Uses, u)
 	return &f.report.Uses[len(f.report.Uses)-1]
 }
@@ -216,11 +216,11 @@ func (f *pythonFlow) finishValidation() {
 			continue
 		}
 		sink := v.deps[0].dep.Source
-		u := graph.StringUse{ID: "input:" + f.route.route.ID + ":" + key, RouteID: f.route.route.ID, Kind: "input_validation_candidate", Sink: sink, Context: append([]graph.Evidence{}, f.context...), Gaps: append([]graph.Gap{}, f.gaps...), Assessment: graph.Assessment{Status: "not_run"}, Dependencies: []graph.Dependency{v.deps[0].dep}}
+		u := analysis.CandidateUse{ID: "input:" + f.route.route.ID + ":" + key, RouteID: f.route.route.ID, Kind: "input_validation_candidate", Sink: sink, Context: append([]analysis.Evidence{}, f.context...), Gaps: append([]analysis.Gap{}, f.gaps...), Assessment: analysis.Assessment{Status: "not_run"}, Dependencies: []analysis.Dependency{v.deps[0].dep}}
 		if len(policy) > 0 {
 			f.validationClaim(&u, key, v, policy)
 		} else {
-			u.Gaps = append(u.Gaps, graph.Gap{Kind: "input_validation_unresolved", Detail: key + ": assess actual enforcing conditions in handler; no external business policy was supplied", At: sink.Span})
+			u.Gaps = append(u.Gaps, analysis.Gap{Kind: "input_validation_unresolved", Detail: key + ": assess actual enforcing conditions in handler; no external business policy was supplied", At: sink.Span})
 		}
 		f.report.Uses = append(f.report.Uses, u)
 	}

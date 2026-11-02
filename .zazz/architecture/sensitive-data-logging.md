@@ -32,7 +32,7 @@ The use carries `Kind: log_sink_candidate`, the call as sink evidence, logger bi
 
 ## Request-line logging
 
-`strings.go` resolves a destructured first handler parameter with `requestParts`; container members
+`analysis.go` resolves a destructured first handler parameter with `requestParts`; container members
 (`query`, `body`, ...) become request sources in `flow.eval` unless a local rebinds the name, and other
 members stay explicit as `request_projection_partial`. `flow.eval` records credential destinations on
 `inputFacts`: a request value in an object `pair` whose key is credential-named, or compared with
@@ -51,8 +51,9 @@ outer call's may-dependency. This is shared engine behavior, so it also changes 
 `judge/logging.go` defines protocol `log-use-v1` (data_class, content_exposure, redaction,
 log_exposure) with strict choices. `applyLogPolicy` requires a `logger_binding` context item and a
 request source, then accepts vulnerable only with a sensitive class, content yes and redaction no or
-not applicable, and never against non-content-only scanner facts. The `javascript` rule pack (v3)
-carries the logging rules sent with each request. Query protocol `string-use-v8` is unchanged.
+not applicable, and never against non-content-only scanner facts. The embedded JavaScript/TypeScript Analysis Guidelines
+(`internal/guidelines/javascript.md`, v5) carry the logging guidance supplied with each request.
+The generic query protocol is now `candidate-use-v9`; logging questions retain `log-use-v1`.
 
 ## Reporting
 

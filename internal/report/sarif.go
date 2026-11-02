@@ -6,14 +6,14 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 const SchemaURI = "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json"
 
 // SARIF returns an interoperable view of the canonical evidence report. Advisory
 // findings, protected claims and incomplete analysis remain distinct.
-func SARIF(report *graph.StringReport) map[string]any {
+func SARIF(report *analysis.AnalysisReport) map[string]any {
 	Enrich(report)
 	rules := []any{}
 	results := []any{}
@@ -113,7 +113,7 @@ func SARIF(report *graph.StringReport) map[string]any {
 	return map[string]any{"$schema": SchemaURI, "version": "2.1.0", "runs": []any{run}}
 }
 
-func ruleIdentity(use graph.StringUse) (string, string) {
+func ruleIdentity(use analysis.CandidateUse) (string, string) {
 	kind := use.Kind
 	if use.Check != nil {
 		kind = use.Check.Kind
@@ -137,7 +137,7 @@ func ruleIdentity(use graph.StringUse) (string, string) {
 		return "scan/unresolved-string-use", ""
 	}
 }
-func resultKind(f graph.Finding) (string, string) {
+func resultKind(f analysis.Finding) (string, string) {
 	if f.Status == "not_applicable" {
 		return "notApplicable", "none"
 	}
@@ -151,7 +151,7 @@ func resultKind(f graph.Finding) (string, string) {
 	}
 }
 
-func routeName(report *graph.StringReport, use graph.StringUse) string {
+func routeName(report *analysis.AnalysisReport, use analysis.CandidateUse) string {
 	if use.ClientID != "" {
 		for _, entry := range report.ClientEntries {
 			if entry.ID == use.ClientID {
@@ -171,7 +171,7 @@ func routeName(report *graph.StringReport, use graph.StringUse) string {
 	return use.RouteID
 }
 func relativeURI(path string) string { return (&url.URL{Path: path}).String() }
-func location(span graph.Span, text string) map[string]any {
+func location(span analysis.Span, text string) map[string]any {
 	loc := map[string]any{"message": map[string]string{"text": text}}
 	if span.File != "" {
 		region := map[string]any{}

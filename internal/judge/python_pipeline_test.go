@@ -30,7 +30,7 @@ def index():
 	if err := os.WriteFile(filepath.Join(root, "app.py"), []byte(source), 0600); err != nil {
 		t.Fatal(err)
 	}
-	r, err := parse.Strings(root, "app.py")
+	r, err := parse.Analyze(root, "app.py")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,8 +46,8 @@ def index():
 			w.WriteHeader(400)
 			return
 		}
-		if !strings.Contains(body.Input, `"id":"python"`) || !strings.Contains(body.Input, `"version":"2"`) {
-			t.Error("Python practice not transmitted")
+		if !strings.Contains(body.Input, `"id":"python"`) || !strings.Contains(body.Input, `"version":"3"`) {
+			t.Error("Python analysis guidelines not transmitted")
 		}
 		answers := []map[string]string{}
 		choices := map[string]string{"validation": "uncertain", "protection": "insufficient", "injection_protection": "vulnerable", "output_context": "html_text", "encoding_adequacy": "not_present", "sanitizer_effectiveness": "absent", "xss_all_paths_protected": "no", "xss_exposure": "vulnerable", "data_class": "personal_data", "content_exposure": "yes", "redaction": "no", "log_exposure": "vulnerable"}

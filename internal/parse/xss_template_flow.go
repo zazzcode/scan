@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func definitionAt(m *sourceModule, reference *sitter.Node, name string) *sitter.Node {
@@ -112,7 +112,7 @@ func (f *flow) templateCall(call, fn, args *sitter.Node) (value, bool) {
 				if !known {
 					key = "file:unresolved:" + f.module.file
 				}
-				v.deps = []graph.Dependency{{StorageKey: key, Source: f.module.evidence("file_read", call), Transfers: []graph.Evidence{}}}
+				v.deps = []analysis.Dependency{{StorageKey: key, Source: f.module.evidence("file_read", call), Transfers: []analysis.Evidence{}}}
 			}
 			last := args.NamedChild(args.NamedChildCount() - 1)
 			if isFunction(last) {

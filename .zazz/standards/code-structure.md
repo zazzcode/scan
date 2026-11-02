@@ -5,7 +5,7 @@ to `cmd/`, `internal/`, `.zazz/`, and `.agents/skills/`.
 
 ## 1. Package layout
 
-The [architecture package map](../architecture.md#11-proposed-package-boundaries) owns package
+The [architecture package map](../architecture.md#11-implemented-package-boundaries) owns package
 responsibilities; new boundaries are finalized in greenlit specs. The map is not an instruction to
 scaffold packages. Keep the CLI under `cmd/scan` and implementation under `internal/`.
 
@@ -16,9 +16,10 @@ Rules:
 - `cmd/` packages contain only argument handling, dependency wiring, and exit codes. If `main` needs
   branching logic longer than a line or two, that logic belongs in `internal/`.
 - A package owns one concern. If describing a package needs the word "and", split it.
-- Shared operations and provenance live in `internal/ir`; graph indexes build on those records.
-  `walk` and `parse` know nothing about rules,
-  tracing, or semantic adapters. `trace` knows nothing about Tree-sitter.
+- Shared analysis records and provenance MUST live in `internal/analysis`, independent of
+  Tree-sitter and HTTP. `parse` currently owns bounded flow/evidence assembly; `judge` owns
+  model transport and claim gates. `walk` MUST remain independent of those stages. Future
+  IR/graph/flow packages require actual consumers and a scoped contract.
 - Import cycles are a design error. Fix the boundary rather than hiding it behind an interface.
 - Interfaces are declared by the consumer, not the producer, and stay small — one or two methods.
   Define an interface when there is a second real implementation (for example, a stubbed semantic adapter in

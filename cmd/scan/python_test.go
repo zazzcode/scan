@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"os"
 	"path/filepath"
 	"testing"
@@ -22,7 +22,7 @@ func TestPythonCLI(t *testing.T) {
 	}
 	for _, entry := range []string{"app.py", ""} {
 		var stdout, stderr bytes.Buffer
-		args := []string{"--strings", "--json", "--output-dir", out}
+		args := []string{"--analyze", "--json", "--output-dir", out}
 		if entry != "" {
 			args = append(args, "--entry", entry)
 		}
@@ -30,7 +30,7 @@ func TestPythonCLI(t *testing.T) {
 		if code := run(args, &stdout, &stderr); code != exitOK {
 			t.Fatalf("entry %q: %s", entry, stderr.String())
 		}
-		var r graph.StringReport
+		var r analysis.AnalysisReport
 		if err := json.Unmarshal(stdout.Bytes(), &r); err != nil {
 			t.Fatal(err)
 		}

@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"github.com/zazzcode/zazzles/internal/report"
 )
 
@@ -26,9 +26,9 @@ func runExport(path string, asHTML bool, stdout, stderr io.Writer) int {
 		fmt.Fprintln(stderr, "scan: saved report read failed or exceeds 64 MiB")
 		return exitError
 	}
-	var saved graph.StringReport
-	if err := json.Unmarshal(data, &saved); err != nil || saved.SchemaVersion != 1 || saved.Uses == nil {
-		fmt.Fprintln(stderr, "scan: expected a schema-v1 canonical string report")
+	var saved analysis.AnalysisReport
+	if err := json.Unmarshal(data, &saved); err != nil || (saved.SchemaVersion != 1 && saved.SchemaVersion != analysis.ReportSchemaVersion) || saved.Uses == nil {
+		fmt.Fprintln(stderr, "scan: expected a schema-v1 or schema-v2 canonical analysis report")
 		return exitError
 	}
 	if asHTML {

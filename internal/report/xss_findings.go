@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func describeXSS(u graph.StringUse, f *graph.Finding) {
+func describeXSS(u analysis.CandidateUse, f *analysis.Finding) {
 	if u.Kind == "xss_data_candidate" {
 		f.Title = "API data needs a rendering link before XSS assessment"
 		f.Summary = "Request-derived data is returned as JSON. JSON output is not an HTML rendering sink. Link any browser consumer and its output context before making an XSS claim."
@@ -53,7 +53,7 @@ func describeXSS(u graph.StringUse, f *graph.Finding) {
 
 // xssPathSummary names each differing source path, so an unsafe path stays
 // visible beside unresolved or protected siblings at the same sink.
-func xssPathSummary(paths []graph.XSSPath) string {
+func xssPathSummary(paths []analysis.XSSPath) string {
 	if len(paths) == 0 {
 		return ""
 	}

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var pythonJinjaOutput = regexp.MustCompile(`(?s)\{\{\s*(.*?)\s*\}\}`)
@@ -21,7 +21,7 @@ func appendUniqueString(a []string, s string) []string {
 	}
 	return append(a, s)
 }
-func (f *pythonFlow) recordXSS(sink graph.Evidence, v pythonValue, context string, extra []graph.Evidence) {
+func (f *pythonFlow) recordXSS(sink analysis.Evidence, v pythonValue, context string, extra []analysis.Evidence) {
 	if len(v.deps) == 0 {
 		return
 	}
@@ -29,8 +29,8 @@ func (f *pythonFlow) recordXSS(sink graph.Evidence, v pythonValue, context strin
 		context = f.expressionContext(v, context)
 	}
 	v.gaps = append(v.gaps, f.guardGaps(v)...)
-	deps := []graph.Dependency{}
-	paths := []graph.XSSPath{}
+	deps := []analysis.Dependency{}
+	paths := []analysis.XSSPath{}
 	hasRaw, hasUnknown := false, false
 	stored := false
 	for _, d := range v.deps {
@@ -55,7 +55,7 @@ func (f *pythonFlow) recordXSS(sink graph.Evidence, v pythonValue, context strin
 		hasUnknown = hasUnknown || p == "unknown"
 		stored = stored || d.dep.StorageKey != ""
 		deps = append(deps, d.dep)
-		paths = append(paths, graph.XSSPath{Dependency: len(deps) - 1, Protection: p})
+		paths = append(paths, analysis.XSSPath{Dependency: len(deps) - 1, Protection: p})
 	}
 	p, reason := "encoded", "Every modeled source path is HTML-escaped in HTML text or a quoted non-active attribute."
 	if hasUnknown {
@@ -64,7 +64,7 @@ func (f *pythonFlow) recordXSS(sink graph.Evidence, v pythonValue, context strin
 	if hasRaw {
 		p, reason = "raw", "A supported source path reaches HTML without context-appropriate escaping; unknown siblings remain explicit."
 	}
-	for _, g := range append(append([]graph.Gap{}, f.gaps...), v.gaps...) {
+	for _, g := range append(append([]analysis.Gap{}, f.gaps...), v.gaps...) {
 		switch g.Kind {
 		case "python_decorator_unresolved", "route_mount_unresolved", "render_configuration_unresolved", "template_parse_unresolved", "python_loop_unresolved", "dependency_limit", "transfer_limit", "work_limit", "input_helper_unresolved", "python_finally_unresolved":
 			p, reason = "unknown", "A relevant Python control, registration or renderer contract is unresolved."
@@ -81,7 +81,7 @@ func (f *pythonFlow) recordXSS(sink graph.Evidence, v pythonValue, context strin
 	if stored {
 		kind = "stored"
 	}
-	u := graph.StringUse{ID: "use:" + f.route.route.ID + ":" + sink.Span.File + ":" + fmtInt(sink.Span.StartByte) + ":xss", RouteID: f.route.route.ID, Kind: "xss_candidate", Sink: sink, Dependencies: deps, Context: append(append([]graph.Evidence{}, f.context...), extra...), Gaps: append(append([]graph.Gap{}, f.gaps...), v.gaps...), Assessment: graph.Assessment{Status: "not_run"}, XSS: &graph.XSSFacts{Type: kind, EntryKind: "server", OutputContext: context, ContentType: "text/html", Protection: p, ProtectionReason: reason, OriginResolved: !stored, Paths: paths}, APIModel: &graph.APIModel{ID: "python-html-output-v1", Library: f.route.route.Framework, Semantics: "Flask string returns use HTML; FastAPI HTML is explicit. Jinja autoescape protects template variables, not request text compiled as template source.", Reference: "https://flask.palletsprojects.com/en/stable/templating/"}}
+	u := analysis.CandidateUse{ID: "use:" + f.route.route.ID + ":" + sink.Span.File + ":" + fmtInt(sink.Span.StartByte) + ":xss", RouteID: f.route.route.ID, Kind: "xss_candidate", Sink: sink, Dependencies: deps, Context: append(append([]analysis.Evidence{}, f.context...), extra...), Gaps: append(append([]analysis.Gap{}, f.gaps...), v.gaps...), Assessment: analysis.Assessment{Status: "not_run"}, XSS: &analysis.XSSFacts{Type: kind, EntryKind: "server", OutputContext: context, ContentType: "text/html", Protection: p, ProtectionReason: reason, OriginResolved: !stored, Paths: paths}, APIModel: &analysis.APIModel{ID: "python-html-output-v1", Library: f.route.route.Framework, Semantics: "Flask string returns use HTML; FastAPI HTML is explicit. Jinja autoescape protects template variables, not request text compiled as template source.", Reference: "https://flask.palletsprojects.com/en/stable/templating/"}}
 	u.Context = append(u.Context, f.route.module.evidence("render_binding", f.route.decorator))
 	f.report.Uses = append(f.report.Uses, u)
 }
@@ -134,7 +134,7 @@ func (f *pythonFlow) renderInline(n *sitter.Node, text string) {
 	file.Text = text
 	f.templateOutputs(n, file, f.templateLocals(n), true)
 }
-func (f *pythonFlow) templateOutputs(call *sitter.Node, file graph.Evidence, locals map[string]pythonValue, auto bool) {
+func (f *pythonFlow) templateOutputs(call *sitter.Node, file analysis.Evidence, locals map[string]pythonValue, auto bool) {
 	matches := pythonJinjaOutput.FindAllStringSubmatchIndex(file.Text, -1)
 	configUnknown := f.rendererUnknown()
 	for _, match := range matches {
@@ -143,14 +143,14 @@ func (f *pythonFlow) templateOutputs(call *sitter.Node, file graph.Evidence, loc
 		field := strings.TrimSpace(parts[0])
 		if !simpleTemplateField.MatchString(field) {
 			if !strings.HasPrefix(field, "url_for(") {
-				f.report.Gaps = append(f.report.Gaps, graph.Gap{Kind: "template_output_unresolved", Detail: "Jinja output expression is outside the bounded field subset", At: textRange(file, match[0], match[1], "template_output").Span})
+				f.report.Gaps = append(f.report.Gaps, analysis.Gap{Kind: "template_output_unresolved", Detail: "Jinja output expression is outside the bounded field subset", At: textRange(file, match[0], match[1], "template_output").Span})
 			}
 			continue
 		}
 		keys := strings.Split(field, ".")
 		v, ok := locals[keys[0]]
 		if !ok {
-			f.report.Gaps = append(f.report.Gaps, graph.Gap{Kind: "template_binding_unresolved", Detail: "No supported render-local/loop/global binding for " + keys[0], At: textRange(file, match[0], match[1], "template_output").Span})
+			f.report.Gaps = append(f.report.Gaps, analysis.Gap{Kind: "template_binding_unresolved", Detail: "No supported render-local/loop/global binding for " + keys[0], At: textRange(file, match[0], match[1], "template_output").Span})
 			continue
 		}
 		for _, key := range keys[1:] {
@@ -222,10 +222,10 @@ func (f *pythonFlow) templateOutputs(call *sitter.Node, file graph.Evidence, loc
 			markup = f.module.evidence("render_markup_context", pyArgs(call)[0])
 			sourceContext = f.module.evidence("inline_template", pyArgs(call)[0])
 		}
-		f.recordXSS(sink, v, htmlOutputContext(file.Text[:match[0]]), []graph.Evidence{f.module.evidence("render_binding", call), markup, sourceContext})
+		f.recordXSS(sink, v, htmlOutputContext(file.Text[:match[0]]), []analysis.Evidence{f.module.evidence("render_binding", call), markup, sourceContext})
 	}
 }
-func pythonMarkupPath(d graph.Dependency) bool {
+func pythonMarkupPath(d analysis.Dependency) bool {
 	for _, e := range d.Transfers {
 		if e.Kind == "trusted_html_wrapper" {
 			return true

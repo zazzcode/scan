@@ -21,14 +21,44 @@ Evaluate and iterate against all three pinned Python targets and independent sou
 - [Sample reference policy](../../docs/samples/reference-policy.md).
 - Standards: [structure](../standards/code-structure.md), [testing](../standards/testing.md),
   [spec hygiene](../standards/spec-hygiene.md), [docs hygiene](../standards/docs-hygiene.md).
-- Existing `internal/parse/strings.go`, `xss_claims.go`, graph records and report/judge adapters.
+- Existing `internal/parse/analysis.go`, `xss_claims.go`, graph records and report/judge adapters.
+
+## Architecture and terminology closeout
+
+The user authorized this closeout in the existing feature worktree before the draft PR.
+It changes naming and documentation, not vulnerability coverage or security policy.
+
+- Rename the embedded language documents and their Go types to **Analysis Guidelines**.
+  Move `internal/rules/` to `internal/guidelines/`; distinguish embedded model guidance
+  from executable detection rules, application requirements and Go policy gates.
+- Rename `StringUse` to `CandidateUse`, `StringReport` to `AnalysisReport`, and
+  `graph.Graph` to `analysis.RouteInventory`. Move shared records to `internal/analysis/`.
+  Rename parser entry points to `Analyze` and `AnalyzeWithChecks` and document `--analyze`.
+- Keep `--strings` as a working compatibility alias for existing user scripts. No old
+  internal Go aliases remain. New analysis reports use schema 2 and `analysis_guidelines`;
+  saved schema-1 reports with `practice` remain readable for HTML/SARIF export.
+  Route inventory JSON remains schema 1. Candidate IDs, claim statuses and evidence stay intact.
+- Rename the model-input key to `analysis_guidelines` and version changed embedded documents
+  and generic questions. Existing claim-specific question versions retain their question semantics.
+  Exact-request replay MUST reject old payloads after guideline text or envelope changes.
+  Historical sample artifacts retain their original source, answers, versions and provenance.
+- Rewrite the main architecture overview around implemented packages and pipeline. Label the
+  full repository IR, independent Findings Review, caching and CI severity gates as planned.
+  Keep existing architecture anchors working where practical.
+- Document the technical approach and design strengths in `docs/technical-approach.md`, with
+  official SAST/prior-art references, scoped evidence and explicit limits on novelty/superiority.
+- Verify with the full Go race suite, vet and build; targeted compatibility tests MUST prove
+  both CLI names work, old/new saved reports export, guidelines enter both provider payloads,
+  changed guidance cannot inherit a saved decision, and current names serialize correctly.
+  Run the built CLI offline on JS/TS and Python fixtures and export real saved sample reports.
+  Check changed docs for links, formatting and stale names. No paid requests or sample edits.
 
 ## Invariants
 
 Sample checkouts MUST remain clean at pinned revisions; analysis MUST NOT execute target code.
 Expected labels MUST stay outside target source and model inputs; no target-name detector exceptions.
 Unknown flows, bindings, guards and renderer settings MUST NOT become protection or proven paths.
-Validation and sink protection remain separate. Shared judgment protocols remain unchanged.
+Validation and sink protection remain separate. Claim questions and policy semantics remain unchanged except for the explicitly authorized terminology migration below.
 Only the selected provider key reaches a live scanner child; never print secrets.
 New evidence MUST NOT inherit decisions for an older request. Record cumulative live usage; use explicit per-run limits, no fallback.
 
@@ -41,16 +71,17 @@ All product changes stay in this worktree. Raw runs are outside it in `_test-fin
 | --- | --- | --- |
 | `go.mod`, `go.sum` | modified | pinned Python grammar |
 | `internal/parse/python_*.go`, Python testdata | new | separate Python adapter and paired fixtures |
-| `internal/parse/parse.go`, `strings.go`, `modules.go`, `flow.go`, `xss_client*.go` | modified | language dispatch, mixed repositories and reusing browser analysis for inline template scripts |
+| `internal/parse/parse.go`, `analysis.go`, `modules.go`, `flow.go`, `xss_client*.go` | modified | language dispatch, mixed repositories and reusing browser analysis for inline template scripts |
 | `cmd/scan/` | modified | Python CLI acceptance, help and end-to-end tests |
-| `internal/rules/python.md` | modified if needed | accurate Python practice guidance |
-| `internal/graph/`, `internal/report/`, `internal/judge/` | modified only if necessary | language-neutral compatibility; preserve question versions |
+| `internal/guidelines/python.md` | modified if needed | accurate Python Analysis Guidelines |
+| `internal/analysis/`, `internal/report/`, `internal/judge/` | modified only if necessary | language-neutral compatibility; version changed generic questions and guideline documents |
 | `docs/analysis/`, `docs/samples/`, `README.md`, `docs/` | modified/new | implemented subset, source keys, curated baselines and usage |
 | `.zazz/specifications/`, `.zazz/evaluation/`, `.zazz/docs/zazzles-agent-orientation.md` | modified/new | tracked contract, durable evaluation and current resumption pointers |
 | `.zazz/ephemeral/` | ignored | execution history, scripts and local results |
 
 Out of scope: new vulnerability families, SCA, other languages, edits/dependency installation
-inside samples, deployment, integration pushes, PR publication. NoSQL is out of corpus unless
+inside samples, deployment, integration pushes and merge. Draft PR publication into `stage` is
+explicitly authorized for this branch closeout. NoSQL is out of corpus unless
 source inspection finds actual PyMongo use. Outbound destinations are existing candidate evidence,
 not an expanded SSRF verdict engine.
 
@@ -143,7 +174,8 @@ Additional acceptance evidence:
 New tests: `TestPythonGeneralizationBranches`, `TestPythonPackageImports`,
 `TestPythonDBAPIBindings`, `TestPythonUnknownHelperParameters`, plus targeted policy/bundle tests.
 The existing parser/CLI/race/vet/build and source-integrity checks remain required. Iterate in coherent
-green commits and push `python-support-base`; no integration push, publication or merge is authorized.
+green commits and push `python-support-base`; the user subsequently authorized draft PR publication
+into `stage`. No integration push or merge is authorized.
 
 ## Shared trace and reporting hardening
 
@@ -201,3 +233,21 @@ and literal keyword-path extraction controls. No new vulnerability family is inc
 Final route review identified contradictory generic protected-SQL titles and coarse missing-validator
 wording. Shared presentation now names SQL syntax protection and defers field-policy adequacy to
 its independent claim; source evidence and saved model answers remain unchanged.
+
+### 2026-11-02 — Architecture and terminology closeout
+
+**Source:** user requested Analysis Guidelines and correction of architecture/naming before merge.
+**Changed sections:** Architecture and terminology closeout; invariants.
+**Rationale:** names and the architecture overview must describe the implemented scanner.
+**Verification impact:** naming migration, saved-report/CLI compatibility, payload identity,
+offline end-to-end runs and full Go checks; no new live model calibration.
+
+### 2026-11-02 — Follow-up handoff and draft PR publication
+
+**Source:** user requested a separate common-entry/dispatch handoff with required reading, then
+committing/pushing all worktree changes and creating a draft PR for human review/merge.
+**Changed sections:** branch closeout authorization and out-of-scope publication wording.
+**Summary:** publish the Python/terminology work as one draft PR into `stage`; the common model
+remains a separately scoped foundation refactor documented in the tracked follow-up brief.
+**Verification impact:** final documentation/link checks, clean committed/pushed branch and remote
+verification of draft/head/base. No additional scanner behavior or live-model testing is introduced.

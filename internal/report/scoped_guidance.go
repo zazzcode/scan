@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func scopedGuidance(u graph.StringUse, f graph.Finding) Guidance {
+func scopedGuidance(u analysis.CandidateUse, f analysis.Finding) Guidance {
 	at := fmt.Sprintf("%s:%d", u.Sink.Span.File, u.Sink.Span.StartLine)
 	if f.RecordType == "protection" {
 		if u.Kind == "input_validation_candidate" && u.Check != nil {
@@ -50,9 +50,9 @@ func scopedGuidance(u graph.StringUse, f graph.Finding) Guidance {
 	}
 	return g
 }
-func investigationGuidance(u graph.StringUse, at string) Guidance {
+func investigationGuidance(u analysis.CandidateUse, at string) Guidance {
 	g := Guidance{Title: "Resolve the specific claim blockers", ExampleStatus: "no patch proposed while the claim is inconclusive", Actions: []string{"Investigate the operation at " + at + ": " + u.Sink.Text + ". Its current Review status does not establish a code defect."}}
-	gaps := append([]graph.Gap{}, u.Assessment.BlockingGaps...)
+	gaps := append([]analysis.Gap{}, u.Assessment.BlockingGaps...)
 	if u.Completeness != nil {
 		gaps = append(gaps, u.Completeness.Blockers...)
 	}
@@ -83,7 +83,7 @@ func investigationGuidance(u graph.StringUse, at string) Guidance {
 	}
 	return g
 }
-func renderingGuidance(u graph.StringUse, at string) Guidance {
+func renderingGuidance(u analysis.CandidateUse, at string) Guidance {
 	g := Guidance{Title: "Repair this HTML output", ExampleStatus: "source-derived candidate; review intended output semantics and test before applying"}
 	if strings.Contains(u.Sink.Text, "{{") && strings.Contains(u.Sink.Text, "|") && u.XSS.OutputContext != "script" && u.XSS.OutputContext != "url" {
 		replacement := jinjaSafeFilter.ReplaceAllString(u.Sink.Text, "")
@@ -102,7 +102,7 @@ func renderingGuidance(u graph.StringUse, at string) Guidance {
 	return g
 }
 
-func fieldPolicyText(u graph.StringUse) string {
+func fieldPolicyText(u analysis.CandidateUse) string {
 	var text []string
 	if u.Completeness != nil {
 		for _, e := range u.Completeness.Evidence["field_policy"] {

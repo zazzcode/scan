@@ -2,7 +2,7 @@ package parse
 
 import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"strings"
 )
 
@@ -12,7 +12,7 @@ func (f *pythonFlow) frameworkCall(n *sitter.Node, q string, nodes []*sitter.Nod
 	case "flask.request.get_json":
 		return f.source(n, "json", ""), true
 	case "sqlite3.connect", "psycopg.connect", "psycopg2.connect", "pymysql.connect", "mysql.connector.connect":
-		return pythonValue{binding: "db_connection", driver: strings.TrimSuffix(q, ".connect"), evidence: []graph.Evidence{m.evidence("sink_binding", n)}}, true
+		return pythonValue{binding: "db_connection", driver: strings.TrimSuffix(q, ".connect"), evidence: []analysis.Evidence{m.evidence("sink_binding", n)}}, true
 	case "flask.redirect", "flask.send_file", "flask.send_from_directory":
 		return pythonValue{rendered: true, binding: "non_html"}, true
 	case "flask.jsonify":
@@ -27,7 +27,7 @@ func (f *pythonFlow) frameworkCall(n *sitter.Node, q string, nodes []*sitter.Nod
 		if len(values) > 0 {
 			v := values[0]
 			if len(v.deps) > 0 {
-				f.recordXSS(m.evidence("template_source", nodes[0]), v, "html_text", []graph.Evidence{m.evidence("render_binding", n)})
+				f.recordXSS(m.evidence("template_source", nodes[0]), v, "html_text", []analysis.Evidence{m.evidence("render_binding", n)})
 			} else if v.constant {
 				f.renderInline(n, v.literal)
 			}
@@ -100,7 +100,7 @@ func (f *pythonFlow) outboundCall(n *sitter.Node, q string, fn *sitter.Node, val
 	if requestDependent {
 		u := f.addUse("outbound_http_candidate", n, destination)
 		u.Context = append(u.Context, m.evidence("sink_binding", fn))
-		u.APIModel = &graph.APIModel{ID: "python-http-destination-v1", Library: strings.Split(q, ".")[0], Semantics: "The URL/destination operand is separate from request body and response; response data is an independent external source."}
+		u.APIModel = &analysis.APIModel{ID: "python-http-destination-v1", Library: strings.Split(q, ".")[0], Semantics: "The URL/destination operand is separate from request body and response; response data is an independent external source."}
 	}
-	return pythonValue{binding: "http_response", evidence: []graph.Evidence{m.evidence("external_exchange", n)}}
+	return pythonValue{binding: "http_response", evidence: []analysis.Evidence{m.evidence("external_exchange", n)}}
 }

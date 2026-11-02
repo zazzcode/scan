@@ -1,10 +1,10 @@
 id: python
-version: 2
+version: 3
 languages: python
 
-# Python practice
+# Python analysis guidelines
 
-This standard applies to Python route, SQL, logging, rendering and outbound evidence.
+These analysis guidelines apply to Python route, SQL, logging, rendering and outbound evidence.
 
 ## Posture
 

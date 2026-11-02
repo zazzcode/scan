@@ -1,6 +1,6 @@
 // Package parse turns JavaScript, TypeScript and Python source into route evidence.
 //
-// Routes records syntactic registrations. Strings adds bounded handler resolution
+// Routes records syntactic registrations. Analyze adds bounded handler resolution
 // and local dependency evidence. Neither mode decides validation adequacy locally.
 package parse
 
@@ -16,7 +16,7 @@ import (
 	js "github.com/tree-sitter/tree-sitter-javascript/bindings/go"
 	ts "github.com/tree-sitter/tree-sitter-typescript/bindings/go"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"github.com/zazzcode/zazzles/internal/lang"
 	"github.com/zazzcode/zazzles/internal/walk"
 )
@@ -33,7 +33,7 @@ var methods = map[string]string{
 }
 
 // Routes scans root and returns a syntactic route inventory.
-func Routes(root string) (*graph.Graph, error) {
+func Routes(root string) (*analysis.RouteInventory, error) {
 	parsed, err := walk.Walk(root, walk.Options{})
 	if err != nil {
 		return nil, err
@@ -45,11 +45,11 @@ func Routes(root string) (*graph.Graph, error) {
 	}
 	defer parsers.close()
 
-	out := &graph.Graph{
-		SchemaVersion: graph.SchemaVersion,
+	out := &analysis.RouteInventory{
+		SchemaVersion: analysis.RouteSchemaVersion,
 		Root:          root,
-		Routes:        []graph.Route{},
-		Gaps:          []graph.Gap{},
+		Routes:        []analysis.Route{},
+		Gaps:          []analysis.Gap{},
 	}
 
 	for _, file := range parsed.Files {
@@ -148,21 +148,21 @@ func (p *parsers) forPath(path string) *sitter.Parser {
 	}
 }
 
-func extractFile(parser *sitter.Parser, file string, src []byte) ([]graph.Route, []graph.Gap, error) {
+func extractFile(parser *sitter.Parser, file string, src []byte) ([]analysis.Route, []analysis.Gap, error) {
 	tree := parser.Parse(src, nil)
 	if tree == nil {
-		return nil, []graph.Gap{{
+		return nil, []analysis.Gap{{
 			Kind:   "parse_error",
 			Detail: "parser returned no tree",
-			At:     graph.Span{File: file, StartLine: 1, EndLine: 1},
+			At:     analysis.Span{File: file, StartLine: 1, EndLine: 1},
 		}}, nil
 	}
 	defer tree.Close()
 
 	root := tree.RootNode()
-	var gaps []graph.Gap
+	var gaps []analysis.Gap
 	if root.HasError() {
-		gaps = append(gaps, graph.Gap{
+		gaps = append(gaps, analysis.Gap{
 			Kind:   "parse_error",
 			Detail: "syntax error",
 			At:     spanOf(file, root),
@@ -172,17 +172,17 @@ func extractFile(parser *sitter.Parser, file string, src []byte) ([]graph.Route,
 	locals := map[string]*sitter.Node{}
 	collectFuncs(root, src, locals)
 
-	var routes []graph.Route
+	var routes []analysis.Route
 	walkCalls(root, func(call *sitter.Node) {
 		found, dyn := routesFromCall(file, src, call, locals)
 		routes = append(routes, found...)
 		gaps = append(gaps, dyn...)
 	})
 	if routes == nil {
-		routes = []graph.Route{}
+		routes = []analysis.Route{}
 	}
 	if gaps == nil {
-		gaps = []graph.Gap{}
+		gaps = []analysis.Gap{}
 	}
 	return routes, gaps, nil
 }
@@ -224,7 +224,7 @@ func isFunction(node *sitter.Node) bool {
 	return node.Kind() == "function_expression" || node.Kind() == "arrow_function" || node.Kind() == "function"
 }
 
-func routesFromCall(file string, src []byte, call *sitter.Node, locals map[string]*sitter.Node) ([]graph.Route, []graph.Gap) {
+func routesFromCall(file string, src []byte, call *sitter.Node, locals map[string]*sitter.Node) ([]analysis.Route, []analysis.Gap) {
 	fn := call.ChildByFieldName("function")
 	if fn == nil || fn.Kind() != "member_expression" {
 		return nil, nil
@@ -274,30 +274,30 @@ func routesFromCall(file string, src []byte, call *sitter.Node, locals map[strin
 		at.StartByte = regSpan.StartByte
 	}
 	if dynamic {
-		return nil, []graph.Gap{{
+		return nil, []analysis.Gap{{
 			Kind:   "dynamic_path",
 			Detail: "path is not a string literal starting with /",
 			At:     at,
 		}}
 	}
 
-	reg := graph.Step{
+	reg := analysis.Step{
 		Kind: "registration",
-		Symbol: graph.Symbol{
+		Symbol: analysis.Symbol{
 			Name: regName,
 			Kind: "method",
 			Span: regSpan,
 		},
 	}
-	var chain []graph.Step
-	var gaps []graph.Gap
+	var chain []analysis.Step
+	var gaps []analysis.Gap
 	for i := handlersFrom; i < args.NamedChildCount(); i++ {
 		steps, more := argumentSteps(file, src, args.NamedChild(i), locals)
 		chain = append(chain, steps...)
 		gaps = append(gaps, more...)
 	}
 
-	handler := graph.Symbol{}
+	handler := analysis.Symbol{}
 	for i := len(chain) - 1; i >= 0; i-- {
 		if chain[i].Kind == "handler" {
 			handler = chain[i].Symbol
@@ -305,12 +305,12 @@ func routesFromCall(file string, src []byte, call *sitter.Node, locals map[strin
 		}
 	}
 
-	routes := make([]graph.Route, 0, len(paths))
+	routes := make([]analysis.Route, 0, len(paths))
 	for _, path := range paths {
-		steps := make([]graph.Step, 0, 1+len(chain))
+		steps := make([]analysis.Step, 0, 1+len(chain))
 		steps = append(steps, reg)
 		steps = append(steps, chain...)
-		routes = append(routes, graph.Route{
+		routes = append(routes, analysis.Route{
 			ID:           fmt.Sprintf("route:%s:%d:%s:%s", file, at.StartByte, method, path),
 			Method:       method,
 			PathPattern:  path,
@@ -378,47 +378,47 @@ func chainedRoutePaths(member *sitter.Node, src []byte) ([]string, bool) {
 	return nil, false
 }
 
-func argumentSteps(file string, src []byte, node *sitter.Node, locals map[string]*sitter.Node) ([]graph.Step, []graph.Gap) {
+func argumentSteps(file string, src []byte, node *sitter.Node, locals map[string]*sitter.Node) ([]analysis.Step, []analysis.Gap) {
 	switch node.Kind() {
 	case "identifier":
 		return identSteps(file, src, node, locals)
 	case "call_expression":
 		return callSteps(file, src, node, locals, true)
 	case "arrow_function", "function_expression", "function":
-		step := graph.Step{
+		step := analysis.Step{
 			Kind: "handler",
-			Symbol: graph.Symbol{
+			Symbol: analysis.Symbol{
 				Kind: "anonymous",
 				Span: spanOf(file, node),
 			},
 		}
-		return append([]graph.Step{step}, bodyCalls(file, src, node.ChildByFieldName("body"), "")...), nil
+		return append([]analysis.Step{step}, bodyCalls(file, src, node.ChildByFieldName("body"), "")...), nil
 	default:
 		return nil, nil
 	}
 }
 
-func identSteps(file string, src []byte, node *sitter.Node, locals map[string]*sitter.Node) ([]graph.Step, []graph.Gap) {
+func identSteps(file string, src []byte, node *sitter.Node, locals map[string]*sitter.Node) ([]analysis.Step, []analysis.Gap) {
 	name := node.Utf8Text(src)
-	step := graph.Step{
+	step := analysis.Step{
 		Kind: "handler",
-		Symbol: graph.Symbol{
+		Symbol: analysis.Symbol{
 			Name: name,
 			Kind: "identifier",
 			Span: spanOf(file, node),
 		},
 	}
 	if body, ok := locals[name]; ok {
-		return append([]graph.Step{step}, bodyCalls(file, src, body, name)...), nil
+		return append([]analysis.Step{step}, bodyCalls(file, src, body, name)...), nil
 	}
-	return []graph.Step{step}, []graph.Gap{{
+	return []analysis.Step{step}, []analysis.Gap{{
 		Kind:   "unresolved_handler",
 		Detail: name,
 		At:     spanOf(file, node),
 	}}
 }
 
-func callSteps(file string, src []byte, node *sitter.Node, locals map[string]*sitter.Node, unwrap bool) ([]graph.Step, []graph.Gap) {
+func callSteps(file string, src []byte, node *sitter.Node, locals map[string]*sitter.Node, unwrap bool) ([]analysis.Step, []analysis.Gap) {
 	callee := node.ChildByFieldName("function")
 	name := ""
 	kind := "method"
@@ -426,28 +426,28 @@ func callSteps(file string, src []byte, node *sitter.Node, locals map[string]*si
 		name = callee.Utf8Text(src)
 		kind = symbolKind(callee)
 	}
-	step := graph.Step{
+	step := analysis.Step{
 		Kind: "handler",
-		Symbol: graph.Symbol{
+		Symbol: analysis.Symbol{
 			Name: name,
 			Kind: kind,
 			Span: spanOf(file, node),
 		},
 	}
-	steps := []graph.Step{step}
-	var gaps []graph.Gap
+	steps := []analysis.Step{step}
+	var gaps []analysis.Gap
 	if kind == "identifier" {
 		if body, ok := locals[name]; ok {
 			steps = append(steps, bodyCalls(file, src, body, name)...)
 		} else {
-			gaps = append(gaps, graph.Gap{
+			gaps = append(gaps, analysis.Gap{
 				Kind:   "unresolved_handler",
 				Detail: name,
 				At:     spanOf(file, node),
 			})
 		}
 	} else if name != "" {
-		gaps = append(gaps, graph.Gap{
+		gaps = append(gaps, analysis.Gap{
 			Kind:   "unresolved_handler",
 			Detail: name,
 			At:     spanOf(file, callee),
@@ -459,8 +459,8 @@ func callSteps(file string, src []byte, node *sitter.Node, locals map[string]*si
 	if unwrap && callee != nil && callee.Kind() == "member_expression" {
 		if args := node.ChildByFieldName("arguments"); args != nil && args.NamedChildCount() == 1 {
 			inner := args.NamedChild(0)
-			var more []graph.Step
-			var moreGaps []graph.Gap
+			var more []analysis.Step
+			var moreGaps []analysis.Gap
 			switch inner.Kind() {
 			case "identifier":
 				more, moreGaps = identSteps(file, src, inner, locals)
@@ -474,7 +474,7 @@ func callSteps(file string, src []byte, node *sitter.Node, locals map[string]*si
 	return steps, gaps
 }
 
-func bodyCalls(file string, src []byte, body *sitter.Node, caller string) []graph.Step {
+func bodyCalls(file string, src []byte, body *sitter.Node, caller string) []analysis.Step {
 	if body == nil {
 		return nil
 	}
@@ -484,13 +484,13 @@ func bodyCalls(file string, src []byte, body *sitter.Node, caller string) []grap
 		if callee != nil {
 			name = callee.Utf8Text(src)
 		}
-		return []graph.Step{{
+		return []analysis.Step{{
 			Kind:   "call",
 			Caller: caller,
-			Symbol: graph.Symbol{Name: name, Kind: symbolKind(callee), Span: spanOf(file, body)},
+			Symbol: analysis.Symbol{Name: name, Kind: symbolKind(callee), Span: spanOf(file, body)},
 		}}
 	}
-	var steps []graph.Step
+	var steps []analysis.Step
 	for i := uint(0); i < body.NamedChildCount(); i++ {
 		stmt := body.NamedChild(i)
 		if stmt.Kind() != "expression_statement" || stmt.NamedChildCount() == 0 {
@@ -505,10 +505,10 @@ func bodyCalls(file string, src []byte, body *sitter.Node, caller string) []grap
 		if callee != nil {
 			name = callee.Utf8Text(src)
 		}
-		steps = append(steps, graph.Step{
+		steps = append(steps, analysis.Step{
 			Kind:   "call",
 			Caller: caller,
-			Symbol: graph.Symbol{Name: name, Kind: symbolKind(callee), Span: spanOf(file, expr)},
+			Symbol: analysis.Symbol{Name: name, Kind: symbolKind(callee), Span: spanOf(file, expr)},
 		})
 	}
 	return steps
@@ -532,10 +532,10 @@ func stringLiteral(node *sitter.Node, src []byte) (string, bool) {
 	return text[1 : len(text)-1], true
 }
 
-func spanOf(file string, node *sitter.Node) graph.Span {
+func spanOf(file string, node *sitter.Node) analysis.Span {
 	start := node.StartPosition()
 	end := node.EndPosition()
-	return graph.Span{
+	return analysis.Span{
 		File:      file,
 		StartLine: int(start.Row) + 1,
 		EndLine:   int(end.Row) + 1,

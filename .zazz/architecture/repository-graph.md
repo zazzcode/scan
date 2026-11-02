@@ -8,7 +8,11 @@ proposed semantic design; the current route-v1 artifact is only a syntax invento
 
 ## Objective and analysis boundary
 
-Start at inbound API endpoints/routes. Follow supported internal control and value dependencies,
+Start at explicit analysis entry points. HTTP routes and browser entries are current forms;
+GraphQL fields, message consumers, commands and other roots are future adapters. Separate entry
+identity, registration, dispatch binding and callable identity as described in the
+[entry/dispatch decision](../architecture.md#multiple-entry-and-dispatch-mechanisms).
+Follow supported internal control and value dependencies,
 including strings sent in outbound service calls, values received in responses, and their subsequent
 uses. Prepare evidence for a semantic judge (GPT Decisions, Jev, or another explicit provider) to assess
 sufficient validation/protection and potential source-code vulnerabilities. Expand toward selected
@@ -21,8 +25,8 @@ edges or discharge missing flow evidence. Unsupported behavior remains an explic
 
 ```mermaid
 flowchart LR
-    In[Inbound API route] --> H[Handler and middleware]
-    H --> V[Request values and local transformations]
+    In[Analysis entry point] --> H[Dispatch binding and invocation context]
+    H --> V[Input values and local transformations]
     V --> Call[Outbound request operation]
     Call --> Remote[External service boundary]
     Remote --> Resp[Response values / errors]
@@ -50,7 +54,9 @@ analysis worklists and context state stay separate. No file is parsed repeatedly
 |---|---|
 | Snapshot / module | Target scope, relative path, source hash, language and parser versions |
 | Symbol / callable | Lexical binding, imports/exports, signature, parameters, body and returns |
-| Route registration / entry point | Method/path syntax, receiver provenance, ordered middleware, mount context, handler binding |
+| Entry point | Logical analysis root, kind and input/context roles; independent of HTTP transport |
+| Registration | Source/configuration wiring, receiver provenance, framework metadata and generated alternatives |
+| Dispatch binding | Entry/registration to possible callable targets, conditions, order, invocation bindings and uncertainty |
 | Basic block / operation | Ordering, branches, assignments, calls, returns, throws, await and supported transfers |
 | Value definition | Parameter, literal, field projection, expression result or merged definitions; distinguish reassignments |
 | External service / exchange | Known or dynamic destination, request operation, response/error results, library model |
@@ -66,7 +72,8 @@ The following names describe semantics, not finalized Go enums or a released JSO
 | Relation and direction | Meaning / required justification |
 |---|---|
 | module → symbol `DECLARES`; binding → target `REFERS_TO` | Exact lexical/import resolution or explicit set of possible targets |
-| registration → callable `HANDLED_BY` | Framework registration plus callable/factory resolution |
+| registration → entry `EXPOSES` | Source-backed exposure; method/path is HTTP-specific metadata |
+| entry/registration → callable `DISPATCHES_TO` | Supported callable targets, conditions, invocation bindings and unresolved alternatives |
 | registration → middleware `USES_MIDDLEWARE` | Ordered registration/mount applicability; pathless middleware is represented |
 | caller operation → callable `CALLS` | Supported target binding; separate call site and function identity |
 | block → block `NEXT`, `TRUE_BRANCH`, `FALSE_BRANCH`, `EXCEPTION` | Possible control successor with associated condition/exception |

@@ -6,14 +6,14 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var angularBinding = regexp.MustCompile(`(?i)\[(innerHTML|href|src)\]\s*=\s*(["'])([^"']+)["']`)
 
 func (s *moduleSet) clientClass(m *sourceModule, class *sitter.Node) *clientContext {
 	name := class.ChildByFieldName("name")
-	context := &clientContext{entry: graph.ClientEntry{ID: clientID(m.file, name.Utf8Text(m.src), class.StartByte()), Kind: "component", Name: name.Utf8Text(m.src), Location: spanOf(m.file, class)},
+	context := &clientContext{entry: analysis.ClientEntry{ID: clientID(m.file, name.Utf8Text(m.src), class.StartByte()), Kind: "component", Name: name.Utf8Text(m.src), Location: spanOf(m.file, class)},
 		injected: map[string]clientInjection{}, methods: map[string]*sitter.Node{}, fields: map[string]*sitter.Node{}}
 	body := class.ChildByFieldName("body")
 	if body == nil {
@@ -131,7 +131,7 @@ func (s *moduleSet) angularOutputs(f *flow) {
 			}
 		}
 	}
-	var uses []graph.StringUse
+	var uses []analysis.CandidateUse
 	for _, u := range f.uses {
 		if u.Sink.Kind != "trust_bypass" || !matchedBypass[u.Sink.Span.File+":"+u.Sink.Text] {
 			uses = append(uses, u)
@@ -143,7 +143,7 @@ func (s *moduleSet) angularOutputs(f *flow) {
 // angularPathProtection classifies each path to a one-way Angular binding. A
 // matching trust bypass is unsafe unless verified sanitization precedes it; a
 // plain path gets default sanitization; any other transformation is unknown.
-func (f *flow) angularPathProtection(v value, context string) (string, string, []graph.XSSPath) {
+func (f *flow) angularPathProtection(v value, context string) (string, string, []analysis.XSSPath) {
 	paths := make([]string, len(v.deps))
 	unsafe, unknown, mismatch := false, false, false
 	for i, d := range v.deps {
@@ -160,7 +160,7 @@ func (f *flow) angularPathProtection(v value, context string) (string, string, [
 			paths[i], mismatch = "unknown", true
 		case bypass != "":
 			paths[i] = f.dependencyProtection(d, context)
-		case plainFrameworkInput(value{deps: []graph.Dependency{d}}):
+		case plainFrameworkInput(value{deps: []analysis.Dependency{d}}):
 			paths[i] = "sanitized"
 		default:
 			paths[i] = "unknown"

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var pythonForm = regexp.MustCompile(`(?is)<form\b([^>]*)>(.*?)</form\s*>`)
@@ -16,11 +16,11 @@ var pythonHTMLAttr = regexp.MustCompile(`(?i)([a-z][a-z0-9_-]*)\s*=\s*["']([^"']
 
 // formPolicies records client-declared requirements only for a form that posts to
 // this handler. Browser validation is policy evidence, never server enforcement.
-func (s *pythonSet) formPolicies(r pythonRoute) []graph.Evidence {
+func (s *pythonSet) formPolicies(r pythonRoute) []analysis.Evidence {
 	if r.receiver.kind != "flask" || r.receiver.templates == "" {
 		return nil
 	}
-	var result []graph.Evidence
+	var result []analysis.Evidence
 	seen := map[string]bool{}
 	pyWalk(r.fn.ChildByFieldName("body"), func(n *sitter.Node) {
 		if n.Kind() != "call" || s.qualified(r.module, pyText(r.module, n.ChildByFieldName("function"))) != "flask.render_template" {
@@ -85,12 +85,12 @@ func (s *pythonSet) formPolicies(r pythonRoute) []graph.Evidence {
 
 // fieldPolicy matches the actual input name, rather than borrowing a sibling's
 // requirements. Browser policy is applicable only to the modeled form operand.
-func (f *pythonFlow) fieldPolicy(key string) []graph.Evidence {
+func (f *pythonFlow) fieldPolicy(key string) []analysis.Evidence {
 	if !strings.HasPrefix(key, "form.") {
 		return nil
 	}
 	name := strings.TrimPrefix(key, "form.")
-	var result []graph.Evidence
+	var result []analysis.Evidence
 	for _, e := range f.context {
 		if e.Kind != "form_field_requirement" {
 			continue
@@ -104,8 +104,8 @@ func (f *pythonFlow) fieldPolicy(key string) []graph.Evidence {
 	}
 	return result
 }
-func (f *pythonFlow) validationClaim(u *graph.StringUse, key string, v pythonValue, policy []graph.Evidence) {
-	context := []graph.Evidence{}
+func (f *pythonFlow) validationClaim(u *analysis.CandidateUse, key string, v pythonValue, policy []analysis.Evidence) {
+	context := []analysis.Evidence{}
 	for _, e := range u.Context {
 		if e.Kind != "form_field_requirement" {
 			context = append(context, e)
@@ -114,7 +114,7 @@ func (f *pythonFlow) validationClaim(u *graph.StringUse, key string, v pythonVal
 	context = append(context, policy...)
 	u.Context = context
 	handler := f.route.module.evidence("route_handler", f.route.fn)
-	blockers := append([]graph.Gap{}, f.gaps...)
+	blockers := append([]analysis.Gap{}, f.gaps...)
 	blockers = append(blockers, v.gaps...)
 	blockers = append(blockers, f.guardGaps(v)...)
 	constraints := []string{}
@@ -133,6 +133,6 @@ func (f *pythonFlow) validationClaim(u *graph.StringUse, key string, v pythonVal
 			}
 		}
 	}
-	u.Check = &graph.Check{ID: "source-field-policy", Method: f.route.route.Method, Path: f.route.route.PathPattern, Kind: "validation", Fields: []string{key}, Validation: "The complete policy for " + key + " in this claim is ONLY: " + strings.Join(constraints, "; ") + ". Do not demand password complexity, email syntax on a username, length/type/range restrictions, trimming or other constraints absent from this list. SQL binding, hashing and authorization are separate claims. Judge direct HTTP enforcement before sensitive use; returning a form/error before the operation enforces rejection even with HTTP status 200."}
-	u.Completeness = &graph.Completeness{ClaimKind: "validation", Required: []string{"request_source", "field_policy", "route_handler", "control_flow"}, Evidence: map[string][]graph.Evidence{"request_source": {u.Sink}, "field_policy": policy, "route_handler": {handler}, "control_flow": append([]graph.Evidence{handler}, context...)}, Blockers: blockers, Coverage: []graph.Gap{}, Scope: "Bounded source-declared form policy and linked handler/helper implementation. Missing enforcement semantics remain blockers; no field-name policy inference."}
+	u.Check = &analysis.Check{ID: "source-field-policy", Method: f.route.route.Method, Path: f.route.route.PathPattern, Kind: "validation", Fields: []string{key}, Validation: "The complete policy for " + key + " in this claim is ONLY: " + strings.Join(constraints, "; ") + ". Do not demand password complexity, email syntax on a username, length/type/range restrictions, trimming or other constraints absent from this list. SQL binding, hashing and authorization are separate claims. Judge direct HTTP enforcement before sensitive use; returning a form/error before the operation enforces rejection even with HTTP status 200."}
+	u.Completeness = &analysis.Completeness{ClaimKind: "validation", Required: []string{"request_source", "field_policy", "route_handler", "control_flow"}, Evidence: map[string][]analysis.Evidence{"request_source": {u.Sink}, "field_policy": policy, "route_handler": {handler}, "control_flow": append([]analysis.Evidence{handler}, context...)}, Blockers: blockers, Coverage: []analysis.Gap{}, Scope: "Bounded source-declared form policy and linked handler/helper implementation. Missing enforcement semantics remain blockers; no field-name policy inference."}
 }

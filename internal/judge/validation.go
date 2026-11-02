@@ -1,6 +1,6 @@
 package judge
 
-import "github.com/zazzcode/zazzles/internal/graph"
+import "github.com/zazzcode/zazzles/internal/analysis"
 
 const validationQuestionVersion = "validation-use-v2"
 
@@ -10,7 +10,7 @@ var validationQuestions = []question{
 	{"enforcement_coverage", "Is enough relevant server implementation present and structurally linked to assess enforcement? complete requires the actual guards/helpers, branch/return behavior and downstream constraints that can enforce this requirement; incomplete means a required definition, dispatch, model constraint or path is missing. Source comments and benchmark descriptions are not evidence of an expected answer."},
 }
 
-func validationUse(u graph.StringUse) bool {
+func validationUse(u analysis.CandidateUse) bool {
 	return u.Kind == "input_validation_candidate" && u.Completeness != nil && u.Completeness.ClaimKind == "validation"
 }
 func validationChoices(name string) []map[string]string {
@@ -24,9 +24,9 @@ func validationChoices(name string) []map[string]string {
 	}
 	return nil
 }
-func applyValidationPolicy(u graph.StringUse, a *graph.Assessment) {
+func applyValidationPolicy(u analysis.CandidateUse, a *analysis.Assessment) {
 	a.FindingStatus, a.Protection = "needs_evidence", "uncertain"
-	blockers := append([]graph.Gap{}, u.Completeness.Blockers...)
+	blockers := append([]analysis.Gap{}, u.Completeness.Blockers...)
 	roles := append(append([]string{}, u.Completeness.Required...), "request_source", "field_policy", "route_handler", "control_flow")
 	seen := map[string]bool{}
 	for _, role := range roles {
@@ -35,11 +35,11 @@ func applyValidationPolicy(u graph.StringUse, a *graph.Assessment) {
 		}
 		seen[role] = true
 		if len(u.Completeness.Evidence[role]) == 0 {
-			blockers = append(blockers, graph.Gap{Kind: "validation_evidence_missing", Detail: role, At: u.Sink.Span})
+			blockers = append(blockers, analysis.Gap{Kind: "validation_evidence_missing", Detail: role, At: u.Sink.Span})
 		}
 	}
 	if a.QuestionVersion != validationQuestionVersion {
-		blockers = append(blockers, graph.Gap{Kind: "validation_protocol_missing"})
+		blockers = append(blockers, analysis.Gap{Kind: "validation_protocol_missing"})
 	}
 	a.BlockingGaps = blockers
 	if len(blockers) > 0 || a.Answers["enforcement_coverage"] != "complete" || a.Answers["field_requirement"] != "established" {
@@ -57,7 +57,7 @@ func applyValidationPolicy(u graph.StringUse, a *graph.Assessment) {
 		a.Reason = "The supplied implementation does not support a definite validation judgment."
 	}
 }
-func protocolVersion(u graph.StringUse) string {
+func protocolVersion(u analysis.CandidateUse) string {
 	if validationUse(u) {
 		return validationQuestionVersion
 	}

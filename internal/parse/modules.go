@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 type importBinding struct {
@@ -16,7 +16,7 @@ type importBinding struct {
 	declaration  *sitter.Node
 }
 type sourceModule struct {
-	browserGlobals map[string]graph.Evidence
+	browserGlobals map[string]analysis.Evidence
 	file           string
 	src            []byte
 	hash           string
@@ -31,10 +31,10 @@ type sourceModule struct {
 type moduleSet struct {
 	storageWrites  map[string][]storageWrite
 	producers      []jsonProducer
-	modelEvidence  map[string][]graph.Evidence
+	modelEvidence  map[string][]analysis.Evidence
 	mountedOrigins map[string]bool
-	textSources    map[string]graph.Evidence
-	contextLimits  []graph.Gap
+	textSources    map[string]analysis.Evidence
+	contextLimits  []analysis.Gap
 	contextFields  []string
 	root           string
 	parsers        *parsers

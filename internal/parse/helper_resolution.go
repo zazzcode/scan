@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func (s *moduleSet) resolveCall(m *sourceModule, call *sitter.Node) (*sourceModule, *sitter.Node) {
@@ -38,8 +38,8 @@ func (s *moduleSet) resolveCall(m *sourceModule, call *sitter.Node) (*sourceModu
 	return s.resolve(m, name)
 }
 
-func (s *moduleSet) inputHelperGaps(m *sourceModule, body *sitter.Node, req string, fields []string) []graph.Gap {
-	gaps := []graph.Gap{}
+func (s *moduleSet) inputHelperGaps(m *sourceModule, body *sitter.Node, req string, fields []string) []analysis.Gap {
+	gaps := []analysis.Gap{}
 	sinkStart := uint(0)
 	sinkEnd := uint(0)
 	walkCalls(body, func(call *sitter.Node) {
@@ -96,7 +96,7 @@ func (s *moduleSet) inputHelperGaps(m *sourceModule, body *sitter.Node, req stri
 		if _, helper := s.resolveCall(m, call); helper != nil {
 			return
 		}
-		gaps = append(gaps, graph.Gap{Kind: "input_helper_unresolved", Detail: "call receiving checked input lacks a definition: " + name, At: spanOf(m.file, call)})
+		gaps = append(gaps, analysis.Gap{Kind: "input_helper_unresolved", Detail: "call receiving checked input lacks a definition: " + name, At: spanOf(m.file, call)})
 	})
 	return gaps
 }

@@ -16,13 +16,28 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 
 ## Current work
 
+**Follow-up foundation:** the [common entry/dispatch brief](../project/common-entry-dispatch.md)
+records a separate implementation activity before dynamic-route/GraphQL adapters. Current code
+still has HTTP-shaped entry/check records; naming changes do not implement the generalized model.
+Use the current reviewed Python/terminology revision as the prerequisite, not the old pre-rename API.
+
+**Architecture/terminology closeout:** embedded documents are **Analysis Guidelines**
+(`internal/guidelines`); shared records live in `internal/analysis` as `CandidateUse`,
+`AnalysisReport` and `RouteInventory`. `--analyze` is canonical; `--strings` remains an external
+alias. Fresh analysis JSON is schema 2 with `analysis_guidelines`; schema-1 saved reports still
+export. See the [implemented architecture](../architecture.md) and the
+[closeout contract](../specifications/python-support.md#architecture-and-terminology-closeout).
+Historical reports retain their original versions/answers; changed guideline inputs need fresh judgments.
+
+
 **Active worktree, 2026-11-01: `python-support-base`.** The bounded Python adapter is implemented
 and tested on three pinned apps. Read the [Python contract](../specifications/python-support.md),
 [results and limits](../evaluation/python-support-results.md), and [user guide](../../docs/python-support.md)
 for resumption. Raw results remain under `_test-findings/<app>/run-<id>/`; source keys, hashes and curated
 reports are in root `docs/samples/`. 184 Luna calls were completed; saved answers require exact
 request matching and changed evidence cannot inherit them. The user authorized pushing `python-support-base` and continued general hardening;
-PR publication, integration pushes and merge remain unauthorized. Python NoSQL is out of corpus/unimplemented. Shared trace/report hardening and policy-backed
+The user subsequently authorized committing/pushing this closeout and creating a draft PR into
+`stage`. Integration pushes and merge remain unauthorized. Python NoSQL is out of corpus/unimplemented. Shared trace/report hardening and policy-backed
 validation are documented in [trace judgment](../architecture/trace-judgment.md); all 29 independent
 Python case checks pass. Only final Protected records are green.
 Living answer guides for ThreatByte, the FastAPI app and the added VulnPy corpus are linked from

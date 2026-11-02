@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var jinjaSafeFilter = regexp.MustCompile(`\|\s*safe\b`)
@@ -13,7 +13,7 @@ var jqueryListAppend = regexp.MustCompile(`^\s*([A-Za-z_$][A-Za-z0-9_$]*)\.appen
 var simplePythonInterpolation = regexp.MustCompile(`\{([A-Za-z_][A-Za-z0-9_.]*)\}`)
 var pythonPercentOperand = regexp.MustCompile(`^\s*%\s*([A-Za-z_][A-Za-z0-9_.]*)\s*\)?\s*$`)
 
-func sqliteGuidance(u graph.StringUse, at string) Guidance {
+func sqliteGuidance(u analysis.CandidateUse, at string) Guidance {
 	g := Guidance{Title: "Bind this sqlite3 statement's values", ExampleStatus: "source-derived candidate; not executed or verified as an application patch", Actions: []string{"At " + at + ", keep the sqlite3 execute SQL operand static and place each request-derived value in its separate parameter operand. Supplying parameters does not protect interpolation already present in the SQL text.", "Use ? placeholders for values. Column/table names cannot be bound as values: retain an explicit allow-list and reject unlisted identifiers before constructing those SQL fragments."}}
 	texts := []string{u.Sink.Text}
 	for _, d := range u.Dependencies {

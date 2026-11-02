@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func property(n *sitter.Node, key string, src []byte) *sitter.Node {
@@ -46,7 +46,7 @@ func variable(m *sourceModule, name string) *sitter.Node {
 	return found
 }
 
-func sequelizeBinding(m *sourceModule, name string, depth int) []graph.Evidence {
+func sequelizeBinding(m *sourceModule, name string, depth int) []analysis.Evidence {
 	if depth > 3 {
 		return nil
 	}
@@ -95,7 +95,7 @@ func sequelizeBinding(m *sourceModule, name string, depth int) []graph.Evidence 
 	if p := v.Parent(); p != nil && p.Kind() == "variable_declarator" {
 		assignment = p
 	}
-	out := []graph.Evidence{m.evidence("sink_binding", imp.declaration), m.evidence("sink_binding", assignment)}
+	out := []analysis.Evidence{m.evidence("sink_binding", imp.declaration), m.evidence("sink_binding", assignment)}
 	if ctor.StartByte() != v.StartByte() || ctor.EndByte() != v.EndByte() {
 		out = append(out, m.evidence("sink_binding", ctor))
 	}
@@ -131,11 +131,11 @@ func literalTemplate(n *sitter.Node, m *sourceModule, values map[string]string) 
 	return out.String(), true
 }
 
-func (s *moduleSet) persistenceEvidence(m *sourceModule, path string) ([]graph.Evidence, []graph.Evidence) {
+func (s *moduleSet) persistenceEvidence(m *sourceModule, path string) ([]analysis.Evidence, []analysis.Evidence) {
 	if m == nil {
 		return nil, nil
 	}
-	var mapping, models []graph.Evidence
+	var mapping, models []analysis.Evidence
 	walkCalls(m.tree.RootNode(), func(call *sitter.Node) {
 		fn := call.ChildByFieldName("function")
 		if fn == nil || fn.Kind() != "member_expression" {
@@ -208,7 +208,7 @@ func (s *moduleSet) persistenceEvidence(m *sourceModule, path string) ([]graph.E
 	return mapping, models
 }
 
-func (s *moduleSet) modelContext(m *sourceModule, name string) []graph.Evidence {
+func (s *moduleSet) modelContext(m *sourceModule, name string) []analysis.Evidence {
 	imp, ok := m.imports[name]
 	if !ok {
 		return nil
@@ -218,7 +218,7 @@ func (s *moduleSet) modelContext(m *sourceModule, name string) []graph.Evidence 
 		return nil
 	}
 	// Include the entire model declaration: field validators alone omit setters/hooks.
-	out := []graph.Evidence{target.evidence("model_constraints", target.tree.RootNode())}
+	out := []analysis.Evidence{target.evidence("model_constraints", target.tree.RootNode())}
 	s.includeHelpers(target, target.tree.RootNode(), &out, map[string]bool{}, 0)
 	return out
 }

@@ -24,7 +24,7 @@ func TestStoredTemplatePathsAndControls(t *testing.T) {
 			writeSource(t, root, "app.js", "const express=require('express');const mongoose=require('mongoose');const marked=require('marked');const Note=mongoose.model('Note');const app=express();app.set('view engine','ejs');app.locals.marked=marked;app.post('/write',(req,res)=>{"+tt.write+"});app.get('/read',(req,res)=>{Note.find({}).exec(function(err,notes){res.render('page',{notes})})})")
 			writeSource(t, root, "views/page.ejs", tt.template)
 			writeSource(t, root, "package.json", `{"dependencies":{"marked":"`+tt.version+`"}}`)
-			r, err := Strings(root, "app.js")
+			r, err := Analyze(root, "app.js")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -66,7 +66,7 @@ func TestStoredWritePathsStaySeparate(t *testing.T) {
 				"app.post('/create',(req,res)=>{"+tt.create+"});"+fmt.Sprintf(update, tt.update)+
 				"app.get('/',(req,res)=>{Note.find({}).exec(function(err,notes){res.render('page',{notes})})})")
 			writeSource(t, root, "views/page.ejs", `<% notes.forEach(function(note){ %><%- note.body %><% }); %>`)
-			r, err := Strings(root, "app.js")
+			r, err := Analyze(root, "app.js")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -114,7 +114,7 @@ func TestBranchPathsAndPreconditions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "app.js", "const express=require('express');const escapeHtml=require('escape-html');const app=express();app.get('/x',(req,res)=>{"+tt.body+"})")
-			r, err := Strings(root, "app.js")
+			r, err := Analyze(root, "app.js")
 			if err != nil {
 				t.Fatal(err)
 			}

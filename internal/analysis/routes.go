@@ -1,14 +1,11 @@
-// Package graph defines source-backed route and string-use analysis artifacts.
-//
-// The next phase reads this document to judge validation and sanitization.
-// It is syntax: route registrations and the handler chain attached to them.
-package graph
+// Package analysis defines source-backed security analysis records shared by adapters, judges and reports.
+package analysis
 
-// SchemaVersion is the JSON contract version.
-const SchemaVersion = 1
+// RouteSchemaVersion is the route inventory JSON contract version.
+const RouteSchemaVersion = 1
 
-// Graph is one scan of a repository.
-type Graph struct {
+// RouteInventory describes supported route registrations, not a whole-repository graph.
+type RouteInventory struct {
 	SchemaVersion int     `json:"schema_version"`
 	Root          string  `json:"root"`
 	Routes        []Route `json:"routes"`

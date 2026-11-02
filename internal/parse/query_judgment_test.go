@@ -1,7 +1,7 @@
 package parse
 
 import (
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"strings"
 	"testing"
 )
@@ -20,7 +20,7 @@ func TestConditionalQueryOutputConstraints(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "server.ts", `import express from 'express';import * as MarsDB from 'marsdb';const api=express();const records=new MarsDB.Collection('x');`+tt.prefix+`api.get('/input',(req,res)=>{const id=`+tt.value+`;records.find({$where:'this.id == '+id})});`)
-			r, err := Strings(root, "server.ts")
+			r, err := Analyze(root, "server.ts")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -37,7 +37,7 @@ func TestAutomaticCollectionProvenance(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "data.ts", `import * as MarsDB from 'marsdb';export const records=new MarsDB.Collection('records')`)
 	writeSource(t, root, "server.ts", `import express from 'express';import * as store from './data';const api=express();api.get('/lookup',(req,res)=>store.records.find({$where:'this.id == '+req.query.id}));`)
-	r, err := Strings(root, "server.ts")
+	r, err := Analyze(root, "server.ts")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,11 +78,11 @@ func TestAutomaticQueryEvidenceControls(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "data.ts", `import * as MarsDB from 'marsdb';export const records=new MarsDB.Collection('x');`)
 			writeSource(t, root, "server.ts", `import express from 'express';const api=express();`+tt.source)
-			r, err := Strings(root, "server.ts")
+			r, err := Analyze(root, "server.ts")
 			if err != nil {
 				t.Fatal(err)
 			}
-			var use *graph.StringUse
+			var use *analysis.CandidateUse
 			for i := range r.Uses {
 				if r.Uses[i].Completeness != nil {
 					use = &r.Uses[i]

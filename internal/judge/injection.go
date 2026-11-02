@@ -1,8 +1,8 @@
 package judge
 
-import "github.com/zazzcode/zazzles/internal/graph"
+import "github.com/zazzcode/zazzles/internal/analysis"
 
-func questionsFor(use graph.StringUse) []question {
+func questionsFor(use analysis.CandidateUse) []question {
 	if validationUse(use) {
 		return validationQuestions
 	}

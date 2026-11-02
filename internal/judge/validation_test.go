@@ -1,7 +1,7 @@
 package judge
 
 import (
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"testing"
 )
 
@@ -19,17 +19,17 @@ func TestValidationPolicyRequiresIndependentEvidence(t *testing.T) {
 		{name: "old protocol", validation: "insufficient", coverage: "complete", requirement: "established", version: questionVersion, want: "needs_evidence"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &graph.Completeness{ClaimKind: "validation", Evidence: map[string][]graph.Evidence{}}
+			c := &analysis.Completeness{ClaimKind: "validation", Evidence: map[string][]analysis.Evidence{}}
 			for _, role := range []string{"request_source", "field_policy", "route_handler", "control_flow"} {
 				if role != tt.missing {
-					c.Evidence[role] = []graph.Evidence{{Kind: role, Text: "source evidence"}}
+					c.Evidence[role] = []analysis.Evidence{{Kind: role, Text: "source evidence"}}
 				}
 			}
 			if tt.blocker {
-				c.Blockers = []graph.Gap{{Kind: "input_helper_unresolved"}}
+				c.Blockers = []analysis.Gap{{Kind: "input_helper_unresolved"}}
 			}
-			u := graph.StringUse{Kind: "input_validation_candidate", Completeness: c}
-			a := graph.Assessment{Status: "completed", QuestionVersion: tt.version, Answers: map[string]string{"validation": tt.validation, "enforcement_coverage": tt.coverage, "field_requirement": tt.requirement}}
+			u := analysis.CandidateUse{Kind: "input_validation_candidate", Completeness: c}
+			a := analysis.Assessment{Status: "completed", QuestionVersion: tt.version, Answers: map[string]string{"validation": tt.validation, "enforcement_coverage": tt.coverage, "field_requirement": tt.requirement}}
 			applyPolicy(u, &a)
 			if a.FindingStatus != tt.want {
 				t.Fatalf("got %+v want %s", a, tt.want)
@@ -42,12 +42,12 @@ func TestValidationPolicyRequiresIndependentEvidence(t *testing.T) {
 }
 
 func TestValidationRespectsAdditionalRequiredRoles(t *testing.T) {
-	c := &graph.Completeness{ClaimKind: "validation", Required: []string{"schema_constraints"}, Evidence: map[string][]graph.Evidence{}}
+	c := &analysis.Completeness{ClaimKind: "validation", Required: []string{"schema_constraints"}, Evidence: map[string][]analysis.Evidence{}}
 	for _, role := range []string{"request_source", "field_policy", "route_handler", "control_flow"} {
-		c.Evidence[role] = []graph.Evidence{{Kind: role}}
+		c.Evidence[role] = []analysis.Evidence{{Kind: role}}
 	}
-	a := graph.Assessment{QuestionVersion: validationQuestionVersion, Answers: map[string]string{"field_requirement": "established", "validation": "sufficient", "enforcement_coverage": "complete"}}
-	applyPolicy(graph.StringUse{Kind: "input_validation_candidate", Completeness: c}, &a)
+	a := analysis.Assessment{QuestionVersion: validationQuestionVersion, Answers: map[string]string{"field_requirement": "established", "validation": "sufficient", "enforcement_coverage": "complete"}}
+	applyPolicy(analysis.CandidateUse{Kind: "input_validation_candidate", Completeness: c}, &a)
 	if a.FindingStatus != "needs_evidence" || len(a.BlockingGaps) != 1 {
 		t.Fatal("adapter's additional required role was ignored")
 	}

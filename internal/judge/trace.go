@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 // DecisionTrace contains the exact JSON bodies used in one assessment, never
@@ -21,9 +21,9 @@ type DecisionTrace struct {
 
 // Replay applies the current decoder/policy to a saved decision only when its
 // exact request still matches the supplied use. It makes no network request.
-func (c *Client) Replay(use graph.StringUse, trace DecisionTrace) graph.Assessment {
+func (c *Client) Replay(use analysis.CandidateUse, trace DecisionTrace) analysis.Assessment {
 	version := protocolVersion(use)
-	a := graph.Assessment{Status: "failed", Provider: c.provider, Model: c.model, QuestionVersion: version}
+	a := analysis.Assessment{Status: "failed", Provider: c.provider, Model: c.model, QuestionVersion: version}
 	payload, err := c.payload(use)
 	if err != nil || !sameRequest(payload, trace.Request) || trace.HTTPStatus != 200 || trace.QuestionVersion != version {
 		a.Reason = "Saved decision request does not exactly match the current evidence/protocol, or the response failed."
@@ -45,7 +45,7 @@ func (c *Client) Replay(use graph.StringUse, trace DecisionTrace) graph.Assessme
 }
 
 // Preview prepares the exact JSON request without making a network call.
-func (c *Client) Preview(use graph.StringUse) (DecisionTrace, error) {
+func (c *Client) Preview(use analysis.CandidateUse) (DecisionTrace, error) {
 	payload, err := c.payload(use)
 	version := protocolVersion(use)
 	return DecisionTrace{QuestionVersion: version, Request: payload, RequestBytes: len(payload)}, err
@@ -53,7 +53,7 @@ func (c *Client) Preview(use graph.StringUse) (DecisionTrace, error) {
 
 // AssessTrace evaluates one use and returns its request/response evidence for
 // bounded calibration. It has the same limits and no-retry behavior as Assess.
-func (c *Client) AssessTrace(ctx context.Context, use graph.StringUse) (graph.Assessment, DecisionTrace) {
+func (c *Client) AssessTrace(ctx context.Context, use analysis.CandidateUse) (analysis.Assessment, DecisionTrace) {
 	var trace DecisionTrace
 	assessment := c.assess(ctx, use, &trace)
 	return assessment, trace

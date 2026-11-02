@@ -134,8 +134,10 @@ Native Go 1.27.3 darwin/arm64, with `GOTOOLCHAIN=local`, `GOPROXY=off` and a loc
   clone at the same pin with identical source hashes and two exact decision replays, no extra calls.
 
 Raw runs remain under `_test-findings/<app>/run-<id>/`; the local results report names exact runs and
-records source checks. The source clones were not remediated or dependency-modified. Work is committed
-and pushed on `python-support-base`; there is no integration push, PR publication or merge.
+records source checks. The source clones were not remediated or dependency-modified. At the original evaluation closeout, work was committed
+and pushed on `python-support-base` without PR publication, integration push or merge.
+The user subsequently authorized the terminology closeout and draft PR publication into `stage`;
+merge remains human-operated.
 
 ## Remaining boundaries
 
@@ -161,3 +163,34 @@ coverage warnings. Offline results: 11 static entries, six unassessed records, n
 Semgrep CE reports eight findings and Bearer 21 with pinned local rules; neither reports the three
 SQL variants. The initial sandbox-failed Bearer worker run was rejected and rerun successfully.
 Full details and provenance live with the sample; new framework/family work remains future branches.
+
+## Architecture and terminology closeout verification
+
+The naming migration and [implemented architecture](../architecture.md) now distinguish Analysis
+Guidelines, candidate uses, route inventories, evidence trace graphs and the planned repository graph.
+The [technical approach](../../docs/technical-approach.md) records design strengths, primary SAST/prior-art
+references and evaluation limits. Dynamic route/GraphQL entry-model pressure points are documented
+as future design work, not implemented coverage.
+
+Verified with native Go 1.27.3, `GOTOOLCHAIN=local`, `GOPROXY=off` and the local ignored Go cache:
+
+- `go test -race ./...`, `go vet ./...`, `go build ./...` and
+  `go build -o bin/scan ./cmd/scan` passed. The sandbox initially blocked loopback listeners;
+  the complete race suite passed with local HTTP-stub access. No tests were skipped.
+- `gofmt -l cmd internal` and `git diff --check` are clean. Changed Markdown relative links
+  and all incoming main-architecture anchor references resolve. No repository doc linter is configured.
+- The built CLI scanned TypeScript and a source-only Python fixture, generated schema-2 bundles
+  with guideline metadata and unassessed model statuses, and exported both to HTML/SARIF.
+  `--analyze` and compatibility alias `--strings` produced byte-identical JSON.
+- All seven historical sample reports exported to HTML and SARIF without modifying saved JSON.
+  The original 29 saved-report case checks still pass (18 ThreatByte, 3 FastAPI, 8 Erlik).
+  These checks validate historical evidence, not new live judgments.
+- Four golden fixtures preserve exactly the previous entries, evidence, dependencies and gaps;
+  analysis goldens change only schema and renamed/versioned guideline metadata. Route JSON stays schema 1.
+- Tests cover schema-1/schema-2 export, legacy metadata decoding, both provider guideline envelopes
+  and rejection of saved decisions after guideline text/key changes, even with unchanged source.
+
+No paid model calls or target application execution occurred. Historical source-containing artifacts,
+answers and provenance remain unchanged. Fresh model inputs use renamed/versioned guidelines;
+existing answers cannot serve as calibration of those changed requests. The known VulnPy misses
+and remaining dynamic-registration limits are unchanged.

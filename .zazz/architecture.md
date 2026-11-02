@@ -1,267 +1,253 @@
 # Architecture
 
-**Architecture direction, updated 2026-10-31; implementation follows explicitly authorized contracts.** This document owns
-technical responsibilities and contracts. Product purpose/state lives in [project.md](project.md),
-rationale and decisions in the [proposal](project/03-jev-design-proposal.md), and delivery order in the
-[implementation plan](project/implementation-plan.md).
+**Implemented architecture, updated 2026-11-02.** This document owns package responsibilities,
+terminology and pipeline boundaries. Planned components are labeled explicitly. Product direction
+lives in [project.md](project.md), decisions in the [proposal](project/03-jev-design-proposal.md),
+and delivery order in the [implementation plan](project/implementation-plan.md).
 
 ## Current provider decision
 
-**2026-10-31 user direction:** use a provider-neutral **semantic judge**. OpenAI GPT Decisions
-and TypeSafe Jev are alternative providers, with room for future decision models. OpenAI is the first
-integration target; Jev remains supported by the design. These models are intended to provide faster,
-lower-cost decisions than general LLM review; actual accuracy, speed, and cost require evaluation.
-A subscription is a setup consideration, not an architecture dependency.
+Zazzles uses a provider-neutral **semantic judge** to analyze source-backed security claims.
+The Go client supports explicit `openai` and `jev` transports. Development and live calibration
+use OpenAI Decisions with `gpt-6-luna`; transport support does not establish equivalent provider
+accuracy. Credentials do not select a provider or authorize a paid request. No provider/model
+fallback occurs. See [decision-model setup](../docs/decision-models.md).
 
-The judge evaluates whether strings are sufficiently validated/protected for their uses, and whether
-the supplied source evidence supports a potential vulnerability. The long-term objective is selected
-OWASP Top 10 vulnerability families, each with explicit evidence requirements and evaluation cases.
-The target repository is the application being analyzed. Tree-sitter and Go construct its inbound API
-entry points, internal code paths/value flow, outbound service requests, and response continuations.
-The [repository graph design](architecture/repository-graph.md) owns those structures and boundaries.
+Decision-model judgment is core to a completed security assessment. Offline inventory, evidence
+inspection, deterministic construction findings and saved-report export remain available.
+A run without `--judge` leaves model assessments `not_run`; it does not complete a model-assessed
+scan. A request cap or transport failure remains visible.
 
-The phrase **Decision Assessment** below means this provider-neutral judge role. Provider selection
-is explicit (`openai` or `jev`); separate keys configure each adapter. No automatic provider fallback
-or second-provider source transmission is implied. Wire formats, model versions, question translation,
-calibration, and costs remain provider-specific. The independent LLM Findings Reviewer is a separate
-role; its model/transport selection remains open. See the [OpenAI setup](docs/openai-decisions-setup.md)
-and [Jev research/setup](project/04-jev-validation-research.md#what-can-happen-before-a-key-exists).
+**Independent Findings Review is planned.** It is a separate evidence review by an LLM reviewer,
+not another name for the implemented semantic judge or the report's Review category.
+There is no implemented reviewer stage or reviewer-completion field in current reports.
 
-The current route JSON is a syntax inventory, not the normalized security IR proposed below.
-Receiver provenance, imported handler factories, router mounts, and effective middleware ordering need
-explicit contracts before route-level security conclusions. Schema-v1 route IDs contain byte offsets;
-they MUST NOT be treated as edit-stable finding identities. See the
-[assessment](project/06-route-validation-assessment.md#architecture-and-plan-assessment).
+## Design rationale and strengths
+
+The [technical approach](../docs/technical-approach.md) explains the combination of bounded static
+evidence, semantic judgment, separate claims, explicit blockers and preservation/repair guidance.
+It compares documented SAST capabilities, distinguishes product differentiation from established
+prior art and links measured case evidence and known misses. Better recall, precision, cost and
+novel-repository generalization remain hypotheses until matched independent evaluation.
 
 ## Detailed analysis designs
 
-- [Repository graph](architecture/repository-graph.md): source/control/value and API-boundary structure.
-- [Evidence and claims](architecture/evidence-and-claims.md): route-to-use slices, relevant functions,
-  library models, precise requirements, completeness and phase acceptance cases.
-- [Reporting and SARIF](architecture/reporting-and-sarif.md): route-oriented findings, multiple
-  complementary remediations and a planned interoperable SARIF export.
-- [SCA follow-on](architecture/sca-design.md): ecosystem dependency auditing after code-path analysis.
+- [Repository graph](architecture/repository-graph.md): target-repository graph direction and bounded implemented subsets.
+- [Evidence and claims](architecture/evidence-and-claims.md): source slices, requirements and completeness.
+- [Trace judgment](architecture/trace-judgment.md): implemented evidence bundles, gates and exact-request replay.
+- [Reporting and SARIF](architecture/reporting-and-sarif.md): report records and implemented bounded SARIF export.
+- [Standalone HTML](architecture/html-reporting.md): human-facing report and disclosure rows.
+- [SCA follow-on](architecture/sca-design.md): planned dependency auditing.
 
 ## 1. Architecture premise
 
-Tree-sitter extracts syntax. Go establishes supported control and data dependencies. **The configured semantic judge (GPT Decisions or Jev) is the
-primary semantic assessor for whether a candidate string is adequately validated or sanitized for
-its particular use. The LLM Findings Reviewer reviews identified issues against their evidence.**
-Go retains orchestration, reconciliation, reporting, and CI policy.
+Tree-sitter extracts syntax. Go adapters resolve supported bindings and establish bounded value/control
+relationships. The semantic judge evaluates named claims using that evidence and the embedded
+Analysis Guidelines. Go policy prevents model answers from overriding missing source facts or blockers.
+The reporter preserves evidence and answers while producing Findings, Review and Protected records.
 
-All zazzles-authored scanner and code-analysis code is Go: language adapters, graph/flow analysis,
-rules, model API clients, orchestration, reporting, and evaluation harnesses. Python and other target
-languages describe code being scanned, not implementation runtimes. Tree-sitter's native parser and
-grammars remain dependencies with explicit build requirements; this is not a pure-Go dependency claim.
-The configured judge and LLM reviewer are external inference services accessed through Go adapters.
+The scanner and its language adapters are implemented in Go. Tree-sitter grammars and bindings
+require cgo and a C compiler. Python is a target language, not a separate scanner runtime.
+Repository maintenance and evaluation utilities also include Python scripts; they are outside the
+scanner binary. Analyzed applications are read as source, never executed by the analysis pipeline.
 
-The model split aims to use the decision model for fast, lower-cost decisions over candidates and reserve deeper
-LLM Findings Review for identified issues, uncertain candidates, and the protected-case audit below.
-Measure total pipeline cost and latency, including review volume, retries, and context assembly.
-A per-request advantage alone would not establish end-to-end savings.
+| Term | Meaning |
+|---|---|
+| Analysis Guidelines | Versioned language documents with secure coding guidance and evidence interpretation instructions |
+| Application requirement | A concrete field or behavior constraint supplied by source or an explicit scan check |
+| API model | A versioned library contract, applicable only with verified binding/provenance |
+| Entry | A logical analysis starting point; currently represented by separate route/handler and browser records |
+| Candidate use | A value-consuming security operation requiring claim-specific analysis |
+| Claim | A particular question about injection, validation, rendering or logging |
+| Evidence | Source text, span and snapshot hash supporting an observed fact |
+| Dependency / trace | Supported static value relationships under declared conditions, not runtime execution |
+| Gap | A fact the bounded analysis could not establish |
+| Blocker | A gap relevant to the named claim that prevents a definitive conclusion |
+| Assessment | Raw model answers, completion metadata and policy interpretation |
+| Finding record | A presentation record; it can describe a defect, unresolved analysis or protection |
+| Review | The current report category for unresolved evidence; no independent reviewer is implied |
+| Findings Review | A planned independent review stage for identified issues and selected controls |
 
-Experiments measure the decision model's accuracy, required context, and failure cases. Findings Review covers all
-identified issues in the full pipeline. Reviewer model selection, budgets, and calibrated thresholds
-remain open.
-
-| Role | Responsibility | Output |
-|---|---|---|
-| Tree-sitter and Go | Extract code, resolve supported relationships, trace values and guards | Source-backed candidates and analysis gaps |
-| Decision Assessment | Assess string validation, sanitization, and relevance to the named sink | Typed assessments and proposed issues |
-| LLM Findings Reviewer | Independently inspect the evidence for each identified issue, then compare with the proposed assessment | Supported, disputed, or needs more evidence; evidence references |
-| Go policy/reporter | Preserve assessments, apply explicit policy, report findings and review completeness | Auditable report and configured CI result |
-
-Terminology: a **candidate** is a string/use needing assessment; an **identified issue** is a proposed
-finding raised by the decision model or deterministic rules. **Findings Review** is the stage performed by the
-**LLM Findings Reviewer**; reports retain findings together with their assessment and review status.
-
-A call path means potential reachability; a dataflow trace means a supported value dependency under
-declared assumptions. Neither a model judgment nor a trace proves runtime execution or exploitability.
+**Poor practice** remains a finding classification for established construction or enforcement defects.
+It is distinct from the former document/type name `Practice`; the classification is not renamed.
+No trace or model judgment proves runtime execution or exploitability.
 
 ## 2. Pipeline
 
 ```mermaid
 flowchart TD
-    Repo["Target repository"] --> Parse["Tree-sitter CST and queries"]
-    Parse --> IR["Go adapters, resolution, and normalized IR"]
-    IR --> Rules["Track A: deterministic rule findings"]
-    IR --> Flow["Go CFG and bounded dataflow"]
-    Flow --> Bundle["Candidate strings, source-to-sink evidence, and gaps"]
-    Bundle --> Decision["Semantic judge: GPT Decisions or Jev"]
-    Decision --> Issues["Identified issues and uncertain cases"]
-    Decision --> Retained["Retain all assessments for coverage and audit"]
-    Retained -->|Protected-case audit sample| Review
-    Rules --> Review["Findings Review"]
-    Issues --> Review
-    Review --> Policy["Go: reconcile results and apply policy"]
-    Retained --> Policy
-    Policy --> Report["Findings, review status, coverage, JSON and Markdown"]
+    Repo["Target source files"] --> Walk["walk and lang: selected manifest"]
+    Walk --> Parse["parse: Tree-sitter and language/framework adapters"]
+    Parse --> Evidence["analysis: entries, candidate uses, evidence and gaps"]
+    Guidelines["guidelines: embedded Analysis Guidelines"] --> Judge
+    Evidence --> Judge["judge: bounded model requests and typed answers"]
+    Judge --> Policy["judge: claim-specific policy gates"]
+    Policy --> Report["report: classification, guidance, JSON / HTML / SARIF"]
+    Evidence -->|"Offline inspection and deterministic construction findings"| Report
 ```
 
-Every identified rule or decision-model issue enters Findings Review in the full pipeline. Uncertain candidates
-also enter review; a sampled set of the decision model's adequately-protected candidates provides a false-negative
-audit. This sample measures missed issues in addition to reviewing identified ones. Local-only and
-decision-model-only runs are useful for diagnostics/experiments, but their reports explicitly mark omitted stages.
+`cmd/scan` wires these stages. The current request loop is sequential, explicitly capped and
+prioritizes SQL/NoSQL candidates. Failed or capped requests remain failed/unassessed; no retry or
+provider fallback is automatic. Source evidence and candidate ordering are deterministic for identical
+inputs; live model predictions have no assumed byte-stability guarantee.
 
-Ingestion and parsing use bounded workers. Graph construction has explicit ownership; workers do not
-mutate shared graph state without a defined merge strategy. Independent analyses and model requests
-may use bounded pools. Stable sorting removes scheduling dependence from deterministic artifacts.
+There is no general repository IR builder, independent reviewer, persistent cache or severity CI gate
+in this pipeline. Bounded worker pools and richer graph indexes are future architecture choices.
 
 ## 3. Parsing and language adapters
 
-The route MVP uses [tree-sitter/go-tree-sitter](https://github.com/tree-sitter/go-tree-sitter)
-with pinned JS/TS grammars in `go.mod`. The binding uses native resources that need explicit lifetime
-management. The MVP requires cgo and a C compiler. Future parser/IR contracts must verify grammar compatibility,
-error recovery, and supported platforms before promising a static binary.
+`internal/parse` owns Tree-sitter lifetimes, module resolution, framework bindings, bounded flow,
+security operation models and evidence assembly. Its name reflects its origin; it currently owns
+more than syntax parsing. Shared records do not depend on Tree-sitter nodes or HTTP clients.
 
-Tree-sitter queries identify syntax such as calls, assignments, branches, route registrations, and
-candidate source/sink/validator APIs. A query match is not proof of validation or of data reaching a
-sink. A function named `sanitize` is only a candidate guard.
+- JS/TS analysis covers supported Express/CommonJS/ESM routes, helpers, browser entries,
+  database/logging/outbound operations, templates and selected stored/cross-tier XSS relationships.
+- Python uses `python_*.go` files for local modules, Flask/Blueprint, RESTX and FastAPI routes,
+  value/control flow, DB-API, validation, logging, HTTP and template semantics. Supported inline
+  template scripts reuse browser analysis. See [Python coverage](../docs/python-support.md).
+- `Analyze` discovers supported registration files across languages when `--entry` is omitted;
+  `AnalyzeWithChecks` additionally accepts explicitly declared security requirements.
+- File-extension recognition in `internal/lang` does not imply an implemented language analyzer.
 
-Each language adapter owns grammar selection, query sets, symbol/module resolution, syntax lowering,
-and framework/library transfer models. Adding a language includes its control/dataflow semantics,
-not merely a grammar and resolver. The shared core consumes normalized operations and declared
-capabilities. A new language may expose an IR gap; revisit the contract through a spec rather than
-forcing incorrect semantics into an existing operation.
+An API name alone is not proof of binding, source control or protection. Unknown calls, dynamic
+registration, helper limits and unsupported control/heap behavior retain explicit uncertainty.
+Adapter-specific limits and current case evidence belong in their contracts and coverage guides.
 
-Initial focus is JS/TS: aliases, barrel re-exports, inline handlers, middleware passed by reference,
-shadowing, and package boundaries. Python decorators, Go receiver/interface calls, and Java overloads
-are design pressure cases; unsupported behavior remains explicit until its adapter lands.
+### Multiple entry and dispatch mechanisms
+
+**Architecture decision:** analysis roots MUST be independent of HTTP routes. Entry kinds and dispatch
+mechanisms are separate dimensions; language is another. An entry does not, by itself, establish an
+untrusted source. Input origins and trust assumptions remain explicit evidence.
+
+The shared design separates these concepts:
+
+| Concept | Responsibility |
+|---|---|
+| Entry point | A logical analysis root with identity, kind, location and input/context roles |
+| Registration | Source/configuration evidence exposing or wiring an entry, including generated registrations |
+| Dispatch binding | A supported relationship from an entry/registration to possible callables, with conditions, order, provenance and unresolved alternatives |
+| Callable | The function/method implementation, independent of the number or kind of registrations invoking it |
+| Invocation context | Actual parameter/receiver/closure bindings and applicable controls for a particular dispatch path |
+| Transport | Optional delivery context, such as an HTTP endpoint carrying GraphQL operations |
+
+HTTP handlers and browser entries are the current consumers. Future examples include GraphQL fields,
+message consumers, CLI commands and scheduled jobs. Direct calls, decorator/factory registration,
+lookup tables, schema resolver bindings and event subscriptions are dispatch mechanisms, not entry
+kinds. One entry can have multiple possible targets; a callable can be exposed by multiple entries
+or registrations. Shared bodies MUST NOT lend a guard from one dispatch context to another.
+
+These are design responsibilities, not instructions to scaffold empty adapters. **The current code
+has not yet implemented this common entry/dispatch model:** `Entry` contains `Route`, checks select
+by method/path, and candidates have separate route/browser IDs. The terminology closeout renames
+records without removing those HTTP assumptions. Route inventory remains a useful HTTP-specific
+view, not the future canonical analysis-root abstraction.
+
+The next entry-model implementation should first use the existing HTTP and browser consumers to
+establish shared entry identity and dispatch bindings, with compatibility for saved reports. Then
+add bounded generated-route and GraphQL adapters. This foundation belongs before additional entry
+frameworks accumulate route-specific assumptions; it does not require a full repository IR rewrite.
+
+### Future dynamic routes and GraphQL
+
+**Not implemented:** these adapters build on the entry/dispatch decision above.
+
+| Boundary | Required capability | Existing core to reuse |
+|---|---|---|
+| Dynamic registration | Retain factory/loop/configuration provenance, finite target alternatives and unresolved registrations | Supported helper/value transfers, evidence and claim gates |
+| GraphQL | Connect schema fields/operation kinds to resolvers and nested field transitions; associate transport separately | Sink models and claim-specific judgment/reporting |
+| Input provenance | Distinguish resolver arguments, parent result and context; establish actual coercion and application constraints | Named requirements, API contracts and validation/protection separation |
+| Coverage | Distinguish undiscovered entries/unresolved dispatch from incomplete traces within discovered entries | Explicit gaps and snapshot provenance |
+| Scale | Bound dispatch alternatives and recursive field/helper traversal; retain invocation context and reusable summaries | Deterministic bounded evidence and exact-request identity |
+
+GraphQL executes selected fields through resolvers; a resolver can receive a parent object, field
+arguments and request context. Those are distinct provenance roles. [GraphQL execution](https://graphql.org/learn/execution/)
+Authentication at the transport or a directive name alone does not establish field/object authorization;
+actual enforcement may live in business logic. Authorization remains a separate future claim family.
+[GraphQL authorization](https://graphql.org/learn/authorization/)
+
+Unknown registrations, resolver dispatch, loaders and runtime composition MUST remain gaps rather
+than inferred protection. The selector/check schema and reports will need entry-specific locations
+and requirements; method/path remains HTTP metadata. A shared model does not supply new source,
+flow, authorization or framework semantics automatically.
 
 ## 4. Normalized representation and graph views
 
-The [repository graph design](architecture/repository-graph.md) owns node/edge semantics, target
-repository boundaries, outbound requests and response continuations, provenance, and traversal limits.
-The overview here summarizes the shared representation; implementation contracts select the supported
-subset without implying the complete design exists.
+`internal/analysis` is the shared record model. It contains `RouteInventory`, `AnalysisReport`,
+`CandidateUse`, `Evidence`, `Dependency`, `Completeness`, `Assessment` and presentation records.
 
-The proposed IR carries modules, callables, basic blocks, statements/operations, value definitions,
-uses, and source spans. Security roles are annotations and can overlap; a callable-only node model is
-insufficient for assignments and branch guards.
+Three structures MUST remain distinct:
 
-| View | Representative relationships | Meaning |
-|---|---|---|
-| Module and symbols | `IMPORTS`, `RE_EXPORTS`, `REFERENCES`, `CALLS` | Names and possible invocation targets |
-| Type relationships | `INHERITS`, `IMPLEMENTS` | Supported static type relationships |
-| Control flow | `NEXT`, `TRUE_BRANCH`, `FALSE_BRANCH`, `RETURN` | Possible ordering within a callable |
-| Data dependencies | `DEFINES`, `USES`, `ASSIGNS`, `ARG_TO_PARAM`, `RETURN_TO_CALL` | Supported value transfer |
-| Framework/security | route registration, source/sink/guard annotations | Rule/model facts with provenance |
+- **Route inventory:** `RouteInventory` lists syntactic route registrations and handler/call steps.
+  Its schema-1 JSON is not a whole-program control/dataflow graph.
+- **Evidence trace graph:** `internal/judge` projects supplied dependencies/control edges into a
+  request-local graph with evidence references, operand roles and a coverage ledger. It discovers
+  no additional calls from surrounding text.
+- **Repository graph:** the broader [repository graph design](architecture/repository-graph.md)
+  describes planned canonical modules, operations, control flow and adjacency indexes. The complete
+  generalized IR and indexes are not implemented by the current record package.
 
-Exact enums and serialized types belong to a future schema spec. Relations carry provenance, source
-spans, the resolver/transfer rule used, and unresolved/approximate status. Extracted syntax and inferred
-relationships are distinguishable; these labels are not statistical confidence scores.
-
-CFGs and call graphs can contain cycles. They are not assumed to be DAGs. Traversal uses bounded
-worklists/summaries and explicitly reports recursion, loop, depth, or candidate limits reached.
-
-Identity separates semantic identity from display locations. Symbols include module/namespace,
-receiver and signature discriminators as needed; anonymous callables and multiple sink sites need
-stable disambiguation. Line numbers alone are not identities. Rename/move/collision behavior is a
-future contract to test, not an assertion that any symbol chain is globally unique.
+Route IDs include source offsets. They identify the analyzed snapshot and are not edit-stable issue
+fingerprints. Candidate identities remain independent of model answers and report classifications.
 
 ### Graph storage decision
 
-Use zazzles-owned typed Go adjacency structures as the canonical in-memory representation. Node/edge
-records carry relation kinds and provenance; forward/reverse indexes support relation-filtered
-queries. Preserve multiple relations between the same endpoints and self-edges where the IR requires
-them. Dense internal indexes may optimize access but are distinct from persistent semantic identities.
-
-Build with explicit ownership, then expose stable read views to analysis workers. Keep per-analysis
-worklist/visited/abstract state separate from the shared graph; traversal state may include value and
-call context, not only a node ID. Stable ordering is part of the graph contract.
-
-Gonum is not the planned storage dependency. A specific algorithm may later justify a small adapter
-over a selected graph view, without duplicating the canonical store. The
-[decision rationale](project/03-jev-design-proposal.md#graph-representation-decision) records tradeoffs,
-validation work, and conditions for reconsidering this choice.
+**Planned:** use owned typed Go adjacency structures for the generalized repository graph; preserve
+relation kinds, provenance, parallel relations and self-edges. Traversal state remains separate from
+shared records. CFG/call graphs can contain cycles and require bounded worklists and explicit limits.
+Gonum is not a storage dependency. See the [decision rationale](project/03-jev-design-proposal.md#graph-representation-decision).
 
 ## 5. Go analysis engine
 
 ### Local flow first
 
-The first flow slice covers a declared JS/TS subset: source values, assignments/reassignments,
-parameters, expression dependencies, branches, returns, and bounded loop handling. A spec must define
-join/merge semantics and conservative handling for unknown operations. Fields, aliases, closures,
-exceptions, async behavior, and heap mutation are separate capability decisions, never silently
-assumed correct.
+Language adapters follow their supported assignments, projections, alternatives, guards and operation
+operands. Unsupported loops, aliases, exception paths and dispatch remain gaps according to the adapter.
+Source availability does not establish complete control flow or runtime feasibility.
 
 ### Bounded interprocedural flow second
 
-Resolved argument-to-parameter and return-to-call edges connect local analyses. Function summaries
-record input/output dependencies and mitigation facts under declared assumptions. Limits include call
-depth, recursion iterations, candidate count, and per-source work. Unknown calls and external packages
-produce an explicit gap unless a versioned library model defines their behavior.
-
-No exhaustive path enumeration is required. Summary/worklist analysis can retain representative
-witness traces with join points and approximation markers. Cycle handling and termination belong in
-acceptance tests.
+Resolved helper arguments/parameters and returns carry dependency witnesses and source provenance.
+Unknown bindings, recursion and reached expansion bounds cannot establish protection. General reusable
+function summaries and whole-program heap/control analysis remain planned.
 
 ### Guards and mitigations
 
-A guard mitigates only the specific value/use and sink context it protects. Checking a value after a
-sink, ignoring a validator result, validating an unrelated copy, or taking an unchecked branch does
-not discharge a candidate. Parameter binding, allow-listing, HTML encoding, path containment, and
-shell execution mode are distinct rule-specific facts.
-
-A sanitizer's presence does not terminate taint tracking. Deterministic suppression requires a modeled
-transfer/mitigation rule with its preconditions established. The decision model can classify a custom check's apparent
-adequacy from supplied evidence; it cannot turn an unresolved flow into a proven safe one.
+A guard applies only to the actual value, constraint, ordering and use it protects. Checking a sibling
+field, ignoring a result or checking after the sink does not discharge the claim. API contracts require
+verified import/constructor evidence. A sanitizer name alone does not terminate tracking.
 
 ### Protection is specific to a value use
 
-Decision Assessment and Findings Review evaluate the tuple **value → transformations/guards → sink →
-control-flow assumptions**. If the protection is correct for that exact use and relevant paths, the
-particular vulnerability is prevented; there is no context-independent “safe string” property.
-An HTML-text encoder does not establish SQL/path safety, and valid identifier syntax does not establish
-resource authorization. See [OWASP validation guidance](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html)
-and [context-specific encoding](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html).
-
-The LLM Findings Reviewer is explicitly responsible for challenging a mismatch between protection and
-use: wrong encoding context, ignored return, validation of a different value, bypass path, later
-transformation, or missing business/framework facts. Successful code-level protection and correct model
-recognition of that protection are separate test expectations. The reviewer needs the applicable code;
-it cannot close a gap in evidence by agreeing with the decision model.
+Validation, query binding, HTML encoding, sanitization and sensitive-content classification are separate
+questions. A bound SQL value can be protected against syntax injection while failing an established
+email-format requirement. An escaped branch cannot lend protection to an unresolved sibling.
+Protection requires every relevant modeled path; one supported unsafe path can establish a defect
+under its stated conditions. Missing requirements remain uncertain rather than invented.
 
 ## 6. Detection and candidate selection
 
-**Track A — deterministic rules.** Findings arise from explicit rule conditions over extracted or
-supported analysis facts. Determinism describes reproducibility, not certainty that the code is
-exploitable. Each rule declares CWE/OWASP edition mapping, severity policy, supported frameworks,
-positive/negative examples, and evidence requirements.
+Deterministic Go logic recognizes supported operations and construction defects. The semantic judge
+answers claim-specific questions about the supplied evidence. `internal/guidelines` holds Markdown
+Analysis Guidelines, not an executable pattern/rule engine. Current poor-practice findings and model
+verdicts are reconciled by Go judgment/reporting code, not by a separate rules-engine package.
 
-**Track B — path classification.** Go produces a bounded source-to-sink candidate with dataflow
-witnesses, sink semantics, guards, and gaps. The decision model evaluates only the semantic questions not settled by
-those facts. Classification is an annotation on the candidate, not its identity.
-
-**Track C — deferred.** Broad controller/authorization/logic review is not carried forward as an
-open-ended decision-model task. Any future scope check must enumerate its questions, candidate anchors, required
-evidence, and evaluation corpus before implementation.
-
-Pruning removes irrelevant graph regions; rule-specific filters handle established mitigation facts.
-A non-literal argument is not automatically untrusted, and constants do not by themselves prove all
-related operations safe. Unknown or truncated cases are unexamined/uncertain, with reason counts.
-Prioritization by rule severity and evidence completeness changes processing order, not proof of safety.
+Guidelines combine secure coding recommendations with instructions about evidence and uncertainty.
+They are embedded with `go:embed` and selected by language. Report metadata retains their ID/version;
+model inputs include the full applicable document. The Go document is preparatory guidance and does
+not imply implemented Go source analysis. Root [analysis guides](../docs/analysis/README.md) describe
+product behavior; `.zazz/standards/` governs development. Neither is loaded dynamically by the binary.
 
 ## 7. Evidence bundle contract
 
-The implemented [trace and judgment design](architecture/trace-judgment.md) describes the
-shared version-2 evidence wire format, API/browser slices, validation protocol, reporting
-guardrails and replay requirements. This pipeline is language-neutral; adapter coverage
-remains explicit.
+The [trace judgment design](architecture/trace-judgment.md) owns evidence-version 2: deduplicated
+source evidence, dependency witnesses, trace/control edges, roles, required evidence, API contracts,
+exact field constraints and remaining blockers. Supplied evidence means present, not complete or
+protective. Source/comments are untrusted data, never model instructions.
 
-A bundle contains a stable candidate ID, rule/version, source and sink spans, ordered witness operations,
-call-site bindings, branch/guard facts, relevant validator definitions, library-model/version facts,
-and explicit gaps. Source snapshots/hashes bind every span to the analyzed revision.
-
-Per-file, per-snippet, per-bundle, per-run, and request-size budgets are specified before live use.
-Incomplete required evidence cannot be silently truncated into a “validated” result. Oversized or
-unresolvable candidates are reported as unexamined or uncertain. Repository comments are untrusted
-source data, not instructions for the classifier. Payload minimization and redaction policies must
-preserve the evidence needed for the question and record any resulting loss.
-
-Go constructs source references and report templates. The decision model does not generate explanations or citations.
-The LLM Findings Reviewer references supplied evidence IDs; its interpretation is separate from the
-underlying source evidence.
+Model envelopes use `analysis_guidelines`. The generic question protocol is `candidate-use-v9`;
+claim-specific SQL/XSS/logging/validation questions retain their separate protocols. Renamed guideline
+documents carry new versions because their request text changed. Request identity includes the full
+envelope and guideline body; old responses cannot be replayed on renamed/changed requests.
 
 <a id="8-jev-assessment-and-findings-review"></a>
 
@@ -269,205 +255,94 @@ underlying source evidence.
 
 ### Decision experiment and adapter
 
-The decision model receives a candidate string's origin, transformations, named field requirements, validator/helper
-bodies, relevant guard results, sink context, and known gaps. The experiment tests separate questions:
-
-- Does the shown validation enforce the named field/type/format constraint?
-- What sanitization/encoding transformation is applied, if any?
-- Is that transformation appropriate to the named sink and output context?
-
-Validation and sanitization are separate assessments; neither is universally required for every sink.
-A parameterized operation, for example, may protect a value without a string-cleaning function.
-Go establishes whether the examined/transformed value and required guard outcome reach the actual
-sink. The decision model does not reconstruct missing control flow or certify a function globally safe.
-
-```mermaid
-flowchart TD
-    Value["Candidate string and its source"] --> Context["Go traces value, guard use, and sink context"]
-    Context --> Ready{"Required evidence available?"}
-    Ready -->|Yes| DecisionCheck["Decision assesses validation and sanitization adequacy"]
-    Ready -->|No| Unknown["Uncertain: preserve missing-evidence reason"]
-    DecisionCheck --> Classify{"Go interprets typed assessments"}
-    Classify -->|Potential protection gap| Issue["Proposed issue"]
-    Classify -->|Uncertain| Unknown
-    Classify -->|Adequately protected| Audit["Retain assessment and sample for audit"]
-    Issue --> Reviewer["Findings Review"]
-    Unknown --> Reviewer
-    Audit -->|Audit sample| Reviewer
-```
-
-[OpenAI Decisions](https://developers.openai.com/api/docs/guides/decisions) accepts bounded evidence
-and named `predicate`, `choice`, or `score` questions. The Go transport uses `net/http` and
-`encoding/json`; see [setup](docs/openai-decisions-setup.md). TypeSafe Noul/Choice schemas are not
-wire-compatible. Question names and versions bind answers to candidates; dependent questions run in
-separate stages. Go validates response names, types, allowed choices, numeric ranges, refusals, and
-missing/duplicate answers before applying policy. API model estimates require corpus calibration;
-provider selection does not establish security accuracy or latency/cost targets.
-
-The provisional outcomes `adequately_protected`,
-`protection_gap`, and `uncertain` describe candidate protection under stated criteria; the facet
-assessments retain the distinction between validation and sanitization. Missing validation alone is
-not automatically an exploitable issue. Exact field names/thresholds belong in the future spec.
-An answer below a finding threshold is not by itself an adequately-protected verdict. Scores do not
-directly set severity; Go applies rule-specific mappings, evidence requirements, and calibrated policy.
+**Implemented:** the judge supplies named choice questions for validation, construction/protection,
+injection, XSS and logging as applicable. It validates responses, completion state and answer details,
+then applies claim-specific completeness and consistency gates. Model confidence cannot fill blockers.
+Raw answers are retained separately from the final finding status.
 
 ### Provider-neutral judge boundary
 
-The analysis engine supplies a versioned evidence bundle and named semantic questions. It MUST NOT
-embed a provider's wire schema in graph records. A consumer-owned adapter boundary accepts the
-bundle/questions plus cancellation and returns normalized facet assessments, typed question answers,
-evidence references, model/provider identity, usage, and completion state. Create abstractions only
-alongside their real callers; the design does not require speculative packages.
-
-| Configuration | Responsibility |
-|---|---|
-| `openai` + `OPENAI_API_KEY` | OpenAI Decisions transport and its typed question schema |
-| `jev` + `TYPESAFE_API_KEY` | TypeSafe Jev transport and its own schema/model contract |
-| Future explicit provider + provider-specific secret | Adapter with capability declaration, conformance tests and independent evaluation |
-
-Credentials alone do not select a provider. Unsupported providers, missing keys, refusals, invalid
-answers, missing evidence, and failures remain explicit. There is no silent credential/provider
-fallback. Equivalent question intent does not imply equivalent probability calibration or thresholds.
-Cache keys include provider, model, question translation/version, evidence hash, and request options.
-The report separates sufficient validation, context-specific protection, vulnerability assessment,
-and evidence completeness. A negative answer to a validation question alone is not a finding.
+`internal/judge.Client` supports explicit OpenAI/TypeSafe transport selection using `net/http` and
+`encoding/json`; no speculative provider interface is required. Provider keys stay out of evidence
+and saved traces. Requests are bounded to 64 KiB and responses to 1 MiB, with deadlines and no automatic
+retry/fallback. Local HTTP stubs test both transports; live calibration is separate evidence.
 
 ### LLM Findings Reviewer contract
 
-For each identified issue, the reviewer examines the same bounded source evidence, relevant helper
-bodies and framework facts, then evaluates whether the proposed issue is supported. Its first pass
-assesses the evidence without the decision model's conclusion to reduce anchoring; Go then compares the independent
-result with the model/rule assessment. Any follow-up reconciliation call is explicit and bounded.
-
-The review checks the claimed input-to-sink connection, whether validation/sanitization protects the
-actual value/use, bypasses and contradictory evidence, and whether required context is missing.
-The reviewer cannot create graph facts or assume omitted code is safe. It returns a structured verdict
-of `supported`, `disputed`, or `needs_more_evidence`, with evidence IDs and a concise explanation.
-Decision Assessment and reviewer results remain separate. A dispute is visible; it does not silently delete a finding.
-
-```mermaid
-sequenceDiagram
-    participant G as Go orchestrator
-    participant J as OpenAI Decision Assessment
-    participant L as LLM Findings Reviewer
-    participant R as Report
-    G->>J: Candidate evidence and atomic questions
-    J-->>G: Typed validation and sanitization assessments
-    G->>L: Issue evidence, without assessor conclusion
-    L-->>G: Independent assessment and evidence IDs
-    G->>G: Compare assessments and validate citations
-    opt Reconciliation needs additional review
-        G->>L: Both assessments and bounded clarification evidence
-        L-->>G: Supported, disputed, or needs more evidence
-    end
-    G->>R: Findings, separate assessments, and completeness status
-```
-
-Both adapters have explicit enablement, credentials, pinned models, deadlines, concurrency/request
-limits, retry/backoff rules, cancellation, and run budgets. No-key operation marks missing stages
-`not_run`; request failures mark them `failed`. A cap or missing credential leaves issues visibly
-unreviewed, not accepted or reviewed-safe. An unavailable reviewer does not silently substitute a
-decision-model-only result for completed Findings Review. Humans retain acceptance and suppression authority.
+**Planned:** independent evidence review returns supported, disputed or needs-more-evidence outcomes.
+The proposed first pass excludes the judge's conclusion to reduce anchoring, followed by bounded
+comparison/reconciliation. Review of identified issues, uncertain cases and protected controls needs
+its own schema, budget, model choice and evaluation contract. Current reports MUST NOT imply that
+this stage ran. Its absence does not mean a Review-category record has received independent review.
 
 ## 9. Findings, comparison, and CI
 
-The report separates candidate discovery from semantic assessment and CI eligibility:
+`report.Enrich` derives presentation records from candidate uses and assessments. JSON retains raw
+evidence/answers; HTML supports human review; SARIF supplies standard security-tool interchange.
+Only final `protected_for_claim` records may use green protection styling. Review records name missing
+evidence and findings name the supported defect; guidance is not a verified applied fix.
 
-| Record | Proposed contents |
-|---|---|
-| Candidate | identity, rule/version, source/sink, witness, guard facts, analysis gaps |
-| Assessment | Decision validation/sanitization facets, typed answers, model/question/bundle versions, policy outcome |
-| Findings Review | completion status, independent reviewer verdict, evidence IDs, disagreement, model/prompt version |
-| Finding | detection track, rule title, CWE/OWASP mapping, severity, evidence, template explanation |
-| Coverage | supported/skipped files, parse failures, unresolved edges, limits hit, unexamined candidates |
-
-A deterministic rule does not get a probability of `1.0`; rule certainty and model probability are
-separate concepts. Template explanations identify observed facts and predictions separately.
-
-Fingerprints exclude decision-model answers, probabilities, model versions, and policy thresholds. A proposed key
-uses rule identity plus a scoped sink-site identity; source traces group beneath the finding. The exact
-collision/rename/grouping scheme must be specified and tested before persistence. Candidate identity
-is separate from whether an assessment currently meets finding/report policy.
-
-A verdict change is an assessment change, not a new structural candidate. It can still require review
-or affect policy; stable identity must not silently hide changed risk. Missing/failed/limited analysis
-cannot mark a previously observed issue resolved. Comparison requires compatible scan scope and
-analysis versions, otherwise status is unknown/unexamined.
-
-Git-tracked baseline entries record reason and ownership; new-finding gating and severity policy are
-reviewed separately. Proposed defaults gate selected new Track A findings and keep Track B advisory
-until calibrated and explicitly enabled for gating. Exact baseline semantics, incomplete-scan behavior,
-and exit codes belong to a future reporting spec. Existing manifest exit codes remain unchanged now.
+Finding records currently group multiple concerns within a use. Fully independent claim-level
+counting, edit-stable fingerprints, baseline comparison and severity CI gates remain planned.
+Exit 0 means execution completed, not that the target is secure. Exit 1 signals execution or requested
+assessment failure; exit 2 signals invalid usage.
 
 ## 10. Persistence and determinism
 
-Execution uses the [typed adjacency representation](#graph-storage-decision); ordered JSON is an
-interchange artifact. Persistence starts with a local cache. Graph databases and Redis are deferred.
+**Implemented:** saved JSON reports and explicit decision traces. Preview/replay compares compact JSON
+bytes, model/provider request content and question version. Changed evidence, guidelines, roles or
+instructions cannot inherit an old answer. Reading a historical report is distinct from replaying a
+decision onto newly generated evidence. Historical sample artifacts retain original versions/answers.
 
-Cache Decision Assessment and Findings Review responses separately. Reviewer keys include provider/model,
-prompt/schema, exact source evidence, and any supplied prior assessments. Audit-selection or
-reconciliation-policy changes can create additional review work.
+**Planned:** automatic persistent source/summary/decision caches, independent reviewer caches and
+incremental invalidation. There is no automatic runtime cache implied by saved evaluation replays.
 
-Cache keys cover content, grammar/binding version, adapter/IR version, resolver configuration,
-transitive summaries/library models, rule version, complete evidence bundle, decision model/question
-version, and request options. Raw typed responses are cached separately from policy outcomes, so
-threshold changes can be evaluated without inference. Validator summaries cannot be cached as globally
-“safe” on a function-body hash alone; value, sink, configuration, and dependency context matter.
+<a id="11-proposed-package-boundaries"></a>
 
-Changed imports, callers/callees, guard definitions, models, or configuration invalidate affected
-artifacts. Cached and uncached analysis must agree. Exact storage format is deferred to its spec.
+## 11. Implemented package boundaries
 
-Deterministic graph/candidate/rule artifacts are stable for identical input and versions regardless of
-worker ordering. Live decision-model predictions have no assumed byte-stability guarantee. Request metadata and
-operational timing are separate from deterministic artifacts.
-
-## 11. Proposed package boundaries
-
-Only `cmd/scan`, `internal/lang`, and `internal/walk` currently exist. Add packages when approved specs
-supply real consumers; this table is a responsibility map, not an instruction to scaffold placeholders.
-
-| Package | Responsibility |
+| Package | Current responsibility |
 |---|---|
-| `cmd/scan` | CLI parsing and wiring |
-| `internal/lang` | Existing extension registry; future adapter registration |
-| `internal/walk` | Input manifest and selection |
-| `internal/parse` | CST/query lifecycle and parser workers |
-| `internal/ir` | Normalized analysis operations and source provenance |
-| `internal/graph` | Graph views and adjacency indexes |
-| `internal/rules`, `internal/patterns` | Classification models and deterministic findings |
-| `internal/flow` | CFG/dataflow transfers and function summaries |
-| `internal/trace` | Bounded witnesses, pruning, deduplication |
-| `internal/context` | Evidence bundle assembly and completeness |
-| `internal/judge` | Consumer-owned judge contract and normalized results; provider adapters validate their own wire answers |
-| `internal/llm` | LLM Findings Reviewer adapter; independent assessment and bounded reconciliation |
-| `internal/policy` | Decision interpretation, review reconciliation/completeness, audit selection, gating |
-| `internal/findings`, `internal/report` | Identity/baseline/comparison and report emission |
+| `cmd/scan` | CLI arguments, pipeline wiring, request caps and export modes |
+| `internal/walk` | Target file selection and manifest |
+| `internal/lang` | File-extension language registry |
+| `internal/parse` | Tree-sitter, language/framework resolution, bounded flow and evidence assembly |
+| `internal/analysis` | Shared route, candidate, evidence, claim, assessment and report records |
+| `internal/guidelines` | Embedded versioned language Analysis Guidelines |
+| `internal/judge` | Evidence requests, provider transports, typed answers, policy gates and explicit replay |
+| `internal/report` | Presentation classification, guidance and JSON/HTML/SARIF bundles |
 
-Language-specific lowering and resolution sit behind adapters; their concrete directory layout is
-chosen in the parser/IR spec. Shared analysis does not depend on Tree-sitter node types or HTTP.
-The CLI uses standard-library `flag`, `encoding/json`, and normal exit-code handling; no CLI framework
-is planned. A future change needs a concrete requirement the existing surface cannot reasonably meet.
+The diagram names responsibilities, not additional packages to scaffold. Future `ir`, `flow`, `trace`,
+`context`, `policy`, `findings` or reviewer packages require real consumers and an approved contract.
+Today flow/evidence construction lives in `parse`, claim gates in `judge`, and presentation rules in
+`report`. Shared records import neither Tree-sitter nor provider transport.
+
+### Naming and compatibility
+
+`--analyze` is the documented analysis mode; `--strings` remains an external compatibility alias.
+Internal APIs use `Analyze`, `AnalyzeWithChecks`, `CandidateUse` and `AnalysisReport`, with no obsolete
+Go aliases. Fresh analysis reports use schema 2 and `analysis_guidelines`; route inventory stays
+schema 1. Export accepts schema-1 reports and maps historical `practice` metadata to `GuidelinesRef`.
+New serialization emits only `analysis_guidelines`. Candidate/claim identities and status meanings
+are preserved. Historical command transcripts and source-containing sample artifacts are not rewritten.
 
 ## 12. Validation and unresolved decisions
 
-Golden fixtures cover extraction/resolution. Hand-built flow fixtures cover assignments, branch joins,
-cycles, guard bypass, ignored results, argument/return propagation, and unknown calls. Determinism tests
-compare serial/parallel output; cache tests compare cold/warm results and dependency invalidation.
-Local HTTP stubs cover semantic adapters, schema validation, retries, cancellation, and partial failures.
-Live evaluation is separate, opt-in, versioned, and compared with human-labeled held-out examples,
-including diagnostic decision-model-only/LLM-only baselines and the planned Decision Assessment → Findings Review pipeline.
-Measure reviewer disagreement, incorrect agreement, unsupported citations, review completeness, and
-false-negative audit results against human labels; LLM agreement is not ground truth. See the
-[research/evaluation note](project/04-jev-validation-research.md).
+Golden fixtures verify parsing, source spans and deterministic evidence. Paired controls exercise
+raw/protected/unknown paths and existing languages. Local HTTP stubs verify both transports, malformed
+answers, cancellation, payload limits, policy gates and replay identity. CLI tests cover analysis,
+compatibility flags, schema-1/schema-2 exports and mixed-language bundles. Native Go test/race, vet,
+build and formatting checks follow the [contributor guide](../docs/contributing.md).
 
-The [proposal decision register](project/03-jev-design-proposal.md#open-decision-register) owns unresolved
-choices and their refinement gates; [scope](project/02-project-scope.md) owns project-level risks and
-quality hypotheses.
+Live sample calibration and source-reviewed case checks do not establish whole-program recall,
+runtime exploitation, provider parity or independent findings review. See the [Python results](evaluation/python-support-results.md)
+and [XSS results](evaluation/xss-implementation-results.md) for measured coverage and remaining gaps.
+The [proposal decision register](project/03-jev-design-proposal.md#open-decision-register) owns open design
+choices; the [scope](project/02-project-scope.md) owns project-level risks.
 
 ## CLI report artifacts
 
-The [reporting design](architecture/reporting-and-sarif.md) owns canonical JSON and standard SARIF
-output. The [standalone HTML design](architecture/html-reporting.md) defines the core human-facing
-CLI report: source/route rows expandable into findings, evidence, uncertainty, and remediation.
-All outputs share raw assessment and evidence identities; the viewer contains only scan results,
-while tool comparisons stay in evaluation documents.
+The [reporting design](architecture/reporting-and-sarif.md) owns canonical JSON/SARIF; the
+[HTML design](architecture/html-reporting.md) owns the human-facing report. Current scan bundles contain
+`findings.json`, `findings.html` and `findings.sarif`. Saved reports can be exported without rescanning
+or model calls; comparator results remain separate evaluation artifacts.

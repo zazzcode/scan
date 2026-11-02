@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 var update = flag.Bool("update", false, "rewrite golden files")
@@ -16,7 +16,7 @@ func TestExpressLoginGolden(t *testing.T) {
 	got := mustScan(t, "testdata/express-login")
 	encoded := mustJSON(t, got)
 
-	const golden = "testdata/express-login/express-login.graph.json"
+	const golden = "testdata/express-login/routes.json"
 	if *update {
 		if err := os.WriteFile(golden, encoded, 0o644); err != nil {
 			t.Fatalf("write golden: %v", err)
@@ -28,11 +28,11 @@ func TestExpressLoginGolden(t *testing.T) {
 		t.Fatalf("read golden: %v", err)
 	}
 	if !bytes.Equal(encoded, want) {
-		t.Fatalf("graph JSON differs from golden\n got:\n%s\nwant:\n%s", encoded, want)
+		t.Fatalf("route inventory differs from golden\n got:\n%s\nwant:\n%s", encoded, want)
 	}
 
-	var login *graph.Route
-	var profile *graph.Route
+	var login *analysis.Route
+	var profile *analysis.Route
 	for i := range got.Routes {
 		route := &got.Routes[i]
 		if route.Method == "POST" && route.PathPattern == "/rest/user/login" {
@@ -95,7 +95,7 @@ func TestRouteGaps(t *testing.T) {
 		t.Fatalf("gaps = %+v, want dynamic_path in dynamic.js", got.Gaps)
 	}
 
-	var health *graph.Route
+	var health *analysis.Route
 	for i := range got.Routes {
 		if got.Routes[i].PathPattern == "/health" {
 			health = &got.Routes[i]
@@ -128,7 +128,7 @@ func TestRoutesDeterministic(t *testing.T) {
 	if !bytes.Equal(first, second) {
 		t.Fatal("two scans differed")
 	}
-	var got graph.Graph
+	var got analysis.RouteInventory
 	if err := json.Unmarshal(first, &got); err != nil {
 		t.Fatal(err)
 	}
@@ -139,7 +139,7 @@ func TestRoutesDeterministic(t *testing.T) {
 	}
 }
 
-func mustScan(t *testing.T, root string) *graph.Graph {
+func mustScan(t *testing.T, root string) *analysis.RouteInventory {
 	t.Helper()
 	got, err := Routes(root)
 	if err != nil {
@@ -148,7 +148,7 @@ func mustScan(t *testing.T, root string) *graph.Graph {
 	return got
 }
 
-func mustJSON(t *testing.T, g *graph.Graph) []byte {
+func mustJSON(t *testing.T, g *analysis.RouteInventory) []byte {
 	t.Helper()
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)
@@ -159,7 +159,7 @@ func mustJSON(t *testing.T, g *graph.Graph) []byte {
 	return buf.Bytes()
 }
 
-func hasStep(route *graph.Route, name string) bool {
+func hasStep(route *analysis.Route, name string) bool {
 	for _, step := range route.Steps {
 		if step.Symbol.Name == name {
 			return true
@@ -168,7 +168,7 @@ func hasStep(route *graph.Route, name string) bool {
 	return false
 }
 
-func hasCall(route *graph.Route, name string) bool {
+func hasCall(route *analysis.Route, name string) bool {
 	for _, step := range route.Steps {
 		if step.Kind == "call" && step.Symbol.Name == name {
 			return true
@@ -177,7 +177,7 @@ func hasCall(route *graph.Route, name string) bool {
 	return false
 }
 
-func hasGap(g *graph.Graph, kind, file string) bool {
+func hasGap(g *analysis.RouteInventory, kind, file string) bool {
 	for _, gap := range g.Gaps {
 		if gap.Kind == kind && gap.At.File == file {
 			return true
@@ -186,7 +186,7 @@ func hasGap(g *graph.Graph, kind, file string) bool {
 	return false
 }
 
-func findRoute(g *graph.Graph, file, method, path string) *graph.Route {
+func findRoute(g *analysis.RouteInventory, file, method, path string) *analysis.Route {
 	for i := range g.Routes {
 		route := &g.Routes[i]
 		if route.Registration.File == file && route.Method == method && route.PathPattern == path {
@@ -200,7 +200,7 @@ func methodName(method string) string {
 	return map[string]string{"GET": "get", "PUT": "put", "DELETE": "delete"}[method]
 }
 
-func countRoutes(g *graph.Graph, file, method, path string) int {
+func countRoutes(g *analysis.RouteInventory, file, method, path string) int {
 	n := 0
 	for _, route := range g.Routes {
 		if route.Registration.File == file && route.Method == method && route.PathPattern == path {

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func handlerParameter(body *sitter.Node, index uint, src []byte) string {
@@ -162,7 +162,7 @@ func responseOutputContext(n *sitter.Node, m *sourceModule, fallback string) str
 	return fallback
 }
 
-func (f *flow) recordXSS(sink graph.Evidence, v value, context, contentType string, escaped bool, extra []graph.Evidence) {
+func (f *flow) recordXSS(sink analysis.Evidence, v value, context, contentType string, escaped bool, extra []analysis.Evidence) {
 	if len(v.deps) == 0 {
 		return
 	}
@@ -184,7 +184,7 @@ func (f *flow) recordXSS(sink graph.Evidence, v value, context, contentType stri
 	if context == "unknown" || context == "mixed" {
 		protection, reason, paths = "unknown", "Rendering context is not established for every value.", nil
 	}
-	ctx := append(append([]graph.Evidence{}, f.context...), extra...)
+	ctx := append(append([]analysis.Evidence{}, f.context...), extra...)
 	if m := f.registration; m != nil {
 		var names []string
 		for name := range m.imports {
@@ -198,7 +198,7 @@ func (f *flow) recordXSS(sink graph.Evidence, v value, context, contentType stri
 			}
 		}
 	}
-	gaps := append(append([]graph.Gap{}, f.gaps...), v.gaps...)
+	gaps := append(append([]analysis.Gap{}, f.gaps...), v.gaps...)
 	kind := "reflected"
 	for _, dependency := range v.deps {
 		if dependency.StorageKey != "" {
@@ -214,16 +214,16 @@ func (f *flow) recordXSS(sink graph.Evidence, v value, context, contentType stri
 	if f.client != nil {
 		kind, clientID, entryKind, identity = "dom", f.client.entry.ID, "client", f.client.entry.ID
 	}
-	f.uses = append(f.uses, graph.StringUse{
+	f.uses = append(f.uses, analysis.CandidateUse{
 		ID: fmt.Sprintf("xss:%s:%s:%d", identity, sink.Span.File, sink.Span.StartByte), RouteID: f.route.ID, ClientID: clientID,
 		Kind: "xss_candidate", Sink: sink, Dependencies: v.deps, Context: ctx, Gaps: gaps,
-		XSS: &graph.XSSFacts{Type: kind, EntryKind: entryKind, OutputContext: context, OriginResolved: kind == "reflected" || kind == "dom",
+		XSS: &analysis.XSSFacts{Type: kind, EntryKind: entryKind, OutputContext: context, OriginResolved: kind == "reflected" || kind == "dom",
 			ContentType: contentType, Protection: protection, ProtectionReason: reason, Paths: paths},
-		APIModel:   &graph.APIModel{ID: "html-output-v1", Library: "express", Semantics: "Request values reach an HTML rendering operation in the recorded output context.", Reference: "https://expressjs.com/en/api.html#res.send"},
-		Assessment: graph.Assessment{Status: "not_run"},
+		APIModel:   &analysis.APIModel{ID: "html-output-v1", Library: "express", Semantics: "Request values reach an HTML rendering operation in the recorded output context.", Reference: "https://expressjs.com/en/api.html#res.send"},
+		Assessment: analysis.Assessment{Status: "not_run"},
 	})
 	if f.client != nil {
 		last := &f.uses[len(f.uses)-1]
-		last.APIModel = &graph.APIModel{ID: "browser-output-v1", Library: f.client.entry.Framework, Semantics: "Verified browser/framework rendering binding and source flow in the stated context.", Reference: "https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML"}
+		last.APIModel = &analysis.APIModel{ID: "browser-output-v1", Library: f.client.entry.Framework, Semantics: "Verified browser/framework rendering binding and source flow in the stated context.", Reference: "https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML"}
 	}
 }

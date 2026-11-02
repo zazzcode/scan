@@ -1,5 +1,8 @@
 # Human-readable scan reports
 
+Historical contract/evidence below retains its original names. Current package, CLI and report
+names are documented in the [implemented architecture](../architecture.md#naming-and-compatibility).
+
 ## Outcome and authorization
 
 The user requested clearer input-validation and database-sink results, fresh offline scans of Juice

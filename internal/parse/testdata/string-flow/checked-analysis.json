@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "root": "testdata/string-flow",
   "entries": [
     {
@@ -143,15 +143,15 @@
         }
       ],
       "check": {
-        "id": "automatic-query",
+        "id": "login-input",
         "method": "POST",
         "path": "/login",
         "kind": "sql_query",
         "fields": [
           "email"
         ],
-        "validation": "Assess only field requirements established by the supplied code; missing business constraints remain uncertain.",
-        "protection": "Untrusted input must remain data and must not change executable query syntax or selector operators. Evaluate actual transformations and enforcing guards separately from construction practice."
+        "validation": "email must be a valid string",
+        "protection": "separate data from SQL structure"
       },
       "completeness": {
         "model_facts": [
@@ -319,7 +319,7 @@
         ],
         "scope": "injection claim over the supplied route, relevant request values, verified operation contract and guard/transfer context"
       },
-      "id": "use:route:server.ts:102:POST:/login:handler.ts:172",
+      "id": "use:route:server.ts:102:POST:/login:handler.ts:172/login-input",
       "route_id": "route:server.ts:102:POST:/login",
       "kind": "sql_query_candidate",
       "sink": {
@@ -535,10 +535,10 @@
     "Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
     "SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities"
   ],
-  "practice": [
+  "analysis_guidelines": [
     {
       "id": "javascript",
-      "version": "4",
+      "version": "5",
       "languages": [
         "javascript",
         "typescript"

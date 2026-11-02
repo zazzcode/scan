@@ -70,7 +70,7 @@ func TestPythonRouteGolden(t *testing.T) {
 	}
 	g.Root = "python/routes"
 	encoded := mustJSON(t, g)
-	const golden = "testdata/python/routes/routes.graph.json"
+	const golden = "testdata/python/routes/routes.json"
 	if *update {
 		if err := os.WriteFile(golden, encoded, 0644); err != nil {
 			t.Fatal(err)

@@ -1,13 +1,13 @@
 package report
 
-import "github.com/zazzcode/zazzles/internal/graph"
+import "github.com/zazzcode/zazzles/internal/analysis"
 
 // Guidance is evidence-scoped help, not a generated or verified patch.
 // Every result includes the hardening posture: report proven vulnerabilities and
 // weak or poor practice, because an agent can fix both cheaply.
-type Guidance = graph.Recommendation
+type Guidance = analysis.Recommendation
 
-func guidance(use graph.StringUse) Guidance {
+func guidance(use analysis.CandidateUse) Guidance {
 	kind := use.Kind
 	if use.Check != nil {
 		kind = use.Check.Kind

@@ -1,7 +1,7 @@
 package parse
 
 import (
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"testing"
 )
 
@@ -23,7 +23,7 @@ def read():
     user=cur.fetchone()
     return render_template('view.html', user=user)
 `, "templates/view.html": `<p>{{ user.country | safe }}</p><p>{{ user.country }}</p><p>{{ user.email | safe }}</p>`})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +54,7 @@ func TestPythonResponseContexts(t *testing.T) {
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			root := pythonFixture(t, map[string]string{"a.py": "from flask import Flask,request\nfrom markupsafe import escape\napp=Flask(__name__)\n@app.get('/')\ndef index():\n    name=request.args.get('name')\n    return " + tt.expr + "\n"})
-			r, err := Strings(root, "")
+			r, err := Analyze(root, "")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -79,7 +79,7 @@ def inline():
 def boolean():
     return str(not request.args.get('name'))
 `})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,11 +117,11 @@ $(document).ready(function(){
  });
 });
 </script>`})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	var client []graph.StringUse
+	var client []analysis.CandidateUse
 	for _, u := range r.Uses {
 		if u.ClientID != "" {
 			client = append(client, u)
@@ -142,7 +142,7 @@ func TestJQueryVersusNativeAppend(t *testing.T) {
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			root := pythonFixture(t, map[string]string{"browser.js": tt.source})
-			r, err := Strings(root, "")
+			r, err := Analyze(root, "")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -166,7 +166,7 @@ def index():
 {{ raw }}
 {{ safe }}
 {{ ineffective }}`})
-	r, err := Strings(root, "")
+	r, err := Analyze(root, "")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -41,20 +41,21 @@ func run(args []string, stdout, stderr io.Writer) int {
 		exportFile    = flags.String("export-sarif", "", "convert a saved canonical JSON report to SARIF without API calls")
 		list          = flags.Bool("list", false, "list the source files under the target path and exit")
 		routes        = flags.Bool("routes", false, "emit supported route inventories and exit")
-		stringsMode   = flags.Bool("strings", false, "emit bounded route-to-string-use evidence")
-		routeFilter   = flags.String("route", "", "optional exact route path pattern for --strings")
-		checksFile    = flags.String("checks", "", "JSON file declaring route/method/field security requirements for --strings")
-		entry         = flags.String("entry", "", "relative JS/TS/Python registration file for --strings")
+		analyzeMode   = flags.Bool("analyze", false, "analyze bounded route/browser security evidence; add --judge for model assessment")
+		routeFilter   = flags.String("route", "", "optional exact route path pattern for --analyze")
+		checksFile    = flags.String("checks", "", "JSON file declaring route/method/field security requirements for --analyze")
+		entry         = flags.String("entry", "", "relative JS/TS/Python registration file for --analyze")
 		judgeProvider = flags.String("judge", "", "optional semantic judge: openai or jev (transmits bounded source evidence)")
 		judgeModel    = flags.String("judge-model", "", "judge model; required for jev")
 		judgeLimit    = flags.Int("judge-limit", 10, "maximum judge requests per run, no retries")
-		asSARIF       = flags.Bool("sarif", false, "emit SARIF 2.1.0 findings for --strings")
+		asSARIF       = flags.Bool("sarif", false, "emit SARIF 2.1.0 findings for --analyze")
 		asJSON        = flags.Bool("json", false, "emit machine-readable JSON instead of text")
 	)
+	flags.BoolVar(analyzeMode, "strings", false, "compatibility alias for --analyze")
 	flags.Usage = func() {
 		fmt.Fprintln(stderr, "usage: scan --list [--json] <path>")
 		fmt.Fprintln(stderr, "       scan --routes [--json] <path>")
-		fmt.Fprintln(stderr, "       scan --strings [--json] [--entry file] [--judge openai|jev] <path>")
+		fmt.Fprintln(stderr, "       scan --analyze [--json] [--entry file] [--judge openai|jev] <path>")
 		fmt.Fprintln(stderr, "       scan --export-html <saved-report.json>")
 		fmt.Fprintln(stderr, "       scan --export-sarif <saved-report.json>")
 		flags.PrintDefaults()
@@ -69,12 +70,12 @@ func run(args []string, stdout, stderr io.Writer) int {
 			explicitOutputDir = true
 		}
 	})
-	if explicitOutputDir && !*stringsMode {
+	if explicitOutputDir && !*analyzeMode {
 		flags.Usage()
 		return exitUsage
 	}
 	if *exportFile != "" || *exportHTML != "" {
-		if (*exportFile != "" && *exportHTML != "") || flags.NArg() != 0 || *list || *routes || *stringsMode || *asJSON || *asSARIF || *entry != "" || *routeFilter != "" || *checksFile != "" || *judgeProvider != "" || *judgeModel != "" {
+		if (*exportFile != "" && *exportHTML != "") || flags.NArg() != 0 || *list || *routes || *analyzeMode || *asJSON || *asSARIF || *entry != "" || *routeFilter != "" || *checksFile != "" || *judgeProvider != "" || *judgeModel != "" {
 			flags.Usage()
 			return exitUsage
 		}
@@ -84,18 +85,18 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return runExportSARIF(*exportFile, stdout, stderr)
 	}
 	modes := 0
-	for _, enabled := range []bool{*list, *routes, *stringsMode} {
+	for _, enabled := range []bool{*list, *routes, *analyzeMode} {
 		if enabled {
 			modes++
 		}
 	}
-	if (*asSARIF && (*asJSON || !*stringsMode)) || modes != 1 || flags.NArg() != 1 || *judgeLimit < 1 || (!*stringsMode && (*checksFile != "" || *entry != "" || *routeFilter != "" || *judgeProvider != "" || *judgeModel != "")) || (*judgeProvider == "" && *judgeModel != "") {
+	if (*asSARIF && (*asJSON || !*analyzeMode)) || modes != 1 || flags.NArg() != 1 || *judgeLimit < 1 || (!*analyzeMode && (*checksFile != "" || *entry != "" || *routeFilter != "" || *judgeProvider != "" || *judgeModel != "")) || (*judgeProvider == "" && *judgeModel != "") {
 		flags.Usage()
 		return exitUsage
 	}
 
-	if *stringsMode {
-		return runStrings(flags.Arg(0), *entry, *routeFilter, *checksFile, *judgeProvider, *judgeModel, *judgeLimit, *asJSON, *asSARIF, *outputDir, stdout, stderr)
+	if *analyzeMode {
+		return runAnalysis(flags.Arg(0), *entry, *routeFilter, *checksFile, *judgeProvider, *judgeModel, *judgeLimit, *asJSON, *asSARIF, *outputDir, stdout, stderr)
 	}
 	if *routes {
 		return runRoutes(flags.Arg(0), *asJSON, stdout, stderr)

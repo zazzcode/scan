@@ -24,7 +24,7 @@ func TestRequestLineLogging(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "server.ts", tt.src)
-			report, err := Strings(root, "server.ts")
+			report, err := Analyze(root, "server.ts")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -58,7 +58,7 @@ func TestRequestLineLoggingNegativeControls(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "server.ts", tt.src)
-			report, err := Strings(root, "server.ts")
+			report, err := Analyze(root, "server.ts")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -72,7 +72,7 @@ func TestRequestLineLoggingNegativeControls(t *testing.T) {
 func TestDestructuredRequestParameters(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "server.ts", "import express from 'express';const app=express();app.get('/x',({ query, connection },res)=>{console.log(query.token)})")
-	report, err := Strings(root, "server.ts")
+	report, err := Analyze(root, "server.ts")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,11 +86,11 @@ func TestDestructuredRequestParameters(t *testing.T) {
 	t.Run("shadowed container", func(t *testing.T) {
 		root := t.TempDir()
 		writeSource(t, root, "server.ts", "import express from 'express';const app=express();app.get('/x',({ query },res)=>{const query2=1;{};console.log(query.token)})")
-		if _, err := Strings(root, "server.ts"); err != nil {
+		if _, err := Analyze(root, "server.ts"); err != nil {
 			t.Fatal(err)
 		}
 		writeSource(t, root, "server.ts", "import express from 'express';const app=express();app.get('/x',({ query },res)=>{const query={token:'x'};console.log(query.token)})")
-		report, err := Strings(root, "server.ts")
+		report, err := Analyze(root, "server.ts")
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func TestSARIFStatusAndRouteEvidence(t *testing.T) {
 	for _, tt := range []struct{ status, kind, level string }{{"supported_potential", "review", "note"}, {"protected_for_claim", "pass", "none"}, {"needs_evidence", "review", "note"}} {
 		t.Run(tt.status, func(t *testing.T) {
-			e := graph.Evidence{Kind: "request_source", Text: "req.body.email", Span: graph.Span{File: "routes/session handler.ts", StartLine: 4, EndLine: 4, StartByte: 10, EndByte: 24}, SHA256: "snapshot"}
-			use := graph.StringUse{ID: "use", RouteID: "r", Check: &graph.Check{ID: "email-sql", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"email"}}, Sink: e, Dependencies: []graph.Dependency{{Source: e, Transfers: []graph.Evidence{}}}, Context: []graph.Evidence{e, e}, Assessment: graph.Assessment{Status: "completed", FindingStatus: tt.status, Protection: "insufficient"}, Completeness: &graph.Completeness{Evidence: map[string][]graph.Evidence{"sink_binding": {e}}}}
-			report := &graph.StringReport{Entries: []graph.Entry{{Route: graph.Route{ID: "r", Method: "POST", PathPattern: "/session", Registration: e.Span}}}, Uses: []graph.StringUse{use}, Files: []graph.Evidence{}}
+			e := analysis.Evidence{Kind: "request_source", Text: "req.body.email", Span: analysis.Span{File: "routes/session handler.ts", StartLine: 4, EndLine: 4, StartByte: 10, EndByte: 24}, SHA256: "snapshot"}
+			use := analysis.CandidateUse{ID: "use", RouteID: "r", Check: &analysis.Check{ID: "email-sql", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"email"}}, Sink: e, Dependencies: []analysis.Dependency{{Source: e, Transfers: []analysis.Evidence{}}}, Context: []analysis.Evidence{e, e}, Assessment: analysis.Assessment{Status: "completed", FindingStatus: tt.status, Protection: "insufficient"}, Completeness: &analysis.Completeness{Evidence: map[string][]analysis.Evidence{"sink_binding": {e}}}}
+			report := &analysis.AnalysisReport{Entries: []analysis.Entry{{Route: analysis.Route{ID: "r", Method: "POST", PathPattern: "/session", Registration: e.Span}}}, Uses: []analysis.CandidateUse{use}, Files: []analysis.Evidence{}}
 			doc := SARIF(report)
 			runs := doc["runs"].([]any)
 			run := runs[0].(map[string]any)
@@ -40,7 +40,7 @@ func TestSARIFStatusAndRouteEvidence(t *testing.T) {
 
 func TestSARIFPreservesIncompleteAssessments(t *testing.T) {
 	for _, status := range []string{"not_run", "failed"} {
-		report := &graph.StringReport{Uses: []graph.StringUse{{Kind: "sql_query_candidate", Assessment: graph.Assessment{Status: status}}}, Gaps: []graph.Gap{}, Files: []graph.Evidence{}}
+		report := &analysis.AnalysisReport{Uses: []analysis.CandidateUse{{Kind: "sql_query_candidate", Assessment: analysis.Assessment{Status: status}}}, Gaps: []analysis.Gap{}, Files: []analysis.Evidence{}}
 		doc := SARIF(report)
 		run := doc["runs"].([]any)[0].(map[string]any)
 		result := run["results"].([]any)[0].(map[string]any)
@@ -55,8 +55,8 @@ func TestSARIFPreservesIncompleteAssessments(t *testing.T) {
 }
 
 func TestSARIFDoesNotInventRegistrationValueFlow(t *testing.T) {
-	use := graph.StringUse{Kind: "account_creation_candidate", Check: &graph.Check{Method: "POST", Path: "/accounts", Kind: "account_creation"}, Assessment: graph.Assessment{Status: "completed", FindingStatus: "supported_potential"}}
-	run := SARIF(&graph.StringReport{Uses: []graph.StringUse{use}})["runs"].([]any)[0].(map[string]any)
+	use := analysis.CandidateUse{Kind: "account_creation_candidate", Check: &analysis.Check{Method: "POST", Path: "/accounts", Kind: "account_creation"}, Assessment: analysis.Assessment{Status: "completed", FindingStatus: "supported_potential"}}
+	run := SARIF(&analysis.AnalysisReport{Uses: []analysis.CandidateUse{use}})["runs"].([]any)[0].(map[string]any)
 	result := run["results"].([]any)[0].(map[string]any)
 	if _, ok := result["codeFlows"]; ok {
 		t.Fatal("fabricated a value-flow path for a modeled persistence mapping")

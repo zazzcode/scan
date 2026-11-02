@@ -4,14 +4,14 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 // middlewareContext preserves applicable earlier USE registrations. Built-in
-// transport/parser adapters are declared assumptions, not custom validator rules.
-func (s *moduleSet) middlewareContext(m *sourceModule, route graph.Route) ([]graph.Evidence, []graph.Gap) {
-	out := []graph.Evidence{}
-	gaps := []graph.Gap{}
+// transport/parser adapters are declared assumptions, not custom validator guidelines.
+func (s *moduleSet) middlewareContext(m *sourceModule, route analysis.Route) ([]analysis.Evidence, []analysis.Gap) {
+	out := []analysis.Evidence{}
+	gaps := []analysis.Gap{}
 	seen := map[string]bool{}
 	walkCalls(m.tree.RootNode(), func(call *sitter.Node) {
 		if int(call.StartByte()) >= route.Registration.StartByte {
@@ -34,7 +34,7 @@ func (s *moduleSet) middlewareContext(m *sourceModule, route graph.Route) ([]gra
 		if args.NamedChild(0).Kind() == "array" {
 			paths, dynamic, _ := pathArgs(args.NamedChild(0), m.src)
 			if dynamic {
-				gaps = append(gaps, graph.Gap{Kind: "middleware_mount_unresolved", Detail: "dynamic middleware path array", At: spanOf(m.file, call)})
+				gaps = append(gaps, analysis.Gap{Kind: "middleware_mount_unresolved", Detail: "dynamic middleware path array", At: spanOf(m.file, call)})
 				return
 			}
 			applies := false
@@ -60,7 +60,7 @@ func (s *moduleSet) middlewareContext(m *sourceModule, route graph.Route) ([]gra
 				if prefix != "" && !strings.HasPrefix(route.PathPattern, prefix) && route.PathPattern != strings.TrimSuffix(prefix, "/") {
 					return
 				}
-				gaps = append(gaps, graph.Gap{Kind: "middleware_mount_unresolved", Detail: "pattern middleware applicability requires a framework path model", At: spanOf(m.file, call)})
+				gaps = append(gaps, analysis.Gap{Kind: "middleware_mount_unresolved", Detail: "pattern middleware applicability requires a framework path model", At: spanOf(m.file, call)})
 			} else if path != "/" && route.PathPattern != path && !strings.HasPrefix(route.PathPattern, path+"/") {
 				return
 			}

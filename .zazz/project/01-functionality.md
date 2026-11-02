@@ -104,7 +104,7 @@ patterns. Model requests are bounded and saved decisions require exact matching 
 ## Interfaces and report semantics
 
 The source-level CLI foundation currently present is `scan --list [--json] <path>`, `scan --routes [--json]`,
-and `scan --strings [--json]` with entry/route selectors, checked-mode requirement files, and bounded
+and `scan --analyze [--json]` with entry/route selectors, checked-mode requirement files, and bounded
 JSON/HTML/SARIF export. All further analysis interfaces are future spec work. Inspection of graph,
 classifications, witnesses, and explanation bundles is desirable, but exact flags/subcommands beyond
 these are not decided by this document.

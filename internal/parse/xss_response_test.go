@@ -3,11 +3,11 @@ package parse
 import (
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func xssUses(r *graph.StringReport) []graph.StringUse {
-	var uses []graph.StringUse
+func xssUses(r *analysis.AnalysisReport) []analysis.CandidateUse {
+	var uses []analysis.CandidateUse
 	for _, use := range r.Uses {
 		if use.Kind == "xss_candidate" {
 			uses = append(uses, use)
@@ -38,7 +38,7 @@ func TestXSSResponseContexts(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "app.ts", "import express from 'express';"+tt.imports+"const app=express();app.get('/x',(req,res)=>{"+tt.body+"})")
-			r, err := Strings(root, "app.ts")
+			r, err := Analyze(root, "app.ts")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -73,7 +73,7 @@ func TestXSSRawAndEscapedTemplates(t *testing.T) {
 			writeSource(t, root, "app.js", "const express=require('express');const app=express();app.set('view engine','"+tt.extension+"');const routes=require('./routes');app.get('/x',routes.show)")
 			writeSource(t, root, "routes/index.js", "exports.show=function(request,response){return response.render('page',{value:request.query.q})}")
 			writeSource(t, root, "views/page."+tt.extension, tt.template)
-			r, err := Strings(root, "app.js")
+			r, err := Analyze(root, "app.js")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -92,7 +92,7 @@ func TestWholeRequestRenderOptionsRemainReview(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "app.js", "const express=require('express');const app=express();app.set('view engine','hbs');app.post('/profile',(req,res)=>{const profile=req.body;res.render('profile',profile)})")
 	writeSource(t, root, "views/profile.hbs", `<p>{{firstname}}</p>`)
-	r, err := Strings(root, "app.js")
+	r, err := Analyze(root, "app.js")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,7 +117,7 @@ func TestBranchingHelpersAndAugmentedAssignment(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "app.js", "const express=require('express');const escapeHtml=require('escape-html');const app=express();"+tt.helper+";app.get('/x',(req,res)=>{"+tt.body+"})")
-			r, err := Strings(root, "app.js")
+			r, err := Analyze(root, "app.js")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -148,7 +148,7 @@ func TestSanitizerBindingGates(t *testing.T) {
 				writeSource(t, root, "views/page.hbs", tt.template)
 			}
 			writeSource(t, root, "app.js", "const express=require('express');"+tt.imports+"const app=express();"+engine+"app.get('/x',(req,res)=>{"+tt.body+"})")
-			r, err := Strings(root, "app.js")
+			r, err := Analyze(root, "app.js")
 			if err != nil {
 				t.Fatal(err)
 			}

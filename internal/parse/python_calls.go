@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func (f *pythonFlow) call(n *sitter.Node) pythonValue {
@@ -94,7 +94,7 @@ func (f *pythonFlow) call(n *sitter.Node) pythonValue {
 		return pyTransfer(pyCombine(receiver, all), m.evidence("string_transform", n))
 	}
 	if method == "getLogger" && strings.HasPrefix(q, "logging.") {
-		return pythonValue{binding: "logger", evidence: []graph.Evidence{m.evidence("logger_binding", n)}}
+		return pythonValue{binding: "logger", evidence: []analysis.Evidence{m.evidence("logger_binding", n)}}
 	}
 	if target, key := f.set.resolve(m, name, 0); target != nil && target.funcs[key] != nil {
 		// Local assignments/parameters override helper declarations and imported helpers.
@@ -138,7 +138,7 @@ func (f *pythonFlow) helper(call *sitter.Node, m *pythonModule, fn *sitter.Node,
 	for i := uint(0); params != nil && i < params.NamedChildCount(); i++ {
 		p := params.NamedChild(i)
 		if strings.Contains(p.Kind(), "splat") || strings.Contains(pyText(m, p), "*") {
-			v := pythonValue{unknown: true, gaps: []graph.Gap{{Kind: "python_parameter_unresolved", Detail: "variadic helper binding is not modeled", At: spanOf(m.file, p)}}}
+			v := pythonValue{unknown: true, gaps: []analysis.Gap{{Kind: "python_parameter_unresolved", Detail: "variadic helper binding is not modeled", At: spanOf(m.file, p)}}}
 			for _, arg := range values {
 				v = pyCombine(v, arg)
 			}
@@ -156,7 +156,7 @@ func (f *pythonFlow) helper(call *sitter.Node, m *pythonModule, fn *sitter.Node,
 			}
 		}
 		if name == nil {
-			h.gaps = append(h.gaps, graph.Gap{Kind: "python_parameter_unresolved", Detail: "unsupported helper parameter", At: spanOf(m.file, p)})
+			h.gaps = append(h.gaps, analysis.Gap{Kind: "python_parameter_unresolved", Detail: "unsupported helper parameter", At: spanOf(m.file, p)})
 			continue
 		}
 		v := pythonValue{}
@@ -204,7 +204,7 @@ func (f *pythonFlow) logger(q, name string, v pythonValue, method string, n *sit
 	return false
 }
 func (f *pythonFlow) log(n *sitter.Node, v pythonValue) {
-	var claims []graph.Gap
+	var claims []analysis.Gap
 	for _, d := range v.deps {
 		class, hint := logDataClass(d.container, d.key)
 		if d.container == "session" {

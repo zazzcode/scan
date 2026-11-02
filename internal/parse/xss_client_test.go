@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func TestBrowserSourceSinkControls(t *testing.T) {
@@ -31,7 +31,7 @@ func TestBrowserSourceSinkControls(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "browser.js", tt.source)
-			r, err := Strings(root, "")
+			r, err := Analyze(root, "")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -62,7 +62,7 @@ func TestReactAndVueRenderingControls(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, tt.file, tt.source)
-			r, err := Strings(root, "")
+			r, err := Analyze(root, "")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -90,7 +90,7 @@ func TestAngularTrustAndTemplateBindings(t *testing.T) {
 			root := t.TempDir()
 			writeSource(t, root, "component.ts", "import {Component,inject} from '@angular/core';import {ActivatedRoute} from '@angular/router';import {DomSanitizer} from '@angular/platform-browser';@Component({templateUrl:'./page.html'}) export class Page {private route=inject(ActivatedRoute);private sanitizer=inject(DomSanitizer);run(){const q=this.route.snapshot.queryParams.q;this.value="+tt.expression+"}}")
 			writeSource(t, root, "page.html", tt.template)
-			r, err := Strings(root, "")
+			r, err := Analyze(root, "")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -106,30 +106,30 @@ func TestAngularTrustAndTemplateBindings(t *testing.T) {
 }
 
 func TestSameSinkClientRecordsMerge(t *testing.T) {
-	dep := func(text string, at uint) graph.Dependency {
-		return graph.Dependency{Source: graph.Evidence{Kind: "browser_source", Text: text, Span: graph.Span{File: "c.ts", StartByte: int(at)}}, Transfers: []graph.Evidence{}}
+	dep := func(text string, at uint) analysis.Dependency {
+		return analysis.Dependency{Source: analysis.Evidence{Kind: "browser_source", Text: text, Span: analysis.Span{File: "c.ts", StartByte: int(at)}}, Transfers: []analysis.Evidence{}}
 	}
-	use := func(kind, protection string, resolved bool, d graph.Dependency) graph.StringUse {
-		return graph.StringUse{ID: "xss:client:c.ts:1", ClientID: "client:c.ts", Kind: "xss_candidate", Sink: graph.Evidence{Span: graph.Span{File: "c.html", StartByte: 9}},
-			Dependencies: []graph.Dependency{d}, XSS: &graph.XSSFacts{Type: kind, Protection: protection, OriginResolved: resolved, ResponsePath: map[bool]string{false: "/api/x"}[resolved]}}
+	use := func(kind, protection string, resolved bool, d analysis.Dependency) analysis.CandidateUse {
+		return analysis.CandidateUse{ID: "xss:client:c.ts:1", ClientID: "client:c.ts", Kind: "xss_candidate", Sink: analysis.Evidence{Span: analysis.Span{File: "c.html", StartByte: 9}},
+			Dependencies: []analysis.Dependency{d}, XSS: &analysis.XSSFacts{Type: kind, Protection: protection, OriginResolved: resolved, ResponsePath: map[bool]string{false: "/api/x"}[resolved]}}
 	}
 	tests := []struct {
 		name       string
-		uses       []graph.StringUse
+		uses       []analysis.CandidateUse
 		protection string
 		typ        string
 		paths      string
 	}{
-		{"weak cross-tier first does not hide later raw DOM", []graph.StringUse{use("cross_tier", "unknown", false, dep("api", 1)), use("dom", "raw", true, dep("location.hash", 2))}, "raw", "dom", "raw,unknown"},
+		{"weak cross-tier first does not hide later raw DOM", []analysis.CandidateUse{use("cross_tier", "unknown", false, dep("api", 1)), use("dom", "raw", true, dep("location.hash", 2))}, "raw", "dom", "raw,unknown"},
 		// The unresolved cross-tier claim is kept (Review), not replaced by the protected sibling.
-		{"unresolved cross-tier raw path is not covered by a protected sibling", []graph.StringUse{use("dom", "encoded", true, dep("location.hash", 2)), use("cross_tier", "raw", false, dep("api", 1))}, "raw", "cross_tier", "raw,encoded"},
-		{"protected record does not cover an unknown sibling", []graph.StringUse{use("dom", "encoded", true, dep("a", 1)), use("dom", "unknown", true, dep("b", 2))}, "unknown", "dom", "unknown,encoded"},
-		{"identical records stay one protected record", []graph.StringUse{use("dom", "encoded", true, dep("a", 1)), use("dom", "encoded", true, dep("a", 1))}, "encoded", "dom", ""},
+		{"unresolved cross-tier raw path is not covered by a protected sibling", []analysis.CandidateUse{use("dom", "encoded", true, dep("location.hash", 2)), use("cross_tier", "raw", false, dep("api", 1))}, "raw", "cross_tier", "raw,encoded"},
+		{"protected record does not cover an unknown sibling", []analysis.CandidateUse{use("dom", "encoded", true, dep("a", 1)), use("dom", "unknown", true, dep("b", 2))}, "unknown", "dom", "unknown,encoded"},
+		{"identical records stay one protected record", []analysis.CandidateUse{use("dom", "encoded", true, dep("a", 1)), use("dom", "encoded", true, dep("a", 1))}, "encoded", "dom", ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &graph.StringReport{}
-			addClientUses(r, &clientContext{entry: graph.ClientEntry{ID: "client:c.ts"}}, tt.uses)
+			r := &analysis.AnalysisReport{}
+			addClientUses(r, &clientContext{entry: analysis.ClientEntry{ID: "client:c.ts"}}, tt.uses)
 			if len(r.Uses) != 1 || r.Uses[0].XSS.Protection != tt.protection || r.Uses[0].XSS.Type != tt.typ {
 				t.Fatalf("want one %s %s record: %+v", tt.typ, tt.protection, r.Uses)
 			}
@@ -160,7 +160,7 @@ func TestDOMAugmentedSink(t *testing.T) {
 	} {
 		root := t.TempDir()
 		writeSource(t, root, "browser.js", tt.source)
-		r, err := Strings(root, "")
+		r, err := Analyze(root, "")
 		if err != nil {
 			t.Fatal(err)
 		}

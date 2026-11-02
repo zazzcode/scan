@@ -5,13 +5,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func xssClaim(protection string) graph.StringUse {
-	return graph.StringUse{Kind: "xss_candidate", XSS: &graph.XSSFacts{Type: "reflected", OriginResolved: true, OutputContext: "html_text", Protection: protection},
-		Sink: graph.Evidence{Span: graph.Span{File: "views/page.ejs"}}, Context: []graph.Evidence{{Span: graph.Span{File: "app.js"}}},
-		APIModel: &graph.APIModel{ID: "html-output-v1"}, Completeness: &graph.Completeness{ClaimKind: "xss", Evidence: map[string][]graph.Evidence{
+func xssClaim(protection string) analysis.CandidateUse {
+	return analysis.CandidateUse{Kind: "xss_candidate", XSS: &analysis.XSSFacts{Type: "reflected", OriginResolved: true, OutputContext: "html_text", Protection: protection},
+		Sink: analysis.Evidence{Span: analysis.Span{File: "views/page.ejs"}}, Context: []analysis.Evidence{{Span: analysis.Span{File: "app.js"}}},
+		APIModel: &analysis.APIModel{ID: "html-output-v1"}, Completeness: &analysis.Completeness{ClaimKind: "xss", Evidence: map[string][]analysis.Evidence{
 			"render_source": {{Kind: "request_source"}}, "render_binding": {{Kind: "render_binding"}}, "render_context": {{Kind: "template_output"}},
 		}}}
 }
@@ -27,7 +27,7 @@ func TestXSSPolicyEvidenceAndConsistency(t *testing.T) {
 		{"inconclusive", "raw", "unknown", "unknown", "unknown", "unknown", "needs_evidence"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			a := graph.Assessment{Status: "completed", QuestionVersion: xssQuestionVersion, Answers: map[string]string{
+			a := analysis.Assessment{Status: "completed", QuestionVersion: xssQuestionVersion, Answers: map[string]string{
 				"output_context": "html_text", "encoding_adequacy": tt.encoding, "sanitizer_effectiveness": tt.sanitizer,
 				"xss_all_paths_protected": tt.paths, "xss_exposure": tt.verdict}}
 			applyPolicy(xssClaim(tt.protection), &a)
@@ -39,7 +39,7 @@ func TestXSSPolicyEvidenceAndConsistency(t *testing.T) {
 	for _, missing := range []string{"render_source", "render_binding", "render_context", "protocol", "stored_origin"} {
 		t.Run("missing "+missing, func(t *testing.T) {
 			u := xssClaim("raw")
-			a := graph.Assessment{QuestionVersion: xssQuestionVersion, Answers: map[string]string{"output_context": "html_text", "encoding_adequacy": "not_present", "sanitizer_effectiveness": "absent", "xss_all_paths_protected": "no", "xss_exposure": "vulnerable"}}
+			a := analysis.Assessment{QuestionVersion: xssQuestionVersion, Answers: map[string]string{"output_context": "html_text", "encoding_adequacy": "not_present", "sanitizer_effectiveness": "absent", "xss_all_paths_protected": "no", "xss_exposure": "vulnerable"}}
 			switch missing {
 			case "protocol":
 				a.QuestionVersion = questionVersion
@@ -62,7 +62,7 @@ func TestXSSPayloadAndTypedAnswers(t *testing.T) {
 		c, _ := New(provider, "fixture-model", "fixture-key")
 		payload, err := c.payload(use)
 		if err != nil || !strings.Contains(string(payload), "encoding_adequacy") || !strings.Contains(string(payload), "sanitizer_effectiveness") || !strings.Contains(string(payload), "xss_exposure") || !strings.Contains(string(payload), "## Cross-site scripting") {
-			t.Fatalf("XSS protocol/practice missing: %s %v", payload, err)
+			t.Fatalf("XSS protocol/guidelines missing: %s %v", payload, err)
 		}
 	}
 	c, _ := New("openai", "fixture-model", "fixture-key")

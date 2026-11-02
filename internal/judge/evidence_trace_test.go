@@ -2,25 +2,25 @@ package judge
 
 import (
 	"encoding/json"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"strconv"
 	"testing"
 )
 
 func TestTraceGraphUsesOnlyDeclaredDependencies(t *testing.T) {
-	ev := func(kind string, start int) graph.Evidence {
-		return graph.Evidence{Kind: kind, Text: kind, SHA256: "snapshot", Span: graph.Span{File: "a.py", StartByte: start, EndByte: start + 1}}
+	ev := func(kind string, start int) analysis.Evidence {
+		return analysis.Evidence{Kind: kind, Text: kind, SHA256: "snapshot", Span: analysis.Span{File: "a.py", StartByte: start, EndByte: start + 1}}
 	}
 	source, param, guard, sink, unrelated := ev("request_source", 1), ev("argument_to_parameter", 2), ev("branch_precondition", 3), ev("operation", 4), ev("helper_definition", 5)
-	u := graph.StringUse{RouteID: "route", Sink: sink, Context: []graph.Evidence{unrelated}, Dependencies: []graph.Dependency{{Source: source, Transfers: []graph.Evidence{param, guard}, SinkSlot: "sql_parameters", StorageKey: "db:users.email"}}}
+	u := analysis.CandidateUse{RouteID: "route", Sink: sink, Context: []analysis.Evidence{unrelated}, Dependencies: []analysis.Dependency{{Source: source, Transfers: []analysis.Evidence{param, guard}, SinkSlot: "sql_parameters", StorageKey: "db:users.email"}}}
 	data, err := json.Marshal(wireBundle(u))
 	if err != nil {
 		t.Fatal(err)
 	}
 	var b struct {
-		Trace        traceGraph       `json:"trace_graph"`
-		Evidence     []graph.Evidence `json:"evidence"`
-		Dependencies []map[string]any `json:"dependencies"`
+		Trace        traceGraph          `json:"trace_graph"`
+		Evidence     []analysis.Evidence `json:"evidence"`
+		Dependencies []map[string]any    `json:"dependencies"`
 	}
 	if err := json.Unmarshal(data, &b); err != nil {
 		t.Fatal(err)

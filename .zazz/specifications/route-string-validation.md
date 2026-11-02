@@ -1,5 +1,8 @@
 # Route string validation — implementation contract
 
+Historical contract/evidence below retains its original names. Current package, CLI and report
+names are documented in the [implemented architecture](../architecture.md#naming-and-compatibility).
+
 **Authorization:** explicit user request, 2026-10-31, to implement in the isolated
 `route-string-validation` worktree. No further greenlight ceremony is required. The user also
 requested provider-neutral judging and a graph design covering outbound service exchanges.

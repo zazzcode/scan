@@ -9,7 +9,7 @@ open its database, or make the outbound requests found in the code.
 ```sh
 go build -o bin/scan ./cmd/scan
 ./bin/scan --routes --json /path/to/python-app
-./bin/scan --strings --entry server/routes.py --output-dir /path/to/findings /path/to/python-app
+./bin/scan --analyze --entry server/routes.py --output-dir /path/to/findings /path/to/python-app
 ```
 
 Omit `--entry` to discover all supported registration files, including mixed JS/TS/Python repositories.

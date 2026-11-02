@@ -1,4 +1,4 @@
-package graph
+package analysis
 
 // ClientEntry identifies browser code without manufacturing an HTTP route.
 type ClientEntry struct {

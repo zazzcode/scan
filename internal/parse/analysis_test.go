@@ -9,12 +9,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func TestStringFlowGolden(t *testing.T) {
+func TestAnalysisGolden(t *testing.T) {
 	const root = "testdata/string-flow"
-	report, err := Strings(root, "server.ts")
+	report, err := Analyze(root, "server.ts")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -23,7 +23,7 @@ func TestStringFlowGolden(t *testing.T) {
 		t.Fatal(err)
 	}
 	got = append(got, '\n')
-	const file = root + "/strings.graph.json"
+	const file = root + "/analysis.json"
 	if *update {
 		if err := os.WriteFile(file, got, 0644); err != nil {
 			t.Fatal(err)
@@ -34,7 +34,7 @@ func TestStringFlowGolden(t *testing.T) {
 		t.Fatal(err)
 	}
 	if !bytes.Equal(got, want) {
-		t.Fatalf("string graph differs from golden; use -update and review diff\n%s", got)
+		t.Fatalf("analysis report differs from golden; use -update and review diff\n%s", got)
 	}
 	if len(report.Uses) != 1 || len(report.Uses[0].Dependencies) != 1 {
 		t.Fatalf("uses = %+v", report.Uses)
@@ -52,7 +52,7 @@ func TestStringFlowGolden(t *testing.T) {
 			t.Fatalf("bad source span: %+v", e)
 		}
 	}
-	second, err := Strings(root, "server.ts")
+	second, err := Analyze(root, "server.ts")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,12 +88,12 @@ func TestLocalDependencies(t *testing.T) {
 			root := t.TempDir()
 			src := "import express from 'express';const app=express();app.post('/x',async (req,res)=>{" + tt.body + "})"
 			writeSource(t, root, "server.ts", src)
-			report, err := Strings(root, "server.ts")
+			report, err := Analyze(root, "server.ts")
 			if err != nil {
 				t.Fatal(err)
 			}
 			sinks := 0
-			var u graph.StringUse
+			var u analysis.CandidateUse
 			for _, use := range report.Uses {
 				if use.Kind == "input_validation_candidate" || use.Kind == "log_sink_candidate" {
 					continue
@@ -127,7 +127,7 @@ func TestLocalDependencies(t *testing.T) {
 func TestEntrySelectionAndReceiver(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "server.ts", `import * as express from 'express';const app=express();app.post('/x',(req,res)=>db.query(req.body.x));request(app).post('/client');function fake(app){app.get('/shadow',(req,res)=>db.query(req.body.x))}`)
-	report, err := Strings(root, "server.ts")
+	report, err := Analyze(root, "server.ts")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -138,7 +138,7 @@ func TestEntrySelectionAndReceiver(t *testing.T) {
 		t.Fatal("shadowed receiver was accepted")
 	}
 	for _, entry := range []string{"../outside.ts", "/tmp/outside.ts", "missing.ts"} {
-		if _, err := Strings(root, entry); err == nil {
+		if _, err := Analyze(root, entry); err == nil {
 			t.Errorf("accepted entry %s", entry)
 		}
 	}
@@ -147,7 +147,7 @@ func TestEntrySelectionAndReceiver(t *testing.T) {
 func TestConfiguredReceiverParameter(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "server.ts", `import express from 'express';const app=express();function configure(app){app.post('/x',(req,res)=>db.query(req.body.x))}configure(app)`)
-	report, err := Strings(root, "server.ts")
+	report, err := Analyze(root, "server.ts")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -160,7 +160,7 @@ func TestUnknownHandlerAndParseError(t *testing.T) {
 	for _, src := range []string{`import express from 'express';const app=express();app.get('/x',missing)`, `const = (`} {
 		root := t.TempDir()
 		writeSource(t, root, "server.ts", src)
-		report, err := Strings(root, "server.ts")
+		report, err := Analyze(root, "server.ts")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -187,7 +187,7 @@ func TestHandlerImportShadowing(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "handler.ts", `export function handler(req,res){db.query(req.body.x)}`)
 	writeSource(t, root, "server.ts", `import express from 'express';import {handler} from './handler';const app=express();function configure(){const handler=unrelated;app.post('/x',handler)}`)
-	report, err := Strings(root, "server.ts")
+	report, err := Analyze(root, "server.ts")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -205,12 +205,12 @@ func TestDependencyLimit(t *testing.T) {
 	}
 	body += "db.query(v)"
 	writeSource(t, root, "server.ts", "import express from 'express';const app=express();app.get('/x',(req,res)=>{"+body+"})")
-	report, err := Strings(root, "server.ts")
+	report, err := Analyze(root, "server.ts")
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Inputs beyond the limit are reported as their own input-validation records.
-	var query *graph.StringUse
+	var query *analysis.CandidateUse
 	for i := range report.Uses {
 		if report.Uses[i].Kind == "sql_query_candidate" {
 			query = &report.Uses[i]
@@ -233,7 +233,7 @@ func TestDependencyLimit(t *testing.T) {
 func TestCustomValidationEvidence(t *testing.T) {
 	root := t.TempDir()
 	writeSource(t, root, "server.ts", `import express from 'express';const app=express();function acceptsId(value){return /^[0-9]+$/.test(value)}app.get('/x',(req,res)=>{const id=req.query.id;if(!acceptsId(id)){return};db.query('SELECT '+id)})`)
-	report, err := Strings(root, "server.ts")
+	report, err := Analyze(root, "server.ts")
 	if err != nil {
 		t.Fatal(err)
 	}

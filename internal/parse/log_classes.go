@@ -6,7 +6,7 @@ import (
 	"unicode"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 // Field-key lexicons produce hints for judgment, never an established data class.
@@ -20,9 +20,9 @@ var keyToken = regexp.MustCompile(`[A-Za-z0-9_$-]+`)
 
 // classifyLogDeps turns the classified request dependencies of a logger call into
 // claim gaps. Each dependency is judged on its own transfers.
-func (f *flow) classifyLogDeps(deps []graph.Dependency, at *sitter.Node) []graph.Gap {
+func (f *flow) classifyLogDeps(deps []analysis.Dependency, at *sitter.Node) []analysis.Gap {
 	seen := map[string]bool{}
-	var out []graph.Gap
+	var out []analysis.Gap
 	add := func(kind, detail string) {
 		if seen[kind+"\x00"+detail] {
 			return
@@ -65,7 +65,7 @@ func (f *flow) classifyLogDeps(deps []graph.Dependency, at *sitter.Node) []graph
 
 // requestKey returns the request container and field key of a dependency. A
 // destructured binding supplies the key through its field_projection transfer.
-func requestKey(d graph.Dependency) (string, string) {
+func requestKey(d analysis.Dependency) (string, string) {
 	tokens := keyToken.FindAllString(d.Source.Text, -1)
 	container, key := "", ""
 	for i, t := range tokens {
@@ -167,7 +167,7 @@ func nameTokens(s string) []string {
 // logContent reports whether a dependency reaches the logger as content, as a
 // derived non-content fact, or through an unmodeled transformation. Once a value
 // is reduced to a non-content fact, later transfers cannot restore its content.
-func (s *moduleSet) logContent(d graph.Dependency) (string, string) {
+func (s *moduleSet) logContent(d analysis.Dependency) (string, string) {
 	unresolved := ""
 	for _, t := range d.Transfers {
 		m := s.modules[t.Span.File]

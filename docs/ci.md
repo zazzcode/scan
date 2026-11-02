@@ -14,7 +14,7 @@ built and the target is checked out at `target/` with its entry file at `server.
 - name: Scan target
   env:
     SCAN_FINDINGS_DIR: ${{ runner.temp }}/scan-findings
-  run: ./bin/scan --strings --entry server.ts target
+  run: ./bin/scan --analyze --entry server.ts target
 
 - name: Save scan reports
   if: always()

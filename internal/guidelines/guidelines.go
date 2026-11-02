@@ -1,7 +1,7 @@
-// Package rules is the practice pack the scanner applies while it runs.
+// Package guidelines embeds versioned language analysis guidelines supplied to the semantic judge.
 // The files are embedded in the binary. .zazz standards are the SDLC for this
 // repo and are not consulted here.
-package rules
+package guidelines
 
 import (
 	"embed"
@@ -15,15 +15,15 @@ import (
 //go:embed javascript.md python.md go.md
 var files embed.FS
 
-// Practice is one language standard, loaded from the embedded rule pack.
-type Practice struct {
+// AnalysisGuidelines contains secure coding guidance and instructions for interpreting source evidence.
+type AnalysisGuidelines struct {
 	ID        string   `json:"id"`
 	Version   string   `json:"version"`
 	Languages []string `json:"languages"`
 	Body      string   `json:"body"`
 }
 
-var pack []Practice
+var pack []AnalysisGuidelines
 
 func init() {
 	names := []string{"javascript.md", "python.md", "go.md"}
@@ -40,8 +40,8 @@ func init() {
 	}
 }
 
-func parse(raw string) (Practice, error) {
-	item := Practice{Body: raw}
+func parse(raw string) (AnalysisGuidelines, error) {
+	item := AnalysisGuidelines{Body: raw}
 	for _, line := range strings.Split(raw, "\n") {
 		if strings.TrimSpace(line) == "" || strings.HasPrefix(line, "#") {
 			continue
@@ -69,13 +69,13 @@ func parse(raw string) (Practice, error) {
 		}
 	}
 	if item.ID == "" || item.Version == "" || len(item.Languages) == 0 {
-		return Practice{}, fmt.Errorf("practice file needs id, version, and languages")
+		return AnalysisGuidelines{}, fmt.Errorf("analysis guidelines file needs id, version, and languages")
 	}
 	return item, nil
 }
 
-// ForLanguage returns the practice pack for a detected source language.
-func ForLanguage(language lang.Language) (Practice, bool) {
+// ForLanguage returns the analysis guidelines for a detected source language.
+func ForLanguage(language lang.Language) (AnalysisGuidelines, bool) {
 	for _, item := range pack {
 		for _, name := range item.Languages {
 			if name == string(language) {
@@ -83,12 +83,12 @@ func ForLanguage(language lang.Language) (Practice, bool) {
 			}
 		}
 	}
-	return Practice{}, false
+	return AnalysisGuidelines{}, false
 }
 
-// ForPaths returns each applicable practice once, ordered by id.
-func ForPaths(paths []string) []Practice {
-	seen := map[string]Practice{}
+// ForPaths returns each applicable guidelines document once, ordered by id.
+func ForPaths(paths []string) []AnalysisGuidelines {
+	seen := map[string]AnalysisGuidelines{}
 	for _, path := range paths {
 		language, ok := lang.Detect(path)
 		if !ok {
@@ -105,7 +105,7 @@ func ForPaths(paths []string) []Practice {
 		ids = append(ids, id)
 	}
 	sort.Strings(ids)
-	out := make([]Practice, 0, len(ids))
+	out := make([]AnalysisGuidelines, 0, len(ids))
 	for _, id := range ids {
 		item := seen[id]
 		item.Body = ""
@@ -114,7 +114,7 @@ func ForPaths(paths []string) []Practice {
 	return out
 }
 
-// Body returns the full standard for a language, for the decision request.
-func Body(language lang.Language) (Practice, bool) {
+// Body returns the full guidelines document for a language, for the decision request.
+func Body(language lang.Language) (AnalysisGuidelines, bool) {
 	return ForLanguage(language)
 }

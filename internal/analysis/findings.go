@@ -1,4 +1,4 @@
-package graph
+package analysis
 
 // Finding is a human-readable interpretation of one evidence use, not a new detector verdict.
 type Finding struct {

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func parameterNames(fn *sitter.Node, src []byte) []string {
@@ -58,7 +58,7 @@ func readsInput(n *sitter.Node, src []byte, names map[string]bool, fields []stri
 	return false
 }
 
-func (s *moduleSet) inputHelpers(m *sourceModule, n *sitter.Node, out *[]graph.Evidence, seen map[string]bool, depth int, names map[string]bool) {
+func (s *moduleSet) inputHelpers(m *sourceModule, n *sitter.Node, out *[]analysis.Evidence, seen map[string]bool, depth int, names map[string]bool) {
 	if n == nil {
 		return
 	}
@@ -92,7 +92,7 @@ func (s *moduleSet) inputHelpers(m *sourceModule, n *sitter.Node, out *[]graph.E
 			return
 		}
 		if depth >= 3 || len(seen) >= 24 {
-			s.contextLimits = append(s.contextLimits, graph.Gap{Kind: "helper_context_limit", Detail: "checked-input helper expansion reached its depth/count limit", At: spanOf(target.file, helper)})
+			s.contextLimits = append(s.contextLimits, analysis.Gap{Kind: "helper_context_limit", Detail: "checked-input helper expansion reached its depth/count limit", At: spanOf(target.file, helper)})
 			return
 		}
 		seen[key] = true

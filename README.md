@@ -116,6 +116,7 @@ same operation. Read the [project philosophy](docs/philosophy.md).
 
 Start with the [documentation index and introduction](docs/README.md):
 
+- [Technical approach](docs/technical-approach.md) — architecture rationale, strengths and comparisons
 - [Philosophy](docs/philosophy.md) — why and when an agent should fix code
 - [Getting started](docs/getting-started.md) — prerequisites, compilation, and `.env`
 - [Running scans](docs/running-scans.md) — modes, entry selection, output folders, and exports
@@ -153,11 +154,11 @@ calls. Commands without `--judge` collect evidence but do not complete a model-a
 
 ```bash
 export SCAN_FINDINGS_DIR="$HOME/Dev/zazzcode/zazzles/_test-findings"
-./bin/scan --strings --entry server.ts \
+./bin/scan --analyze --entry server.ts \
   --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/juice-shop
-./bin/scan --strings --entry src/server.ts \
+./bin/scan --analyze --entry src/server.ts \
   --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/vulnerable-typescript-app
-./bin/scan --strings --entry server/routes.py \
+./bin/scan --analyze --entry server/routes.py \
   --judge openai --judge-model gpt-6-luna --judge-limit 10 /path/to/ThreatByte
 ```
 

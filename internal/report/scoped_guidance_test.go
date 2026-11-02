@@ -1,7 +1,7 @@
 package report
 
 import (
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"strings"
 	"testing"
 )
@@ -12,7 +12,7 @@ func TestSourceSpecificSQLiteRemediation(t *testing.T) {
 		{"percent value", `cur.execute("select * from accounts where name = '%s'" % name)`, "name = ?", "name,"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			u := graph.StringUse{Kind: "sql_query_candidate", APIModel: &graph.APIModel{Library: "sqlite3"}, Sink: graph.Evidence{Text: tt.source, Span: graph.Span{File: "app.py", StartLine: 18}}, Gaps: []graph.Gap{{Kind: "query_text_interpolated"}}}
+			u := analysis.CandidateUse{Kind: "sql_query_candidate", APIModel: &analysis.APIModel{Library: "sqlite3"}, Sink: analysis.Evidence{Text: tt.source, Span: analysis.Span{File: "app.py", StartLine: 18}}, Gaps: []analysis.Gap{{Kind: "query_text_interpolated"}}}
 			f := describe(u)
 			g := f.Recommendations
 			if !strings.Contains(g.Example, tt.wantSQL) || !strings.Contains(g.Example, tt.wantParams) || strings.Contains(g.Example, "sequelize") {
@@ -25,12 +25,12 @@ func TestSourceSpecificSQLiteRemediation(t *testing.T) {
 	}
 }
 func TestProtectedAndReviewDoNotPrescribeUnprovenFixes(t *testing.T) {
-	protected := graph.StringUse{Kind: "xss_candidate", Sink: graph.Evidence{Text: "{{ user.team }}", Span: graph.Span{File: "profile.html", StartLine: 46}}, XSS: &graph.XSSFacts{Protection: "encoded", OutputContext: "html_text", OriginResolved: true}}
+	protected := analysis.CandidateUse{Kind: "xss_candidate", Sink: analysis.Evidence{Text: "{{ user.team }}", Span: analysis.Span{File: "profile.html", StartLine: 46}}, XSS: &analysis.XSSFacts{Protection: "encoded", OutputContext: "html_text", OriginResolved: true}}
 	f := describe(protected)
 	if f.Recommendations.Example != "" || !strings.Contains(f.Recommendations.Title, "Preserve") {
 		t.Fatal("Protected output receives repair template")
 	}
-	protected.Assessment = graph.Assessment{Status: "completed", FindingStatus: "needs_evidence", Protection: "uncertain"}
+	protected.Assessment = analysis.Assessment{Status: "completed", FindingStatus: "needs_evidence", Protection: "uncertain"}
 	f = describe(protected)
 	if !strings.Contains(f.Recommendations.Title, "Resolve") || f.Recommendations.Example != "" {
 		t.Fatal("Review output prescribes a patch")
@@ -38,7 +38,7 @@ func TestProtectedAndReviewDoNotPrescribeUnprovenFixes(t *testing.T) {
 }
 func TestRawTemplateAndDOMRepairsNameExactOperation(t *testing.T) {
 	for _, source := range []string{`{{ user.country | safe }}`, `$comments.append('<li>' + comment + '</li>')`} {
-		u := graph.StringUse{Kind: "xss_candidate", Sink: graph.Evidence{Text: source, Span: graph.Span{File: "view.html", StartLine: 12}}, XSS: &graph.XSSFacts{Type: "reflected", Protection: "raw", OutputContext: "html_text", OriginResolved: true}}
+		u := analysis.CandidateUse{Kind: "xss_candidate", Sink: analysis.Evidence{Text: source, Span: analysis.Span{File: "view.html", StartLine: 12}}, XSS: &analysis.XSSFacts{Type: "reflected", Protection: "raw", OutputContext: "html_text", OriginResolved: true}}
 		g := describe(u).Recommendations
 		if g.Example == "" || !strings.Contains(strings.Join(g.Actions, " "), "view.html:12") {
 			t.Fatalf("source-specific repair missing %+v", g)
@@ -47,7 +47,7 @@ func TestRawTemplateAndDOMRepairsNameExactOperation(t *testing.T) {
 }
 
 func TestProtectedDisplayCannotOverrideCanonicalBlocker(t *testing.T) {
-	u := graph.StringUse{Kind: "xss_candidate", XSS: &graph.XSSFacts{Protection: "encoded", OutputContext: "html_text"}, Completeness: &graph.Completeness{Blockers: []graph.Gap{{Kind: "unresolved_helper"}}}, Assessment: graph.Assessment{Status: "completed", FindingStatus: "protected_for_claim"}}
+	u := analysis.CandidateUse{Kind: "xss_candidate", XSS: &analysis.XSSFacts{Protection: "encoded", OutputContext: "html_text"}, Completeness: &analysis.Completeness{Blockers: []analysis.Gap{{Kind: "unresolved_helper"}}}, Assessment: analysis.Assessment{Status: "completed", FindingStatus: "protected_for_claim"}}
 	f := describe(u)
 	if f.RecordType == "protection" || f.Status != "needs_evidence" || f.Title == "Context-appropriate rendering protection is present" {
 		t.Fatalf("unsafe display: %+v", f)
@@ -55,7 +55,7 @@ func TestProtectedDisplayCannotOverrideCanonicalBlocker(t *testing.T) {
 }
 
 func TestProtectedSQLHeadingAndValidationScope(t *testing.T) {
-	u := graph.StringUse{Kind: "sql_query_candidate", Gaps: []graph.Gap{{Kind: "input_validation_absent", Detail: "No complete policy established"}}, Assessment: graph.Assessment{Status: "completed", FindingStatus: "protected_for_claim", Answers: map[string]string{"injection_protection": "protected", "validation": "insufficient"}, Protection: "sufficient"}}
+	u := analysis.CandidateUse{Kind: "sql_query_candidate", Gaps: []analysis.Gap{{Kind: "input_validation_absent", Detail: "No complete policy established"}}, Assessment: analysis.Assessment{Status: "completed", FindingStatus: "protected_for_claim", Answers: map[string]string{"injection_protection": "protected", "validation": "insufficient"}, Protection: "sufficient"}}
 	f := describe(u)
 	if f.RecordType != "protection" || f.Title != "SQL values remain separate from query syntax" {
 		t.Fatalf("contradictory SQL heading: %+v", f)

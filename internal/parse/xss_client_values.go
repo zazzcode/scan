@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 func browserGlobal(m *sourceModule, node *sitter.Node, name string) bool {
@@ -12,7 +12,7 @@ func browserGlobal(m *sourceModule, node *sitter.Node, name string) bool {
 }
 
 func (f *flow) browserSource(node *sitter.Node) value {
-	return value{deps: []graph.Dependency{{Source: f.module.evidence("browser_source", node), Transfers: []graph.Evidence{}}}}
+	return value{deps: []analysis.Dependency{{Source: f.module.evidence("browser_source", node), Transfers: []analysis.Evidence{}}}}
 }
 
 func (f *flow) clientValue(n *sitter.Node) (value, bool) {

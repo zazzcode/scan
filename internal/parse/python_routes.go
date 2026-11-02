@@ -6,21 +6,21 @@ import (
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 type pythonReceiver struct {
 	kind, prefix, templates string
-	evidence                []graph.Evidence
+	evidence                []analysis.Evidence
 	uncertain               bool
 }
 type pythonRoute struct {
-	route         graph.Route
+	route         analysis.Route
 	module        *pythonModule
 	fn, decorator *sitter.Node
 	receiver      pythonReceiver
 	html          bool
-	gaps          []graph.Gap
+	gaps          []analysis.Gap
 }
 
 func (s *pythonSet) receiver(m *pythonModule, name string, depth int) pythonReceiver {
@@ -44,7 +44,7 @@ func (s *pythonSet) receiver(m *pythonModule, name string, depth int) pythonRece
 	fn := pyText(m, n.ChildByFieldName("function"))
 	q := s.qualified(m, fn)
 	args := pyArgs(n)
-	r := pythonReceiver{evidence: []graph.Evidence{m.evidence("receiver_binding", n)}}
+	r := pythonReceiver{evidence: []analysis.Evidence{m.evidence("receiver_binding", n)}}
 	switch q {
 	case "flask.Flask":
 		r.kind = "flask"
@@ -110,7 +110,7 @@ func (s *pythonSet) routeEntries() []pythonRoute {
 				if fn != nil && fn.Kind() == "attribute" && pyText(m, fn.ChildByFieldName("attribute")) == "add_url_rule" {
 					recv := s.receiver(m, pyText(m, fn.ChildByFieldName("object")), 0)
 					if recv.kind == "flask" {
-						s.gaps = append(s.gaps, graph.Gap{Kind: "python_registration_unresolved", Detail: "Verified Flask add_url_rule registration is outside the supported decorator registration subset; its generated handler/path is not analyzed.", At: spanOf(m.file, n)})
+						s.gaps = append(s.gaps, analysis.Gap{Kind: "python_registration_unresolved", Detail: "Verified Flask add_url_rule registration is outside the supported decorator registration subset; its generated handler/path is not analyzed.", At: spanOf(m.file, n)})
 					}
 				}
 			}
@@ -153,12 +153,12 @@ func (s *pythonSet) routeEntries() []pythonRoute {
 					pathNode = pyKeywordIn(m, call, "rule")
 				}
 				if pathNode == nil {
-					s.gaps = append(s.gaps, graph.Gap{Kind: "dynamic_path", Detail: "Python route path operand is missing or unsupported", At: spanOf(m.file, d)})
+					s.gaps = append(s.gaps, analysis.Gap{Kind: "dynamic_path", Detail: "Python route path operand is missing or unsupported", At: spanOf(m.file, d)})
 					continue
 				}
 				path, ok := pyLiteral(m, pathNode)
 				if !ok {
-					s.gaps = append(s.gaps, graph.Gap{Kind: "dynamic_path", Detail: "Python route path is not literal", At: spanOf(m.file, d)})
+					s.gaps = append(s.gaps, analysis.Gap{Kind: "dynamic_path", Detail: "Python route path is not literal", At: spanOf(m.file, d)})
 					continue
 				}
 				prefix, mountGap := s.mountPrefix(m, recvName, recv)
@@ -279,17 +279,17 @@ func (s *pythonSet) routeFromRegistration(reg pythonRegistration, handler *sitte
 	recvName, path, mountGap, recv := reg.receiverName, reg.path, reg.mountGap, reg.receiver
 
 	name := pyText(m, handler.ChildByFieldName("name"))
-	r := graph.Route{ID: fmt.Sprintf("route:%s:%d:%s:%s", m.file, d.StartByte(), verb, path), Method: verb, PathPattern: path, Framework: recv.kind, Registration: spanOf(m.file, d), Handler: graph.Symbol{Name: name, Kind: "function", Span: spanOf(m.file, handler)}}
-	r.Steps = []graph.Step{{Kind: "registration", Symbol: graph.Symbol{Name: pyText(m, fn), Kind: "decorator", Span: spanOf(m.file, d)}}, {Kind: "handler", Symbol: r.Handler}}
+	r := analysis.Route{ID: fmt.Sprintf("route:%s:%d:%s:%s", m.file, d.StartByte(), verb, path), Method: verb, PathPattern: path, Framework: recv.kind, Registration: spanOf(m.file, d), Handler: analysis.Symbol{Name: name, Kind: "function", Span: spanOf(m.file, handler)}}
+	r.Steps = []analysis.Step{{Kind: "registration", Symbol: analysis.Symbol{Name: pyText(m, fn), Kind: "decorator", Span: spanOf(m.file, d)}}, {Kind: "handler", Symbol: r.Handler}}
 	pr := pythonRoute{route: r, module: m, fn: handler, decorator: call, receiver: recv, html: recv.kind == "flask"}
 	if v := pyKeywordIn(m, call, "response_class"); v != nil {
 		pr.html = s.qualified(m, pyText(m, v)) == "fastapi.responses.HTMLResponse"
 	}
 	if recv.uncertain {
-		pr.gaps = append(pr.gaps, graph.Gap{Kind: "render_configuration_unresolved", Detail: "dynamic receiver/template settings", At: r.Registration})
+		pr.gaps = append(pr.gaps, analysis.Gap{Kind: "render_configuration_unresolved", Detail: "dynamic receiver/template settings", At: r.Registration})
 	}
 	if mountGap != "" {
-		pr.gaps = append(pr.gaps, graph.Gap{Kind: "route_mount_unresolved", Detail: mountGap, At: r.Registration})
+		pr.gaps = append(pr.gaps, analysis.Gap{Kind: "route_mount_unresolved", Detail: mountGap, At: r.Registration})
 	}
 	// Custom decorators can change arguments, enforce checks, or replace responses.
 	pyWalk(n, func(other *sitter.Node) {
@@ -303,7 +303,7 @@ func (s *pythonSet) routeFromRegistration(reg pythonRegistration, handler *sitte
 		if strings.HasPrefix(text, "@"+recvName+".") {
 			return
 		}
-		pr.gaps = append(pr.gaps, graph.Gap{Kind: "python_decorator_unresolved", Detail: text, At: spanOf(m.file, other)})
+		pr.gaps = append(pr.gaps, analysis.Gap{Kind: "python_decorator_unresolved", Detail: text, At: spanOf(m.file, other)})
 	})
 	return pr
 

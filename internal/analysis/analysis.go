@@ -1,4 +1,7 @@
-package graph
+package analysis
+
+// ReportSchemaVersion identifies analysis reports using analysis_guidelines metadata.
+const ReportSchemaVersion = 2
 
 // Evidence binds an observed operation to an immutable source file snapshot.
 type Evidence struct {
@@ -17,8 +20,8 @@ type Dependency struct {
 	Transfers  []Evidence `json:"transfers"`
 }
 
-// StringUse is a candidate use needing context-specific assessment.
-type StringUse struct {
+// CandidateUse is a security-sensitive value use needing claim-specific analysis.
+type CandidateUse struct {
 	XSS          *XSSFacts     `json:"xss,omitempty"`
 	APIModel     *APIModel     `json:"api_model,omitempty"`
 	ControlEdges []ControlEdge `json:"control_edges,omitempty"`
@@ -57,26 +60,26 @@ type Entry struct {
 	Gaps    []Gap     `json:"gaps"`
 }
 
-// StringReport is the bounded analysis artifact, separate from route-v1 JSON.
-type StringReport struct {
-	ClientEntries       []ClientEntry `json:"client_entries,omitempty"`
-	FindingTypes        []FindingType `json:"finding_types,omitempty"`
-	PresentationVersion int           `json:"presentation_version,omitempty"`
-	Findings            []Finding     `json:"findings,omitempty"`
-	SelectedRoute       string        `json:"selected_route,omitempty"`
-	SchemaVersion       int           `json:"schema_version"`
-	Root                string        `json:"root"`
-	Entries             []Entry       `json:"entries"`
-	Uses                []StringUse   `json:"uses"`
-	Gaps                []Gap         `json:"gaps"`
-	Files               []Evidence    `json:"files"`
-	Limitations         []string      `json:"limitations"`
-	Practice            []PracticeRef `json:"practice,omitempty"`
+// AnalysisReport contains bounded security analysis, separate from the route inventory.
+type AnalysisReport struct {
+	ClientEntries       []ClientEntry   `json:"client_entries,omitempty"`
+	FindingTypes        []FindingType   `json:"finding_types,omitempty"`
+	PresentationVersion int             `json:"presentation_version,omitempty"`
+	Findings            []Finding       `json:"findings,omitempty"`
+	SelectedRoute       string          `json:"selected_route,omitempty"`
+	SchemaVersion       int             `json:"schema_version"`
+	Root                string          `json:"root"`
+	Entries             []Entry         `json:"entries"`
+	Uses                []CandidateUse  `json:"uses"`
+	Gaps                []Gap           `json:"gaps"`
+	Files               []Evidence      `json:"files"`
+	Limitations         []string        `json:"limitations"`
+	AnalysisGuidelines  []GuidelinesRef `json:"analysis_guidelines,omitempty"`
 }
 
-// PracticeRef names the embedded language rule applied to this report.
+// GuidelinesRef identifies the embedded language analysis guidelines used for a report.
 // The full text is sent with a decision request, not copied into every use.
-type PracticeRef struct {
+type GuidelinesRef struct {
 	ID        string   `json:"id"`
 	Version   string   `json:"version"`
 	Languages []string `json:"languages"`

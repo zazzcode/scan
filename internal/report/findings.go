@@ -3,22 +3,22 @@ package report
 import (
 	"strings"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
 // Enrich adds deterministic display records while preserving raw evidence and assessments.
-// Rebuilding from uses also lets older saved reports use the current presentation rules.
-func Enrich(r *graph.StringReport) {
+// Rebuilding from uses also lets older saved reports use the current presentation guidelines.
+func Enrich(r *analysis.AnalysisReport) {
 	r.PresentationVersion = 5
-	r.FindingTypes = append([]graph.FindingType(nil), findingTypes...)
-	r.Findings = make([]graph.Finding, 0, len(r.Uses))
+	r.FindingTypes = append([]analysis.FindingType(nil), findingTypes...)
+	r.Findings = make([]analysis.Finding, 0, len(r.Uses))
 	for _, u := range r.Uses {
 		r.Findings = append(r.Findings, describe(u))
 	}
 }
 
-func describe(u graph.StringUse) graph.Finding {
-	f := graph.Finding{ID: "finding:" + u.ID, TypeIDs: findingTypeIDs(u), UseID: u.ID, RouteID: u.RouteID,
+func describe(u analysis.CandidateUse) analysis.Finding {
+	f := analysis.Finding{ID: "finding:" + u.ID, TypeIDs: findingTypeIDs(u), UseID: u.ID, RouteID: u.RouteID,
 		ClientID:   u.ClientID,
 		RecordType: "analysis", Status: "needs_review", Title: "Sensitive operation needs review",
 		Summary:    "Scan recorded a possible sensitive operation. Its security behavior has not been established.",
@@ -195,7 +195,7 @@ func describe(u graph.StringUse) graph.Finding {
 	f.Recommendations = scopedGuidance(u, f)
 	return f
 }
-func hasGap(u graph.StringUse, kind string) bool {
+func hasGap(u analysis.CandidateUse, kind string) bool {
 	for _, g := range u.Gaps {
 		if g.Kind == kind {
 			return true
@@ -206,7 +206,7 @@ func hasGap(u graph.StringUse, kind string) bool {
 
 // Display must not inherit a safe label from an old assessment whose source claim
 // still declares blockers. The raw model answer remains available for audit.
-func protectionBlocked(u graph.StringUse) bool {
+func protectionBlocked(u analysis.CandidateUse) bool {
 	if len(u.Assessment.BlockingGaps) > 0 {
 		return true
 	}

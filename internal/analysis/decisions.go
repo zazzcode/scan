@@ -1,4 +1,4 @@
-package graph
+package analysis
 
 // AnswerDetail preserves provider-reported choice scores for audit. Scores are
 // not calibrated correctness guarantees and never replace source evidence.

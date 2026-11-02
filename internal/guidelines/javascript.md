@@ -1,8 +1,8 @@
 id: javascript
-version: 4
+version: 5
 languages: javascript, typescript
 
-# JavaScript and TypeScript practice
+# JavaScript and TypeScript analysis guidelines
 
 TypeScript types are not runtime validation. The same rules apply to `.js`, `.jsx`, `.ts`, and `.tsx`.
 

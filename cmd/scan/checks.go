@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 )
 
-func loadChecks(path string) ([]graph.Check, error) {
+func loadChecks(path string) ([]analysis.Check, error) {
 	if path == "" {
 		return nil, nil
 	}
@@ -26,7 +26,7 @@ func loadChecks(path string) ([]graph.Check, error) {
 	if len(data) > 64<<10 {
 		return nil, errors.New("checks file exceeds 64 KiB")
 	}
-	var checks []graph.Check
+	var checks []analysis.Check
 	dec := json.NewDecoder(strings.NewReader(string(data)))
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(&checks); err != nil {

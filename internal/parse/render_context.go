@@ -1,13 +1,13 @@
 package parse
 
 import (
-	"github.com/zazzcode/zazzles/internal/graph"
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"strings"
 )
 
 // renderMarkup supplies the actual surrounding markup, not just the interpolated
 // expression. Bounds limit context size without claiming the slice is a full DOM.
-func renderMarkup(file graph.Evidence, start, end int) graph.Evidence {
+func renderMarkup(file analysis.Evidence, start, end int) analysis.Evidence {
 	before := file.Text[:start]
 	left := strings.LastIndex(before, "\n") + 1
 	tag, closed := strings.LastIndex(before, "<"), strings.LastIndex(before, ">")
