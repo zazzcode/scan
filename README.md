@@ -1,8 +1,8 @@
 # Zazzles
 
-Zazzles is a Go static application security scanner (SAST) under active
-development. It aims to help developers and coding agents understand how request inputs reach
-security-sensitive operations,
+Zazzles is a static application security testing (SAST) tool under active development.
+It analyzes JavaScript, TypeScript and Python source to help developers and coding agents understand
+how request inputs reach security-sensitive operations,
 what validation and protection already hold, and where code needs hardening. Reports should give
 reviewers source evidence and explicit analysis gaps so they can judge each finding.
 
