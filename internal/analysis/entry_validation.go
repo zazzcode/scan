@@ -242,6 +242,9 @@ func validateEntryInvocation(ctx InvocationContext, index entryCatalogIndex) err
 }
 
 func validateEntryInput(input InputBinding, index entryCatalogIndex) error {
+	if input.Constant != nil && input.Origin.Kind != "constant" {
+		return fmt.Errorf("constant binding requires constant origin")
+	}
 	if input.Role == "" || input.Parameter == "" {
 		return fmt.Errorf("input role and parameter are required")
 	}

@@ -23,7 +23,7 @@ func applyPolicy(use analysis.CandidateUse, a *analysis.Assessment) {
 			a.Protection = "uncertain"
 			a.FindingStatus = "needs_evidence"
 			a.BlockingGaps = use.Gaps
-			a.Reason = "legacy candidate has no claim-scoped completeness evidence"
+			a.Reason = "candidate has no claim-scoped completeness evidence"
 		}
 		return
 	}

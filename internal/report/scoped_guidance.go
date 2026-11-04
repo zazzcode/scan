@@ -92,6 +92,19 @@ func renderingGuidance(u analysis.CandidateUse, at string) Guidance {
 			return g
 		}
 	}
+	if filepath.Ext(u.Sink.Span.File) == ".py" && (u.Sink.Kind == "html_return" || u.Sink.Kind == "html_response") && u.XSS.OutputContext == "html_text" {
+		compiled := false
+		for _, d := range u.Dependencies {
+			for _, e := range d.Transfers {
+				compiled = compiled || e.Kind == "template_source" || e.Kind == "template_render" || e.Kind == "template_compile"
+			}
+		}
+		if !compiled {
+			g.Actions = []string{"At " + at + ", HTML-encode the inserted request text before combining it with the returned HTML or HTMLResponse. Use an appropriate text encoder such as Python html.escape; retain the surrounding constant markup.", "If this output moves into a template, pass the value separately to a verified autoescaping template instead of concatenating it into HTML or template source.", "Test HTML-significant input through this generated route and each factory context; assert that the supplied markup is displayed as text. Keep raw, escaped and unresolved callback paths separate."}
+			g.ExampleStatus = "no automatic patch; preserve intended response and output context"
+			return g
+		}
+	}
 	if strings.Contains(u.Sink.Text, "{{") && strings.Contains(u.Sink.Text, "|") && u.XSS.OutputContext != "script" && u.XSS.OutputContext != "url" {
 		replacement := jinjaSafeFilter.ReplaceAllString(u.Sink.Text, "")
 		if replacement != u.Sink.Text {

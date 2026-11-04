@@ -102,3 +102,9 @@ Contract references: [Psycopg 3](https://www.psycopg.org/psycopg3/docs/basic/par
 [Psycopg 2](https://www.psycopg.org/docs/usage.html#passing-parameters-to-sql-queries),
 [PyMySQL](https://pymysql.readthedocs.io/en/latest/modules/cursors.html), and
 [MySQL Connector](https://dev.mysql.com/doc/connector-python/en/connector-python-api-mysqlcursor-execute.html).
+
+Generated Python handlers can now retain source-derived registry selection, captured request values,
+local callback arguments and helper-returned SQLite connection/cursor provenance. A callback call by
+itself is not value flow: the report includes the captured input and actual cursor/SQL-slot witnesses.
+Unresolved or mutated registry/callback bindings remain gaps; schema setup and constant SELECT text
+are not request-derived SQL findings. See the [bounded Python subset](../python-support.md#finite-generated-http-routes).

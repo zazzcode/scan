@@ -66,7 +66,7 @@ func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (result *ana
 	out := &analysis.AnalysisReport{SchemaVersion: analysis.ReportSchemaVersion, Root: root, Entries: []analysis.EntryPoint{}, Uses: []analysis.CandidateUse{}, Gaps: []analysis.Gap{}, Files: []analysis.Evidence{}, Limitations: []string{
 		"ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain",
 		"Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
-		"Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
+		"Supported helpers bind identifier parameters and direct returns; finite literal tables and local literal-argument factories retain closure contexts. Unsupported branches/captures, wrappers, unknown calls, recursion and asynchronous continuations remain gaps",
 		"SQL text, NoSQL $where strings, query documents, and request-field validation are candidate findings, not confirmed vulnerabilities",
 	}}
 	for _, file := range selected {
@@ -87,6 +87,9 @@ func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (result *ana
 			}
 			obj := fn.ChildByFieldName("object")
 			if obj == nil || obj.Kind() != "identifier" || !m.receivers[obj.Utf8Text(m.src)] {
+				return
+			}
+			if set.finiteRoutes(out, m, call, obj.Utf8Text(m.src)) {
 				return
 			}
 			routes, _ := routesFromCall(file, m.src, call, locals)
@@ -157,11 +160,19 @@ func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (result *ana
 }
 
 func (m *sourceModule) evidence(kind string, n *sitter.Node) analysis.Evidence {
+	if !m.commentsReady {
+		m.comments = sourceComments(m.tree.RootNode(), m.src, false)
+		m.commentsReady = true
+	}
+	modelText := ""
+	if kind != "file" {
+		modelText = modelSource(m.src, n.StartByte(), n.EndByte(), m.comments)
+	}
 	text := n.Utf8Text(m.src)
 	if kind == "file" {
 		text = ""
 	}
-	return analysis.Evidence{Kind: kind, Text: text, Span: spanOf(m.file, n), SHA256: m.hash}
+	return analysis.Evidence{ModelText: modelText, Kind: kind, Text: text, Span: spanOf(m.file, n), SHA256: m.hash}
 }
 
 func (s *moduleSet) handler(m *sourceModule, n *sitter.Node) (*sourceModule, *sitter.Node, string, []analysis.Gap) {

@@ -26,6 +26,7 @@ func browserEntry(m *sourceModule, nodeEvidence analysis.Evidence, name, categor
 	// excerpts already live in each use; sending the whole module would inflate
 	// otherwise bounded judge requests and imply unsupported dispatch evidence.
 	nodeEvidence.Text = ""
+	nodeEvidence.ModelText = ""
 	instance := "browser:" + m.file + ":" + m.hash
 	return analysis.EntryPoint{ID: snapshotID("entry", nodeEvidence, instance, category+":"+name), Kind: "browser", Name: name, InstanceID: instance, Location: nodeEvidence, Browser: &analysis.BrowserEntryMetadata{Category: category}}
 }

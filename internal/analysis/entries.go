@@ -117,6 +117,7 @@ type InvocationContext struct {
 // InputBinding maps a role/projection onto an actual parameter, closure or ambient framework binding.
 // Role names do not establish trust, value transfer or application requirements.
 type InputBinding struct {
+	Constant   *string     `json:"constant,omitempty"`
 	Role       string      `json:"role"`
 	Parameter  string      `json:"parameter"`
 	Projection []string    `json:"projection,omitempty"`

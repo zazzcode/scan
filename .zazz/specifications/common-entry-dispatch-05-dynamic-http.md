@@ -5,8 +5,10 @@ Milestone deliverable: 5 of 8. Project and Deliverable Owner: Michael.
 Drafted: 2026-11-03. Execution tracking: deliverable-specific ignored local run log only.
 Coordination: one Contributor Agent working in the assigned worktree; no delegation required.
 Proposed review shape: one milestone draft PR into `stage`, human review/merge.
-The user requested design/specification now and will request implementation later.
-This document does not itself authorize implementation, publishing, paid calls or merging.
+The user invoked §12 on 2026-11-04, authorizing D5 implementation, verification, commit and
+feature-branch push. During implementation the user also authorized full real VulnPy and Juice Shop
+Decision-mode evaluations with gpt-6-luna, scanner fixes discovered by those runs, and prompt
+deduplication/comment filtering. No new worktree, PR, merge, integration push or D6 is authorized.
 
 ## 0. Capability
 
@@ -61,8 +63,12 @@ an in-place contract revision. Unrelated cleanup is outside scope.
 | `internal/parse/python_routes.go, python_modules.go, python_flow.go, python_calls.go, python_values.go, python_sql.go, python_dbapi.go, entry_context.go` | modified where necessary | Flask/FastAPI generation, finite trigger selection, captured values and actual callback/cursor flow |
 | `internal/parse/testdata/python/dynamic-vulnpy/` | new | Licensed source-only pinned excerpts and independent raw/bound/unknown controls |
 | `internal/judge/*_test.go; internal/report/*_test.go` | modified/new as needed | Python trace/policy/report pipeline with local stubs only |
-| `docs/analysis/xss.md, database-injection.md; docs/python-support.md; .zazz/evaluation/common-entry-dispatch-results.md` | modified where necessary | Implemented Python subset, actual sample trace evidence and remaining gaps |
+| `docs/analysis/xss.md, database-injection.md; docs/python-support.md, decision-models.md; .zazz/evaluation/common-entry-dispatch-results.md` | modified where necessary | Implemented Python subset, actual sample trace evidence and remaining gaps |
+| `internal/analysis/analysis.go, entries.go, entry_validation.go; internal/parse/model_source.go, model_source_test.go` | modified/new where necessary | Source-backed constant closures and original-preserving model source projection |
+| `internal/judge/entry_context.go, bundle.go, client.go, source_excerpts.go, compact_bundle.go; adjacent focused tests` | modified/new | Versioned closure evidence and lossless prompt deduplication with replay verification |
 | `internal/report/entries.go; cmd/scan/analysis_test.go` | modified | Generation provenance and real pipeline checks |
+| `docs/samples/vulnpy/README.md, reference.md; .zazz/evaluation/vulnpy-detection-guide.md` | modified | User-requested source-inspected confirmation table; historical baseline retained |
+| `internal/parse/testdata/string-flow/analysis.json, checked-analysis.json; internal/report/scoped_guidance.go` | modified | Reviewed capability wording and correct raw-response guidance |
 | `.zazz/specifications/common-entry-dispatch-05-dynamic-http.md` | modified if needed | Contract decisions and evidence links |
 | `.zazz/ephemeral/common-entry-dispatch-05-dynamic-http-run-log.md` | ignored local | Append-only execution evidence |
 
@@ -73,7 +79,7 @@ This proposed review shape remains reviewable by the user before implementation.
 
 Exclusions: new vulnerability families, authorization engine, queues/jobs/CLI entry adapters,
 new target languages, full IR, graph database, automatic cache, independent LLM reviewer,
-paid calibration, application execution, sample remediation and unrelated formatting.
+unassigned paid calibration, application execution, sample remediation and unrelated formatting.
 
 The Python addition is limited to existing Flask/Blueprint and FastAPI/APIRouter support,
 finite source-backed registry construction/selection and the closure/callback transfers needed
@@ -106,7 +112,7 @@ Record exact modified paths and compare the slice diff against its recorded star
 Keep coherent green recovery points. Commit/push only when authorized by the active user
 request; verify the `zazzcode` identity/authentication before publication. Never merge,
 push to `stage`/`main`, or create a release. Draft PRs target `stage` when publication is requested.
-Do not use live keys or execute/install dependencies in target applications.
+Live keys are permitted only for the user-authorized full VulnPy/Juice Shop evaluations below. Do not execute/install dependencies in target applications.
 
 Halt dependent work for missing required reference data, a conflicting user edit, unresolved
 scope/public-contract choice, destructive recovery, or an invariant violation. Investigate
@@ -230,6 +236,26 @@ index defines the commands and each later code change invalidates affected prior
 Local loopback stubs test policy/transport, not model accuracy. A sandbox bind denial is
 an environment limitation to resolve, not a passing test or a reason to use a paid endpoint.
 
+### User-added real-model and prompt acceptance
+
+After offline acceptance, run full source-only Decision-mode assessments of the existing pinned
+VulnPy and Juice Shop checkouts with OpenAI Decisions `gpt-6-luna`. The user explicitly chose
+both apps and no request/spend cap; a funding/rate response stops further requests without retries
+or fallback. Record actual attempts/completions/failures and exact request/response artifacts.
+Compare resulting claims with source-reviewed expectations; model confidence is not accuracy.
+Fix scanner defects exposed by these real apps and repeat affected checks and exact-request
+assessments. Changed requests cannot reuse historical answers. Unsupported families and unresolved
+necessary facts stay explicit; a full scan is not a promise of complete framework coverage.
+
+Deduplicate model-bound source/metadata losslessly before transmission, without raising the 64 KiB
+request bound or removing controls, witnesses or gaps. Preserve roles, record order, source spans,
+hashes and code reconstruction. Exclude parsed code comments and Python docstrings from model-facing
+source while keeping original local audit text and runtime code/strings. Record every issue,
+hardening change, attempted remedy and verification outcome in the append-only execution log.
+Original paid-call prohibitions in the initial prompt below are superseded only by this explicit
+user steering for these two evaluations. Other models/providers, target execution/edits and D6 remain
+outside scope.
+
 ## 8. TDD entry point and execution sequence
 
 First failing test: `TestDynamicHTTPRegistrations` with the observable contract in §6.
@@ -254,13 +280,13 @@ record exact partial changes and failing checks, without claiming this deliverab
 
 ## 9. Definition of done
 
-- [ ] Required source/standards read and current scope verified.
-- [ ] All acceptance criteria have passing, cited evidence; affected regressions explained.
-- [ ] Scoped tests/race checks and diff checks pass; only changed Go files formatted.
-- [ ] Required offline reports/manual review performed where this slice changes output.
-- [ ] Remaining gaps, exact artifact locations and next checkpoint recorded.
-- [ ] No out-of-scope change, fabricated protection or stale-response replay.
-- [ ] User receives the completed slice and any remaining unchecked acceptance items.
+- [x] Required source/standards read and current scope verified.
+- [x] All acceptance criteria have passing, cited evidence; affected regressions explained.
+- [x] Scoped tests/race checks and diff checks pass; only changed Go files formatted.
+- [x] Required offline reports/manual review performed where this slice changes output.
+- [x] Remaining gaps, exact artifact locations and next checkpoint recorded.
+- [x] No out-of-scope change, fabricated protection or stale-response replay.
+- [x] User receives the completed slice and any remaining unchecked acceptance items.
 
 ## 10. Open questions
 
@@ -282,19 +308,109 @@ reconstruct from Git and tracked acceptance evidence; never infer success from m
 ## 12. Agent implementation prompt
 
 ```text
-Implement only the user-authorized deliverable in the existing common-entry-and-dispatch
-worktree. Read AGENTS.md, .zazz/specifications/common-entry-dispatch-05-dynamic-http.md,
-its linked design/dependencies, and the deliverable-specific ignored run log. Load spec-driven and
-matched analysis/engineering standards. Work as one agent. Start with the first failing
-acceptance test, keep HTTP/browser regressions green, and verify actual pipeline behavior.
-D5 includes the mandatory real VulnPy acceptance at ~/Dev/vulnpy in §7: recover the
-specified generated Flask/FastAPI routes, source-to-sink traces and offline SQL/raw-XSS
-findings while preserving existing static routes/uses and historical sample artifacts.
-Do not substitute literal-table fixtures or route inventory alone for this acceptance.
-Record context/coverage and exact evidence; use recovery checkpoints to fit the available
-usage window. Do not begin another deliverable automatically when only this one is assigned.
-Preserve sample apps, raw historical answers and user edits. No paid calls, target execution,
-new worktrees, merge or integration push. Report acceptance results and next checkpoint.
+Implement deliverable 5 only, unattended, in the existing common-entry-and-dispatch
+worktree and branch. Execute this specification as the implementation instruction:
+.zazz/specifications/common-entry-dispatch-05-dynamic-http.md
+
+This instruction authorizes implementation, required verification, then committing
+and pushing the completed D5 checkpoint to origin/common-entry-and-dispatch. Do not
+create another worktree or PR, merge, push to integration, or begin deliverable 6.
+D4 is completed and pushed at fe11151bcb0a11102592a805e7d160fa57c303a9.
+
+Read AGENTS.md and orientation, this complete contract and its required design,
+analysis, source/reference and dependency sections. Read the latest D4 run-log entries:
+.zazz/ephemeral/common-entry-dispatch-04-browser-events-run-log.md
+Maintain a separate append-only ignored D5 log:
+.zazz/ephemeral/common-entry-dispatch-05-dynamic-http-run-log.md
+Create it if absent; reconstruct unavailable predecessor evidence from Git/contracts,
+never infer passing verification from missing notes. Load spec-driven and matched
+engineering, testing, database-injection, XSS and documentation standards. Work as one
+agent; do not delegate.
+
+Verify actual cwd, branch, HEAD, D4 ancestry and existing changes before editing.
+Preserve user edits and prompt/specification preparation. Record the actual start
+revision, bounded D5 scope and the next incomplete checkpoint. Maintain an evidence
+matrix mapping every AC1-AC4 obligation and Definition of Done item to its test,
+actual-sample assertion or manual check, result and artifact location.
+
+Work unattended toward the capability in §0 and every acceptance criterion in §6.
+Follow §8's TDD sequence, starting with failing TestDynamicHTTPRegistrations and then
+TestDynamicHTTPContextIsolation. For each requirement, implement the smallest supported
+change, run its checks, inspect the actual evidence, diagnose failures or missing traces,
+correct the implementation and repeat until that requirement passes. Review the complete
+AC matrix after each recovery checkpoint and continue to the next unmet obligation.
+A passing focused test, partial route inventory, green recovery checkpoint or completed
+Express slice is not D5 completion and is not a reason to end the session.
+
+Capture source-only predecessor baselines before the corresponding implementation
+changes. Implement finite Express tables/for-of and direct local literal-argument
+factories with registration, row/call, argument, closure and control provenance.
+Preserve existing direct routes, zero-argument factories and specialized Finale
+persistence behavior. Use §7's pinned Juice Shop reference for before/after inventory,
+provenance and candidate/claim comparison; existing support is not a new capability.
+
+D5 includes mandatory real VulnPy acceptance at ~/Dev/vulnpy (D5_VULNPY_ROOT may
+override the location), pinned to b81885e58283a3449b578d20c20557aff637e5ea.
+Read and statically analyze the actual source shapes specified in §7. Derive finite
+registry/member selection and Flask/FastAPI generation from source declarations and
+bindings. Never import/execute target code, hardcode its endpoint/function map, or
+consume evaluation labels as detector input. Verify target cleanliness, HEAD and
+reference hashes before and after every acceptance scan.
+
+Recover every required §7 route/context: Flask GET/POST and FastAPI GET for all three
+SQLite trigger variants and raw XSS. Prove request -> generated handler/closure ->
+selected trigger -> callback/cursor -> executable SQL operand or raw HTML response.
+Retain Flask header/query/form alternatives, FastAPI query binding, SQLite connection/
+cursor provenance and SQL text versus bound-value separation. Constant setup SQL must
+not become request-derived findings. Hand-built records, simplified literal-registry
+fixtures, discovered paths or findings elsewhere at the same sink line do not satisfy
+this acceptance. The full-checkout scan must recover the required per-route traces and
+visible SQL/raw-XSS findings while preserving supported static entries/uses and explicit
+unsupported/zero-use gaps. Keep VP-XSS-JINJA deferred and its existing observation visible.
+
+Continue autonomously through ordinary implementation choices, test failures, missing
+trace investigation, report defects and rework. Do not ask for routine approval or end
+with an offer to continue. Never weaken tests, remove mandatory coverage, replace a
+required trace with a warning, relabel expectations to match output, or call partial
+work complete. Stop dependent work only for §5's genuine halt conditions, such as missing
+required reference data, conflicting user edits, an unresolved material scope/public-
+contract decision, destructive recovery or an invariant violation. Investigate routine
+failures first; apply the repeated-failure rule without treating one failure or a
+recoverable sandbox restriction as a blocker. Explain any genuine blocker precisely,
+record attempted remedies and a resumable checkpoint, and report every unmet obligation.
+
+Use the milestone usage-window policy without inventing quota. Keep context, modified
+paths, partial state, commands/results, AC coverage, limitations and the exact next action
+current in the ignored log. Recovery checkpoints support resumption; they do not reduce
+the goal or authorize early completion. If an enforced interruption prevents completion,
+leave an honest resumable state and distinguish completed evidence from outstanding work.
+
+Complete all scoped tests, affected-package race checks and applicable local provider/
+exact-request replay regressions using the declared Go toolchain. Keep D4 browser-event,
+existing browser/framework/inline-script and HTTP regressions green. Run the required
+full-checkout and scoped VulnPy baseline/current scans and Node.js reference comparisons.
+Generate fresh offline JSON/HTML/SARIF, verify status/provenance parity, and visually
+inspect route labels, source/sink locations, traces, gaps, sorting, disclosure, keyboard
+focus and narrow layout. Fix defects and repeat all affected checks after changes.
+Record exact commands, results, artifact paths/hashes and remaining supported-subset
+limits. Update the owning tracked contract, public documentation and durable results.
+
+Before declaring D5 complete, audit every AC1-AC4 subcondition and Definition of Done
+item against actual passing evidence. Mandatory sample checks cannot be skipped and
+counted as success. Format only changed Go files; run git diff --check, inspect status
+and review the entire D5 slice against the recorded start revision. Commit/push a completed
+checkpoint only when all required acceptance and verification obligations are satisfied.
+
+Verify the assigned path/branch and zazzcode Git/GitHub authentication before publication.
+Commit and push only the verified D5 checkpoint to origin/common-entry-and-dispatch.
+Verify a clean worktree and exact remote synchronization. Report the commit, acceptance
+matrix results, remaining limitations and next checkpoint, then stop. D6 requires a
+separate user assignment.
+
+No paid calls, live-key use, target execution/dependency installation, sample-app changes,
+historical raw-answer edits or stale-answer replay. No new worktrees, PR creation, merges,
+integration pushes or later-deliverable implementation. Local loopback stubs are allowed;
+resolve sandbox socket restrictions through permitted access, never a paid endpoint.
 ```
 
 ## 13. Implementation and review change log
@@ -318,3 +434,25 @@ first-failing-test inconsistency. This is specification work only; D5 is not imp
 `~/Dev/sast-testbench/js-samples` directory. Added §7's Juice Shop generated-Finale and
 returned-handler references, preserving their existing bounded support, and distinguished
 them from the fixed-route JS snippets. Focused table/closure/guard fixtures remain required.
+
+2026-11-04 — Deliverable Owner requested an explicitly unattended, goal- and acceptance-
+driven D5 implementation prompt. Replaced §12 with the D4 predecessor checkpoint,
+per-criterion evidence matrix, implement/test/inspect/rework loop, mandatory real-sample
+acceptance, interruption recovery and completed-checkpoint commit/push instructions.
+Recovery checkpoints are resumable steps, not completion or routine approval gates.
+Scope, acceptance criteria and required checks are unchanged. This edit prepares the
+new-session instruction only; it does not start D5 implementation.
+
+2026-11-04 — D5 implementation: explicitly named adjacent shared-model/judge consumers for source-backed constant closure values and the corresponding evidence-envelope version increment. These implement the already required actual argument/closure provenance; no new adapter, family or protection rule. Exact-request replay remains mandatory.
+
+2026-11-04 — User expanded D5 acceptance during implementation: full VulnPy/Juice Shop OpenAI Decisions gpt-6-luna runs, no user request/spend cap, stop on funding response, source-reviewed claim checks and scanner fixes found through those apps. User also requested prompt deduplication, exclusion of training comments/instructions and an explicit issue/hardening execution log. Added the corresponding current acceptance section and focused model/projection paths. No target execution, sample edits, model fallback, new family or later deliverable is authorized.
+
+### D5 completion evidence — 2026-11-04
+
+All D5 acceptance criteria pass; see [implementation results](../evaluation/common-entry-dispatch-results.md)
+for the criterion matrix, actual-sample findings, verification and retained limits. User steering added
+full live VulnPy/Juice Shop Decision-mode evaluations, lossless request deduplication, code-only model
+projections and the VulnPy scan-plus-source confirmation table. These changes remain within D5.
+Final source passes all-package race tests, vet/build, fresh offline sample/export/parity checks and
+exact offline replay of all 1,015 completed live requests. No D6 work is included. The append-only
+local execution log records fixes, artifact paths, final scope and publication verification.

@@ -19,7 +19,7 @@ Structural findings remain useful without a model; neither mode certifies an app
 
 | Area | Implemented subset |
 | --- | --- |
-| Entries | Verified Flask app/Blueprint decorators, a single static Blueprint mount, RESTX Api/namespace Resource methods, FastAPI decorators |
+| Entries | Verified Flask/Blueprint and FastAPI decorators, bounded generated Flask add_url_rule/FastAPI registrations, separate verified generated-route application mounts, RESTX Resource methods |
 | Sources | Flask args/form/values/JSON/cookies/headers/session, RESTX payload, FastAPI parameters; HTTP response text is a separate source |
 | Flow | Assignments/reassignments, f-strings, percent/format/concatenation, output alternatives, bounded direct helpers and local imports; explicit request-method guards exclude impossible method branches |
 | SQL | sqlite3 connection/cursor provenance, SQL text versus parameter tuple/list, statement construction and separate validation evidence |
@@ -67,3 +67,25 @@ relative package imports are bounded; variadic helper binding stays explicit unc
 Constant Jinja templates require autoescaping for substituted HTML variables; `.render()` alone
 does not establish XSS protection. Reports provide source-specific preservation, repair or
 investigation guidance according to the final claim status. Only Protected is green.
+
+## Finite generated HTTP routes
+
+Finite source-backed registries, local registration factories and captured literal values can
+expose generated Flask GET/POST and FastAPI GET handlers. Selected local module/member inventories
+and supported name transformations are derived from parsed source, without importing Python modules
+or executing discovery/reflection. Every registration retains generation, member, factory and mount
+provenance; different application instances and closure values have separate contexts.
+
+Nested local callbacks preserve captured request values and actual argument bindings, including
+SQLite connections returned by helpers and cursors passed to callbacks. SQL construction uses the
+executable-text slot; a separate bound parameter does not repair interpolated SQL. Constant setup
+queries do not become request-controlled findings. Literal factory conditions exclude impossible
+raw-output branches while unknown conditions remain explicit.
+
+Discovery is bounded to 128 generated registrations per site before mount projection, finite loops
+of 128 members, eight discovery-factory levels, 10000 syntax steps per registration module and 10000
+new entry/binding/context records per scan. Runtime helper depth 3 / work 24 and existing path/transfer
+limits remain. Unsupported registry/member mutation, shadowed lookups, unresolved callbacks,
+external members and reached bounds leave gaps; absence of a use is not evidence of protection.
+The source-backed glob/member subset is an analysis of selected files, not general Python reflection.
+Other VulnPy frameworks/families and its separate Jinja Environment binding remain outside this subset.

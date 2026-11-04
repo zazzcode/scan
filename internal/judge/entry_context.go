@@ -45,7 +45,7 @@ func wireInvocation(use analysis.CandidateUse, ref func(analysis.Evidence) strin
 			for _, e := range v.Origin.Evidence {
 				evidence = append(evidence, ref(e))
 			}
-			return map[string]any{"role": v.Role, "parameter": v.Parameter, "projection": v.Projection, "origin_kind": v.Origin.Kind, "origin_evidence": evidence, "related_entry_id": v.Origin.RelatedEntryID}
+			return map[string]any{"constant": v.Constant, "role": v.Role, "parameter": v.Parameter, "projection": v.Projection, "origin_kind": v.Origin.Kind, "origin_evidence": evidence, "related_entry_id": v.Origin.RelatedEntryID}
 		}
 		inputs := []any{}
 		for _, v := range ctx.Inputs {

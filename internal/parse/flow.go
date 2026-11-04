@@ -26,6 +26,7 @@ type value struct {
 	gaps          []analysis.Gap
 }
 type flow struct {
+	constants    registrationSeeds
 	client       *clientContext
 	response     string
 	responseType string
@@ -79,6 +80,18 @@ func (f *flow) statement(n *sitter.Node) bool {
 	switch n.Kind() {
 	case "statement_block":
 		return f.statements(n)
+	case "if_statement":
+		if yes, known := f.registrationCondition(n.ChildByFieldName("condition")); known {
+			f.context = append(f.context, f.module.evidence("conditional_test", n.ChildByFieldName("condition")))
+			if yes {
+				return f.statement(n.ChildByFieldName("consequence"))
+			}
+			if alt := n.ChildByFieldName("alternative"); alt != nil && alt.NamedChildCount() > 0 {
+				return f.statement(alt.NamedChild(alt.NamedChildCount() - 1))
+			}
+			return false
+		}
+		f.branches(n)
 	case "lexical_declaration", "variable_declaration":
 		for j := uint(0); j < n.NamedChildCount(); j++ {
 			d := n.NamedChild(j)
@@ -385,6 +398,14 @@ func (f *flow) eval(n *sitter.Node) value {
 	case "number", "string", "true", "false", "null", "undefined", "property_identifier", "type_identifier", "comment", "string_fragment", "escape_sequence":
 		return value{}
 	case "ternary_expression":
+		if yes, known := f.registrationCondition(n.ChildByFieldName("condition")); known {
+			f.context = append(f.context, f.module.evidence("conditional_test", n.ChildByFieldName("condition")))
+			branch := "alternative"
+			if yes {
+				branch = "consequence"
+			}
+			return f.transfer(f.eval(n.ChildByFieldName(branch)), "conditional_value", n)
+		}
 		a := f.eval(n.ChildByFieldName("consequence"))
 		b := f.eval(n.ChildByFieldName("alternative"))
 		v := combine(a, b)

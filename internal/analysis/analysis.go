@@ -5,10 +5,11 @@ const ReportSchemaVersion = 3
 
 // Evidence binds an observed operation to an immutable source file snapshot.
 type Evidence struct {
-	Kind   string `json:"kind"`
-	Text   string `json:"text"`
-	Span   Span   `json:"span"`
-	SHA256 string `json:"sha256"`
+	ModelText string `json:"model_text,omitempty"`
+	Kind      string `json:"kind"`
+	Text      string `json:"text"`
+	Span      Span   `json:"span"`
+	SHA256    string `json:"sha256"`
 }
 
 // Dependency records a local value relationship; use-level gaps distinguish

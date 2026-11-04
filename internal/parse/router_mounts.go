@@ -133,6 +133,9 @@ func (s *moduleSet) scanMounts(out *analysis.AnalysisReport, m, owner *sourceMod
 			if obj == nil || obj.Utf8Text(target.src) != receiver {
 				return
 			}
+			if s.finiteRoutesAt(out, target, owner, child, receiver, fullPrefix, context) {
+				return
+			}
 			routes, _ := routesFromCall(target.file, target.src, child, locals)
 			for _, route := range routes {
 				rawPath := route.PathPattern

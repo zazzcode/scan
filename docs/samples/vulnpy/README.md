@@ -6,6 +6,8 @@ Target: [Contrast-Security-OSS/vulnpy](https://github.com/Contrast-Security-OSS/
 reviewed at `b81885e58283a3449b578d20c20557aff637e5ea`. The target remained clean and unchanged.
 Its vulnerable function library is exposed through several frameworks and dynamically built routes.
 
+## Published historical baseline
+
 The offline Zazzles scan records 11 static entries, six unassessed records and four explicit
 registration/path coverage warnings. The core generated SQL/XSS routes remain coverage gaps.
 This is not a completed semantic calibration or a clean result. No new source was sent to a model.
@@ -25,3 +27,11 @@ See the living [detection guide and checklist](../../../.zazz/evaluation/vulnpy-
 [source reference](reference.md), [expected cases](cases.json), [hashes](source-hashes.json),
 [metadata](metadata.json), [Semgrep baseline](semgrep/baseline.json),
 [Bearer baseline](bearer/baseline.json), and [upstream license](SOURCE-LICENSE.txt).
+
+## D5 follow-up
+
+A later full source-only scan and code inspection confirmed the three SQLite constructions and
+generated Flask/FastAPI raw-HTML responses. See the
+[confirmed-findings table](reference.md#findings-confirmed-by-scan-and-code-inspection--d5) and
+[D5 results](../../../.zazz/evaluation/common-entry-dispatch-results.md). The HTML/JSON/SARIF links
+above still identify the original published baseline; this follow-up does not overwrite its evidence.

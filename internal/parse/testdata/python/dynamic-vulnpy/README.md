@@ -1,0 +1,1 @@
+Source-only MIT excerpts from Contrast-Security-OSS/vulnpy, revision b81885e58283a3449b578d20c20557aff637e5ea. Original source bytes retained. Only SQL/raw-XSS trigger modules are included; independent controls live separately. Never execute or install this fixture.

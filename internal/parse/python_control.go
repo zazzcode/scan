@@ -1,6 +1,9 @@
 package parse
 
-import sitter "github.com/tree-sitter/go-tree-sitter"
+import (
+	sitter "github.com/tree-sitter/go-tree-sitter"
+	"github.com/zazzcode/zazzles/internal/analysis"
+)
 
 func (f *pythonFlow) block(n *sitter.Node) bool {
 	if n == nil {
@@ -62,7 +65,21 @@ func (f *pythonFlow) stmt(n *sitter.Node) bool {
 		for k, v := range temp.imports {
 			f.imports[k] = v
 		}
-	case "function_definition", "class_definition", "decorated_definition":
+	case "function_definition":
+		closure := map[string]pythonValue{}
+		for k, v := range f.env {
+			closure[k] = pyTransfer(v, f.module.evidence("closure_capture", n))
+		}
+		f.env[pyText(f.module, n.ChildByFieldName("name"))] = pythonValue{callable: &pythonBoundCallable{module: f.module, fn: n, closure: closure}}
+		return false
+	case "decorated_definition":
+		if fn := n.ChildByFieldName("definition"); fn != nil && fn.Kind() == "function_definition" {
+			gap := f.gap("python_callback_unresolved", "Decorated local callback requires its wrapper contract", n)
+			f.env[pyText(f.module, fn.ChildByFieldName("name"))] = pythonValue{unknown: true, gaps: []analysis.Gap{gap}}
+			f.gaps = append(f.gaps, gap)
+		}
+		return false
+	case "class_definition":
 		return false
 	default:
 		f.evalChildren(n)
@@ -73,7 +90,7 @@ func (f *pythonFlow) conditional(n *sitter.Node) bool {
 	test := n.ChildByFieldName("condition")
 	f.eval(test)
 
-	if outcome, known := f.methodCondition(test); known {
+	if outcome, known := f.constantCondition(test); known {
 		if outcome {
 			f.context = append(f.context, f.module.evidence("branch_precondition", test))
 			return f.block(n.ChildByFieldName("consequence"))
@@ -95,7 +112,7 @@ func (f *pythonFlow) conditional(n *sitter.Node) bool {
 	if !yt {
 		branches = append(branches, yes)
 	} else {
-		f.returns = pyCombine(f.returns, yes.returns)
+		f.returns = pyCombine(f.returns, pyTransfer(yes.returns, f.module.evidence("branch_precondition", test)))
 	}
 	alternative := n.ChildByFieldName("alternative")
 	no := f.clone()
@@ -112,7 +129,7 @@ func (f *pythonFlow) conditional(n *sitter.Node) bool {
 	if !nt {
 		branches = append(branches, no)
 	} else {
-		f.returns = pyCombine(f.returns, no.returns)
+		f.returns = pyCombine(f.returns, pyTransfer(no.returns, f.module.evidence("branch_false_precondition", test)))
 	}
 	if len(branches) > 0 {
 		f.merge(branches...)

@@ -13,7 +13,15 @@ type pythonDep struct {
 	dep                               analysis.Dependency
 	protection, container, key, entry string
 }
+type pythonBoundCallable struct {
+	module   *pythonModule
+	fn       *sitter.Node
+	closure  map[string]pythonValue
+	evidence []analysis.Evidence
+}
+
 type pythonValue struct {
+	callable        *pythonBoundCallable
 	deps            []pythonDep
 	gaps            []analysis.Gap
 	fields          map[string]pythonValue
@@ -101,19 +109,47 @@ func (s *pythonSet) analyze(out *analysis.AnalysisReport, r pythonRoute) {
 	registration := m.evidence("entry_registration", r.decorator)
 	registration.Span = r.route.Registration
 	registration.Text = string(m.src[registration.Span.StartByte:registration.Span.EndByte])
-	entry := httpEntry(r.route, registration, m.file+":"+m.hash+":"+r.route.Framework)
+	registration.ModelText = modelSource(m.src, uint(registration.Span.StartByte), uint(registration.Span.EndByte), m.comments)
+	instance := r.instance
+	if instance == "" {
+		instance = m.file + ":" + m.hash + ":" + r.route.Framework
+	}
+	entry := httpEntry(r.route, registration, instance)
 	entry.Gaps = append([]analysis.Gap{}, r.gaps...)
-	invocation := registerInvocation(out, entry, &handler, "decorator_registration", nil, r.gaps)
+	mechanism := "decorator_registration"
+	if r.generated {
+		mechanism = "factory_expansion"
+	}
+	invocation := registerInvocation(out, entry, &handler, mechanism, nil, r.gaps)
+	if r.generated {
+		out.Registrations[len(out.Registrations)-1].DerivedFrom = r.provenance
+	}
 	work := 0
 	f := &pythonFlow{set: s, module: m, route: r, invocation: invocation, report: out, env: map[string]pythonValue{}, context: append([]analysis.Evidence{handler, m.evidence("route_registration", r.decorator)}, r.receiver.evidence...), gaps: append([]analysis.Gap{}, r.gaps...), work: &work, stack: map[string]bool{}}
 	f.guards = map[string][]analysis.Gap{}
 	f.inputs = map[string]pythonValue{}
 	f.imports = map[string]pythonImport{}
 	f.context = append(f.context, s.formPolicies(r)...)
+	keys := []string{}
+	for k := range r.closures {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		v := r.closures[k]
+		f.env[k] = pythonValue{literal: v.text, constant: true, evidence: v.evidence}
+		f.invocation.Closures = append(f.invocation.Closures, analysis.InputBinding{Constant: &v.text, Role: "closure", Parameter: k, Origin: analysis.InputOrigin{Kind: "constant", Evidence: v.evidence}})
+	}
+	f.context = append(f.context, r.provenance...)
 	f.parameters(r.fn)
 	out.InvocationContexts[len(out.InvocationContexts)-1] = f.invocation
 	f.block(r.fn.ChildByFieldName("body"))
 	f.finishValidation()
+	for i := range out.Entries {
+		if out.Entries[i].ID == entry.ID {
+			out.Entries[i].Gaps = pythonMergeGaps(out.Entries[i].Gaps, f.gaps)
+		}
+	}
 }
 func (f *pythonFlow) parameters(fn *sitter.Node) {
 	params := fn.ChildByFieldName("parameters")

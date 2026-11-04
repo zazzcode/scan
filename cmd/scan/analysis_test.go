@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/zazzcode/zazzles/internal/analysis"
@@ -99,5 +100,35 @@ func TestBrowserEventPipeline(t *testing.T) {
 	after, err := os.ReadFile(saved)
 	if err != nil || !bytes.Equal(after, original) {
 		t.Fatal("export modified evidence")
+	}
+}
+
+func TestDynamicPythonVulnPyTraces(t *testing.T) {
+	t.Setenv("SCAN_FINDINGS_DIR", "")
+	var out, stderr bytes.Buffer
+	if code := run([]string{"--analyze", "--json", "../../internal/parse/testdata/python/dynamic-vulnpy"}, &out, &stderr); code != exitOK {
+		t.Fatalf("code=%d stderr=%s", code, stderr.String())
+	}
+	var r analysis.AnalysisReport
+	if err := json.Unmarshal(out.Bytes(), &r); err != nil {
+		t.Fatal(err)
+	}
+	if err := r.ValidateUses(); err != nil {
+		t.Fatal(err)
+	}
+	paths := map[string]string{}
+	for _, e := range r.Entries {
+		if e.HTTP != nil {
+			paths[e.ID] = e.HTTP.Path
+		}
+	}
+	count := 0
+	for _, f := range r.Findings {
+		if strings.HasPrefix(paths[f.EntryID], "/vulnpy/") && f.Status == "poor_practice" {
+			count++
+		}
+	}
+	if count != 12 {
+		t.Fatalf("generated contextual poor-practice findings=%d want12", count)
 	}
 }

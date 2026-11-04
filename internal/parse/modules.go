@@ -16,6 +16,8 @@ type importBinding struct {
 	declaration  *sitter.Node
 }
 type sourceModule struct {
+	commentsReady  bool
+	comments       []sourceComment
 	browserGlobals map[string]analysis.Evidence
 	file           string
 	src            []byte

@@ -1,6 +1,7 @@
 package parse
 
 import (
+	"fmt"
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
@@ -96,9 +97,15 @@ func (f *pythonFlow) call(n *sitter.Node) pythonValue {
 	if method == "getLogger" && strings.HasPrefix(q, "logging.") {
 		return pythonValue{binding: "logger", evidence: []analysis.Evidence{m.evidence("logger_binding", n)}}
 	}
+	if v, ok := f.env[name]; ok && v.callable != nil {
+		return f.boundHelper(n, v.callable, values)
+	}
 	if target, key := f.set.resolve(m, name, 0); target != nil && target.funcs[key] != nil {
 		// Local assignments/parameters override helper declarations and imported helpers.
-		if _, shadow := f.env[strings.Split(name, ".")[0]]; !shadow {
+		if _, shadow := f.env[strings.Split(name, ".")[0]]; !shadow && !f.set.staticInvalid[m.file+":"+strings.Split(name, ".")[0]] && !f.set.staticInvalid[target.file+":"+key] {
+			if callable := f.staticCallable(n); callable != nil {
+				return pythonValue{callable: callable}
+			}
 			return f.helper(n, target, target.funcs[key], values)
 		}
 	}
@@ -106,6 +113,9 @@ func (f *pythonFlow) call(n *sitter.Node) pythonValue {
 	if len(v.deps) > 0 {
 		v = pyTransfer(pyProtect(v, "unknown"), m.evidence("call_argument_dependency", n))
 		v.gaps = append(v.gaps, f.gap("python_call_unresolved", "unmodeled return/content effect: "+name, n))
+		if f.route.generated {
+			f.gaps = append(f.gaps, f.gap("python_dispatch_unresolved", "Request-dependent call lacks a supported callable: "+name, n))
+		}
 	}
 	return v
 }
@@ -114,7 +124,12 @@ func (f *pythonFlow) builtin(name string) bool {
 	return !local && f.module.vars[name] == nil && f.module.funcs[name] == nil && f.module.imports[name].node == nil
 }
 func (f *pythonFlow) helper(call *sitter.Node, m *pythonModule, fn *sitter.Node, values []pythonValue) pythonValue {
-	key := m.file + ":" + pyText(m, fn.ChildByFieldName("name"))
+	return f.boundHelper(call, &pythonBoundCallable{module: m, fn: fn}, values)
+}
+func (f *pythonFlow) boundHelper(call *sitter.Node, callable *pythonBoundCallable, values []pythonValue) pythonValue {
+	m, fn := callable.module, callable.fn
+	f.context = append(f.context, callable.evidence...)
+	key := fmt.Sprintf("%s:%d", m.file, fn.StartByte())
 	if f.depth >= 3 || *f.work >= 24 || f.stack[key] {
 		v := pythonValue{}
 		for _, a := range values {
@@ -132,6 +147,9 @@ func (f *pythonFlow) helper(call *sitter.Node, m *pythonModule, fn *sitter.Node,
 	h.module = m
 	h.depth++
 	h.env = map[string]pythonValue{}
+	for k, v := range callable.closure {
+		h.env[k] = v
+	}
 	h.imports = map[string]pythonImport{}
 	h.context = append(h.context, m.evidence("helper_definition", fn), f.module.evidence("call_binding", call))
 	params := fn.ChildByFieldName("parameters")

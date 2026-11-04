@@ -21,21 +21,24 @@ type pythonImport struct {
 	node         *sitter.Node
 }
 type pythonModule struct {
-	file        string
-	src         []byte
-	hash        string
-	tree        *sitter.Tree
-	imports     map[string]pythonImport
-	vars, funcs map[string]*sitter.Node
+	commentsReady bool
+	comments      []sourceComment
+	file          string
+	src           []byte
+	hash          string
+	tree          *sitter.Tree
+	imports       map[string]pythonImport
+	vars, funcs   map[string]*sitter.Node
 }
 type pythonSet struct {
-	root    string
-	parser  *sitter.Parser
-	modules map[string]*pythonModule
-	files   []string
-	gaps    []analysis.Gap
-	text    *moduleSet
-	writes  map[string][]pythonWrite
+	root          string
+	parser        *sitter.Parser
+	modules       map[string]*pythonModule
+	files         []string
+	gaps          []analysis.Gap
+	text          *moduleSet
+	writes        map[string][]pythonWrite
+	staticInvalid map[string]bool
 }
 
 func newPythonSet(root string) (*pythonSet, error) {
@@ -75,6 +78,7 @@ func newPythonSet(root string) (*pythonSet, error) {
 		}
 		m.declarations(tree.RootNode(), true)
 	}
+	s.indexStaticMutations()
 	return s, nil
 }
 func (s *pythonSet) close() {
@@ -87,7 +91,15 @@ func (m *pythonModule) evidence(kind string, n *sitter.Node) analysis.Evidence {
 	if n == nil {
 		return analysis.Evidence{Kind: kind, SHA256: m.hash, Span: analysis.Span{File: m.file}}
 	}
-	return analysis.Evidence{Kind: kind, Text: n.Utf8Text(m.src), Span: spanOf(m.file, n), SHA256: m.hash}
+	if !m.commentsReady {
+		m.comments = sourceComments(m.tree.RootNode(), m.src, true)
+		m.commentsReady = true
+	}
+	modelText := ""
+	if kind != "file" {
+		modelText = modelSource(m.src, n.StartByte(), n.EndByte(), m.comments)
+	}
+	return analysis.Evidence{ModelText: modelText, Kind: kind, Text: n.Utf8Text(m.src), Span: spanOf(m.file, n), SHA256: m.hash}
 }
 func pyWalk(n *sitter.Node, fn func(*sitter.Node)) {
 	if n == nil {
@@ -230,7 +242,7 @@ func (s *pythonSet) importModule(m *pythonModule, module string) *pythonModule {
 		module = strings.TrimLeft(module, ".")
 	}
 	path := filepath.ToSlash(filepath.Join(base, strings.ReplaceAll(module, ".", "/")))
-	for _, p := range []string{path + ".py", path + "/__init__.py"} {
+	for _, p := range []string{path + ".py", path + "/__init__.py", "src/" + path + ".py", "src/" + path + "/__init__.py"} {
 		if found := s.modules[p]; found != nil {
 			return found
 		}
@@ -294,8 +306,22 @@ func (s *pythonSet) report(entry string, checks []analysis.Check) (*analysis.Ana
 		return nil, fmt.Errorf("entry must be a selected JS/TS/Python file relative to target root: %s", entry)
 	}
 	routes := s.routeEntries()
+	dynamic := s.dynamicRouteEntries()
+	routes = append(routes, dynamic...)
+	resolvedSites := map[string]bool{}
+	for _, r := range dynamic {
+		resolvedSites[fmt.Sprintf("%s:%d", r.route.Registration.File, r.route.Registration.StartByte)] = true
+	}
+	gaps := s.gaps[:0]
+	for _, g := range s.gaps {
+		if (g.Kind == "dynamic_path" || g.Kind == "python_registration_unresolved") && resolvedSites[fmt.Sprintf("%s:%d", g.At.File, g.At.StartByte)] {
+			continue
+		}
+		gaps = append(gaps, g)
+	}
+	s.gaps = gaps
 	out := &analysis.AnalysisReport{SchemaVersion: analysis.ReportSchemaVersion, Root: s.root, Entries: []analysis.EntryPoint{}, Uses: []analysis.CandidateUse{}, Gaps: append([]analysis.Gap{}, s.gaps...), Files: []analysis.Evidence{}, Limitations: []string{
-		"Python adapter v1: static Flask/Blueprint, RESTX Resource and FastAPI routes; dynamic registration, custom decorators and response overrides remain gaps",
+		"Python supports static Flask/Blueprint, RESTX Resource and FastAPI routes plus bounded source-derived Flask/FastAPI generation; runtime registry mutation, unsupported decorators and response overrides remain gaps",
 		"Python helper expansion is bounded to depth 3 and 24 calls per route; loops, comprehensions, mutation, exceptions and external dispatch are conservative",
 		"Jinja output requires a verified Flask template binding; unresolved configuration, includes/macros and stored origins remain Review; no runtime execution or SCA",
 	}}

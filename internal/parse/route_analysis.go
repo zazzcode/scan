@@ -7,6 +7,10 @@ import (
 )
 
 func (s *moduleSet) analyzeRoute(out *analysis.AnalysisReport, m, owner *sourceModule, r analysis.Route, call *sitter.Node, receiver string, context []analysis.Evidence, sourcePath, mount string) {
+	s.analyzeSeededRoute(out, m, owner, r, call, receiver, context, sourcePath, mount, nil)
+}
+
+func (s *moduleSet) analyzeSeededRoute(out *analysis.AnalysisReport, m, owner *sourceModule, r analysis.Route, call *sitter.Node, receiver string, context []analysis.Evidence, sourcePath, mount string, seeds registrationSeeds) {
 	e := httpEntry(r, m.evidence("entry_registration", call), owner.file+":"+owner.hash+":"+receiver)
 	e.HTTP.Receiver = receiver
 	e.HTTP.SourcePath = sourcePath
@@ -23,13 +27,29 @@ func (s *moduleSet) analyzeRoute(out *analysis.AnalysisReport, m, owner *sourceM
 	if args != nil && args.NamedChildCount() > 1 {
 		h = args.NamedChild(args.NamedChildCount() - 1)
 	}
+	if h != nil && h.Kind() == "identifier" && seeds[h.Utf8Text(m.src)] != nil {
+		h = seeds[h.Utf8Text(m.src)]
+	}
 	hm, body, req, gaps := s.handler(m, h)
+	mechanism := "direct_registration"
+	if len(seeds) > 0 {
+		mechanism = "table_expansion"
+	}
+	if fm, fb, fr, fs, provenance, ok := s.literalFactory(m, h, seeds); ok {
+		hm, body, req, gaps = fm, fb, fr, nil
+		seeds = fs
+		context = append(context, provenance...)
+		mechanism = "factory_expansion"
+	}
 	var parts map[string]string
 	if body != nil && req == "" {
 		parts, gaps = requestParts(hm, body, gaps)
 	}
 	e.Gaps = append(e.Gaps, gaps...)
 	if body != nil {
+		if r.Handler.Span.File == "" {
+			r.Handler = analysis.Symbol{Name: textNode(h, m.src), Kind: "function", Span: spanOf(hm.file, body.Parent())}
+		}
 		evidence := hm.evidence("handler", body)
 		inputs := []analysis.InputBinding{}
 		if req != "" {
@@ -47,11 +67,16 @@ func (s *moduleSet) analyzeRoute(out *analysis.AnalysisReport, m, owner *sourceM
 		if response != "" {
 			inputs = append(inputs, httpInput("http.response", response, parameterEvidence(hm, body, 1)))
 		}
-		invocation := registerInvocation(out, e, &evidence, "direct_registration", inputs, e.Gaps)
+		invocation := registerInvocation(out, e, &evidence, mechanism, inputs, e.Gaps)
+		invocation.Closures = registrationClosures(m, seeds)
+		out.InvocationContexts[len(out.InvocationContexts)-1] = invocation
 		f := flow{module: hm, set: s, entry: e, invocation: invocation, registration: owner,
-			env: map[string]value{}, context: append([]analysis.Evidence{m.evidence("registration", call), evidence}, context...),
+			constants: seeds, env: map[string]value{}, context: append([]analysis.Evidence{m.evidence("registration", call), evidence}, context...),
 			gaps: append([]analysis.Gap{}, e.Gaps...), helpers: &helperExpansion{budget: 24, stack: map[string]bool{}}, facts: newInputFacts(), parts: parts}
 		f.seedInvocation()
+		for name, node := range seeds {
+			f.env[name] = f.eval(node)
+		}
 		f.gaps = append(f.gaps, analysis.Gap{Kind: "middleware_unresolved", Detail: "effective middleware/guard chain is not modeled", At: r.Registration})
 		s.noteMiddlewareFields(&f, m, call)
 		f.statements(body)

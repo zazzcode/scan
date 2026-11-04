@@ -108,3 +108,12 @@ only; canonical JSON/SARIF retain all records. Reusable source-reviewed sample r
 The shared facts use language-neutral source/context/protection/storage/entry fields. The [Python adapter](../python-support.md) supplies those facts for bounded Flask/Jinja/FastAPI
 flows and literal inline browser scripts. Unresolved renderer settings, template constructs and
 storage origins remain Review.
+
+Finite Express table registrations and local literal-argument handler factories retain separate
+closure/control contexts. A factory's encoded branch cannot protect a raw sibling registration.
+Bounded generated Flask/FastAPI handlers also resolve source-backed registry names before evaluating
+supported literal conditions; raw HTML concatenation is associated with its actual generated route.
+An unrelated unknown template-content value does not erase an established raw-output witness, while
+unknown transformations or relevant guards still prevent protection claims. Runtime registration data,
+mutation, unknown wrappers, unresolved callbacks and reached limits remain explicit gaps. See the
+[Python subset and limits](../python-support.md#finite-generated-http-routes).
