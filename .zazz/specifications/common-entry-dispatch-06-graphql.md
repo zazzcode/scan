@@ -124,6 +124,20 @@ index defines the commands and each later code change invalidates affected prior
 Local loopback stubs test policy/transport, not model accuracy. A sandbox bind denial is
 an environment limitation to resolve, not a passing test or a reason to use a paid endpoint.
 
+### Post-checkpoint sample verification
+
+The user's 2026-11-04 follow-up authorizes fresh source-only scans of all seven pinned sample
+applications, investigation/fixes of scanner regressions, and a further verified feature checkpoint
+commit/push before their absence. Compare against exact D5 source builds, inspect JSON/HTML/SARIF,
+verify source hashes and target integrity before/after, and run existing case evaluations. Source auditing discovered global-console logger evidence whose
+text differed from its source span; the follow-up includes the focused correction in
+`internal/parse/log_sinks.go` and regression in `internal/parse/log_sinks_test.go`, preserving
+logger detection/status behavior and historical answers. The matching logging analysis guide and
+implementation results record this evidence correction. Reuse
+historical model responses only through complete exact-request replay; no new paid calls, target
+execution/modification, new worktree, PR, merge, integration push or D7 is authorized. Retain
+historical reports/labels, record real gaps separately, and publish durable verification results.
+
 ## 8. TDD entry point and execution sequence
 
 First failing test: `TestGraphQLResolverBindings` with the observable contract in §6.
@@ -201,3 +215,14 @@ limits are recorded in [implementation results](../evaluation/common-entry-dispa
 The ignored per-deliverable log retains RED/green recovery, issues, commands and artifact hashes.
 Browser security policy prevented visual preview; HTML source/export verification passed, without
 a browser-QA claim. D7 and the future GraphQL application evaluation remain unstarted.
+
+2026-11-04 — User expanded post-checkpoint verification to real pinned sample apps and authorized
+fixing discovered scan regressions now, followed by commit/push. Added the bounded sample-verification
+scope in §7; source integrity, D5 parity, real exports and exact historical decision replay are required.
+Existing no-paid-call/no-target-execution restrictions and the D7 boundary remain in effect.
+
+2026-11-04 — Real-sample source auditing found inherited synthetic global-console binding text in
+Goof and the TypeScript app. Fixed the binding through the standard source-evidence constructor,
+with parsed-source TDD, exact expected report-delta validation and full source/report/regression
+checks. Current-source D5 decision replay remains exact for all 1,015 responses; no new paid calls.
+See [real-sample follow-up results](../evaluation/common-entry-dispatch-results.md#d6-real-sample-follow-up--2026-11-04).

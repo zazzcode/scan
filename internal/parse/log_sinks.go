@@ -31,7 +31,7 @@ func (f *flow) logSink(call, fn *sitter.Node) (analysis.Evidence, bool) {
 		if !consoleMethods[method] || moduleBinds(m, name) {
 			return analysis.Evidence{}, false
 		}
-		return analysis.Evidence{Kind: "logger_binding", Text: "global console." + method, Span: spanOf(m.file, fn), SHA256: m.hash}, true
+		return m.evidence("logger_binding", fn), true
 	}
 	if !winstonMethods[method] || f.set == nil {
 		return analysis.Evidence{}, false

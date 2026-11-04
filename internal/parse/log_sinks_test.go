@@ -1,6 +1,8 @@
 package parse
 
 import (
+	"crypto/sha256"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -148,5 +150,42 @@ func TestLoggerIsNotAValidator(t *testing.T) {
 	v := kindUse(t, report, "input_validation_candidate")
 	if !gapKind(v.Gaps, "input_validation_absent") || gapKind(v.Gaps, "input_validation_unresolved") {
 		t.Fatalf("logging changed validation evidence: %+v", v.Gaps)
+	}
+}
+
+func TestGlobalLoggerSourceSnapshot(t *testing.T) {
+	for _, callee := range []string{"console.log", "console.info", "console.warn", "console.error", "console /* binding comment */ .debug"} {
+		t.Run(callee, func(t *testing.T) {
+			root := t.TempDir()
+			source := "import express from 'express';const app=express();app.post('/x',(req,res)=>{" + callee + "(req.headers.authorization)})"
+			writeSource(t, root, "server.js", source)
+			r, err := Analyze(root, "server.js")
+			if err != nil {
+				t.Fatal(err)
+			}
+			uses := logUses(r)
+			if len(uses) != 1 {
+				t.Fatalf("logger uses=%d", len(uses))
+			}
+			found := false
+			for _, e := range uses[0].Context {
+				if e.Kind != "logger_binding" {
+					continue
+				}
+				found = true
+				if e.Text != source[e.Span.StartByte:e.Span.EndByte] {
+					t.Fatalf("logger evidence rewrites source: %q vs %q", e.Text, source[e.Span.StartByte:e.Span.EndByte])
+				}
+				if e.SHA256 != fmt.Sprintf("%x", sha256.Sum256([]byte(source))) {
+					t.Fatal("logger source hash mismatch")
+				}
+				if strings.Contains(e.ModelText, "binding comment") {
+					t.Fatal("logger model projection leaked source comments")
+				}
+			}
+			if !found {
+				t.Fatal("verified global logger evidence missing")
+			}
+		})
 	}
 }

@@ -43,6 +43,68 @@ HTML source, disclosures/sort/filter markup and cross-format evidence/status par
 blocked the local-file visual preview; no visual browser QA is claimed here. Broader milestone visual
 acceptance remains separate from these D6 adapter/export tests.
 
+## D6 real-sample follow-up — 2026-11-04
+
+At the user's request, fresh full source scans ran against all seven pinned application checkouts,
+followed by a source-evidence audit, saved exports and exact historical decision replay. Every target
+matched its recorded revision, reference hashes and clean Git state, including ignored files, before
+and after scanning. No target was executed, modified or installed into; no new paid request was made.
+
+| Fresh full scan | Entries | Uses | Offline finding / Review / Protected records |
+| --- | ---: | ---: | --- |
+| Juice Shop | 167 | 208 | 8 / 200 / 0 |
+| Node.js Goof | 19 | 33 | 2 / 29 / 2 |
+| Vulnerable TypeScript app | 19 | 20 | 1 / 19 / 0 |
+| ThreatByte | 24 | 56 | 5 / 40 / 11 |
+| Python insecure app | 1 | 2 | 1 / 1 / 0 |
+| Vulnerable Flask App | 19 | 24 | 4 / 20 / 0 |
+| VulnPy | 564 | 827 | 28 / 799 / 0 |
+
+These fresh runs contain no model assessments. Their finding counts describe established
+construction-practice observations; scoped protection can follow supported structural encoding facts.
+They are not fresh vulnerability confirmations or proof of complete coverage.
+
+The initial scan output matched the exact D5 source build for all seven apps. A stricter byte-span
+audit then found an inherited logger-evidence defect in Goof and the TypeScript app: verified global
+console bindings recorded descriptive text `global console.log` at a span containing `console.log`.
+The fix uses the standard source-evidence constructor, preserving original text/hash/span and masked
+model text. A failing-then-passing parsed-source regression covers five console methods/forms,
+including an inline comment. Final reports retain identical entries, contexts, operations and
+classifications; five apps remain completely identical to D5, while the other two differ only in
+these two corrected witnesses and their two evidence-derived candidate/finding IDs. Old judgments
+were not copied onto the changed evidence.
+
+The final audit verifies 47,937 source-location/hash/line witnesses, including 46,035 byte-exact raw
+excerpts. The remainder comprises 1,882 labeled field-projection annotations and 20 excerpt-free
+browser scope markers; their original source hashes/spans are verified without relabeling them as
+raw source text. JSON/HTML/SARIF entry/context/status/sink-location parity, zero-use entry visibility,
+and identical generated/saved-export output pass. All seven curated saved JSON inputs remain
+unchanged after offline export.
+
+Current-source exact-request replay accepts all 827 VulnPy and 188 Juice Shop saved D5 decisions,
+with zero new calls and complete assessed-report parity. VulnPy retains 28 contextual confirmed
+findings and 799 evidence-limited results; the twelve main-app generated route/method contexts all
+retain their source-backed SQL/raw-HTML findings. Juice Shop retains seven confirmed findings,
+three construction-practice findings, 178 evidence-limited results and twenty unassessable API-data
+observations. These are historical decisions applied only to identical current requests.
+
+Original Python saved-report acceptance remains 29/29. Fresh source evidence passes all 22 structural
+case checks; seven ThreatByte validation cases remain unassessed under the no-paid-call restriction,
+with their policy candidates retained. The old VulnPy baseline intentionally still evaluates 4/10,
+including its six documented positive misses; neither labels nor historical results were rewritten.
+The separate Jinja coverage gap and other documented framework/flow limits remain. Node source
+controls preserve Goof's raw/stored create+update and escaped/unknown outputs, TypeScript's raw
+search output with no fabricated SQL sink, and Juice Shop's browser/cross-tier origins. Application
+level GraphQL evaluation still awaits the future sample app.
+
+Verification after the repair: focused logging tests, full `go test -race ./... -count=1`, vet/build,
+formatting and diff review pass. Local ignored evidence:
+`d6-real-sample-manifest.json`, `d6-real-sample-audit.json`, `d6-saved-python-evaluation.json`,
+`d6-real-samples/`, `d6-real-logger-{red,green}.log`, and `d6-sample-fix-{race,vet,build}.log`.
+The append-only D6 run log records commands, expected deltas, source hashes and publication checks.
+No additional scanner regressions were found in this bounded sample verification; known unsupported
+paths remain limits rather than protection claims. D7 has not started.
+
 ## D5 — bounded dynamic HTTP registration, 2026-11-04
 
 Implemented in `common-entry-and-dispatch` against predecessor `fe11151bcb0a11102592a805e7d160fa57c303a9`.
