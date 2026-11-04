@@ -64,13 +64,16 @@ zero-use entries remain visible as coverage gaps. A call relationship alone does
 that a request value reaches a sink, and a protected claim never certifies an entire entry.
 
 The benefit is a reusable analysis/reporting contract across entry types, precise evidence for
-remediation, and explicit limits as framework coverage expands. The building blocks are established
-SAST techniques: [CodeQL](https://codeql.github.com/docs/writing-codeql-queries/about-data-flow-analysis/)
-models data flow, [Joern](https://docs.joern.io/code-property-graph/) uses shared program representations,
-and [Semgrep](https://docs.semgrep.dev/writing-rules/data-flow/taint-mode/overview) models sources,
-sinks and sanitization. Zazzles's particular combination is its design, not a claim to have invented
-those techniques or proven better accuracy. See the [technical approach](docs/technical-approach.md)
-for rationale, comparisons and evaluation limits.
+remediation, and explicit limits as framework coverage expands. Research references and inspiration
+include [CodeQL](https://codeql.github.com/docs/writing-codeql-queries/about-data-flow-analysis/),
+[Joern Scan](https://docs.joern.io/scan/) and its Code Property Graph,
+[Bearer](https://docs.bearer.com/guides/dataflow/), and
+[Semgrep](https://docs.semgrep.dev/writing-rules/data-flow/taint-mode/overview).
+Bearer and Semgrep CE also supply pinned local comparison baselines; CodeQL and Joern are
+architectural references, not claimed benchmarks or embedded engines. Zazzles's particular
+combination does not establish a unique algorithm or proven accuracy advantage. The
+[research comparison and Joern Scan discussion](docs/technical-approach.md#research-references-and-inspiration)
+explain the ideas studied, our constrained decision-model judgment, and the evaluation limits.
 
 ### Entry use cases and delivery status
 

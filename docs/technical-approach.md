@@ -47,19 +47,45 @@ resolve possible call targets, bind inputs to particular invocations and track v
 control reachability. Other tools need not use Zazzles's record names or identical boundaries to
 implement related analysis. This comparison concerns architectural ideas, not equivalent coverage.
 
-Conventional SAST includes much more than textual matching. CodeQL documents local/global dataflow,
-taint tracking and source-to-sink path queries. These are established capabilities, not unique Zazzles
-features. [CodeQL dataflow documentation](https://codeql.github.com/docs/writing-codeql-queries/about-data-flow-analysis/)
+### Research references and inspiration
 
-Joern's code property graph combines representations of program syntax, control and data flow,
-and its typed nodes can represent methods and higher-level HTTP endpoints. A common representation
-across language frontends is established practice; Zazzles currently uses typed Go evidence records
-and bounded language-specific flow engines, not Joern's graph implementation or a full repository IR.
-[Joern code property graph documentation](https://docs.joern.io/code-property-graph/)
+We studied the following SAST approaches for design ideas and evaluation. Conventional SAST includes
+structured program models, framework semantics and dataflow analysis, not only textual matching.
+These references inform Zazzles's engineering; they do not establish equivalent coverage or quality.
 
-Semgrep documents source, sink, sanitizer and propagation models. Its Community Edition and
-proprietary analysis have different interprocedural/interfile capabilities; a local CE comparison
-must not stand in for every Semgrep edition. [Semgrep taint analysis](https://docs.semgrep.dev/writing-rules/data-flow/taint-mode/overview)
+| Tool/reference | Approach and ideas studied | Role in Zazzles research |
+|---|---|---|
+| [CodeQL](https://codeql.github.com/docs/writing-codeql-queries/about-data-flow-analysis/) | Local/global dataflow, source/sink models, taint steps and path queries | Architecture and semantic-model reference; not a measured CodeQL benchmark or a Zazzles runtime dependency |
+| [Joern / Joern Scan](https://docs.joern.io/scan/) and [Code Property Graph](https://docs.joern.io/code-property-graph/) | Shared program representation across language frontends; graph relationships, traversals and predefined security queries | Architecture reference reviewed for common representations and query-driven scanning; no Joern comparison run or integration is claimed |
+| [Bearer](https://docs.bearer.com/guides/dataflow/) | Go/Tree-sitter language adapters and flow/reporting patterns studied in its pinned source; reports exposing classifications, source locations and components | Read-only implementation study plus pinned local comparison scans; see the [research record](../.zazz/project/05-prior-art-and-feasibility.md#bearer-inspection-provenance) and [baseline runbook](samples/nodejs-goof/bearer-runbook.md) |
+| [Semgrep](https://docs.semgrep.dev/writing-rules/data-flow/taint-mode/overview) | Pattern rules and taint models for sources, propagation, sanitization and sinks | Rule/model reference plus pinned Community Edition comparison scans; CE evidence does not establish the capabilities or performance of every edition |
+
+Bearer and Semgrep CE baselines are scope-specific observations on selected applications, not
+rankings of whole products. CodeQL and Joern are architectural research references here, not executed
+benchmarks. Studying these approaches does not imply their engines, source or rule sets are embedded
+in Zazzles. The [prior-art record](../.zazz/project/05-prior-art-and-feasibility.md) retains research
+provenance and the boundaries of implementation reuse.
+
+### Relationship to Joern Scan
+
+There is a broad similarity: extract program structure, preserve relationships and source locations,
+evaluate security properties, and report findings. In the
+[documented Joern Scan workflow](https://docs.joern.io/scan/), Joern generates a Code Property Graph,
+runs a selected bundle of predefined queries against it and reports matches. Its queries can express
+structural and flow-related analysis; the approach is more than a text-pattern scanner.
+
+Zazzles is not Joern Scan with a model added. Its current static engine uses Tree-sitter, typed Go
+entry/dispatch records and bounded language-specific flow/evidence assembly, rather than Joern's CPG
+backend or a full repository IR. Go records deterministic findings where the construction is
+established. The decision model assesses claim-specific security questions about supplied code,
+including controls and operation roles; Go then applies evidence-completeness and consistency gates.
+It is part of judgment, not just an explanation appended to an alert.
+
+The model cannot create a missing call/argument binding, assume a generated route exists, or turn an
+unresolved trace into protection. Thus the distinction involves both the representation and the
+judgment contract, not merely adding AI to an otherwise equivalent scanner. Neither architecture
+implies equal language coverage, trace depth, accuracy or runtime cost. This comparison concerns the
+documented Joern Scan pipeline, not every possible extension built on Joern.
 
 Model assistance also has prior art. IRIS combines static analysis with LLM-assisted specification
 inference and contextual path review. Semgrep describes AI-assisted triage and remediation on top of
@@ -84,8 +110,8 @@ and evidence boundaries; they do not establish general accuracy.
 The added VulnPy corpus exposes six known positive coverage misses and four warning controls. Those
 results remain separate from the original 29-case success claim. The [XSS evaluation](../.zazz/evaluation/xss-implementation-results.md)
 and sample answer guides record additional implemented behavior and gaps. Local Semgrep CE/Bearer
-baselines are pinned, scope-specific observations, not full-product rankings. CodeQL documentation
-here is an architecture reference, not a measured CodeQL benchmark.
+baselines are pinned, scope-specific observations, not full-product rankings. CodeQL and Joern documentation
+here are architecture references, not measured CodeQL/Joern benchmarks.
 
 ## What remains to establish
 
