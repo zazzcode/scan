@@ -4,6 +4,9 @@
 results. Start with a local JavaScript, TypeScript or Python application, produce JSON/HTML/SARIF reports, and
 review vulnerabilities, poor practice, unresolved questions, and sufficient protection separately.
 The scanner is under active development with bounded analysis; see the limits in the running guide.
+These guides cover the current **Scan** capability. The [project goals](../README.md#project-goals-scan-audit-and-fix)
+also include planned **Audit** (ecosystem dependency audits, HTML/JSON and SBOM artifacts) and
+**Fix** (coding-agent remediation, verification and PR creation).
 
 The agent-first objective is practical: **fix established problems correctly**, including poor
 practice that deserves refactoring without proof of an exploit. Keep the evidence, business policy,

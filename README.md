@@ -1,12 +1,37 @@
 # Zazzles
 
-Zazzles is a static application security testing (SAST) tool under active development.
-It analyzes JavaScript, TypeScript and Python source to help developers and coding agents understand
-how request inputs reach security-sensitive operations,
-what validation and protection already hold, and where code needs hardening. Reports should give
-reviewers source evidence and explicit analysis gaps so they can judge each finding.
+Zazzles is an application-security toolkit under active development, designed for developers and
+coding agents. The project goal is to discover problems in application code and dependencies,
+present reviewable evidence, and help agents turn established issues into verified remediation PRs.
 
-The approach combines Tree-sitter source extraction, code-flow analysis and decision-model
+## Project goals: Scan, Audit and Fix
+
+| Capability | Purpose | Status and intended outputs |
+|---|---|---|
+| **Scan** | Analyze application source to explain how inputs reach sensitive operations, what protection holds, and what needs repair | **Current development focus.** Bounded JavaScript, TypeScript and Python analysis, with source evidence and Findings / Review / Protected results in HTML, JSON and SARIF |
+| **Audit** | Audit dependency libraries using ecosystem tooling such as `npm audit` and Python's `pip-audit`, then normalize the results for Zazzles users and agents | **Planned.** Consistent HTML and JSON reporting, dependency/advisory provenance, and software bill of materials (SBOM) artifacts |
+| **Fix** | Let an LLM coding agent such as Codex or Cursor consume Scan/Audit issues and source evidence, remediate the problem, verify the change, and create a pull request | **Planned.** Reviewable code changes, validation evidence and remediation PRs; preserve intended behavior and protection already present |
+
+Scan supplies code-behavior evidence; Audit supplies dependency and advisory evidence; Fix turns
+established issues into proposed repairs. An SBOM inventories components and complements the audit
+findings. Audit and Fix are project goals, not currently implemented commands. Today's CLI, sample
+reports and setup instructions below describe Scan. The [dependency-audit design](.zazz/architecture/sca-design.md)
+records the planned ecosystem-tool adapters; the [remediation philosophy](docs/philosophy.md) explains
+what a correct fix should preserve and verify.
+
+## Scan: current implementation
+
+Scan analyzes JavaScript, TypeScript and Python source to help developers and coding agents understand
+how request inputs reach security-sensitive operations, what validation and protection already hold,
+and where code needs hardening. Reports retain source evidence and explicit analysis gaps so reviewers
+can judge each finding.
+
+**Our Scan engineering approach combines explicit entry/dispatch contexts, claim-specific evidence
+requirements, model assessment constrained by that evidence, and reports that preserve findings,
+scoped protection and analysis gaps.** This is Zazzles' particular design; it does not establish a
+unique algorithm or an accuracy advantage we have not measured.
+
+Scan combines Tree-sitter source extraction, code-flow analysis and decision-model
 assessment of source-backed evidence. Decision-model assessment is core to Zazzles' security judgment:
 the code trace supplies the relevant inputs, operations and controls for the model to assess. We
 develop and test with the OpenAI Luna Decision API (`gpt-6-luna`); support for Jev and other decision
@@ -18,7 +43,7 @@ rather than becoming a safety claim or a vulnerability by assumption.
 
 ## Architecture and approach
 
-Zazzles starts from an exposed operation and follows supported input values to a sensitive use.
+Scan starts from an exposed operation and follows supported input values to a sensitive use.
 The common entry and dispatch model separates **what is exposed**, **where it is registered**,
 **which callable may run**, and **the inputs and controls of that particular invocation**.
 Framework adapters supply these facts; bounded flow analysis builds claim evidence; decision-model
@@ -87,7 +112,8 @@ The goal is to report vulnerabilities, weak security practices, and sufficient p
 with useful explanations and remediation guidance. Bearer and Semgrep Community Edition serve as local
 comparison tools on source-reviewed cases.
 
-Today, Zazzles analyzes local **JavaScript, TypeScript and Python** source:
+The current scope below describes **Scan**. Audit and Fix remain planned.
+Scan currently analyzes local **JavaScript, TypeScript and Python** source:
 
 - **JavaScript/TypeScript routes:** Express-style registrations, including CommonJS exports and static router mounts.
 - **Python routes:** Flask/Blueprint, RESTX and FastAPI registrations.
@@ -116,6 +142,7 @@ does not establish analysis support. A clean scan does not certify that an appli
 
 ## Roadmap: vulnerability types
 
+This checklist tracks Scan analysis; the separate Audit and Fix goals are described above.
 Checked boxes mark **initial implementation**, not complete coverage of every framework or input
 path. Each capability uses source-reviewed answer keys and vulnerable/protected/unknown controls;
 remaining gaps stay visible. The [project plan](.zazz/project/implementation-plan.md#future-capability-branches)
@@ -147,7 +174,8 @@ contains the detailed per-language checklist and delivery order.
 - [ ] Server-side request forgery (SSRF) — assess existing outbound-destination candidates and restrictions.
 - [ ] Prototype pollution — JS/TS prototype/object operations; document Python non-applicability.
 - [ ] Complete Python NoSQL and API-to-browser XSS linkage coverage.
-- [ ] Dependency vulnerability scanning (SCA) — resolved JavaScript/TypeScript and Python packages and advisories.
+- [ ] Audit capability (SCA) — ecosystem dependency auditing for JavaScript/TypeScript and Python, normalized HTML/JSON results and SBOM artifacts.
+- [ ] Fix capability — agent-driven remediation of Scan/Audit issues, verification and pull-request creation.
 - [ ] Secret scanning — private material in source, with public keys and placeholders as controls.
 
 All future functionality must include JavaScript, TypeScript and Python acceptance evidence, with
