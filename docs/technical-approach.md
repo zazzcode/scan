@@ -30,7 +30,7 @@ syntax parsing, dataflow, taint analysis, model-assisted security review or SARI
 | Source-backed evidence roles and claim blockers | A confident model answer cannot turn absent bindings, helpers or policies into protection | Incorrect extraction or an incorrect answer can still produce a bad result |
 | Analysis Guidelines plus actual helper/guard evidence | Semantic questions can consider an implementation rather than only a validator's name | Custom behavior is judged only within resolved, bounded paths |
 | Findings, Review and Protected outcomes | Agents receive both repair work and scoped controls to preserve, plus explicit investigation gaps | Protected applies to the named claim, not the route or whole application |
-| Route/browser context and bounded stored/cross-tier links | Review can connect an input, operation and rendering context across supported boundaries | Dynamic registrations, storage identity and cross-tier coverage remain incomplete |
+| Entry/dispatch invocation context and bounded stored/cross-tier links | Shared handlers keep separate input/control facts for each exposure; review can connect supported producer and rendering contexts | Framework discovery, dynamic dispatch, storage identity and cross-tier coverage remain bounded |
 | Versioned evidence, guideline documents and exact-request replay | A historical decision remains auditable and cannot silently move onto changed input | Replay is explicit; an automatic persistent decision cache is not implemented |
 | Shared language-neutral analysis records and reporting | JS/TS and Python use the same claim gates and output semantics | Each language still needs its own correct framework and flow models |
 
@@ -42,9 +42,20 @@ A construction defect can also merit repair without establishing an injection ex
 
 ## Relationship to established SAST
 
+The common-entry design follows established static-analysis principles: represent program structure,
+resolve possible call targets, bind inputs to particular invocations and track values separately from
+control reachability. Other tools need not use Zazzles's record names or identical boundaries to
+implement related analysis. This comparison concerns architectural ideas, not equivalent coverage.
+
 Conventional SAST includes much more than textual matching. CodeQL documents local/global dataflow,
 taint tracking and source-to-sink path queries. These are established capabilities, not unique Zazzles
 features. [CodeQL dataflow documentation](https://codeql.github.com/docs/writing-codeql-queries/about-data-flow-analysis/)
+
+Joern's code property graph combines representations of program syntax, control and data flow,
+and its typed nodes can represent methods and higher-level HTTP endpoints. A common representation
+across language frontends is established practice; Zazzles currently uses typed Go evidence records
+and bounded language-specific flow engines, not Joern's graph implementation or a full repository IR.
+[Joern code property graph documentation](https://docs.joern.io/code-property-graph/)
 
 Semgrep documents source, sink, sanitizer and propagation models. Its Community Edition and
 proprietary analysis have different interprocedural/interfile capabilities; a local CE comparison
@@ -94,13 +105,42 @@ CI gates and dependency scanning remain planned. Current analysis is bounded sta
 runtime confirmation or a security certificate. Paid model judgment also introduces source-transmission,
 service-availability and cost considerations; offline evidence inspection remains available.
 
-## Future entry types
+## Common entry and dispatch architecture
 
-Dynamic routes and GraphQL require both framework adapters and a focused evolution of today's
-HTTP-shaped entry/check records. The shared design separates logical entry points, registrations,
-dispatch bindings, callables and invocation context; HTTP routes are one view. The existing HTTP
-and browser paths should be the first consumers of that foundation before more entry types land.
-Sink evidence, Analysis Guidelines, judgment gates and report
-formats remain reusable. The [architecture extension assessment](../.zazz/architecture.md#future-dynamic-routes-and-graphql)
-names entry identity, registration/dispatch, resolver input provenance, discovery completeness
-and bounded traversal as the pressure points. Neither capability is implemented by the naming migration.
+The shared model separates these responsibilities:
+
+| Record | Meaning | Why it is separate |
+|---|---|---|
+| Entry | Logical exposed operation, such as an HTTP endpoint or schema field | The same implementation can serve different operations; transport is optional metadata |
+| Registration | Source/configuration wiring and generation provenance | A generated endpoint needs evidence of how it was exposed |
+| Dispatch binding | A known or unresolved callable alternative, stage or condition | Discovery of an operation does not establish its implementation or value flow |
+| Callable | Lexical implementation identity and source snapshot | Shared code retains one identity without acquiring a global protection flag |
+| Invocation context | Actual parameters, captured values, input roles and applicable controls | A guard or binding from one exposure must not leak into another |
+| Gap | A located unresolved fact or reached limit | Unknown alternatives and zero-use entries remain inspectable without invented security findings |
+
+For example, one handler exposed twice can have one callable record, two registrations and distinct
+invocation contexts. If only one registration runs an enforcing guard, the other retains its own
+unprotected or unresolved claim. Separately, a discovered registration with no resolved callable
+remains a coverage record; it cannot be interpreted as a safe operation.
+
+Adapters own framework evidence and input roles. Language flow engines own supported transfers,
+helper/callback binding and control facts. Shared claim policy and presenters interpret the resulting
+evidence without manufacturing a missing edge. This makes reports and selectors reusable across entry
+types while leaving each adapter responsible for proving its own source relationships.
+
+The common records, existing HTTP/browser consumer migration and typed reports/selectors are
+implemented on the current development branch. Explicit browser-event callback dispatch is next (D4).
+D5 adds bounded Express and Python generated registration, finite lookup and closure/callback flows,
+with real VulnPy trace/finding acceptance and Juice Shop regressions. Node.js Apollo GraphQL (D6) and
+grpc-js unary gRPC (D7) are planned adapters. Typed metadata/presentation support already present
+for GraphQL/gRPC is not a claim that their source discovery or input propagation is implemented.
+The [README use-case matrix](../README.md#entry-use-cases-and-delivery-status) summarizes supported
+and planned scenarios; the [common-entry design](../.zazz/architecture/common-entry-dispatch.md)
+and [delivery contracts](../.zazz/specifications/common-entry-dispatch.md) own the detailed boundaries.
+
+The architectural benefit is a common evidence and invocation contract rather than a separate
+security interpretation for every framework. It does not automatically yield deeper analysis,
+fewer false positives, complete dynamic-language coverage or proof that all runtime paths were
+examined. Source-reviewed real applications and independent raw/protected/unknown controls must
+establish those capabilities incrementally. This is a deliberate engineering combination of known
+techniques and constrained semantic judgment; research novelty and superiority remain unproven.

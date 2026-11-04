@@ -16,6 +16,53 @@ Field validation and sink protection are separate questions: a valid email addre
 that a SQL query uses bound parameters. Missing source facts and unresolved behavior remain explicit
 rather than becoming a safety claim or a vulnerability by assumption.
 
+## Architecture and approach
+
+Zazzles starts from an exposed operation and follows supported input values to a sensitive use.
+The common entry and dispatch model separates **what is exposed**, **where it is registered**,
+**which callable may run**, and **the inputs and controls of that particular invocation**.
+Framework adapters supply these facts; bounded flow analysis builds claim evidence; decision-model
+assessment and Go evidence gates determine the result. JSON, HTML and SARIF share that interpretation.
+
+```mermaid
+flowchart LR
+    A[Framework adapters] --> B[Common entry and dispatch records]
+    B --> C[Bounded value flow and claim evidence]
+    C --> D[Decision assessment and evidence gates]
+    D --> E[JSON / HTML / SARIF]
+```
+
+This lets one handler serve several operations without mixing their input or protection facts.
+For example, exposing the same function through guarded and unguarded registrations must produce
+separate contexts; protection on one cannot protect the other. Unknown dispatch alternatives and
+zero-use entries remain visible as coverage gaps. A call relationship alone does not establish
+that a request value reaches a sink, and a protected claim never certifies an entire entry.
+
+The benefit is a reusable analysis/reporting contract across entry types, precise evidence for
+remediation, and explicit limits as framework coverage expands. The building blocks are established
+SAST techniques: [CodeQL](https://codeql.github.com/docs/writing-codeql-queries/about-data-flow-analysis/)
+models data flow, [Joern](https://docs.joern.io/code-property-graph/) uses shared program representations,
+and [Semgrep](https://docs.semgrep.dev/writing-rules/data-flow/taint-mode/overview) models sources,
+sinks and sanitization. Zazzles's particular combination is its design, not a claim to have invented
+those techniques or proven better accuracy. See the [technical approach](docs/technical-approach.md)
+for rationale, comparisons and evaluation limits.
+
+### Entry use cases and delivery status
+
+| Entry/use case | What analysis starts from | Supported now | Planned extension |
+|---|---|---|---|
+| **HTTP** | A method/path registration and its handler context | Bounded Express JS/TS and Flask/Blueprint, RESTX and FastAPI Python routes; request fields into supported SQL/NoSQL, HTML, logging and outbound operations, with per-language limits | Broader dispatch and flow coverage; retain existing route filters/checks and evidence |
+| **Browser** | A supported script, component or inline-script context | DOM/location/storage sources and supported DOM/framework rendering sinks; React, Vue, Angular, jQuery and bounded server-to-browser links | Explicit DOM/window `click`, `input`, `change`, `submit` and `message` registrations, callback contexts and event-value provenance (D4) |
+| **Dynamic HTTP routes** | Source-generated registrations and factory-returned handlers | Selected returned-handler and Finale persistence patterns; generalized generation remains incomplete | Finite tables/loops, literal factory arguments and closure bindings; generated Flask/FastAPI routes and source-to-sink findings in VulnPy (D5) |
+| **GraphQL resolvers** | A schema field bound to a resolver | Typed entry records, selectors and presenters are ready; resolver discovery/flow is pending | Bounded Node.js Apollo resolver maps and literal SDL; distinct argument/parent/context roles and field-specific findings (D6) |
+| **gRPC methods** | A service/method registration bound to a handler | Typed entry records, selectors and presenters are ready; service discovery/flow is pending | Bounded Node.js grpc-js unary handlers with local proto3 declarations; request/metadata/callback roles; unsupported streaming stays explicit (D7) |
+
+The shared model, migration of existing HTTP/browser consumers, and entry-specific reports/selectors
+are implemented on this development branch. D4 is next; new adapter support is delivered and verified
+separately. A recognized entry kind or accepted selector does not by itself establish discovery,
+value flow or vulnerability coverage. The [milestone contracts](.zazz/specifications/common-entry-dispatch.md)
+record the delivery order and acceptance checks.
+
 ## Explore sample findings
 
 These saved reports show scans of intentionally vulnerable applications, including route and browser
@@ -36,7 +83,7 @@ coverage limits and refresh instructions; they will be updated as Zazzles improv
 
 ## Goals and current scope
 
-The goal is to report vulnerabilities, weak security practices, and sufficient protection by route,
+The goal is to report vulnerabilities, weak security practices, and sufficient protection by entry and scoped claim,
 with useful explanations and remediation guidance. Bearer and Semgrep Community Edition serve as local
 comparison tools on source-reviewed cases.
 
@@ -88,7 +135,7 @@ contains the detailed per-language checklist and delivery order.
 
 **Next and planned work**
 
-- [ ] **Common entry and dispatch model — next:** shared analysis entry points with support for dynamic routes, GraphQL resolvers and gRPC handlers.
+- [ ] **Common entry and dispatch model — in progress:** shared records, existing HTTP/browser migration and typed reports/selectors implemented; explicit browser events, broader dynamic HTTP, GraphQL and gRPC adapters follow.
 - [ ] Command injection — process/shell execution and protective patterns across JavaScript, TypeScript and Python.
 - [ ] XSS hardening — renderer configuration, helpers, generated routes, stored/cross-tier origins and VulnPy coverage gaps.
 - [ ] Path traversal — request-influenced paths and enforced containment.
