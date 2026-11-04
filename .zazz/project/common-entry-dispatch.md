@@ -11,6 +11,13 @@ facilitate their registration, callable binding and invocation context without H
 Language adapters supply their own binding and flow evidence; adding gRPC or the common model
 does not itself implement support for another source language.
 
+The [architecture proposal](../architecture/common-entry-dispatch.md) and
+[eight-deliverable specification set](../specifications/common-entry-dispatch.md) refine this
+brief as of 2026-11-03. They retain HTTP/sample compatibility, make browser events explicit,
+and prioritize Node.js GraphQL before gRPC. The user-built GraphQL application is a later
+evaluation; source-only fixtures support initial adapter acceptance. Implementation has
+not started.
+
 ## Governing design
 
 Read [AGENTS.md](../../AGENTS.md), the [orientation](../docs/zazzles-agent-orientation.md), then
