@@ -85,6 +85,13 @@ func investigationGuidance(u analysis.CandidateUse, at string) Guidance {
 }
 func renderingGuidance(u analysis.CandidateUse, at string) Guidance {
 	g := Guidance{Title: "Repair this HTML output", ExampleStatus: "source-derived candidate; review intended output semantics and test before applying"}
+	for _, e := range u.Context {
+		if e.Kind == "event_registration" && u.XSS.OutputContext == "html_text" {
+			g.Actions = []string{"At " + at + ", replace the raw HTML construction in " + u.Sink.Text + " with DOM node construction and textContent when the intended output is text.", "If HTML is required, use a verified HTML sanitizer appropriate to this output context before inserting the event-derived value. Event names, input validation and message-origin checks do not encode HTML.", "Test the registered callback with HTML-significant event input and assert the intended text or sanitized DOM. Preserve separate tests for each registration of a shared callback."}
+			g.ExampleStatus = "no automatic patch; review intended DOM output and callback semantics"
+			return g
+		}
+	}
 	if strings.Contains(u.Sink.Text, "{{") && strings.Contains(u.Sink.Text, "|") && u.XSS.OutputContext != "script" && u.XSS.OutputContext != "url" {
 		replacement := jinjaSafeFilter.ReplaceAllString(u.Sink.Text, "")
 		if replacement != u.Sink.Text {

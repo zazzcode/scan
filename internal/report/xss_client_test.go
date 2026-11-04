@@ -2,10 +2,14 @@ package report
 
 import (
 	"bytes"
+	"encoding/json"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/parse"
 )
 
 func TestClientResultsHaveSeparateHeadingsAndIdentity(t *testing.T) {
@@ -42,5 +46,79 @@ func TestClientResultsHaveSeparateHeadingsAndIdentity(t *testing.T) {
 	props := result["properties"].(map[string]any)
 	if props["scan.entryId"] != "client:view" || props["scan.route"] != nil {
 		t.Fatal("SARIF manufactured a route")
+	}
+}
+
+func TestBrowserEventPipeline(t *testing.T) {
+	for _, lang := range []string{"javascript", "typescript"} {
+		t.Run(lang, func(t *testing.T) {
+			r, err := parse.Analyze("../parse/testdata/"+lang+"/browser-events", "")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(r.Entries) != 6 || len(r.Uses) != 4 {
+				t.Fatalf("lost parsed controls: %d/%d", len(r.Entries), len(r.Uses))
+			}
+			dir, err := WriteBundle(t.TempDir(), r)
+			if err != nil {
+				t.Fatal(err)
+			}
+			data, err := os.ReadFile(filepath.Join(dir, "findings.json"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			var saved analysis.AnalysisReport
+			if err := json.Unmarshal(data, &saved); err != nil {
+				t.Fatal(err)
+			}
+			if err := saved.ValidateUses(); err != nil {
+				t.Fatal(err)
+			}
+			html, err := os.ReadFile(filepath.Join(dir, "findings.html"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if strings.Contains(string(html), "Jinja autoescape") || !strings.Contains(string(html), "textContent") {
+				t.Fatal("event report lacks DOM-specific repair guidance")
+			}
+			statuses := map[string]int{}
+			for _, f := range saved.Findings {
+				statuses[f.Status]++
+				if !strings.Contains(string(html), `data-record-type="`+f.RecordType+`"`) {
+					t.Fatalf("HTML lost status %s", f.Status)
+				}
+			}
+			if len(statuses) != 3 {
+				t.Fatalf("raw/encoded/unknown status controls lost: %v", statuses)
+			}
+			run := SARIF(&saved)["runs"].([]any)[0].(map[string]any)
+			results := run["results"].([]any)
+			if len(results) != 4 {
+				t.Fatal("zero-use entry became a finding or use was lost")
+			}
+			for i, item := range results {
+				result := item.(map[string]any)
+				props := result["properties"].(map[string]any)
+				f := props["scan.finding"].(analysis.Finding)
+				if f.Status != saved.Findings[i].Status || props["scan.entryId"] != saved.Uses[i].EntryID || props["scan.invocationContextId"] != saved.Uses[i].InvocationContextID || props["scan.route"] != nil {
+					t.Fatal("SARIF status/context parity failed")
+				}
+				if len(result["relatedLocations"].([]any)) < 2 {
+					t.Fatal("registration/callback/source witnesses lost")
+				}
+			}
+			for _, e := range saved.Entries {
+				if e.HTTP != nil || e.Browser.Category != "event" || !strings.Contains(string(html), e.ID) {
+					t.Fatal("event identity/details missing")
+				}
+			}
+			if !strings.Contains(string(html), "browser_event_callback_unresolved") {
+				t.Fatal("zero-use gap hidden")
+			}
+			inv := run["invocations"].([]any)[0].(map[string]any)
+			if inv["properties"] == nil || len(inv["toolExecutionNotifications"].([]any)) == 0 {
+				t.Fatal("SARIF zero-use coverage missing")
+			}
+		})
 	}
 }

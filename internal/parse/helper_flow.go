@@ -115,6 +115,9 @@ func supportedCallee(n *sitter.Node) bool {
 func functionParameters(fn *sitter.Node, src []byte) ([]boundParam, bool) {
 	params := fn.ChildByFieldName("parameters")
 	if params == nil {
+		params = fn.ChildByFieldName("parameter")
+	}
+	if params == nil {
 		return nil, true
 	}
 	// `value => ...` stores the identifier directly. `(value) => ...` wraps it.

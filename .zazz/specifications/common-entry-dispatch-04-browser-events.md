@@ -5,8 +5,8 @@ Milestone deliverable: 4 of 8. Project and Deliverable Owner: Michael.
 Drafted: 2026-11-03. Execution tracking: deliverable-specific ignored local run log only.
 Coordination: one Contributor Agent working in the assigned worktree; no delegation required.
 Proposed review shape: one milestone draft PR into `stage`, human review/merge.
-The user requested design/specification now and will request implementation later.
-This document does not itself authorize implementation, publishing, paid calls or merging.
+The user invoked §12 on 2026-11-04, authorizing deliverable 4 implementation, verification,
+commit and feature-branch push. Paid calls, later deliverables, PR creation and merging remain outside scope.
 
 ## 0. Capability
 
@@ -148,17 +148,17 @@ record exact partial changes and failing checks, without claiming this deliverab
 
 ## 9. Definition of done
 
-- [ ] Required source/standards read and current scope verified.
-- [ ] All acceptance criteria have passing, cited evidence; affected regressions explained.
-- [ ] Scoped tests/race checks and diff checks pass; only changed Go files formatted.
-- [ ] Required offline reports/manual review performed where this slice changes output.
-- [ ] Remaining gaps, exact artifact locations and next checkpoint recorded.
-- [ ] No out-of-scope change, fabricated protection or stale-response replay.
-- [ ] User receives the completed slice and any remaining unchecked acceptance items.
+- [x] Required source/standards read and current scope verified.
+- [x] All acceptance criteria have passing, cited evidence; affected regressions explained.
+- [x] Scoped tests/race checks and diff checks pass; only changed Go files formatted.
+- [x] Required offline reports/manual review performed where this slice changes output.
+- [x] Remaining gaps, exact artifact locations and next checkpoint recorded.
+- [x] No out-of-scope change, fabricated protection or stale-response replay.
+- [x] User receives the completed slice and any remaining unchecked acceptance items.
 
 ## 10. Open questions
 
-No deliverable-specific blocker remains beyond user review of the proposed design/scope.
+No deliverable-specific blocker or unresolved scope decision remains.
 Node.js GraphQL is first new server support; Apollo and grpc-js are concrete bounded
 implementation choices, adjustable by user steering. The user's future GraphQL test app
 is deferred evaluation, not a dependency. Resolve any materially new choice before its
@@ -248,3 +248,22 @@ and resume prompts. This changes execution tracking only, with no product/test c
 new chat. It names the completed D3 checkpoint, predecessor logs, single-agent scope,
 recovery/verification duties and explicit future D4 commit/push authorization when invoked.
 This edit changes execution instructions only; D4 implementation has not started.
+
+2026-11-04 — Implemented deliverable 4 after the user invoked §12. Verified literal
+DOM/window event registrations now supply explicit entries, local/inline callback bindings,
+separate invocation contexts and event-input projections. Shared callbacks retain one callable
+identity. DOM/location reads remain distinct; message-origin conditions do not encode output.
+Zero-use and unresolved registrations, conservative mutation gaps and reached traversal/expansion
+limits remain visible. Existing script/component and inline-template provenance are retained.
+Focused adjacent changes support single-parameter arrow callbacks and DOM-specific event report
+guidance. No new adapter family or later deliverable is included.
+
+Acceptance: `TestBrowserEventDispatch`, `TestBrowserEventProvenance`,
+`TestBrowserEventUnknownAndLimits` and `TestBrowserEventPipeline` exercise real parsed JS/TS,
+Python inline scripts, typed checks, completeness and JSON/HTML/SARIF exports. Source fixtures
+produce six event entries and four contextual uses: two raw, one encoded, one unknown, plus
+zero-use and unresolved callbacks. Scoped package/race checks and local provider/replay regressions
+pass. Offline discovery and synthetic local-stub reports retain status/provenance parity and were
+visually inspected for identity, disclosure, sorting, keyboard focus, gaps and narrow layout.
+Exact commands, final artifact paths/hashes and publication identity belong to the separate ignored
+D4 run log. Implemented limits are documented in the [XSS guide](../../docs/analysis/xss.md).

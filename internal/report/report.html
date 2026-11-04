@@ -28,7 +28,7 @@
 {{range .Rows}}{{template "entry-row" .}}{{else}}<p class="empty">No server entries in this report. Check selection and coverage gaps.</p>{{end}}
 </section>
 <h2>Browser / client-side</h2>
-<p class="sub">Client code has no HTTP route. Entries identify a component or source file; expand a record for its input source, rendering sink, output context and protection evidence.</p>
+<p class="sub">Client code has no HTTP route. Entries identify an event, component or source file; expand a record for its input source, rendering sink, output context and protection evidence.</p>
 <div class="grid-head"><span>Source type</span><span>Component / source</span><span>Source location</span><span class="status-sort"><span>Findings</span><span>Review</span><span>Protected</span></span><span class="categories-heading">Categories</span></div>
 <section id="client-source-rows" aria-label="Browser and client-side sources">
 {{range .ClientRows}}{{template "entry-row" .}}{{else}}<p class="empty">No client rendering records in the supported analysis scope. This is not a safety verdict.</p>{{end}}

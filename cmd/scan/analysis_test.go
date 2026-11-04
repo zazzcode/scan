@@ -63,3 +63,41 @@ func TestSavedAnalysisSchemaExports(t *testing.T) {
 		}
 	}
 }
+
+func TestBrowserEventPipeline(t *testing.T) {
+	t.Setenv("SCAN_FINDINGS_DIR", "")
+	root := "../../internal/parse/testdata/javascript/browser-events"
+	var out, stderr bytes.Buffer
+	if code := run([]string{"--analyze", "--json", root}, &out, &stderr); code != exitOK {
+		t.Fatalf("code=%d stderr=%s", code, stderr.String())
+	}
+	var r analysis.AnalysisReport
+	if err := json.Unmarshal(out.Bytes(), &r); err != nil {
+		t.Fatal(err)
+	}
+	if r.SchemaVersion != 3 || len(r.Entries) != 6 || len(r.Uses) != 4 || len(r.Findings) != 4 {
+		t.Fatalf("bad actual event pipeline: %d/%d/%d", len(r.Entries), len(r.Uses), len(r.Findings))
+	}
+	if err := r.ValidateUses(); err != nil {
+		t.Fatal(err)
+	}
+	saved := filepath.Join(t.TempDir(), "events.json")
+	original := append([]byte{}, out.Bytes()...)
+	if err := os.WriteFile(saved, original, 0600); err != nil {
+		t.Fatal(err)
+	}
+	for _, mode := range []string{"--export-html", "--export-sarif"} {
+		out.Reset()
+		stderr.Reset()
+		if code := run([]string{mode, saved}, &out, &stderr); code != exitOK {
+			t.Fatalf("%s code=%d stderr=%s", mode, code, stderr.String())
+		}
+		if mode == "--export-sarif" && !json.Valid(out.Bytes()) {
+			t.Fatal("invalid event SARIF")
+		}
+	}
+	after, err := os.ReadFile(saved)
+	if err != nil || !bytes.Equal(after, original) {
+		t.Fatal("export modified evidence")
+	}
+}

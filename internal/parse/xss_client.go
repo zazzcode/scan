@@ -18,6 +18,7 @@ type clientInjection struct {
 }
 
 type clientContext struct {
+	events   *browserEvents
 	entry    analysis.EntryPoint
 	injected map[string]clientInjection
 	methods  map[string]*sitter.Node
@@ -44,7 +45,7 @@ func (s *moduleSet) browser(report *analysis.AnalysisReport) error {
 			return err
 		}
 		text := string(m.src)
-		if !strings.Contains(text, "document") && !strings.Contains(text, "location") && !strings.Contains(text, "@angular") && !strings.Contains(text, "react") && !strings.Contains(text, "innerHTML") && !strings.Contains(text, "postMessage") && !strings.Contains(text, "setTimeout") && !strings.Contains(text, "jquery") {
+		if !strings.Contains(text, "document") && !strings.Contains(text, "location") && !strings.Contains(text, "@angular") && !strings.Contains(text, "react") && !strings.Contains(text, "innerHTML") && !strings.Contains(text, "postMessage") && !strings.Contains(text, "setTimeout") && !strings.Contains(text, "jquery") && !strings.Contains(text, "addEventListener") {
 			continue
 		}
 		if m.tree.RootNode().HasError() {
@@ -52,7 +53,7 @@ func (s *moduleSet) browser(report *analysis.AnalysisReport) error {
 			continue
 		}
 		base := &clientContext{entry: browserEntry(m, m.evidence("browser_source_slice", m.tree.RootNode()), file, "script"),
-			injected: map[string]clientInjection{}, methods: map[string]*sitter.Node{}, fields: map[string]*sitter.Node{}}
+			events: newBrowserEvents(report, m), injected: map[string]clientInjection{}, methods: map[string]*sitter.Node{}, fields: map[string]*sitter.Node{}}
 		for _, imp := range m.imports {
 			base.react = base.react || imp.module == "react"
 		}
@@ -82,6 +83,9 @@ func (s *moduleSet) browser(report *analysis.AnalysisReport) error {
 		}
 		collect(m.tree.RootNode())
 		for _, fn := range functions {
+			if base.events.callbacks[fn.StartByte()] {
+				continue
+			}
 			child := newClientFlow(s, m, base)
 			child.env = copyValues(f.env)
 			if params, ok := functionParameters(fn, m.src); ok {
@@ -96,6 +100,7 @@ func (s *moduleSet) browser(report *analysis.AnalysisReport) error {
 		addClientUses(report, base, f.uses)
 		for _, class := range classes {
 			context := s.clientClass(m, class)
+			context.events = base.events
 			flow := newClientFlow(s, m, context)
 			body := class.ChildByFieldName("body")
 			if body == nil {
@@ -128,6 +133,7 @@ func (s *moduleSet) browser(report *analysis.AnalysisReport) error {
 			s.angularOutputs(&flow)
 			addClientUses(report, context, flow.uses)
 		}
+		base.events.unvisited(m)
 	}
 	return nil
 }
@@ -141,6 +147,25 @@ func addClientUses(report *analysis.AnalysisReport, client *clientContext, uses 
 	if len(uses) == 0 {
 		return
 	}
+	merged := mergeClientUses(uses)
+
+	report.Uses = append(report.Uses, merged...)
+	if len(merged) > 0 {
+		e := client.entry.Location
+		ctx := registerInvocation(report, client.entry, &e, "browser_source_slice", nil, nil)
+		gap := analysis.Gap{Kind: "browser_exposure_unresolved", Detail: "Source slice analysis does not establish runtime event/component exposure", At: e.Span}
+		report.DispatchBindings[len(report.DispatchBindings)-1].Resolution = "partial"
+		report.DispatchBindings[len(report.DispatchBindings)-1].Gaps = []analysis.Gap{gap}
+		report.InvocationContexts[len(report.InvocationContexts)-1].Gaps = []analysis.Gap{gap}
+		for i := len(report.Uses) - len(merged); i < len(report.Uses); i++ {
+			report.Uses[i].EntryID = client.entry.ID
+			report.Uses[i].InvocationContextID = ctx.ID
+			report.Uses[i].EntryKind = "browser"
+		}
+	}
+}
+
+func mergeClientUses(uses []analysis.CandidateUse) []analysis.CandidateUse {
 	// The same sink can be reached from module, function and class flows. Records
 	// are merged so an earlier weak candidate never hides a later stronger one.
 	index := map[string]int{}
@@ -156,20 +181,7 @@ func addClientUses(report *analysis.AnalysisReport, client *clientContext, uses 
 		index[u.ID] = len(merged)
 		merged = append(merged, u)
 	}
-	report.Uses = append(report.Uses, merged...)
-	if len(merged) > 0 {
-		e := client.entry.Location
-		ctx := registerInvocation(report, client.entry, &e, "browser_source_slice", nil, nil)
-		gap := analysis.Gap{Kind: "browser_exposure_unresolved", Detail: "Source slice analysis does not establish runtime event/component exposure", At: e.Span}
-		report.DispatchBindings[len(report.DispatchBindings)-1].Resolution = "partial"
-		report.DispatchBindings[len(report.DispatchBindings)-1].Gaps = []analysis.Gap{gap}
-		report.InvocationContexts[len(report.InvocationContexts)-1].Gaps = []analysis.Gap{gap}
-		for i := len(report.Uses) - len(merged); i < len(report.Uses); i++ {
-			report.Uses[i].EntryID = client.entry.ID
-			report.Uses[i].InvocationContextID = ctx.ID
-			report.Uses[i].EntryKind = "browser"
-		}
-	}
+	return merged
 }
 
 func xssRank(x *analysis.XSSFacts) int {

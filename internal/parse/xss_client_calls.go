@@ -146,14 +146,8 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 				}
 			}
 		case "addEventListener":
-			global := (object == "window" || object == "document") && browserGlobal(f.module, n, object)
-			if (global || receiver.domNode) && args.NamedChildCount() > 1 {
-				event, _ := stringLiteral(args.NamedChild(0), f.module.src)
-				if event == "message" || event == "input" || event == "change" || event == "submit" {
-					f.clientCallback(args.NamedChild(1), f.browserSource(n))
-					return value{}, true
-				}
-			}
+			f.browserEvent(n, obj, args, receiver)
+			return value{}, true
 		case "insertAdjacentHTML", "createContextualFragment", "html", "append":
 			if receiver.domNode && ((method != "append" && method != "html") || receiver.jqueryNode) {
 				index := uint(0)
