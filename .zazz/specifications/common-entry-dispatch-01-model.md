@@ -2,11 +2,11 @@
 
 Worktree / branch: `common-entry-and-dispatch`. Feature: common entry/dispatch.
 Milestone deliverable: 1 of 8. Project and Deliverable Owner: Michael.
-Drafted: 2026-11-03. Execution tracking: shared ignored local run log only.
+Drafted: 2026-11-03. Execution tracking: deliverable-specific ignored local run log only.
 Coordination: one Contributor Agent working in the assigned worktree; no delegation required.
 Proposed review shape: one milestone draft PR into `stage`, human review/merge.
-The user requested design/specification now and will request implementation later.
-This document does not itself authorize implementation, publishing, paid calls or merging.
+The user authorized implementation of this deliverable on 2026-11-03 and requested a
+committed/pushed design checkpoint. Paid calls and merging remain outside scope.
 
 ## 0. Capability
 
@@ -53,7 +53,7 @@ an in-place contract revision. Unrelated cleanup is outside scope.
 | `internal/analysis/entry_validation.go` | new | Reference and ownership validation |
 | `internal/analysis/entries_test.go` | new | Cardinality, identity and gap controls |
 | `.zazz/specifications/common-entry-dispatch-01-model.md` | modified if needed | Contract decisions and evidence links |
-| `.zazz/ephemeral/common-entry-dispatch-run-log.md` | ignored local | Append-only execution evidence |
+| `.zazz/ephemeral/common-entry-dispatch-01-model-run-log.md` | ignored local | Append-only execution evidence |
 
 One milestone PR preserves a single canonical migration and removes transitional state
 before human integration. Each deliverable remains a distinct review/evidence unit in
@@ -91,9 +91,9 @@ blocker and surface it. Do not weaken tests or drop mandatory coverage to fit a 
 
 ## 6. Acceptance criteria
 
-- **AC1 — TestEntryCatalogContexts.** One callable exposed by two entries has separate registrations/contexts and distinct controls; one entry retains two known targets plus an unresolved alternative without a fake callable. Verified by `TestEntryCatalogContexts` in the packages named in §7; new test names are planned contracts, not existing results.
-- **AC2 — TestEntryCatalogIdentity.** Identical snapshots and reordered construction yield identical IDs/order; source/service-instance differences remain distinct and judgments never affect identity. Verified by `TestEntryCatalogIdentity` in the packages named in §7; new test names are planned contracts, not existing results.
-- **AC3 — TestEntryCatalogValidation.** Reject dangling or cross-entry context references; retain located entry/dispatch gaps with no candidates, and preserve unknown entry kinds for inspection. Verified by `TestEntryCatalogValidation` in the packages named in §7; new test names are planned contracts, not existing results.
+- **AC1 — TestEntryCatalogContexts.** One callable exposed by two entries has separate registrations/contexts and distinct controls; one entry retains two known targets plus an unresolved alternative without a fake callable. Verified by `TestEntryCatalogContexts` in the packages named in §7; implementation evidence is recorded below.
+- **AC2 — TestEntryCatalogIdentity.** Identical snapshots and reordered construction yield identical IDs/order; source/service-instance differences remain distinct and judgments never affect identity. Verified by `TestEntryCatalogIdentity` in the packages named in §7; implementation evidence is recorded below.
+- **AC3 — TestEntryCatalogValidation.** Reject dangling or cross-entry context references; retain located entry/dispatch gaps with no candidates, and preserve unknown entry kinds for inspection. Verified by `TestEntryCatalogValidation` in the packages named in §7; implementation evidence is recorded below.
 - **Scope/checks.** Scoped tests pass and the slice diff contains only relevant approved paths;
   verify with `git diff --check`, `git status --short` and slice-diff inspection.
 
@@ -152,6 +152,26 @@ record exact partial changes and failing checks, without claiming this deliverab
 - [ ] No out-of-scope change, fabricated protection or stale-response replay.
 - [ ] User receives the completed slice and any remaining unchecked acceptance items.
 
+### Verification evidence, 2026-11-03
+
+The foundation is implemented in [entry records](../../internal/analysis/entries.go),
+[snapshot identities](../../internal/analysis/entry_ids.go), and
+[reference validation](../../internal/analysis/entry_validation.go).
+The [model tests](../../internal/analysis/entries_test.go) exercise the three acceptance
+criteria plus same-dispatch invocation-control isolation, input provenance/receiver/closure
+bindings, partial dispatch, transport associations and invalid identity sources.
+
+Passing commands, using the declared local Go toolchain with `GOPROXY=off` and the ignored
+worktree Go cache: `go test -race ./...`, `go vet ./...`, `go build ./...`, changed-file
+`gofmt -l`, `git diff --check`, and local documentation links/anchors/text checks.
+The full race suite includes existing HTTP/browser and both-provider local stub tests.
+An initial sandbox-only loopback denial was resolved by rerunning with local access.
+
+Current analysis report schema remains 2; existing runtime producers and report views
+are unchanged. No new-adapter scanner/report support is claimed by this foundation.
+No sample checkout was modified, application executed or live model request made.
+Detailed recovery history is in this deliverable's ignored run log.
+
 ## 10. Open questions
 
 No deliverable-specific blocker remains beyond user review of the proposed design/scope.
@@ -162,8 +182,8 @@ dependent code; do not block unrelated earlier deliverables on later evaluation 
 
 ## 11. Run log protocol
 
-Use `.zazz/ephemeral/common-entry-dispatch-run-log.md`, append-only, with a section for
-this deliverable. Record standards verification, user decisions, start revision, phase
+Use `.zazz/ephemeral/common-entry-dispatch-01-model-run-log.md`, append-only.
+Record standards verification, user decisions, start revision, phase
 completions, commands/results, deviations, report paths/hashes, review/rework and recovery.
 At session start read AGENTS, this contract, relevant design sections and the log; verify
 Git state and choose the next incomplete checkpoint. If the ignored log is absent,
@@ -174,7 +194,7 @@ reconstruct from Git and tracked acceptance evidence; never infer success from m
 ```text
 Implement only the user-authorized deliverable in the existing common-entry-and-dispatch
 worktree. Read AGENTS.md, .zazz/specifications/common-entry-dispatch-01-model.md,
-its linked design/dependencies, and the shared ignored run log. Load spec-driven and
+its linked design/dependencies, and the deliverable-specific ignored run log. Load spec-driven and
 matched analysis/engineering standards. Work as one agent. Start with the first failing
 acceptance test, keep HTTP/browser regressions green, and verify actual pipeline behavior.
 Record context/coverage and exact evidence; use recovery checkpoints to fit the available
@@ -188,3 +208,11 @@ new worktrees, merge or integration push. Report acceptance results and next che
 2026-11-03 — Initial contract from the user's design/spec request, Node.js GraphQL
 priority, explicit browser-event/reporting requirement, retained HTTP sample compatibility,
 and later application evaluation. Product implementation has not started.
+
+2026-11-03 — User requested one ignored run log per deliverable; updated log paths
+and resume prompts. This changes execution tracking only, with no product/test change.
+
+2026-11-03 — User authorized deliverable 1. Implemented the shared model, snapshot IDs,
+canonical ordering, reference/input/control ownership validation and regression controls.
+Existing consumers remain on schema 2 as required; full race/vet/build and documentation
+checks passed. No acceptance weakening or adapter scope expansion occurred.

@@ -2,7 +2,8 @@
 
 Requested 2026-11-03. Worktree and branch: `common-entry-and-dispatch`.
 Project and Deliverable Owner: Michael. Integration: `stage`, human PR review/merge.
-Design/specification authoring is the current assignment; implementation is a later request.
+The user requested design/specification authoring, then authorized deliverable 1
+implementation on the same date.
 
 The [architecture design](../architecture/common-entry-dispatch.md) owns record semantics,
 flow boundaries and reporting approach. Each linked deliverable below is its own executable
@@ -13,7 +14,7 @@ This index owns ordering and milestone-wide verification, not a separate executi
 
 | Order | Deliverable contract | Observable outcome | Small recovery units |
 | --- | --- | --- | --- |
-| 1 | [Shared model](common-entry-dispatch-01-model.md) | Typed records, deterministic identity, contexts and reference validation | Cardinality/identity; validation |
+| 1 | [Shared model](common-entry-dispatch-01-model.md) | Implemented foundation: typed records, deterministic identity, contexts and reference validation | Cardinality/identity; validation |
 | 2 | [Existing consumers and compatibility](common-entry-dispatch-02-consumers-compatibility.md) | Real HTTP/browser flow uses common contexts; saved schemas remain readable | JS/TS HTTP; Python/browser; judge/report/schema cutover |
 | 3 | [Reports and selectors](common-entry-dispatch-03-reporting-selectors.md) | Entry-specific HTML/text/SARIF; typed checks and entry filters | Presentation/locations; selectors; visual checks |
 | 4 | [Browser events](common-entry-dispatch-04-browser-events.md) | Explicit event/callback entries and event-source flow | Binding; source/control pairs; reports |
@@ -47,11 +48,13 @@ allowance or promise that the entire milestone fits one window.
   usage windows. Intermediate bridges are implementation scaffolding, not completed common
   model support; remove duplicate canonical state at its final schema cutover.
 - Do not cut fixtures, browser/HTTP coverage, compatibility, unknown controls or final
-  verification to fit a window. Reduce the active unit and resume from the shared log.
+  verification to fit a window. Reduce the active unit and resume from the deliverable log.
 - No automatic background continuation or paid model calls are implied. A later explicit
   implementation request is sufficient authorization under AGENTS; no repeated ceremony.
 
-Use the ignored `.zazz/ephemeral/common-entry-dispatch-run-log.md` across the milestone.
+Use one ignored `.zazz/ephemeral/common-entry-dispatch-<number>-<slug>-run-log.md`
+per deliverable, as named by its contract. A later deliverable reads predecessor completion
+evidence when it depends on that contract; it does not combine execution histories.
 Tracked contracts and the final evaluation document retain durable decisions and outcomes.
 
 ## Existing behavior is a release constraint
@@ -124,9 +127,9 @@ status parity and no fabricated HTTP values, execution paths or security results
 
 ## Implementation authorization and completion
 
-This specification set is a concrete reviewable proposal. The next user implementation
-request selects its active scope. No code implementation, full test run, paid evaluation,
-commit, push or PR creation has occurred as part of writing these documents.
+The user approved starting deliverable 1 and committing/pushing the design checkpoint
+on 2026-11-03. Later deliverables remain separately assignable. No paid evaluation or PR
+creation is authorized by this index.
 
 Completion requires all eight deliverables' acceptance evidence, no obsolete canonical
 route/client aliases, documented limits, unchanged historical inputs, passing mandatory

@@ -2,7 +2,7 @@
 
 Worktree / branch: `common-entry-and-dispatch`. Feature: common entry/dispatch.
 Milestone deliverable: 3 of 8. Project and Deliverable Owner: Michael.
-Drafted: 2026-11-03. Execution tracking: shared ignored local run log only.
+Drafted: 2026-11-03. Execution tracking: deliverable-specific ignored local run log only.
 Coordination: one Contributor Agent working in the assigned worktree; no delegation required.
 Proposed review shape: one milestone draft PR into `stage`, human review/merge.
 The user requested design/specification now and will request implementation later.
@@ -56,7 +56,7 @@ an in-place contract revision. Unrelated cleanup is outside scope.
 | `internal/report/*_test.go; cmd/scan/*_test.go; internal/parse/checks_test.go` | modified/new | View/selection matrices |
 | `docs/running-scans.md, interpreting-results.md; .zazz/architecture/reporting-and-sarif.md, html-reporting.md` | modified | Implemented reporting and selection contracts |
 | `.zazz/specifications/common-entry-dispatch-03-reporting-selectors.md` | modified if needed | Contract decisions and evidence links |
-| `.zazz/ephemeral/common-entry-dispatch-run-log.md` | ignored local | Append-only execution evidence |
+| `.zazz/ephemeral/common-entry-dispatch-03-reporting-selectors-run-log.md` | ignored local | Append-only execution evidence |
 
 One milestone PR preserves a single canonical migration and removes transitional state
 before human integration. Each deliverable remains a distinct review/evidence unit in
@@ -168,8 +168,8 @@ dependent code; do not block unrelated earlier deliverables on later evaluation 
 
 ## 11. Run log protocol
 
-Use `.zazz/ephemeral/common-entry-dispatch-run-log.md`, append-only, with a section for
-this deliverable. Record standards verification, user decisions, start revision, phase
+Use `.zazz/ephemeral/common-entry-dispatch-03-reporting-selectors-run-log.md`, append-only.
+Record standards verification, user decisions, start revision, phase
 completions, commands/results, deviations, report paths/hashes, review/rework and recovery.
 At session start read AGENTS, this contract, relevant design sections and the log; verify
 Git state and choose the next incomplete checkpoint. If the ignored log is absent,
@@ -180,7 +180,7 @@ reconstruct from Git and tracked acceptance evidence; never infer success from m
 ```text
 Implement only the user-authorized deliverable in the existing common-entry-and-dispatch
 worktree. Read AGENTS.md, .zazz/specifications/common-entry-dispatch-03-reporting-selectors.md,
-its linked design/dependencies, and the shared ignored run log. Load spec-driven and
+its linked design/dependencies, and the deliverable-specific ignored run log. Load spec-driven and
 matched analysis/engineering standards. Work as one agent. Start with the first failing
 acceptance test, keep HTTP/browser regressions green, and verify actual pipeline behavior.
 Record context/coverage and exact evidence; use recovery checkpoints to fit the available
@@ -194,3 +194,6 @@ new worktrees, merge or integration push. Report acceptance results and next che
 2026-11-03 — Initial contract from the user's design/spec request, Node.js GraphQL
 priority, explicit browser-event/reporting requirement, retained HTTP sample compatibility,
 and later application evaluation. Product implementation has not started.
+
+2026-11-03 — User requested one ignored run log per deliverable; updated log paths
+and resume prompts. This changes execution tracking only, with no product/test change.
