@@ -62,7 +62,9 @@ func wireBundle(use analysis.CandidateUse) any {
 		blockers = use.Gaps
 	}
 	augmentRoles(use, roles, ref)
+	invocation := wireInvocation(use, ref)
 	return struct {
+		Invocation      any                 `json:"invocation"`
 		EvidenceVersion int                 `json:"evidence_version"`
 		TraceGraph      traceGraph          `json:"trace_graph"`
 		CoverageLedger  []evidenceCoverage  `json:"evidence_coverage"`
@@ -84,7 +86,7 @@ func wireBundle(use analysis.CandidateUse) any {
 		Resolved        []analysis.Gap      `json:"resolved_gaps,omitempty"`
 		APIModel        *analysis.APIModel  `json:"api_model,omitempty"`
 		XSS             *analysis.XSSFacts  `json:"xss,omitempty"`
-	}{2, buildTraceGraph(use, ref), coverageLedger(required, roles), claimKind(use), use.ID, use.Kind, use.Check, sink, context, dependencies, required, roles, blockers, coverage, scope, table, edges, modelFacts(use), resolvedGaps(use), use.APIModel, use.XSS}
+	}{invocation, 3, buildTraceGraph(use, ref), coverageLedger(required, roles), claimKind(use), use.ID, use.Kind, use.Check, sink, context, dependencies, required, roles, blockers, coverage, scope, table, edges, modelFacts(use), resolvedGaps(use), use.APIModel, use.XSS}
 }
 
 func modelFacts(use analysis.CandidateUse) []string {

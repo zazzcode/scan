@@ -48,7 +48,7 @@ func applyPolicy(use analysis.CandidateUse, a *analysis.Assessment) {
 		if use.APIModel == nil {
 			blockers = append(blockers, analysis.Gap{Kind: "api_contract_missing", Detail: "verified operation contract is required"})
 		}
-		for _, role := range []string{"request_source", "sink_binding", "route_handler", "control_flow"} {
+		for _, role := range []string{"input_source", "sink_binding", "invoked_callable", "control_flow"} {
 			if len(c.Evidence[role]) == 0 {
 				blockers = append(blockers, analysis.Gap{Kind: "injection_evidence_missing", Detail: role})
 			}

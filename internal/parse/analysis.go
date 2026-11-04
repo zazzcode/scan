@@ -57,7 +57,7 @@ func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (*analysis.A
 		}
 		selected = []string{entry}
 	}
-	out := &analysis.AnalysisReport{SchemaVersion: analysis.ReportSchemaVersion, Root: root, Entries: []analysis.Entry{}, Uses: []analysis.CandidateUse{}, Gaps: []analysis.Gap{}, Files: []analysis.Evidence{}, Limitations: []string{
+	out := &analysis.AnalysisReport{SchemaVersion: analysis.ReportSchemaVersion, Root: root, Entries: []analysis.EntryPoint{}, Uses: []analysis.CandidateUse{}, Gaps: []analysis.Gap{}, Files: []analysis.Evidence{}, Limitations: []string{
 		"ESM relative imports, literal CommonJS requires and direct exported handlers are resolved; dynamic imports, re-exports and mutated module bindings remain uncertain",
 		"Verified Express receiver construction and direct registrations required; chained routes, mount composition and effective middleware are not resolved",
 		"Supported helper calls bind identifier parameters and direct returns; branches, closures, wrappers, unknown calls, recursion, and asynchronous response continuations remain uncertain",
@@ -85,7 +85,7 @@ func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (*analysis.A
 			}
 			routes, _ := routesFromCall(file, m.src, call, locals)
 			for _, r := range routes {
-				set.analyzeRoute(out, m, m, r, call, obj.Utf8Text(m.src), nil)
+				set.analyzeRoute(out, m, m, r, call, obj.Utf8Text(m.src), nil, r.PathPattern, "")
 			}
 		})
 	}
@@ -135,8 +135,7 @@ func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (*analysis.A
 		if err != nil {
 			return nil, err
 		}
-		out.ClientEntries = append(out.ClientEntries, more.ClientEntries...)
-		out.Entries = append(out.Entries, more.Entries...)
+		out.MergeEntries(more)
 		out.Uses = append(out.Uses, more.Uses...)
 		out.Gaps = append(out.Gaps, more.Gaps...)
 		out.Files = append(out.Files, more.Files...)
@@ -144,6 +143,9 @@ func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (*analysis.A
 			out.Limitations = append(out.Limitations, more.Limitations...)
 			out.AnalysisGuidelines = append(out.AnalysisGuidelines, more.AnalysisGuidelines...)
 		}
+	}
+	if err := finalizeEntries(out); err != nil {
+		return nil, err
 	}
 	return out, nil
 }

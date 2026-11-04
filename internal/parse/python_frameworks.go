@@ -95,7 +95,7 @@ func (f *pythonFlow) outboundCall(n *sitter.Node, q string, fn *sitter.Node, val
 	}
 	requestDependent := false
 	for _, d := range destination.deps {
-		requestDependent = requestDependent || d.dep.Source.Kind == "request_source" || d.dep.Source.Kind == "external_response_source" || d.dep.Source.Kind == "storage_source"
+		requestDependent = requestDependent || d.dep.Source.Kind == "input_source" || d.dep.Source.Kind == "external_response_source" || d.dep.Source.Kind == "storage_source"
 	}
 	if requestDependent {
 		u := f.addUse("outbound_http_candidate", n, destination)

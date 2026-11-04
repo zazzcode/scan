@@ -27,9 +27,14 @@ func TestCommonJSRouteBindings(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			for _, reg := range r.Registrations {
+				if reg.DeclaredHandler == nil || len(reg.SyntaxSteps) == 0 {
+					t.Fatal("unresolved dispatch lost its declaration syntax")
+				}
+			}
 			resolved := 0
 			for _, entry := range r.Entries {
-				if entry.Handler != nil {
+				if r.Handler(entry.ID) != nil {
 					resolved++
 				}
 			}

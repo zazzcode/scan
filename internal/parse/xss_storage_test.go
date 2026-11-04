@@ -33,7 +33,7 @@ func TestStoredTemplatePathsAndControls(t *testing.T) {
 				t.Fatalf("want stored resolved=%v protection=%s; got %+v", tt.resolved, tt.protection, uses)
 			}
 			if tt.resolved {
-				if len(uses[0].XSS.RelatedEntries) == 0 || !strings.Contains(uses[0].XSS.RelatedEntries[0], "/write") {
+				if len(uses[0].XSS.RelatedEntries) == 0 || testEntryPath(r, uses[0].XSS.RelatedEntries[0]) != "/write" {
 					t.Fatal("write entry link missing")
 				}
 				if !strings.Contains(uses[0].Dependencies[0].Source.Text, "req.body.text") {
@@ -93,7 +93,7 @@ func TestStoredWritePathsStaySeparate(t *testing.T) {
 			if strings.Join(got, ",") != strings.Join(tt.paths, ",") {
 				t.Fatalf("paths %v, want %v", got, tt.paths)
 			}
-			if len(tt.paths) > 0 && !strings.Contains(u.XSS.Paths[len(u.XSS.Paths)-1].Entry, "/update/:id") {
+			if len(tt.paths) > 0 && testEntryPath(r, u.XSS.Paths[len(u.XSS.Paths)-1].Entry) != "/update/:id" {
 				t.Fatalf("update write entry missing: %+v", u.XSS.Paths)
 			}
 		})

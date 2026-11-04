@@ -294,7 +294,7 @@ func (s *pythonSet) report(entry string, checks []analysis.Check) (*analysis.Ana
 		return nil, fmt.Errorf("entry must be a selected JS/TS/Python file relative to target root: %s", entry)
 	}
 	routes := s.routeEntries()
-	out := &analysis.AnalysisReport{SchemaVersion: analysis.ReportSchemaVersion, Root: s.root, Entries: []analysis.Entry{}, Uses: []analysis.CandidateUse{}, Gaps: append([]analysis.Gap{}, s.gaps...), Files: []analysis.Evidence{}, Limitations: []string{
+	out := &analysis.AnalysisReport{SchemaVersion: analysis.ReportSchemaVersion, Root: s.root, Entries: []analysis.EntryPoint{}, Uses: []analysis.CandidateUse{}, Gaps: append([]analysis.Gap{}, s.gaps...), Files: []analysis.Evidence{}, Limitations: []string{
 		"Python adapter v1: static Flask/Blueprint, RESTX Resource and FastAPI routes; dynamic registration, custom decorators and response overrides remain gaps",
 		"Python helper expansion is bounded to depth 3 and 24 calls per route; loops, comprehensions, mutation, exceptions and external dispatch are conservative",
 		"Jinja output requires a verified Flask template binding; unresolved configuration, includes/macros and stored origins remain Review; no runtime execution or SCA",
@@ -332,6 +332,9 @@ func (s *pythonSet) report(entry string, checks []analysis.Check) (*analysis.Ana
 	}
 	for _, r := range guidelines.ForPaths(s.files) {
 		out.AnalysisGuidelines = append(out.AnalysisGuidelines, analysis.GuidelinesRef{ID: r.ID, Version: r.Version, Languages: r.Languages})
+	}
+	if err := finalizeEntries(out); err != nil {
+		return nil, err
 	}
 	return out, nil
 }

@@ -28,8 +28,8 @@ func augmentRoles(use analysis.CandidateUse, roles map[string][]string, ref func
 	for _, e := range use.Context {
 		role := ""
 		switch e.Kind {
-		case "handler", "route_handler":
-			role = "route_handler"
+		case "handler", "invoked_callable":
+			role = "invoked_callable"
 		case "helper_definition", "relevant_function", "condition_helper", "wrapper_definition", "authentication_adapter":
 			role = "helper_definitions"
 		case "branch_precondition", "branch_false_precondition", "branch_alternative", "guard_test", "conditional_test", "exception_precondition", "condition":

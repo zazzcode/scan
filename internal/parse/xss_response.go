@@ -208,14 +208,14 @@ func (f *flow) recordXSS(sink analysis.Evidence, v value, context, contentType s
 			protection, reason, paths = "unknown", "The value source and transfer into rendering are not established.", nil
 		}
 	}
-	clientID := ""
+
 	entryKind := "server"
-	identity := f.route.ID
+	identity := f.entry.ID
 	if f.client != nil {
-		kind, clientID, entryKind, identity = "dom", f.client.entry.ID, "client", f.client.entry.ID
+		kind, entryKind, identity = "dom", "client", f.client.entry.ID
 	}
 	f.uses = append(f.uses, analysis.CandidateUse{
-		ID: fmt.Sprintf("xss:%s:%s:%d", identity, sink.Span.File, sink.Span.StartByte), RouteID: f.route.ID, ClientID: clientID,
+		ID: fmt.Sprintf("xss:%s:%s:%d", identity, sink.Span.File, sink.Span.StartByte), EntryID: f.entry.ID, InvocationContextID: f.invocation.ID, EntryKind: f.entry.Kind,
 		Kind: "xss_candidate", Sink: sink, Dependencies: v.deps, Context: ctx, Gaps: gaps,
 		XSS: &analysis.XSSFacts{Type: kind, EntryKind: entryKind, OutputContext: context, OriginResolved: kind == "reflected" || kind == "dom",
 			ContentType: contentType, Protection: protection, ProtectionReason: reason, Paths: paths},
@@ -224,6 +224,6 @@ func (f *flow) recordXSS(sink analysis.Evidence, v value, context, contentType s
 	})
 	if f.client != nil {
 		last := &f.uses[len(f.uses)-1]
-		last.APIModel = &analysis.APIModel{ID: "browser-output-v1", Library: f.client.entry.Framework, Semantics: "Verified browser/framework rendering binding and source flow in the stated context.", Reference: "https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML"}
+		last.APIModel = &analysis.APIModel{ID: "browser-output-v1", Library: f.client.entry.Browser.Framework, Semantics: "Verified browser/framework rendering binding and source flow in the stated context.", Reference: "https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML"}
 	}
 }

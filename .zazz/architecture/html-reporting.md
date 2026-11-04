@@ -29,7 +29,7 @@ Source analysis → raw uses / assessments → human-readable finding records �
 ```
 
 `--analyze --json` includes additive human-readable `findings` and `presentation_version` fields.
-`--export-html <saved.json>` reads a schema-1 or schema-2 analysis report and renders HTML offline; no target-source
+`--export-html <saved.json>` reads a schema-1, schema-2 or schema-3 analysis report and renders HTML offline; no target-source
 read, key, model request, application execution, or server is needed. `--export-sarif` uses the same
 saved report. `--analyze --output-dir <base>` or `SCAN_FINDINGS_DIR` writes all three formats under
 `<base>/<repo-name>/run-<id>/`. The explicit flag overrides the environment; an empty flag disables file
@@ -165,5 +165,15 @@ artifacts; reusable rendering and classification tests belong in Go test sources
 Curated public samples live under [docs/samples](../../docs/samples/README.md), with canonical JSON
 and offline-generated HTML/SARIF. Public root labels replace local absolute target paths.
 
-Current analysis JSON uses schema 2 and `analysis_guidelines`; schema-1 saved reports remain readable.
+Current analysis JSON uses schema3 and `analysis_guidelines`; schemas1/2 remain readable
+through private compatibility decoding, retaining original source/schema/answer provenance.
 See [naming and compatibility](../architecture.md#naming-and-compatibility).
+
+## Common entry associations
+
+Existing HTTP and browser rows now project from one canonical entry/context model rather
+than separate route/client ID authorities. HTTP presentation remains familiar; browser roots
+remain in their own section. Entry rows include registration, dispatch and invocation gaps
+even when no candidate use exists. Unknown associations retain explicit unresolved rows.
+The template, layout, sorting script and CSS are unchanged by the model migration; richer
+entry-specific details and selectors remain the next deliverable.

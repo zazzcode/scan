@@ -26,10 +26,12 @@ type EntryPoint struct {
 
 // HTTPEntryMetadata contains delivery details, not generic entry identity.
 type HTTPEntryMetadata struct {
-	Method   string `json:"method,omitempty"`
-	Path     string `json:"path,omitempty"`
-	Mount    string `json:"mount,omitempty"`
-	Receiver string `json:"receiver,omitempty"`
+	SourcePath string `json:"source_path,omitempty"`
+	Framework  string `json:"framework,omitempty"`
+	Method     string `json:"method,omitempty"`
+	Path       string `json:"path,omitempty"`
+	Mount      string `json:"mount,omitempty"`
+	Receiver   string `json:"receiver,omitempty"`
 }
 
 // BrowserEntryMetadata distinguishes event registrations from script/component roots.
@@ -66,12 +68,14 @@ type TransportAssociation struct {
 
 // EntryRegistration records source/configuration wiring and generated origin evidence.
 type EntryRegistration struct {
-	ID          string     `json:"id"`
-	EntryID     string     `json:"entry_id"`
-	Origin      Evidence   `json:"origin"`
-	Framework   string     `json:"framework,omitempty"`
-	DerivedFrom []Evidence `json:"derived_from,omitempty"`
-	Gaps        []Gap      `json:"gaps,omitempty"`
+	DeclaredHandler *Symbol    `json:"declared_handler,omitempty"`
+	SyntaxSteps     []Step     `json:"syntax_steps,omitempty"`
+	ID              string     `json:"id"`
+	EntryID         string     `json:"entry_id"`
+	Origin          Evidence   `json:"origin"`
+	Framework       string     `json:"framework,omitempty"`
+	DerivedFrom     []Evidence `json:"derived_from,omitempty"`
+	Gaps            []Gap      `json:"gaps,omitempty"`
 }
 
 // DispatchBinding represents one stage/target alternative, not a call or value-flow proof.
@@ -110,7 +114,7 @@ type InvocationContext struct {
 	Gaps              []Gap               `json:"gaps,omitempty"`
 }
 
-// InputBinding maps a role/projection onto an actual callable parameter or closure binding.
+// InputBinding maps a role/projection onto an actual parameter, closure or ambient framework binding.
 // Role names do not establish trust, value transfer or application requirements.
 type InputBinding struct {
 	Role       string      `json:"role"`
@@ -135,8 +139,8 @@ type ApplicableControl struct {
 	Evidence            Evidence `json:"evidence"`
 }
 
-// EntryCatalog is the shared entry/dispatch record store. It does not replace the
-// schema-2 report until its existing producers and consumers are migrated together.
+// EntryCatalog is the shared entry/dispatch record store used by current reports
+// and adapters; catalog views share the canonical source-backed record collections.
 type EntryCatalog struct {
 	Entries            []EntryPoint        `json:"entries"`
 	Registrations      []EntryRegistration `json:"registrations"`

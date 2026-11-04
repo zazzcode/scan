@@ -16,7 +16,7 @@ import (
 // in these keys. IDs are not edit-stable finding fingerprints.
 func SnapshotRecordID(namespace string, source Evidence, owner, discriminator string) (string, error) {
 	switch namespace {
-	case "entry", "registration", "dispatch", "callable", "invocation":
+	case "entry", "registration", "dispatch", "callable", "invocation", "candidate":
 	default:
 		return "", fmt.Errorf("unsupported record namespace %q", namespace)
 	}

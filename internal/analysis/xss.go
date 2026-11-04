@@ -1,14 +1,5 @@
 package analysis
 
-// ClientEntry identifies browser code without manufacturing an HTTP route.
-type ClientEntry struct {
-	ID        string `json:"id"`
-	Kind      string `json:"kind"`
-	Name      string `json:"name"`
-	Framework string `json:"framework,omitempty"`
-	Location  Span   `json:"location"`
-}
-
 // XSSFacts describes a rendering claim independently of the source language or
 // framework. Parser adapters establish these facts; views do not infer them.
 type XSSFacts struct {

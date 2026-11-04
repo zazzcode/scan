@@ -237,7 +237,7 @@ func (f *pythonFlow) projectValue(v pythonValue, key string, n *sitter.Node) pyt
 		}
 	}
 	for _, d := range v.deps {
-		if d.key != "" && d.container != "session" && d.dep.Source.Kind == "request_source" && f.inputs != nil {
+		if d.key != "" && d.container != "session" && d.dep.Source.Kind == "input_source" && f.inputs != nil {
 			f.inputs[d.container+"."+d.key] = pythonValue{deps: []pythonDep{d}}
 		}
 	}

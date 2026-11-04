@@ -104,7 +104,7 @@ func (f *flow) noteCredentialDestination(pair *sitter.Node, v value) {
 		return
 	}
 	for _, d := range v.deps {
-		if d.Source.Kind != "request_source" {
+		if d.Source.Kind != "input_source" {
 			continue
 		}
 		container, field := requestKey(d)
@@ -139,7 +139,7 @@ func (f *flow) noteCredentialComparison(n, left *sitter.Node, l value, right *si
 			continue
 		}
 		for _, d := range side.v.deps {
-			if d.Source.Kind != "request_source" {
+			if d.Source.Kind != "input_source" {
 				continue
 			}
 			container, field := requestKey(d)
@@ -158,7 +158,7 @@ func (s *moduleSet) requestLineLogs(f *flow, m *sourceModule, route *sitter.Node
 	if f.facts == nil {
 		return
 	}
-	use, binding, format, notes := s.requestLogger(m, route, receiver, f.route.PathPattern)
+	use, binding, format, notes := s.requestLogger(m, route, receiver, f.entry.HTTP.Path)
 	if use == nil {
 		return
 	}
@@ -204,7 +204,7 @@ func (s *moduleSet) requestLineLogs(f *flow, m *sourceModule, route *sitter.Node
 	gaps := append(append([]analysis.Gap{}, f.gaps...), claims...)
 	gaps = append(gaps, notes...)
 	gaps = append(gaps, analysis.Gap{Kind: "log_destination_unresolved", Detail: "access-log stream destination, retention and readers are not modeled", At: spanOf(m.file, use)})
-	f.uses = append(f.uses, analysis.CandidateUse{ID: fmt.Sprintf("log:%s:%s:%d", f.route.ID, m.file, use.StartByte()), RouteID: f.route.ID, Kind: "log_sink_candidate", Sink: m.evidence("log_sink_candidate", use), Dependencies: deps, Context: context, Gaps: gaps, Assessment: analysis.Assessment{Status: "not_run"}})
+	f.uses = append(f.uses, analysis.CandidateUse{ID: fmt.Sprintf("log:%s:%s:%d", f.invocation.ID, m.file, use.StartByte()), EntryID: f.entry.ID, InvocationContextID: f.invocation.ID, Kind: "log_sink_candidate", Sink: m.evidence("log_sink_candidate", use), Dependencies: deps, Context: context, Gaps: gaps, Assessment: analysis.Assessment{Status: "not_run"}})
 }
 
 // requestLogger finds `<receiver>.use(morgan(format))` in the route's own function

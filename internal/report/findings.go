@@ -18,9 +18,9 @@ func Enrich(r *analysis.AnalysisReport) {
 }
 
 func describe(u analysis.CandidateUse) analysis.Finding {
-	f := analysis.Finding{ID: "finding:" + u.ID, TypeIDs: findingTypeIDs(u), UseID: u.ID, RouteID: u.RouteID,
-		ClientID:   u.ClientID,
-		RecordType: "analysis", Status: "needs_review", Title: "Sensitive operation needs review",
+	f := analysis.Finding{ID: "finding:" + u.ID, TypeIDs: findingTypeIDs(u), UseID: u.ID, EntryID: u.EntryID,
+		InvocationContextID: u.InvocationContextID,
+		RecordType:          "analysis", Status: "needs_review", Title: "Sensitive operation needs review",
 		Summary:    "Scan recorded a possible sensitive operation. Its security behavior has not been established.",
 		Validation: "Not established from the supplied evidence.", Protection: "Not established from the supplied evidence.",
 		Uncertainty: "Review the evidence for the named claim. Independent findings review and runtime confirmation have not been performed.", Recommendations: guidance(u)}

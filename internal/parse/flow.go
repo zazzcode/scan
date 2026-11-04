@@ -32,7 +32,8 @@ type flow struct {
 	registration *sourceModule
 	module       *sourceModule
 	set          *moduleSet
-	route        analysis.Route
+	entry        analysis.EntryPoint
+	invocation   analysis.InvocationContext
 	request      string
 	env          map[string]value
 	context      []analysis.Evidence
@@ -256,7 +257,7 @@ func (f *flow) eval(n *sitter.Node) value {
 			return v
 		}
 		if f.parts[n.Utf8Text(src)] != "" {
-			source := f.module.evidence("request_source", n)
+			source := f.module.evidence("input_source", n)
 			f.rememberInput(source)
 			return value{deps: []analysis.Dependency{{Source: source, Transfers: []analysis.Evidence{}}}}
 		}
@@ -270,7 +271,7 @@ func (f *flow) eval(n *sitter.Node) value {
 			} else if field := requestFieldNode(n, src, f.request); field != nil {
 				sourceNode = field
 			}
-			source := f.module.evidence("request_source", sourceNode)
+			source := f.module.evidence("input_source", sourceNode)
 			f.rememberInput(source)
 			v := value{deps: []analysis.Dependency{{Source: source, Transfers: []analysis.Evidence{}}}}
 			// A length read directly on the field is a derived fact, not its content.
@@ -594,7 +595,7 @@ func (f *flow) call(n *sitter.Node) value {
 				gaps = append(gaps, f.gap("external_response_unresolved", "remote response and asynchronous continuation are not modeled", n))
 			}
 			context := append([]analysis.Evidence{}, f.context...)
-			f.uses = append(f.uses, analysis.CandidateUse{ID: fmt.Sprintf("use:%s:%s:%d", f.route.ID, f.module.file, n.StartByte()), RouteID: f.route.ID, Kind: kind, Sink: f.module.evidence(kind, n), Dependencies: v.deps, Context: context, Gaps: gaps, Assessment: analysis.Assessment{Status: "not_run"}})
+			f.uses = append(f.uses, analysis.CandidateUse{ID: fmt.Sprintf("use:%s:%s:%d", f.invocation.ID, f.module.file, n.StartByte()), EntryID: f.entry.ID, InvocationContextID: f.invocation.ID, Kind: kind, Sink: f.module.evidence(kind, n), Dependencies: v.deps, Context: context, Gaps: gaps, Assessment: analysis.Assessment{Status: "not_run"}})
 		}
 		// Response values are new external sources, never aliases of request arguments.
 		if modelCall {

@@ -27,8 +27,8 @@ func runExport(path string, asHTML bool, stdout, stderr io.Writer) int {
 		return exitError
 	}
 	var saved analysis.AnalysisReport
-	if err := json.Unmarshal(data, &saved); err != nil || (saved.SchemaVersion != 1 && saved.SchemaVersion != analysis.ReportSchemaVersion) || saved.Uses == nil {
-		fmt.Fprintln(stderr, "scan: expected a schema-v1 or schema-v2 canonical analysis report")
+	if err := json.Unmarshal(data, &saved); err != nil || saved.SchemaVersion != analysis.ReportSchemaVersion || saved.Uses == nil {
+		fmt.Fprintln(stderr, "scan: expected a schema-v1, schema-v2 or schema-v3 canonical analysis report")
 		return exitError
 	}
 	if asHTML {

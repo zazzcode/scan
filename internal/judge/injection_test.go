@@ -19,7 +19,7 @@ func TestInjectionPolicySeparatesPracticeAndActualProtection(t *testing.T) {
 		{"vulnerable", "insufficient", "needs_evidence", true, false},
 		{"vulnerable", "insufficient", "needs_evidence", false, true},
 	} {
-		c := &analysis.Completeness{ClaimKind: "injection", Required: []string{"request_source", "sink_binding", "control_flow"}, Evidence: map[string][]analysis.Evidence{"request_source": {{Text: "request value"}}, "sink_binding": {{Text: "verified API"}}, "control_flow": {{Text: "guard/path context"}}, "route_handler": {{Text: "handler"}}}}
+		c := &analysis.Completeness{ClaimKind: "injection", Required: []string{"input_source", "sink_binding", "control_flow"}, Evidence: map[string][]analysis.Evidence{"input_source": {{Text: "request value"}}, "sink_binding": {{Text: "verified API"}}, "control_flow": {{Text: "guard/path context"}}, "invoked_callable": {{Text: "handler"}}}}
 		if tt.missing {
 			delete(c.Evidence, "sink_binding")
 		}
@@ -71,7 +71,7 @@ func TestNoSQLAllPathProtectionGate(t *testing.T) {
 	for _, tt := range []struct{ answer, all, want string }{
 		{"vulnerable", "no", "confirmed_vulnerability"}, {"vulnerable", "yes", "needs_evidence"}, {"protected", "yes", "protected_for_claim"}, {"protected", "unknown", "needs_evidence"}, {"protected", "no", "needs_evidence"},
 	} {
-		use := analysis.CandidateUse{Kind: "nosql_query_candidate", APIModel: &analysis.APIModel{ID: "marsdb-collection-v1"}, Completeness: &analysis.Completeness{ClaimKind: "injection", Evidence: map[string][]analysis.Evidence{"request_source": {{Text: "value"}}, "sink_binding": {{Text: "binding"}}, "route_handler": {{Text: "handler"}}, "control_flow": {{Text: "paths"}}}}}
+		use := analysis.CandidateUse{Kind: "nosql_query_candidate", APIModel: &analysis.APIModel{ID: "marsdb-collection-v1"}, Completeness: &analysis.Completeness{ClaimKind: "injection", Evidence: map[string][]analysis.Evidence{"input_source": {{Text: "value"}}, "sink_binding": {{Text: "binding"}}, "invoked_callable": {{Text: "handler"}}, "control_flow": {{Text: "paths"}}}}}
 		a := analysis.Assessment{Status: "completed", Answers: map[string]string{"protection": "insufficient", "injection_protection": tt.answer, "all_paths_protected": tt.all, "source_coverage": "yes", "library_coverage": "yes", "guard_coverage": "yes", "path_coverage": "yes"}}
 		applyPolicy(use, &a)
 		if a.FindingStatus != tt.want {

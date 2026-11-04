@@ -33,7 +33,7 @@ func TestCrossTierResponseFieldLinks(t *testing.T) {
 			}
 			var found bool
 			for _, u := range xssUses(r) {
-				if u.ClientID == "" || u.XSS.Type != "cross_tier" {
+				if u.EntryKind != "browser" || u.XSS.Type != "cross_tier" {
 					continue
 				}
 				found = true
@@ -41,7 +41,7 @@ func TestCrossTierResponseFieldLinks(t *testing.T) {
 					t.Fatalf("want resolved=%v protection=%s field=%s; got %+v", tt.resolved, tt.protection, tt.field, u.XSS)
 				}
 				if tt.resolved {
-					if len(u.XSS.RelatedEntries) != 1 || !strings.Contains(u.XSS.RelatedEntries[0], "/rest/item/:id") || !strings.Contains(u.Dependencies[0].Source.Text, "req.params.id") {
+					if len(u.XSS.RelatedEntries) != 1 || testEntryPath(r, u.XSS.RelatedEntries[0]) != "/rest/item/:id" || !strings.Contains(u.Dependencies[0].Source.Text, "req.params.id") {
 						t.Fatalf("server origin missing: %+v %+v", u.XSS, u.Dependencies)
 					}
 				}

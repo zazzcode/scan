@@ -45,9 +45,14 @@ func SARIF(report *analysis.AnalysisReport) map[string]any {
 		finding := report.Findings[i]
 		message := fmt.Sprintf("%s: %s [%s]. %s %s", route, finding.Title, finding.Status, finding.Summary, finding.Protection)
 		props := map[string]any{"scan.finding": report.Findings[i], "scan.route": route, "scan.useId": use.ID, "scan.kind": use.Kind, "scan.assessment": use.Assessment, "scan.reviewStatus": "not_run", "scan.runtimeConfirmation": "not_run", "scan.recommendations": g, "scan.coverageGaps": use.Gaps}
-		if use.ClientID != "" {
+		props["scan.entryId"] = use.EntryID
+		props["scan.entryKind"] = use.EntryKind
+		props["scan.invocationContextId"] = use.InvocationContextID
+		if use.EntryKind == "browser" {
 			delete(props, "scan.route")
-			props["scan.clientEntry"] = use.ClientID
+			props["scan.entryId"] = use.EntryID
+			props["scan.entryKind"] = use.EntryKind
+			props["scan.invocationContextId"] = use.InvocationContextID
 			props["scan.sourceKind"] = "client"
 		}
 		if use.Check != nil {
@@ -62,8 +67,8 @@ func SARIF(report *analysis.AnalysisReport) map[string]any {
 		primary := use.Sink.Span
 		if primary.File == "" {
 			for _, e := range report.Entries {
-				if e.Route.ID == use.RouteID {
-					primary = e.Route.Registration
+				if e.HTTPRoute().ID == use.EntryID {
+					primary = e.HTTPRoute().Registration
 					break
 				}
 			}
@@ -95,6 +100,11 @@ func SARIF(report *analysis.AnalysisReport) map[string]any {
 				successful = false
 			}
 			notifications = append(notifications, map[string]any{"level": "note", "message": map[string]string{"text": route + ": semantic assessment " + use.Assessment.Status}})
+		}
+	}
+	for _, entry := range report.Entries {
+		for _, g := range report.EntryGaps(entry.ID) {
+			notifications = append(notifications, map[string]any{"level": "warning", "message": map[string]string{"text": entry.Name + ": " + g.Kind + ": " + g.Detail}, "properties": map[string]any{"scan.entryId": entry.ID, "scan.coverageGap": g}})
 		}
 	}
 	for _, g := range report.Gaps {
@@ -152,24 +162,23 @@ func resultKind(f analysis.Finding) (string, string) {
 }
 
 func routeName(report *analysis.AnalysisReport, use analysis.CandidateUse) string {
-	if use.ClientID != "" {
-		for _, entry := range report.ClientEntries {
-			if entry.ID == use.ClientID {
-				return entry.Name
+	for _, e := range report.Entries {
+		if e.ID == use.EntryID {
+			if e.HTTP != nil {
+				return e.HTTP.Method + " " + e.HTTP.Path
 			}
+			if e.Name != "" {
+				return e.Name
+			}
+			return e.ID
 		}
-		return use.ClientID
 	}
 	if use.Check != nil {
 		return use.Check.Method + " " + use.Check.Path
 	}
-	for _, e := range report.Entries {
-		if e.Route.ID == use.RouteID {
-			return e.Route.Method + " " + e.Route.PathPattern
-		}
-	}
-	return use.RouteID
+	return use.EntryID
 }
+
 func relativeURI(path string) string { return (&url.URL{Path: path}).String() }
 func location(span analysis.Span, text string) map[string]any {
 	loc := map[string]any{"message": map[string]string{"text": text}}

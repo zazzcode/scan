@@ -13,7 +13,7 @@ var angularBinding = regexp.MustCompile(`(?i)\[(innerHTML|href|src)\]\s*=\s*(["'
 
 func (s *moduleSet) clientClass(m *sourceModule, class *sitter.Node) *clientContext {
 	name := class.ChildByFieldName("name")
-	context := &clientContext{entry: analysis.ClientEntry{ID: clientID(m.file, name.Utf8Text(m.src), class.StartByte()), Kind: "component", Name: name.Utf8Text(m.src), Location: spanOf(m.file, class)},
+	context := &clientContext{entry: browserEntry(m, m.evidence("browser_source_slice", class), name.Utf8Text(m.src), "component"),
 		injected: map[string]clientInjection{}, methods: map[string]*sitter.Node{}, fields: map[string]*sitter.Node{}}
 	body := class.ChildByFieldName("body")
 	if body == nil {
@@ -82,7 +82,7 @@ func (s *moduleSet) clientClass(m *sourceModule, class *sitter.Node) *clientCont
 		}
 		if template, ok := s.readText(filepath.ToSlash(filepath.Join(filepath.Dir(m.file), path))); ok {
 			context.template = &template
-			context.angular, context.entry.Framework = true, "angular"
+			context.angular, context.entry.Browser.Framework = true, "angular"
 			context.bindings = append(context.bindings, m.evidence("render_binding", call), m.evidence("render_binding", imp.declaration))
 		}
 	})
@@ -202,7 +202,7 @@ func plainFrameworkInput(v value) bool {
 		return false
 	}
 	for _, dep := range v.deps {
-		if dep.Source.Kind != "browser_source" && dep.Source.Kind != "request_source" {
+		if dep.Source.Kind != "browser_source" && dep.Source.Kind != "input_source" {
 			return false
 		}
 		for _, transfer := range dep.Transfers {

@@ -1,6 +1,6 @@
 # Architecture
 
-**Implemented architecture, updated 2026-11-02.** This document owns package responsibilities,
+**Implemented architecture, updated 2026-11-03.** This document owns package responsibilities,
 terminology and pipeline boundaries. Planned components are labeled explicitly. Product direction
 lives in [project.md](project.md), decisions in the [proposal](project/03-jev-design-proposal.md),
 and delivery order in the [implementation plan](project/implementation-plan.md).
@@ -56,7 +56,7 @@ scanner binary. Analyzed applications are read as source, never executed by the 
 | Analysis Guidelines | Versioned language documents with secure coding guidance and evidence interpretation instructions |
 | Application requirement | A concrete field or behavior constraint supplied by source or an explicit scan check |
 | API model | A versioned library contract, applicable only with verified binding/provenance |
-| Entry | A logical analysis starting point; currently represented by separate route/handler and browser records |
+| Entry | A logical analysis starting point; represented by common typed entries, registrations, dispatch and invocation records |
 | Candidate use | A value-consuming security operation requiring claim-specific analysis |
 | Claim | A particular question about injection, validation, rendering or logging |
 | Evidence | Source text, span and snapshot hash supporting an observed fact |
@@ -136,16 +136,22 @@ lookup tables, schema resolver bindings and event subscriptions are dispatch mec
 kinds. One entry can have multiple possible targets; a callable can be exposed by multiple entries
 or registrations. Shared bodies MUST NOT lend a guard from one dispatch context to another.
 
-These are design responsibilities, not instructions to scaffold empty adapters. **The current code
-has not yet implemented this common entry/dispatch model:** `Entry` contains `Route`, checks select
-by method/path, and candidates have separate route/browser IDs. The terminology closeout renames
-records without removing those HTTP assumptions. Route inventory remains a useful HTTP-specific
-view, not the future canonical analysis-root abstraction.
+The common model now serves existing JS/TS HTTP, Python HTTP and browser consumers.
+`AnalysisReport` owns canonical entry/registration/dispatch/callable/context collections;
+candidates and findings refer to `entry_id` and `invocation_context_id`. HTTP method/path,
+receiver, raw source path and mounts are optional HTTP metadata. Route inventory remains
+a separate HTTP-specific schema1 view. Shared callable source never supplies a sibling
+invocation's controls. Current check-file selection remains HTTP-specific; typed selectors
+and richer entry presenters are the next deliverable.
 
-The next entry-model implementation should first use the existing HTTP and browser consumers to
-establish shared entry identity and dispatch bindings, with compatibility for saved reports. Then
-add bounded generated-route and GraphQL adapters. This foundation belongs before additional entry
-frameworks accumulate route-specific assumptions; it does not require a full repository IR rewrite.
+Browser script/component roots retain their supported static slices and explicit unknown
+runtime-exposure gaps. They do not claim event/callback registration completeness. Supported
+earlier HTTP forwarding stages retain source ordering; unknown applicability remains a gap.
+Saved schemas1/2 convert privately at the input boundary without inventing invocation facts.
+See [design](architecture/common-entry-dispatch.md) and
+[consumer migration evidence](specifications/common-entry-dispatch-02-consumers-compatibility.md#implementation-evidence-and-success-assessment-2026-11-03).
+Dynamic registration, explicit browser event bindings, GraphQL and gRPC adapters remain
+separate bounded follow-up deliverables; the model is not a full repository IR rewrite.
 
 ### Future dynamic routes and GraphQL
 
@@ -239,12 +245,12 @@ product behavior; `.zazz/standards/` governs development. Neither is loaded dyna
 
 ## 7. Evidence bundle contract
 
-The [trace judgment design](architecture/trace-judgment.md) owns evidence-version 2: deduplicated
+The [trace judgment design](architecture/trace-judgment.md) owns evidence-version 3: deduplicated
 source evidence, dependency witnesses, trace/control edges, roles, required evidence, API contracts,
 exact field constraints and remaining blockers. Supplied evidence means present, not complete or
 protective. Source/comments are untrusted data, never model instructions.
 
-Model envelopes use `analysis_guidelines`. The generic question protocol is `candidate-use-v9`;
+Model envelopes use `analysis_guidelines`. The generic question protocol is `candidate-use-v10`;
 claim-specific SQL/XSS/logging/validation questions retain their separate protocols. Renamed guideline
 documents carry new versions because their request text changed. Request identity includes the full
 envelope and guideline body; old responses cannot be replayed on renamed/changed requests.
@@ -321,10 +327,12 @@ Today flow/evidence construction lives in `parse`, claim gates in `judge`, and p
 
 `--analyze` is the documented analysis mode; `--strings` remains an external compatibility alias.
 Internal APIs use `Analyze`, `AnalyzeWithChecks`, `CandidateUse` and `AnalysisReport`, with no obsolete
-Go aliases. Fresh analysis reports use schema 2 and `analysis_guidelines`; route inventory stays
-schema 1. Export accepts schema-1 reports and maps historical `practice` metadata to `GuidelinesRef`.
-New serialization emits only `analysis_guidelines`. Candidate/claim identities and status meanings
-are preserved. Historical command transcripts and source-containing sample artifacts are not rewritten.
+Go aliases. Fresh analysis reports use schema3 and `analysis_guidelines`; route inventory stays
+schema1. Export reads schemas1/2/3 and preserves original schema provenance and raw
+assessments. Private legacy decoding maps `practice` metadata to `GuidelinesRef` and
+legacy route/client associations into one current entry/context association.
+New serialization emits only `analysis_guidelines`. Raw historical candidate IDs and status meanings are preserved; fresh candidate IDs
+include snapshot/context/value witnesses and are not edit-stable finding fingerprints. Historical command transcripts and source-containing sample artifacts are not rewritten.
 
 ## 12. Validation and unresolved decisions
 

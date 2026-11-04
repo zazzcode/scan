@@ -3,10 +3,11 @@
 Worktree / branch: `common-entry-and-dispatch`. Feature: common entry/dispatch.
 Milestone deliverable: 2 of 8. Project and Deliverable Owner: Michael.
 Drafted: 2026-11-03. Execution tracking: deliverable-specific ignored local run log only.
-Coordination: one Contributor Agent working in the assigned worktree; no delegation required.
+Coordination: one implementation agent; bounded read-only baseline and verification agents.
 Proposed review shape: one milestone draft PR into `stage`, human review/merge.
-The user requested design/specification now and will request implementation later.
-This document does not itself authorize implementation, publishing, paid calls or merging.
+The user explicitly authorized deliverable2 implementation and a success assessment on
+2026-11-03, following the proposed bounded baseline/review workflow. Paid calls and merging
+remain outside scope. Deliverable3 is not included in this assignment.
 
 ## 0. Capability
 
@@ -95,10 +96,10 @@ blocker and surface it. Do not weaken tests or drop mandatory coverage to fit a 
 
 ## 6. Acceptance criteria
 
-- **AC1 — TestCommonEntryExistingConsumers.** Real JS/TS HTTP, Python HTTP and browser fixtures reach canonical candidates/completeness with entry/context IDs; preserve source hashes, sinks, claim outcomes and relevant gaps after normalized identity changes. Verified by `TestCommonEntryExistingConsumers` in the packages named in §7; new test names are planned contracts, not existing results.
-- **AC2 — TestDispatchContextIsolation.** Guarded and unguarded exposures of one callable never share protection; an unresolved applicable guard blocks its claim, and an unresolved alternative prevents entry-wide protection without erasing an independent unsafe witness. Verified by `TestDispatchContextIsolation` in the packages named in §7; new test names are planned contracts, not existing results.
-- **AC3 — TestReportSchemaCompatibility.** Schemas 1/2/3 export offline to HTML/SARIF with raw answers/source/hash/metadata preserved; no target reread or judge call, no input rewrite, explicit unresolved legacy contexts, rejected unsupported versions and conflicting current associations. Verified by `TestReportSchemaCompatibility` in the packages named in §7; new test names are planned contracts, not existing results.
-- **AC4 — TestEntryContextReplayMismatch.** Changed context, evidence roles or payload versions reject saved response replay while identical requests still replay. Existing HTTP/browser status and no-green-on-blocker tests remain green. Verified by `TestEntryContextReplayMismatch` in the packages named in §7; new test names are planned contracts, not existing results.
+- **AC1 — TestCommonEntryExistingConsumers.** Real JS/TS HTTP, Python HTTP and browser fixtures reach canonical candidates/completeness with entry/context IDs; preserve source hashes, sinks, claim outcomes and relevant gaps after normalized identity changes. Verified by `TestCommonEntryExistingConsumers` in the packages named in §7; actual acceptance evidence is recorded below.
+- **AC2 — TestDispatchContextIsolation.** Guarded and unguarded exposures of one callable never share protection; an unresolved applicable guard blocks its claim, and an unresolved alternative prevents entry-wide protection without erasing an independent unsafe witness. Verified by `TestDispatchContextIsolation` in the packages named in §7; actual acceptance evidence is recorded below.
+- **AC3 — TestReportSchemaCompatibility.** Schemas 1/2/3 export offline to HTML/SARIF with raw answers/source/hash/metadata preserved; no target reread or judge call, no input rewrite, explicit unresolved legacy contexts, rejected unsupported versions and conflicting current associations. Verified by `TestReportSchemaCompatibility` in the packages named in §7; actual acceptance evidence is recorded below.
+- **AC4 — TestEntryContextReplayMismatch.** Changed context, evidence roles or payload versions reject saved response replay while identical requests still replay. Existing HTTP/browser status and no-green-on-blocker tests remain green. Verified by `TestEntryContextReplayMismatch` in the packages named in §7; actual acceptance evidence is recorded below.
 - **Scope/checks.** Scoped tests pass and the slice diff contains only relevant approved paths;
   verify with `git diff --check`, `git status --short` and slice-diff inspection.
 
@@ -159,6 +160,52 @@ record exact partial changes and failing checks, without claiming this deliverab
 - [ ] No out-of-scope change, fabricated protection or stale-response replay.
 - [ ] User receives the completed slice and any remaining unchecked acceptance items.
 
+### Implementation evidence and success assessment, 2026-11-03
+
+The migration is implemented and its automated acceptance gates pass. Actual HTTP and
+browser consumers use common entry/registration/dispatch/callable/context records; current
+reports are schema3, while private input-boundary conversion reads schemas1/2. There is
+one serialized primary entry/context association per use and finding. HTTP-only metadata
+and inventory remain available; no GraphQL/gRPC or explicit event adapter is claimed.
+
+| Criterion | Evidence |
+| --- | --- |
+| Existing consumers | `TestCommonEntryExistingConsumers`; five fresh sample comparisons:244 entries/341 uses, exact normalized entry/witness/context/dependency/gap/assessment/file parity |
+| Context/coverage | `TestDispatchContextIsolation`, `TestCheckContextsAndLimitsStayPerRegistration`, `TestOrderedHTTPForwardingContext`, `TestHTTPAllPredecessorApplicability`, `TestMountedHTTPPredecessorUsesSourcePath`, `TestEntryDispatchGapsVisibleWithoutUses` |
+| Compatibility | `TestReportSchemaCompatibility`, `TestLegacyEntryNamespacesRemainDistinct`; seven saved schema1 reports, five baseline schema2 reports and current schema3 HTML/SARIF exports; all source input hashes unchanged |
+| Replay/policy | `TestEntryContextReplayMismatch`, `TestAccountCreationInvocationBindingPolicy`, `TestBrowserInvocationKeepsRequestBounded`; both-provider local stub suites |
+| Identity/determinism | `TestCandidateIdentityDistinguishesHelperWitnesses`; all fresh candidate IDs unique and catalog references valid |
+| Regression gates | `go test -race ./...`, `go vet ./...`, `go build ./...`, changed-file formatting and `git diff --check` |
+| Historical Python | Original29 case checks pass on original reports and on actual decoder-converted schema3 reports; this is saved-evidence compatibility, not fresh model accuracy |
+
+Both changed goldens preserve original evidence/declarations/snapshots after the documented
+role/identity changes. Same-path ordered HTTP stages are included only under supported
+source/receiver/forwarding rules, with explicit applicability/expansion gaps otherwise.
+Missing-sink and account checks remain independent per registration; an existing API model
+can substantiate generated-operation binding without inventing a repository callable.
+
+Implementation additions include `internal/analysis/report_entries.go`,
+`internal/parse/entry_context.go`, `http_dispatch_context.go`, and
+`internal/judge/entry_context.go`, with corresponding focused tests in the existing packages.
+The shared source role names are `input_source` and `invoked_callable`; structural entry/
+dispatch and supported invocation-binding roles add evidence obligations without replacing
+existing claim-specific source/sink/control/policy obligations. Bundle version3 and generic
+question version `candidate-use-v10` reject changed-request replay. Callable and candidate
+identities remain independent of model answers.
+
+Recovery evidence is in this deliverable's ignored run log and the ignored
+`deliverable-02-baseline/`, `deliverable-02-final/converted-compatibility.json`, and
+`deliverable-02-verified/` evidence directories. The final verified scanner artifact hash is
+`07cfdccb0b0293723c005fb06b60b5b878e9daa92bfe1eb9a5921e087684583c`.
+Bounded read-only review returned PASS for all four acceptance criteria.
+
+Limitations: the native FastAPI checkout has an unrelated untracked `.DS_Store`, so fresh
+scanning was skipped; its saved export and converted case checks pass. Browser entries
+remain explicitly partial source-slice/component contexts with exposure gaps; event
+binding is deliverable4. Local-file browser navigation policy prevented pixel-level HTML
+inspection; report structural/escaping/grouping/status tests and static markup review pass,
+and report layout/template/CSS/JS are unchanged. No paid calls or target execution occurred.
+
 ## 10. Open questions
 
 No deliverable-specific blocker remains beyond user review of the proposed design/scope.
@@ -182,7 +229,8 @@ reconstruct from Git and tracked acceptance evidence; never infer success from m
 Implement only the user-authorized deliverable in the existing common-entry-and-dispatch
 worktree. Read AGENTS.md, .zazz/specifications/common-entry-dispatch-02-consumers-compatibility.md,
 its linked design/dependencies, and the deliverable-specific ignored run log. Load spec-driven and
-matched analysis/engineering standards. Work as one agent. Start with the first failing
+matched analysis/engineering standards. Keep implementation with one agent; bounded
+read-only baseline/verification agents may review evidence without editing sources. Start with the first failing
 acceptance test, keep HTTP/browser regressions green, and verify actual pipeline behavior.
 Record context/coverage and exact evidence; use recovery checkpoints to fit the available
 usage window. Do not begin another deliverable automatically when only this one is assigned.
@@ -198,3 +246,9 @@ and later application evaluation. Product implementation has not started.
 
 2026-11-03 — User requested one ignored run log per deliverable; updated log paths
 and resume prompts. This changes execution tracking only, with no product/test change.
+
+2026-11-03 — User authorized deliverable2. Implemented current-consumer migration, canonical
+schema3 and private legacy conversion, generic judgment contexts/roles/replay versions,
+per-registration checks and baseline reports. Added targeted context/ordering/compatibility
+controls after read-only review. Verification and limitations are recorded in §9; no new
+entry-framework adapter or later deliverable was implemented.

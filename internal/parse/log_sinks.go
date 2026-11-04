@@ -54,7 +54,7 @@ func (f *flow) recordLogSink(n *sitter.Node, binding analysis.Evidence, values [
 	gaps = append(gaps, claims...)
 	gaps = append(gaps, f.gap("log_destination_unresolved", "logger transports, levels, formats and redaction configuration are not modeled", n))
 	context := append(append([]analysis.Evidence{}, f.context...), binding)
-	f.uses = append(f.uses, analysis.CandidateUse{ID: fmt.Sprintf("use:%s:%s:%d", f.route.ID, f.module.file, n.StartByte()), RouteID: f.route.ID, Kind: "log_sink_candidate", Sink: f.module.evidence("log_sink_candidate", n), Dependencies: v.deps, Context: context, Gaps: gaps, Assessment: analysis.Assessment{Status: "not_run"}})
+	f.uses = append(f.uses, analysis.CandidateUse{ID: fmt.Sprintf("use:%s:%s:%d", f.invocation.ID, f.module.file, n.StartByte()), EntryID: f.entry.ID, InvocationContextID: f.invocation.ID, Kind: "log_sink_candidate", Sink: f.module.evidence("log_sink_candidate", n), Dependencies: v.deps, Context: context, Gaps: gaps, Assessment: analysis.Assessment{Status: "not_run"}})
 }
 
 // moduleBinds reports a module-level import, function, or variable with this name.

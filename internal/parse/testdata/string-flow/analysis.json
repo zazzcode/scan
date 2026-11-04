@@ -1,63 +1,82 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "root": "testdata/string-flow",
-  "entries": [
+  "registrations": [
     {
-      "route": {
-        "id": "route:server.ts:102:POST:/login",
-        "method": "POST",
-        "path_pattern": "/login",
-        "framework": "express",
-        "registration": {
+      "declared_handler": {
+        "name": "authenticate",
+        "kind": "identifier",
+        "span": {
+          "file": "server.ts",
+          "start_line": 4,
+          "end_line": 4,
+          "start_byte": 121,
+          "end_byte": 135
+        }
+      },
+      "syntax_steps": [
+        {
+          "kind": "registration",
+          "symbol": {
+            "name": "app.post",
+            "kind": "method",
+            "span": {
+              "file": "server.ts",
+              "start_line": 4,
+              "end_line": 4,
+              "start_byte": 102,
+              "end_byte": 110
+            }
+          }
+        },
+        {
+          "kind": "handler",
+          "symbol": {
+            "name": "authenticate",
+            "kind": "identifier",
+            "span": {
+              "file": "server.ts",
+              "start_line": 4,
+              "end_line": 4,
+              "start_byte": 121,
+              "end_byte": 135
+            }
+          }
+        }
+      ],
+      "id": "registration:v1:2edac28149fcf055d0909d12a405f3af7d3da77f1e715ab2f02080eb12bf085a",
+      "entry_id": "entry:v1:a0a8a4f6787db87f0f4b65e7698f7ee9efe745cc909d2eb38463b469369b9b21",
+      "origin": {
+        "kind": "entry_registration",
+        "text": "app.post('/login', authenticate())",
+        "span": {
           "file": "server.ts",
           "start_line": 4,
           "end_line": 4,
           "start_byte": 102,
           "end_byte": 136
         },
-        "handler": {
-          "name": "authenticate",
-          "kind": "identifier",
-          "span": {
-            "file": "server.ts",
-            "start_line": 4,
-            "end_line": 4,
-            "start_byte": 121,
-            "end_byte": 135
-          }
-        },
-        "steps": [
-          {
-            "kind": "registration",
-            "symbol": {
-              "name": "app.post",
-              "kind": "method",
-              "span": {
-                "file": "server.ts",
-                "start_line": 4,
-                "end_line": 4,
-                "start_byte": 102,
-                "end_byte": 110
-              }
-            }
-          },
-          {
-            "kind": "handler",
-            "symbol": {
-              "name": "authenticate",
-              "kind": "identifier",
-              "span": {
-                "file": "server.ts",
-                "start_line": 4,
-                "end_line": 4,
-                "start_byte": 121,
-                "end_byte": 135
-              }
-            }
-          }
-        ]
+        "sha256": "7fc7eba69407c02911fec45c7110a35c520babcdea6f788890b08e9c991fec5d"
       },
-      "resolved_handler": {
+      "framework": "express"
+    }
+  ],
+  "dispatch_bindings": [
+    {
+      "id": "dispatch:v1:3d629afbf8222c31312834dfba17c0a521cc3d0defbe12f3f34c35f01284efcf",
+      "entry_id": "entry:v1:a0a8a4f6787db87f0f4b65e7698f7ee9efe745cc909d2eb38463b469369b9b21",
+      "registration_id": "registration:v1:2edac28149fcf055d0909d12a405f3af7d3da77f1e715ab2f02080eb12bf085a",
+      "callable_id": "callable:v1:e2b0f9c0f9c4cc7a465e24430569ddd6b5e70e6b6d2c0464e2e435056f6f5d28",
+      "mechanism": "direct_registration",
+      "resolution": "resolved",
+      "stage": 0
+    }
+  ],
+  "callables": [
+    {
+      "id": "callable:v1:e2b0f9c0f9c4cc7a465e24430569ddd6b5e70e6b6d2c0464e2e435056f6f5d28",
+      "language": "typescript",
+      "definition": {
         "kind": "handler",
         "text": "{\n    const email = req.body.email\n    const query = `SELECT * FROM users WHERE email = '${email}'`\n    database.query(query)\n  }",
         "span": {
@@ -68,6 +87,102 @@
           "end_byte": 197
         },
         "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+      }
+    }
+  ],
+  "invocation_contexts": [
+    {
+      "id": "invocation:v1:9df29f853aaae156284a56d6d2a2cd7603bb763569688f5bf872c6dfbd5e7ec8",
+      "entry_id": "entry:v1:a0a8a4f6787db87f0f4b65e7698f7ee9efe745cc909d2eb38463b469369b9b21",
+      "dispatch_binding_id": "dispatch:v1:3d629afbf8222c31312834dfba17c0a521cc3d0defbe12f3f34c35f01284efcf",
+      "inputs": [
+        {
+          "role": "http.request",
+          "parameter": "req",
+          "origin": {
+            "kind": "external",
+            "evidence": [
+              {
+                "kind": "input_binding",
+                "text": "req: Request",
+                "span": {
+                  "file": "handler.ts",
+                  "start_line": 2,
+                  "end_line": 2,
+                  "start_byte": 36,
+                  "end_byte": 48
+                },
+                "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+              }
+            ]
+          }
+        },
+        {
+          "role": "http.response",
+          "parameter": "res",
+          "origin": {
+            "kind": "external",
+            "evidence": [
+              {
+                "kind": "input_binding",
+                "text": "res: Response",
+                "span": {
+                  "file": "handler.ts",
+                  "start_line": 2,
+                  "end_line": 2,
+                  "start_byte": 50,
+                  "end_byte": 63
+                },
+                "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+              }
+            ]
+          }
+        }
+      ],
+      "controls": [
+        {
+          "invocation_context_id": "invocation:v1:9df29f853aaae156284a56d6d2a2cd7603bb763569688f5bf872c6dfbd5e7ec8",
+          "dispatch_binding_id": "dispatch:v1:3d629afbf8222c31312834dfba17c0a521cc3d0defbe12f3f34c35f01284efcf",
+          "evidence": {
+            "kind": "invoked_callable",
+            "text": "{\n    const email = req.body.email\n    const query = `SELECT * FROM users WHERE email = '${email}'`\n    database.query(query)\n  }",
+            "span": {
+              "file": "handler.ts",
+              "start_line": 2,
+              "end_line": 6,
+              "start_byte": 68,
+              "end_byte": 197
+            },
+            "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+          }
+        }
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "id": "entry:v1:a0a8a4f6787db87f0f4b65e7698f7ee9efe745cc909d2eb38463b469369b9b21",
+      "kind": "http",
+      "name": "POST /login",
+      "instance_id": "server.ts:7fc7eba69407c02911fec45c7110a35c520babcdea6f788890b08e9c991fec5d:app",
+      "location": {
+        "kind": "entry_registration",
+        "text": "app.post('/login', authenticate())",
+        "span": {
+          "file": "server.ts",
+          "start_line": 4,
+          "end_line": 4,
+          "start_byte": 102,
+          "end_byte": 136
+        },
+        "sha256": "7fc7eba69407c02911fec45c7110a35c520babcdea6f788890b08e9c991fec5d"
+      },
+      "http": {
+        "source_path": "/login",
+        "framework": "express",
+        "method": "POST",
+        "path": "/login",
+        "receiver": "app"
       },
       "gaps": [
         {
@@ -174,11 +289,14 @@
         ],
         "claim_kind": "injection",
         "required": [
-          "request_source",
+          "input_source",
           "sql_query_candidate",
-          "route_handler",
+          "invoked_callable",
           "sink_binding",
-          "control_flow"
+          "control_flow",
+          "entry_registration",
+          "dispatch_binding",
+          "invocation_binding"
         ],
         "evidence": {
           "control_flow": [
@@ -195,9 +313,91 @@
               "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
             }
           ],
+          "dispatch_binding": [
+            {
+              "kind": "entry_registration",
+              "text": "app.post('/login', authenticate())",
+              "span": {
+                "file": "server.ts",
+                "start_line": 4,
+                "end_line": 4,
+                "start_byte": 102,
+                "end_byte": 136
+              },
+              "sha256": "7fc7eba69407c02911fec45c7110a35c520babcdea6f788890b08e9c991fec5d"
+            }
+          ],
+          "entry_registration": [
+            {
+              "kind": "entry_registration",
+              "text": "app.post('/login', authenticate())",
+              "span": {
+                "file": "server.ts",
+                "start_line": 4,
+                "end_line": 4,
+                "start_byte": 102,
+                "end_byte": 136
+              },
+              "sha256": "7fc7eba69407c02911fec45c7110a35c520babcdea6f788890b08e9c991fec5d"
+            }
+          ],
           "handler": [
             {
               "kind": "handler",
+              "text": "{\n    const email = req.body.email\n    const query = `SELECT * FROM users WHERE email = '${email}'`\n    database.query(query)\n  }",
+              "span": {
+                "file": "handler.ts",
+                "start_line": 2,
+                "end_line": 6,
+                "start_byte": 68,
+                "end_byte": 197
+              },
+              "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+            }
+          ],
+          "input_source": [
+            {
+              "kind": "input_source",
+              "text": "req.body.email",
+              "span": {
+                "file": "handler.ts",
+                "start_line": 3,
+                "end_line": 3,
+                "start_byte": 88,
+                "end_byte": 102
+              },
+              "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+            }
+          ],
+          "invocation_binding": [
+            {
+              "kind": "input_binding",
+              "text": "req: Request",
+              "span": {
+                "file": "handler.ts",
+                "start_line": 2,
+                "end_line": 2,
+                "start_byte": 36,
+                "end_byte": 48
+              },
+              "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+            },
+            {
+              "kind": "input_binding",
+              "text": "res: Response",
+              "span": {
+                "file": "handler.ts",
+                "start_line": 2,
+                "end_line": 2,
+                "start_byte": 50,
+                "end_byte": 63
+              },
+              "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
+            }
+          ],
+          "invoked_callable": [
+            {
+              "kind": "invoked_callable",
               "text": "{\n    const email = req.body.email\n    const query = `SELECT * FROM users WHERE email = '${email}'`\n    database.query(query)\n  }",
               "span": {
                 "file": "handler.ts",
@@ -221,34 +421,6 @@
                 "end_byte": 136
               },
               "sha256": "7fc7eba69407c02911fec45c7110a35c520babcdea6f788890b08e9c991fec5d"
-            }
-          ],
-          "request_source": [
-            {
-              "kind": "request_source",
-              "text": "req.body.email",
-              "span": {
-                "file": "handler.ts",
-                "start_line": 3,
-                "end_line": 3,
-                "start_byte": 88,
-                "end_byte": 102
-              },
-              "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
-            }
-          ],
-          "route_handler": [
-            {
-              "kind": "route_handler",
-              "text": "{\n    const email = req.body.email\n    const query = `SELECT * FROM users WHERE email = '${email}'`\n    database.query(query)\n  }",
-              "span": {
-                "file": "handler.ts",
-                "start_line": 2,
-                "end_line": 6,
-                "start_byte": 68,
-                "end_byte": 197
-              },
-              "sha256": "598706290a8d051e5ac73ace1d64ffa0d5f097ca44103d0194cc9109b19c73cd"
             }
           ],
           "route_registration": [
@@ -319,8 +491,9 @@
         ],
         "scope": "injection claim over the supplied route, relevant request values, verified operation contract and guard/transfer context"
       },
-      "id": "use:route:server.ts:102:POST:/login:handler.ts:172",
-      "route_id": "route:server.ts:102:POST:/login",
+      "id": "candidate:v1:865c0663f1dda8f63a08d541ae094ad1644b682b38ecd8a434f05d39cd18cae7",
+      "entry_id": "entry:v1:a0a8a4f6787db87f0f4b65e7698f7ee9efe745cc909d2eb38463b469369b9b21",
+      "invocation_context_id": "invocation:v1:9df29f853aaae156284a56d6d2a2cd7603bb763569688f5bf872c6dfbd5e7ec8",
       "kind": "sql_query_candidate",
       "sink": {
         "kind": "sql_query_candidate",
@@ -338,7 +511,7 @@
         {
           "sink_slot": "sql_text",
           "source": {
-            "kind": "request_source",
+            "kind": "input_source",
             "text": "req.body.email",
             "span": {
               "file": "handler.ts",
@@ -415,7 +588,7 @@
           "sha256": "7fc7eba69407c02911fec45c7110a35c520babcdea6f788890b08e9c991fec5d"
         },
         {
-          "kind": "route_handler",
+          "kind": "invoked_callable",
           "text": "{\n    const email = req.body.email\n    const query = `SELECT * FROM users WHERE email = '${email}'`\n    database.query(query)\n  }",
           "span": {
             "file": "handler.ts",

@@ -1,7 +1,7 @@
 package analysis
 
 // ReportSchemaVersion identifies analysis reports using analysis_guidelines metadata.
-const ReportSchemaVersion = 2
+const ReportSchemaVersion = 3
 
 // Evidence binds an observed operation to an immutable source file snapshot.
 type Evidence struct {
@@ -22,20 +22,24 @@ type Dependency struct {
 
 // CandidateUse is a security-sensitive value use needing claim-specific analysis.
 type CandidateUse struct {
-	XSS          *XSSFacts     `json:"xss,omitempty"`
-	APIModel     *APIModel     `json:"api_model,omitempty"`
-	ControlEdges []ControlEdge `json:"control_edges,omitempty"`
-	Check        *Check        `json:"check,omitempty"`
-	Completeness *Completeness `json:"completeness,omitempty"`
-	ID           string        `json:"id"`
-	RouteID      string        `json:"route_id,omitempty"`
-	ClientID     string        `json:"client_id,omitempty"`
-	Kind         string        `json:"kind"`
-	Sink         Evidence      `json:"sink"`
-	Dependencies []Dependency  `json:"dependencies"`
-	Context      []Evidence    `json:"context"`
-	Gaps         []Gap         `json:"gaps"`
-	Assessment   Assessment    `json:"assessment"`
+	XSS                 *XSSFacts          `json:"xss,omitempty"`
+	APIModel            *APIModel          `json:"api_model,omitempty"`
+	ControlEdges        []ControlEdge      `json:"control_edges,omitempty"`
+	Check               *Check             `json:"check,omitempty"`
+	Completeness        *Completeness      `json:"completeness,omitempty"`
+	ID                  string             `json:"id"`
+	EntryID             string             `json:"entry_id"`
+	InvocationContextID string             `json:"invocation_context_id"`
+	EntryKind           string             `json:"-"`
+	EntryFacts          *EntryPoint        `json:"-"`
+	InvocationFacts     *InvocationContext `json:"-"`
+	DispatchFacts       *DispatchBinding   `json:"-"`
+	Kind                string             `json:"kind"`
+	Sink                Evidence           `json:"sink"`
+	Dependencies        []Dependency       `json:"dependencies"`
+	Context             []Evidence         `json:"context"`
+	Gaps                []Gap              `json:"gaps"`
+	Assessment          Assessment         `json:"assessment"`
 }
 
 // Assessment preserves the judge's result independently from structural evidence.
@@ -53,28 +57,25 @@ type Assessment struct {
 	Reason          string                  `json:"reason,omitempty"`
 }
 
-// Entry links a syntactic route registration to a selected handler body.
-type Entry struct {
-	Route   Route     `json:"route"`
-	Handler *Evidence `json:"resolved_handler,omitempty"`
-	Gaps    []Gap     `json:"gaps"`
-}
-
 // AnalysisReport contains bounded security analysis, separate from the route inventory.
 type AnalysisReport struct {
-	ClientEntries       []ClientEntry   `json:"client_entries,omitempty"`
-	FindingTypes        []FindingType   `json:"finding_types,omitempty"`
-	PresentationVersion int             `json:"presentation_version,omitempty"`
-	Findings            []Finding       `json:"findings,omitempty"`
-	SelectedRoute       string          `json:"selected_route,omitempty"`
-	SchemaVersion       int             `json:"schema_version"`
-	Root                string          `json:"root"`
-	Entries             []Entry         `json:"entries"`
-	Uses                []CandidateUse  `json:"uses"`
-	Gaps                []Gap           `json:"gaps"`
-	Files               []Evidence      `json:"files"`
-	Limitations         []string        `json:"limitations"`
-	AnalysisGuidelines  []GuidelinesRef `json:"analysis_guidelines,omitempty"`
+	FindingTypes        []FindingType       `json:"finding_types,omitempty"`
+	PresentationVersion int                 `json:"presentation_version,omitempty"`
+	Findings            []Finding           `json:"findings,omitempty"`
+	SelectedRoute       string              `json:"selected_route,omitempty"`
+	SchemaVersion       int                 `json:"schema_version"`
+	Root                string              `json:"root"`
+	SourceSchemaVersion int                 `json:"source_schema_version,omitempty"`
+	Registrations       []EntryRegistration `json:"registrations"`
+	DispatchBindings    []DispatchBinding   `json:"dispatch_bindings"`
+	Callables           []Callable          `json:"callables"`
+	InvocationContexts  []InvocationContext `json:"invocation_contexts"`
+	Entries             []EntryPoint        `json:"entries"`
+	Uses                []CandidateUse      `json:"uses"`
+	Gaps                []Gap               `json:"gaps"`
+	Files               []Evidence          `json:"files"`
+	Limitations         []string            `json:"limitations"`
+	AnalysisGuidelines  []GuidelinesRef     `json:"analysis_guidelines,omitempty"`
 }
 
 // GuidelinesRef identifies the embedded language analysis guidelines used for a report.

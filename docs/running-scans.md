@@ -145,7 +145,8 @@ Entry paths are relative to the target repository. Use `server.ts` for Juice Sho
 `src/server.ts` for the vulnerable TypeScript sample. Omit `--entry` to consider all selected JS/TS
 registration files. Explicit selection avoids conflating training snippets with production scope.
 
-The separate schema-v1 evidence report contains `entries`, `uses`, `files`, `gaps` and `limitations`.
+The separate schema3 evidence report contains typed `entries`, `registrations`,
+`dispatch_bindings`, `callables`, `invocation_contexts`, `uses`, `files`, `gaps` and `limitations`.
 Each use identifies its route, source fields, ordered local transfer evidence, candidate sink,
 snapshot hashes and assessment state. Direct named relative ESM imports, imported handler factories,
 local assignment, string expressions and simple object destructuring are supported. Branches,
@@ -209,8 +210,11 @@ is scoped to its exact output and evidence, never the entire route/application.
 `--strings` flag remains a compatibility alias. Both perform the same analysis; add an explicitly
 configured `--judge` for the required model-assessed security workflow.
 
-Fresh analysis JSON uses `schema_version: 2` and `analysis_guidelines` metadata in place of
+Fresh analysis JSON uses `schema_version: 3` and `analysis_guidelines` metadata in place of
 `practice`. Route inventory JSON remains schema 1. HTML/SARIF export accepts saved analysis reports
-from schemas 1 and 2, including historical guideline metadata. Saved sample reports retain their
+from schemas1/2/3, including historical guideline metadata. Current candidate and finding
+associations use `entry_id` and `invocation_context_id`; old route/client associations are
+converted only when reading saved reports. Original schema provenance is retained in
+`source_schema_version` for converted inputs. Saved sample reports retain their
 original assessments and provenance; changed guideline text or model inputs cannot reuse those
 answers as judgments of a new scan. Consumers reading fresh JSON should use `analysis_guidelines`.

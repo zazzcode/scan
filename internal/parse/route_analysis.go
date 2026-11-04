@@ -3,13 +3,19 @@ package parse
 import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	"github.com/zazzcode/zazzles/internal/analysis"
+	"sort"
 )
 
-func (s *moduleSet) analyzeRoute(out *analysis.AnalysisReport, m, owner *sourceModule, r analysis.Route, call *sitter.Node, receiver string, context []analysis.Evidence) {
-	e := analysis.Entry{Route: r, Gaps: []analysis.Gap{}}
+func (s *moduleSet) analyzeRoute(out *analysis.AnalysisReport, m, owner *sourceModule, r analysis.Route, call *sitter.Node, receiver string, context []analysis.Evidence, sourcePath, mount string) {
+	e := httpEntry(r, m.evidence("entry_registration", call), owner.file+":"+owner.hash+":"+receiver)
+	e.HTTP.Receiver = receiver
+	e.HTTP.SourcePath = sourcePath
+	e.HTTP.Mount = mount
+	e.Gaps = []analysis.Gap{}
 	if shadowed(call, receiver, m.src) && !parameterReceiver(m, call, receiver) {
 		e.Gaps = append(e.Gaps, analysis.Gap{Kind: "ambiguous_receiver", Detail: "receiver is shadowed in enclosing scope", At: r.Registration})
-		out.Entries = append(out.Entries, e)
+		registerInvocation(out, e, nil, "direct_registration", nil, e.Gaps)
+		noteHTTPDeclaration(out, r, context)
 		return
 	}
 	args := call.ChildByFieldName("arguments")
@@ -25,10 +31,27 @@ func (s *moduleSet) analyzeRoute(out *analysis.AnalysisReport, m, owner *sourceM
 	e.Gaps = append(e.Gaps, gaps...)
 	if body != nil {
 		evidence := hm.evidence("handler", body)
-		e.Handler = &evidence
-		f := flow{module: hm, set: s, route: r, request: req, response: handlerParameter(body, 1, hm.src), registration: owner,
+		inputs := []analysis.InputBinding{}
+		if req != "" {
+			inputs = append(inputs, httpInput("http.request", req, parameterEvidence(hm, body, 0)))
+		}
+		keys := []string{}
+		for name := range parts {
+			keys = append(keys, name)
+		}
+		sort.Strings(keys)
+		for _, name := range keys {
+			inputs = append(inputs, httpInput("http."+parts[name], name, hm.evidence("input_binding", body.Parent().ChildByFieldName("parameters"))))
+		}
+		response := handlerParameter(body, 1, hm.src)
+		if response != "" {
+			inputs = append(inputs, httpInput("http.response", response, parameterEvidence(hm, body, 1)))
+		}
+		invocation := registerInvocation(out, e, &evidence, "direct_registration", inputs, e.Gaps)
+		f := flow{module: hm, set: s, entry: e, invocation: invocation, registration: owner,
 			env: map[string]value{}, context: append([]analysis.Evidence{m.evidence("registration", call), evidence}, context...),
 			gaps: append([]analysis.Gap{}, e.Gaps...), helpers: &helperExpansion{budget: 24, stack: map[string]bool{}}, facts: newInputFacts(), parts: parts}
+		f.seedInvocation()
 		f.gaps = append(f.gaps, analysis.Gap{Kind: "middleware_unresolved", Detail: "effective middleware/guard chain is not modeled", At: r.Registration})
 		s.noteMiddlewareFields(&f, m, call)
 		f.statements(body)
@@ -37,5 +60,28 @@ func (s *moduleSet) analyzeRoute(out *analysis.AnalysisReport, m, owner *sourceM
 		out.Uses = append(out.Uses, f.uses...)
 		e.Gaps = append(e.Gaps, f.gaps[len(e.Gaps):]...)
 	}
-	out.Entries = append(out.Entries, e)
+	if body == nil {
+		registerInvocation(out, e, nil, "direct_registration", nil, e.Gaps)
+	} else {
+		out.Entries[len(out.Entries)-1].Gaps = e.Gaps
+	}
+	noteHTTPDeclaration(out, r, context)
+}
+
+func noteHTTPDeclaration(out *analysis.AnalysisReport, r analysis.Route, derived []analysis.Evidence) {
+	reg := &out.Registrations[len(out.Registrations)-1]
+	reg.DeclaredHandler = &r.Handler
+	reg.SyntaxSteps = r.Steps
+	reg.DerivedFrom = append([]analysis.Evidence{}, derived...)
+}
+
+func parameterEvidence(m *sourceModule, body *sitter.Node, index uint) analysis.Evidence {
+	fn := body.Parent()
+	if fn != nil {
+		params := fn.ChildByFieldName("parameters")
+		if params != nil && params.NamedChildCount() > index {
+			return m.evidence("input_binding", params.NamedChild(index))
+		}
+	}
+	return m.evidence("input_binding", body)
 }

@@ -109,7 +109,7 @@ func (s *moduleSet) noteMiddlewareFields(f *flow, registration *sourceModule, ca
 			}
 		}
 	}
-	evidence, _ := s.middlewareContext(registration, f.route)
+	evidence, _ := s.middlewareContext(registration, f.entry.HTTPRoute())
 	for _, item := range evidence {
 		if item.Kind != "middleware_handler" {
 			continue

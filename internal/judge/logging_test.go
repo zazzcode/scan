@@ -11,7 +11,7 @@ import (
 func logClaim(gaps ...string) analysis.CandidateUse {
 	u := analysis.CandidateUse{Kind: "log_sink_candidate", Sink: analysis.Evidence{Span: analysis.Span{File: "server.ts"}},
 		Context:      []analysis.Evidence{{Kind: "logger_binding", Text: "global console.log"}},
-		Dependencies: []analysis.Dependency{{Source: analysis.Evidence{Kind: "request_source", Text: "req.body.password"}}}}
+		Dependencies: []analysis.Dependency{{Source: analysis.Evidence{Kind: "input_source", Text: "req.body.password"}}}}
 	for _, g := range gaps {
 		u.Gaps = append(u.Gaps, analysis.Gap{Kind: g})
 	}

@@ -2,19 +2,19 @@ package analysis
 
 // Finding is a human-readable interpretation of one evidence use, not a new detector verdict.
 type Finding struct {
-	TypeIDs         []string       `json:"type_ids"`
-	ID              string         `json:"id"`
-	UseID           string         `json:"use_id"`
-	RouteID         string         `json:"route_id,omitempty"`
-	ClientID        string         `json:"client_id,omitempty"`
-	RecordType      string         `json:"record_type"`
-	Status          string         `json:"status"`
-	Title           string         `json:"title"`
-	Summary         string         `json:"summary"`
-	Validation      string         `json:"input_validation"`
-	Protection      string         `json:"use_protection"`
-	Uncertainty     string         `json:"uncertainty"`
-	Recommendations Recommendation `json:"recommendations"`
+	TypeIDs             []string       `json:"type_ids"`
+	ID                  string         `json:"id"`
+	UseID               string         `json:"use_id"`
+	EntryID             string         `json:"entry_id"`
+	InvocationContextID string         `json:"invocation_context_id"`
+	RecordType          string         `json:"record_type"`
+	Status              string         `json:"status"`
+	Title               string         `json:"title"`
+	Summary             string         `json:"summary"`
+	Validation          string         `json:"input_validation"`
+	Protection          string         `json:"use_protection"`
+	Uncertainty         string         `json:"uncertainty"`
+	Recommendations     Recommendation `json:"recommendations"`
 }
 
 // Recommendation describes actions to review; examples are never verified patches.

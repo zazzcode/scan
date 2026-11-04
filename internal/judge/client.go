@@ -17,7 +17,7 @@ import (
 	"github.com/zazzcode/zazzles/internal/lang"
 )
 
-const questionVersion = "candidate-use-v9"
+const questionVersion = "candidate-use-v10"
 
 // Client is a selected provider adapter. It never falls back to another provider.
 type Client struct {

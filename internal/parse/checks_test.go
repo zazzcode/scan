@@ -222,7 +222,7 @@ func TestHelperSQLDiscovery(t *testing.T) {
 			t.Fatalf("sink=%+v", use.Sink)
 		}
 		assertParameter(t, use, "server.ts", "value")
-		if len(use.Completeness.Evidence["request_source"]) == 0 {
+		if len(use.Completeness.Evidence["input_source"]) == 0 {
 			t.Fatal("request field did not reach the helper sink")
 		}
 	})
@@ -334,7 +334,7 @@ func assertParameter(t *testing.T, use analysis.CandidateUse, file, name string)
 	t.Helper()
 	source, param := false, false
 	for _, d := range use.Dependencies {
-		if d.Source.Kind == "request_source" && strings.HasSuffix(d.Source.Text, ".body.handle") {
+		if d.Source.Kind == "input_source" && strings.HasSuffix(d.Source.Text, ".body.handle") {
 			source = true
 		}
 		for _, e := range d.Transfers {

@@ -3,7 +3,7 @@
 Requested 2026-11-03. Worktree and branch: `common-entry-and-dispatch`.
 Project and Deliverable Owner: Michael. Integration: `stage`, human PR review/merge.
 The user requested design/specification authoring, then authorized deliverable 1
-implementation on the same date.
+implementation on the same date, then deliverable2 and its success assessment.
 
 The [architecture design](../architecture/common-entry-dispatch.md) owns record semantics,
 flow boundaries and reporting approach. Each linked deliverable below is its own executable
@@ -15,7 +15,7 @@ This index owns ordering and milestone-wide verification, not a separate executi
 | Order | Deliverable contract | Observable outcome | Small recovery units |
 | --- | --- | --- | --- |
 | 1 | [Shared model](common-entry-dispatch-01-model.md) | Implemented foundation: typed records, deterministic identity, contexts and reference validation | Cardinality/identity; validation |
-| 2 | [Existing consumers and compatibility](common-entry-dispatch-02-consumers-compatibility.md) | Real HTTP/browser flow uses common contexts; saved schemas remain readable | JS/TS HTTP; Python/browser; judge/report/schema cutover |
+| 2 | [Existing consumers and compatibility](common-entry-dispatch-02-consumers-compatibility.md) | Implemented: real HTTP/browser contexts, schema3 and saved schemas1/2 compatibility | JS/TS HTTP; Python/browser; judge/report/schema cutover |
 | 3 | [Reports and selectors](common-entry-dispatch-03-reporting-selectors.md) | Entry-specific HTML/text/SARIF; typed checks and entry filters | Presentation/locations; selectors; visual checks |
 | 4 | [Browser events](common-entry-dispatch-04-browser-events.md) | Explicit event/callback entries and event-source flow | Binding; source/control pairs; reports |
 | 5 | [Dynamic HTTP](common-entry-dispatch-05-dynamic-http.md) | Bounded finite registration/factory dispatch | Literal tables; factory/closure contexts; bounds |

@@ -56,13 +56,13 @@ func (f *flow) enterHelper(call *sitter.Node, name string, args []value) (ret va
 		registration: f.registration,
 		module:       hm,
 		set:          f.set,
-		route:        f.route,
-		env:          map[string]value{},
-		context:      append(append([]analysis.Evidence{}, f.context...), f.module.evidence("helper_call", call)),
-		gaps:         append([]analysis.Gap{}, f.gaps...),
-		depth:        f.depth + 1,
-		helpers:      f.helpers,
-		facts:        f.facts,
+		entry:        f.entry, invocation: f.invocation,
+		env:     map[string]value{},
+		context: append(append([]analysis.Evidence{}, f.context...), f.module.evidence("helper_call", call)),
+		gaps:    append([]analysis.Gap{}, f.gaps...),
+		depth:   f.depth + 1,
+		helpers: f.helpers,
+		facts:   f.facts,
 	}
 	unbound := false
 	for i, p := range params {

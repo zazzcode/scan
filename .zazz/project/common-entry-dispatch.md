@@ -4,7 +4,8 @@
 work. Implement the common model using existing HTTP and browser consumers, with bounded support
 for dynamic routes, GraphQL resolvers and gRPC handlers. The exact framework/language subsets and
 coverage limits belong in the next tracked implementation contract. Command injection follows as
-the next new vulnerability family. These capabilities are planned, not currently implemented.
+the next new vulnerability family. The common model and HTTP/browser migration are implemented; the additional bounded
+adapters remain planned in their separate contracts.
 
 gRPC handlers are an entry/dispatch capability independent of source language. The model should
 facilitate their registration, callable binding and invocation context without HTTP-route assumptions.
@@ -15,8 +16,8 @@ The [architecture proposal](../architecture/common-entry-dispatch.md) and
 [eight-deliverable specification set](../specifications/common-entry-dispatch.md) refine this
 brief as of 2026-11-03. They retain HTTP/sample compatibility, make browser events explicit,
 and prioritize Node.js GraphQL before gRPC. The user-built GraphQL application is a later
-evaluation; source-only fixtures support initial adapter acceptance. Implementation has
-not started.
+evaluation; source-only fixtures support initial adapter acceptance. Deliverables1/2 are implemented with acceptance evidence in their contracts; later
+deliverables have not started.
 
 ## Governing design
 
@@ -34,8 +35,9 @@ The same callable can serve multiple entries; an entry can have multiple support
 Entry kind does not determine input trust. Multiple registrations and target alternatives MUST retain
 conditions, provenance and unresolved coverage. Source/control/value semantics remain explicit.
 
-Current pressure points are `analysis.Entry.Route`, separate route/browser identities, method/path
-checks, route-handler completeness roles and route-centric report grouping. A struct-only addition
+The migration removes `analysis.Entry.Route` and competing route/browser associations,
+introducing common entry/context identities and evidence roles. HTTP check selectors and
+richer framework-specific report details remain the next bounded reporting deliverable. A struct-only addition
 or an output projection of unchanged route-only internals does not meet the outcome.
 
 ## Bounded implementation

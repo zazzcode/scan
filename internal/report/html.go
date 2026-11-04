@@ -56,24 +56,27 @@ func HTML(w io.Writer, r *analysis.AnalysisReport) error {
 	v.SortScript = template.JS(sortSource)
 	rows := map[string]*htmlRow{}
 	for _, e := range r.Entries {
-		row := &htmlRow{ID: e.Route.ID, SourceType: "HTTP route", Path: e.Route.PathPattern, Method: e.Route.Method, Signature: e.Route.Method + " " + e.Route.PathPattern, Location: e.Route.Registration, Gaps: e.Gaps}
-		rows[e.Route.ID] = row
-		v.Rows = append(v.Rows, row)
-	}
-	for _, e := range r.ClientEntries {
-		row := &htmlRow{ID: e.ID, SourceType: "Browser " + e.Kind, Path: e.Location.File, Signature: e.Name, Location: e.Location}
+		row := &htmlRow{ID: e.ID, SourceType: e.Kind, Signature: e.Name, Location: e.Location.Span, Gaps: r.EntryGaps(e.ID)}
+		if e.HTTP != nil {
+			row.SourceType = "HTTP route"
+			row.Path = e.HTTP.Path
+			row.Method = e.HTTP.Method
+			row.Signature = e.HTTP.Method + " " + e.HTTP.Path
+		}
+		if e.Browser != nil {
+			row.SourceType = "Browser " + e.Browser.Category
+			row.Path = e.Location.Span.File
+		}
 		rows[e.ID] = row
 		v.Rows = append(v.Rows, row)
 	}
 	for i, u := range r.Uses {
-		identity := u.RouteID
-		if u.ClientID != "" {
-			identity = u.ClientID
-		}
+		identity := u.EntryID
+
 		row := rows[identity]
 		if row == nil {
-			row = &htmlRow{ID: u.RouteID, SourceType: "Unresolved entry", Signature: "Route association unavailable"}
-			rows[u.RouteID] = row
+			row = &htmlRow{ID: u.EntryID, SourceType: "Unresolved entry", Signature: "Route association unavailable"}
+			rows[u.EntryID] = row
 			v.Rows = append(v.Rows, row)
 		}
 		f := r.Findings[i]

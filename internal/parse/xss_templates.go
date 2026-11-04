@@ -221,7 +221,7 @@ func requestRenderOptions(f *flow, locals *sitter.Node) bool {
 		return false
 	}
 	for _, dependency := range f.eval(locals).deps {
-		if dependency.Source.Kind == "request_source" {
+		if dependency.Source.Kind == "input_source" {
 			return true
 		}
 	}

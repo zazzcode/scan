@@ -43,8 +43,8 @@ func codeFlows(report *analysis.AnalysisReport, use analysis.CandidateUse) []any
 		}
 		records := []analysis.Evidence{}
 		for _, e := range report.Entries {
-			if e.Route.ID == use.RouteID {
-				records = append(records, analysis.Evidence{Kind: "inbound_route", Span: e.Route.Registration})
+			if e.HTTP != nil && e.ID == use.EntryID {
+				records = append(records, analysis.Evidence{Kind: "inbound_route", Span: e.HTTPRoute().Registration})
 				break
 			}
 		}

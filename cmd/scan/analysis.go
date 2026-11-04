@@ -43,12 +43,12 @@ func runAnalysis(root, entry, routeFilter, checksFile, provider, model string, l
 	}
 	if routeFilter != "" {
 		report.SelectedRoute = routeFilter
-		selected := []analysis.Entry{}
+		selected := []analysis.EntryPoint{}
 		ids := map[string]bool{}
 		for _, e := range report.Entries {
-			if e.Route.PathPattern == routeFilter {
+			if e.HTTP != nil && e.HTTP.Path == routeFilter {
 				selected = append(selected, e)
-				ids[e.Route.ID] = true
+				ids[e.HTTPRoute().ID] = true
 			}
 		}
 		if len(selected) == 0 {
@@ -57,12 +57,15 @@ func runAnalysis(root, entry, routeFilter, checksFile, provider, model string, l
 		}
 		uses := []analysis.CandidateUse{}
 		for _, u := range report.Uses {
-			if ids[u.RouteID] {
+			if ids[u.EntryID] {
 				uses = append(uses, u)
 			}
 		}
-		report.Entries = selected
-		report.Uses = uses
+		report.SelectEntries(ids)
+		if err := report.BindUses(); err != nil {
+			fmt.Fprintln(stderr, err)
+			return exitError
+		}
 	}
 	failed := false
 	if client != nil {

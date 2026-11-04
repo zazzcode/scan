@@ -27,7 +27,7 @@ func validationChoices(name string) []map[string]string {
 func applyValidationPolicy(u analysis.CandidateUse, a *analysis.Assessment) {
 	a.FindingStatus, a.Protection = "needs_evidence", "uncertain"
 	blockers := append([]analysis.Gap{}, u.Completeness.Blockers...)
-	roles := append(append([]string{}, u.Completeness.Required...), "request_source", "field_policy", "route_handler", "control_flow")
+	roles := append(append([]string{}, u.Completeness.Required...), "input_source", "field_policy", "invoked_callable", "control_flow")
 	seen := map[string]bool{}
 	for _, role := range roles {
 		if seen[role] {

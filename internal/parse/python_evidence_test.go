@@ -52,8 +52,8 @@ def unknown():
 	byPath := map[string][]analysis.CandidateUse{}
 	for _, u := range r.Uses {
 		for _, e := range r.Entries {
-			if u.RouteID == e.Route.ID {
-				byPath[e.Route.PathPattern] = append(byPath[e.Route.PathPattern], u)
+			if u.EntryID == e.HTTPRoute().ID {
+				byPath[e.HTTPRoute().PathPattern] = append(byPath[e.HTTPRoute().PathPattern], u)
 			}
 		}
 	}
@@ -252,7 +252,7 @@ def lookup(name):
 		t.Fatal("Python evidence is nondeterministic")
 	}
 	sql := kindUse(t, first, "sql_query_candidate")
-	if sql.Sink.Span.File != "store.py" || sql.Completeness.Evidence["route_handler"][0].Span.File != "app.py" {
+	if sql.Sink.Span.File != "store.py" || sql.Completeness.Evidence["invoked_callable"][0].Span.File != "app.py" {
 		t.Error("helper/handler snapshots confused")
 	}
 }
@@ -328,13 +328,13 @@ def input():
 	}
 	methods := map[string]string{}
 	for _, e := range r.Entries {
-		methods[e.Route.ID] = e.Route.Method
+		methods[e.HTTPRoute().ID] = e.HTTPRoute().Method
 	}
 	count := 0
 	for _, u := range r.Uses {
 		if u.Kind == "sql_query_candidate" {
 			count++
-			if methods[u.RouteID] != "POST" {
+			if methods[u.EntryID] != "POST" {
 				t.Error("POST-only SQL attributed to GET")
 			}
 		}
@@ -371,16 +371,16 @@ def unrelated():
 	}
 	paths := map[string]string{}
 	for _, e := range r.Entries {
-		paths[e.Route.ID] = e.Route.PathPattern
+		paths[e.HTTPRoute().ID] = e.HTTPRoute().PathPattern
 	}
 	for _, u := range r.Uses {
 		if u.Kind == "sql_query_candidate" {
 			blocked := gapKind(u.Completeness.Blockers, "input_helper_unresolved")
-			if blocked != (paths[u.RouteID] == "/guard") {
-				t.Errorf("guard blocker on %s = %v", paths[u.RouteID], blocked)
+			if blocked != (paths[u.EntryID] == "/guard") {
+				t.Errorf("guard blocker on %s = %v", paths[u.EntryID], blocked)
 			}
 		}
-		if u.XSS != nil && paths[u.RouteID] == "/unrelated" && u.XSS.Protection != "raw" {
+		if u.XSS != nil && paths[u.EntryID] == "/unrelated" && u.XSS.Protection != "raw" {
 			t.Error("keyword helper lost raw value")
 		}
 	}

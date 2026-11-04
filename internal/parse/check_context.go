@@ -77,7 +77,7 @@ func (s *moduleSet) chainEvidence(report *analysis.AnalysisReport, check analysi
 	middlewareFiles := map[string]bool{}
 	seen := map[string]bool{}
 	for _, entry := range report.Entries {
-		r := entry.Route
+		r := entry.HTTPRoute()
 		if r.Method != check.Method || r.PathPattern != check.Path {
 			continue
 		}
@@ -95,26 +95,31 @@ func (s *moduleSet) chainEvidence(report *analysis.AnalysisReport, check analysi
 			context = append(context, global...)
 			gaps = append(gaps, missing...)
 		}
-		context = append(context, m.evidence("route_registration", call))
-		args := call.ChildByFieldName("arguments")
-		if args == nil {
-			continue
-		}
-		for i := uint(1); i < args.NamedChildCount(); i++ {
-			arg := args.NamedChild(i)
-			if adapter := s.authenticationAdapter(m, arg); len(adapter) > 0 {
-				context = append(context, adapter...)
+		calls, priorGaps := s.httpPredecessors(m, entry, call)
+		gaps = append(gaps, priorGaps...)
+		calls = append(calls, call)
+		for _, call := range calls {
+			context = append(context, m.evidence("route_registration", call))
+			args := call.ChildByFieldName("arguments")
+			if args == nil {
 				continue
 			}
-			context = append(context, s.wrapperContext(m, arg)...)
-			hm, body, req, more := s.handler(m, arg)
-			gaps = append(gaps, more...)
-			if body == nil {
-				continue
+			for i := uint(1); i < args.NamedChildCount(); i++ {
+				arg := args.NamedChild(i)
+				if adapter := s.authenticationAdapter(m, arg); len(adapter) > 0 {
+					context = append(context, adapter...)
+					continue
+				}
+				context = append(context, s.wrapperContext(m, arg)...)
+				hm, body, req, more := s.handler(m, arg)
+				gaps = append(gaps, more...)
+				if body == nil {
+					continue
+				}
+				context = append(context, hm.evidence("invoked_callable", body))
+				gaps = append(gaps, s.inputHelperGaps(hm, body, req, check.Fields)...)
+				s.includeHelpers(hm, body, &context, seen, 0)
 			}
-			context = append(context, hm.evidence("route_handler", body))
-			gaps = append(gaps, s.inputHelperGaps(hm, body, req, check.Fields)...)
-			s.includeHelpers(hm, body, &context, seen, 0)
 		}
 	}
 	return context, gaps

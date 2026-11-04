@@ -18,20 +18,22 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 
 **Follow-up foundation:** the [common entry/dispatch brief](../project/common-entry-dispatch.md)
 records the next activity: the shared model with bounded dynamic-route, GraphQL resolver and gRPC
-handler support. Current code still has HTTP-shaped entry/check records; naming changes do not
-implement the generalized model or these adapters.
+handler support. The shared model and existing HTTP/browser consumers are migrated through
+[deliverable2](../specifications/common-entry-dispatch-02-consumers-compatibility.md). Fresh
+reports are schema3 with canonical entry/context associations; saved schemas1/2 still export.
+Typed selectors/presenters, explicit events and new framework adapters remain later work.
 Use the current reviewed Python/terminology revision as the prerequisite, not the old pre-rename API.
 
 **Architecture/terminology closeout:** embedded documents are **Analysis Guidelines**
 (`internal/guidelines`); shared records live in `internal/analysis` as `CandidateUse`,
 `AnalysisReport` and `RouteInventory`. `--analyze` is canonical; `--strings` remains an external
-alias. Fresh analysis JSON is schema 2 with `analysis_guidelines`; schema-1 saved reports still
+alias. Fresh analysis JSON is schema3 with `analysis_guidelines`; schema1/2 saved reports still
 export. See the [implemented architecture](../architecture.md) and the
 [closeout contract](../specifications/python-support.md#architecture-and-terminology-closeout).
 Historical reports retain their original versions/answers; changed guideline inputs need fresh judgments.
 
 
-**Active worktree, 2026-11-01: `python-support-base`.** The bounded Python adapter is implemented
+**Prior Python activity, 2026-11-01: `python-support-base`.** The bounded Python adapter is implemented
 and tested on three pinned apps. Read the [Python contract](../specifications/python-support.md),
 [results and limits](../evaluation/python-support-results.md), and [user guide](../../docs/python-support.md)
 for resumption. Raw results remain under `_test-findings/<app>/run-<id>/`; source keys, hashes and curated

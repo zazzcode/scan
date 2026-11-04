@@ -76,7 +76,7 @@ func TestEntryCatalogIdentity(t *testing.T) {
 	}
 	same := source
 	same.Text = "different excerpt/assessment display"
-	same.Kind = "route_handler"
+	same.Kind = "invoked_callable"
 	got, err := analysis.SnapshotRecordID("callable", same, "module:handler", "scope:create")
 	if err != nil || id != got {
 		t.Fatal("presentation/evidence-role changes altered lexical identity", err)

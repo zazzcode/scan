@@ -42,7 +42,7 @@ func (f *flow) noteInputTouch(values []value, name string) {
 	weakCall := name == "String" || name == "Number" || strings.HasSuffix(name, ".substring") || strings.HasSuffix(name, ".slice") || strings.Contains(name, "trunc")
 	for _, v := range values {
 		for _, d := range v.deps {
-			if d.Source.Kind != "request_source" {
+			if d.Source.Kind != "input_source" {
 				continue
 			}
 			if weakCall {
@@ -216,7 +216,7 @@ func requestFields(values []value) []string {
 	seen := map[string]bool{}
 	for _, v := range values {
 		for _, d := range v.deps {
-			if d.Source.Kind == "request_source" && d.Source.Text != "" {
+			if d.Source.Kind == "input_source" && d.Source.Text != "" {
 				seen[d.Source.Text] = true
 			}
 		}
@@ -276,9 +276,9 @@ func (f *flow) enterQueryCallback(n *sitter.Node) {
 		return
 	}
 	child := flow{
-		module:  f.module,
-		set:     f.set,
-		route:   f.route,
+		module: f.module,
+		set:    f.set,
+		entry:  f.entry, invocation: f.invocation,
 		request: f.request,
 		parts:   f.parts,
 		env:     copyValues(f.env),
@@ -314,8 +314,8 @@ func (f *flow) finishValidation() {
 			gap.Detail = field + " is read and no handler or applicable middleware validator handles it"
 		}
 		f.uses = append(f.uses, analysis.CandidateUse{
-			ID:           fmt.Sprintf("input:%s:%s:%d", f.route.ID, field, source.Span.StartByte),
-			RouteID:      f.route.ID,
+			ID:      fmt.Sprintf("input:%s:%s:%d", f.invocation.ID, field, source.Span.StartByte),
+			EntryID: f.entry.ID, InvocationContextID: f.invocation.ID,
 			Kind:         "input_validation_candidate",
 			Sink:         source,
 			Dependencies: []analysis.Dependency{{Source: source, Transfers: []analysis.Evidence{}}},

@@ -14,7 +14,7 @@ detection/policy implementations for JSON, SARIF, and HTML.
 - **Standalone HTML:** the core human-facing CLI report, generated offline from the canonical JSON.
   Show only zazzles's results. Comparator/tool benchmarking belongs in evaluation documents.
 
-All three formats share the same use/route IDs, raw assessments, and report interpretation. None
+All three formats share the same use/entry/context IDs, raw assessments, and report interpretation. None
 runs an additional detector, changes eligibility, or silently upgrades uncertainty to protection.
 
 ## Canonical report
@@ -141,5 +141,15 @@ finding eligibility, runtime-confirmation state or independent-review policy.
 The [query judgment design](query-judgment.md) owns automatic injection evidence and policy gates.
 Public [analysis rules](../../docs/analysis/README.md) describe SQL/NoSQL and validation semantics.
 
-Current analysis JSON uses schema 2 and `analysis_guidelines`; schema-1 saved reports remain readable.
+Current analysis JSON uses schema3 and `analysis_guidelines`; schemas1/2 remain readable
+through private compatibility decoding, retaining original source/schema/answer provenance.
 See [naming and compatibility](../architecture.md#naming-and-compatibility).
+
+## Common entry migration
+
+Current use/finding records serialize `entry_id` and `invocation_context_id` as their primary
+association. Typed entry metadata supplies HTTP/browser labels; no fake HTTP route is used
+for browser roots. SARIF includes generic entry/context properties and entry-level coverage
+notifications for unknown dispatch, including zero-use entries. Original historical answers,
+classification and source locations remain preserved during offline export. Richer framework
+presenters are a later deliverable; this migration does not add GraphQL/gRPC detection.
