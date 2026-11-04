@@ -10,7 +10,7 @@ This document does not itself authorize implementation, publishing, paid calls o
 
 ## 0. Capability
 
-Resolve finite Express literal-table/for-of registrations and direct literal-argument local factories through shared dispatch/context records, retaining unresolved alternatives, closure bindings and generation provenance.
+Resolve finite Express registrations/factories and the bounded generated Flask/FastAPI routes in the pinned VulnPy Python sample through shared dispatch/context records. Retain generation provenance, closure/callback bindings and unresolved alternatives; produce inspectable source-to-sink traces and existing-family findings from a real source-only scan.
 
 ## 1. Required reading
 
@@ -18,6 +18,12 @@ Resolve finite Express literal-table/for-of registrations and direct literal-arg
   [orientation](../docs/zazzles-agent-orientation.md#documentation-map).
 - [Milestone index](common-entry-dispatch.md#delivery-order) and [Design §§2–5](../architecture/common-entry-dispatch.md#2-semantic-records-and-cardinality) and [§8](../architecture/common-entry-dispatch.md#8-bounded-framework-proposals).
 - Dependency: 03-reporting-selectors; execute after 04-browser-events to keep one ordered lane. [Previous deliverable](common-entry-dispatch-04-browser-events.md)
+- [VulnPy sample](../../docs/samples/vulnpy/README.md), [source reference](../../docs/samples/vulnpy/reference.md),
+  [pinned hashes](../../docs/samples/vulnpy/source-hashes.json), [case inventory](../../docs/samples/vulnpy/cases.json)
+  and [detection guide](../evaluation/vulnpy-detection-guide.md). Read the actual generation,
+  trigger selection, SQL callback and response code identified in §7 before editing.
+- [Database injection](../../docs/analysis/database-injection.md) and
+  [XSS semantics](../../docs/analysis/xss.md); registration/trace recovery does not change claim policy.
 - [Execution discipline](../docs/agent-execution-discipline.md#verification-discipline)
   and repository `.agents/skills/spec-driven/SKILL.md` for implementation.
 - [Code structure §§1–6](../standards/code-structure.md#1-package-layout),
@@ -51,6 +57,11 @@ an in-place contract revision. Unrelated cleanup is outside scope.
 | `internal/parse/dynamic_registrations.go, dynamic_registrations_test.go` | new | Finite registration expansion |
 | `internal/parse/analysis.go, route_analysis.go, router_mounts.go, helper_resolution.go` | modified | Verified registration/target/closure integration |
 | `internal/parse/testdata/typescript/dynamic-dispatch/; internal/parse/testdata/javascript/dynamic-dispatch/` | new | Finite generation and guard controls |
+| `internal/parse/python_dynamic_registrations.go, python_dynamic_registrations_test.go` | new | Bounded source-derived Python registry, factory registration and trace acceptance |
+| `internal/parse/python_routes.go, python_modules.go, python_flow.go, python_calls.go, python_values.go, python_sql.go, python_dbapi.go, entry_context.go` | modified where necessary | Flask/FastAPI generation, finite trigger selection, captured values and actual callback/cursor flow |
+| `internal/parse/testdata/python/dynamic-vulnpy/` | new | Licensed source-only pinned excerpts and independent raw/bound/unknown controls |
+| `internal/judge/*_test.go; internal/report/*_test.go` | modified/new as needed | Python trace/policy/report pipeline with local stubs only |
+| `docs/analysis/xss.md, database-injection.md; docs/python-support.md; .zazz/evaluation/common-entry-dispatch-results.md` | modified where necessary | Implemented Python subset, actual sample trace evidence and remaining gaps |
 | `internal/report/entries.go; cmd/scan/analysis_test.go` | modified | Generation provenance and real pipeline checks |
 | `.zazz/specifications/common-entry-dispatch-05-dynamic-http.md` | modified if needed | Contract decisions and evidence links |
 | `.zazz/ephemeral/common-entry-dispatch-05-dynamic-http-run-log.md` | ignored local | Append-only execution evidence |
@@ -64,6 +75,13 @@ Exclusions: new vulnerability families, authorization engine, queues/jobs/CLI en
 new target languages, full IR, graph database, automatic cache, independent LLM reviewer,
 paid calibration, application execution, sample remediation and unrelated formatting.
 
+The Python addition is limited to existing Flask/Blueprint and FastAPI/APIRouter support,
+finite source-backed registry construction/selection and the closure/callback transfers needed
+by §7. It adds no target language or vulnerability family. Other VulnPy framework adapters,
+arbitrary Python execution/reflection and unrelated Jinja-environment hardening remain outside D5.
+The original sample checkout, saved reports, source hashes, case labels and raw model answers
+MUST remain unchanged. New results belong in fresh ignored report folders.
+
 ## 4. Decisions
 
 **Decision 1.** Expand literal finite tables and direct local factories because this yields source-reviewed bindings without executing target code.
@@ -71,6 +89,12 @@ paid calibration, application execution, sample remediation and unrelated format
 **Decision 2.** Record generated registration origin separately from target resolution and security status because a generated route can be resolved, protected, unsafe or unknown.
 
 **Decision 3.** Report unexpanded remainder at deterministic limits because truncation must not become an all-path protection claim.
+
+**Decision 4.** Use the real pinned VulnPy checkout as an acceptance target, because literal-table
+fixtures alone cannot prove recovery of its generated registration, imported trigger lookup and
+nested SQLite callback. Statically derive finite members from selected local source; never import
+or execute the target, hardcode its endpoint/function map in detector code, or consume evaluation
+case labels as analysis input. Unsupported registry mutation, shadowing or external members retain gaps.
 
 ## 5. Agent implementation rules
 
@@ -93,7 +117,8 @@ blocker and surface it. Do not weaken tests or drop mandatory coverage to fit a 
 
 - **AC1 — TestDynamicHTTPRegistrations.** A literal table/for-of and direct local literal-argument factory expose the expected entries, original spans, row/call/closure provenance and finite target alternatives. Verified by `TestDynamicHTTPRegistrations` in the packages named in §7; new test names are planned contracts, not existing results.
 - **AC2 — TestDynamicHTTPContextIsolation.** Shared function/factory body exposed with different arguments or controls retains separate contexts and correct unsafe/protected/unknown results through real candidate and report paths. Verified by `TestDynamicHTTPContextIsolation` in the packages named in §7; new test names are planned contracts, not existing results.
-- **AC3 — TestDynamicHTTPBounds.** Runtime registration data, mutation, recursive factories, unknown wrappers, unbound/fake receivers and over-limit expansions preserve gaps; known alternatives remain visible, zero-use unknown registrations remain reportable, repeated scans are deterministic. Verified by `TestDynamicHTTPBounds` in the packages named in §7; new test names are planned contracts, not existing results.
+- **AC3 — TestDynamicHTTPBounds.** Runtime registration data, mutation, recursive factories, unknown wrappers, unbound/fake receivers and over-limit expansions preserve gaps; known alternatives remain visible, zero-use unknown registrations remain reportable, repeated scans are deterministic. Include Python registry/member mutation, shadowed lookup, unresolved callbacks and reached-limit controls; none may acquire a fabricated binding or protected claim. Verified by `TestDynamicHTTPBounds` in the packages named in §7; new test names are planned contracts, not existing results.
+- **AC4 — TestDynamicPythonVulnPyTraces.** A fresh source-only scan of **VulnPy at `~/Dev/vulnpy`**, pinned to `b81885e58283a3449b578d20c20557aff637e5ea`, MUST expose the generated Flask GET/POST and FastAPI GET SQL/XSS routes in the §7 matrix, retain their own entry/context identities, and build the actual request → generated handler/closure → selected trigger → callback/cursor → SQL sink or raw HTML response trace. JSON/HTML/SARIF MUST show SQL-construction and raw-XSS poor-practice findings under those dynamic routes using existing classification, preserve supported pre-existing static routes/uses, and retain explicit unsupported/zero-use gaps. A registered path or call graph without value/slot witnesses does not pass. Verified by `TestDynamicPythonVulnPyTraces`, the actual-checkout scan/export commands and source-integrity/parity comparison in §7. No paid judgment or runtime execution is required or claimed.
 - **Scope/checks.** Scoped tests pass and the slice diff contains only relevant approved paths;
   verify with `git diff --check`, `git status --short` and slice-diff inspection.
 
@@ -101,7 +126,91 @@ blocker and surface it. Do not weaken tests or drop mandatory coverage to fit a 
 
 - `TestDynamicHTTPRegistrations`: A literal table/for-of and direct local literal-argument factory expose the expected entries, original spans, row/call/closure provenance and finite target alternatives.
 - `TestDynamicHTTPContextIsolation`: Shared function/factory body exposed with different arguments or controls retains separate contexts and correct unsafe/protected/unknown results through real candidate and report paths.
-- `TestDynamicHTTPBounds`: Runtime registration data, mutation, recursive factories, unknown wrappers, unbound/fake receivers and over-limit expansions preserve gaps; known alternatives remain visible, zero-use unknown registrations remain reportable, repeated scans are deterministic.
+- `TestDynamicHTTPBounds`: Runtime registration data, mutation, recursive factories, unknown wrappers, unbound/fake receivers and over-limit expansions preserve gaps; known alternatives remain visible, zero-use unknown registrations remain reportable, repeated scans are deterministic. Include Python registry/member mutation, shadowed lookup, unresolved callbacks and reached-limit controls.
+- `TestDynamicPythonVulnPyTraces`: Uses source-only pinned fixtures plus the actual VulnPy acceptance scan below. Asserts generated paths/methods, source hashes/spans, closure values, finite callable selection, request dependencies, callback argument/cursor binding, SQL operand separation, claim completeness and matching JSON/HTML/SARIF statuses. Pairs raw traces with bound/escaped and unresolved variants outside the original target. The test MUST NOT pass merely because a finding appears somewhere at the sink line: it must be associated with each required route/context and supported dependency path.
+
+### Existing Node.js application reference
+
+Use the pinned [Juice Shop sample](../../docs/samples/juice-shop/README.md) at
+`~/Dev/juice-shop`, revision `f189f521266f42c6bd05884468292000cee852ed`, as a real
+Node.js regression reference: `server.ts:511–536` defines the 14-row `autoModels` table
+and `for...of`/`finale.resource` endpoint generation; `server.ts:624,630` registers returned
+handlers from `routes/login.ts:18` and `routes/search.ts:19`. Preserve existing specialized
+Finale persistence and zero-argument factory support; do not describe those as newly discovered
+capabilities. Compare inventory, registration/model provenance and existing candidate/claim
+outputs before/after D5. These real paths complement the mandatory focused fixtures for
+plain Express finite tables and literal-argument factories with differing closure/guard contexts.
+A literal URL parameter such as `:id` alone is not generated registration.
+
+The reviewed `~/Dev/sast-testbench/js-samples` files use fixed Express registrations
+(`/login`, `/search`, `/exec`, `/readfile`, `/checkuser`); `weak_crypto.js` has no HTTP route.
+They can supply direct-route controls, but do not replace dynamic-registration acceptance.
+Do not modify or execute any of these sample applications.
+
+### VulnPy acceptance target and required traces
+
+The user-requested acceptance checkout is explicitly **`~/Dev/vulnpy`** (default local path;
+`D5_VULNPY_ROOT` may override it for another machine). Upstream is
+`Contrast-Security-OSS/vulnpy`, MIT, pinned at
+`b81885e58283a3449b578d20c20557aff637e5ea`. Verify clean `git status --porcelain --ignored`,
+HEAD and [reference hashes](../../docs/samples/vulnpy/source-hashes.json) before/after scanning.
+On 2026-11-04 review the local checkout was clean, HEAD matched, and all eight relevant
+registration/registry/trigger/application source files matched their reference hashes.
+
+| Required route stem | Flask exposure | FastAPI exposure | Required source-to-use evidence |
+| --- | --- | --- | --- |
+| `/vulnpy/sqli/sqlite3-execute` | GET and POST, declared trailing slash with `strict_slashes=False` | GET, no declared trailing slash | `_get_user_input` or query parameter → selected `do_sqlite3_execute` → captured input → `_execute` callback/cursor → formatted SQL argument at `trigger/sqli.py:37` |
+| `/vulnpy/sqli/sqlite3-executemany` | GET and POST, same slash behavior | GET | Same dispatch/callback path to `trigger/sqli.py:48`; formatted SQL text remains separate from the other operand's bound value |
+| `/vulnpy/sqli/sqlite3-executescript` | GET and POST, same slash behavior | GET | Same dispatch/callback path to formatted script at `trigger/sqli.py:59` |
+| `/vulnpy/xss/raw` | GET and POST, same slash behavior | GET | Request input and resolved `name="xss"`, `trigger="raw"` branch → concatenated HTML returned at `flask/blueprint.py:57` or `HTMLResponse` at `fastapi/vulnerable.py:44`; `trigger/xss.py:do_raw` is not the rendering sink |
+
+Framework/trigger paths in this matrix are under `src/vulnpy/`. Read `flask/blueprint.py`,
+`fastapi/vulnerable.py` and `trigger/{__init__,util,sqli,xss}.py`, plus the checkout-root
+`apps/{flask_app,fastapi_app}.py`. Generation includes finite source-module/member discovery
+behind `TRIGGER_MAP`, name normalization and `get_trigger` lookup; a literal registry replacement
+in a fixture alone is insufficient. Derive names from actual source declarations/import bindings
+and observed factory inputs. Keep selected-root restrictions, hashes, spans and expansion bounds.
+Do not execute `glob`, `import_module`, `getattr`, registration factories or trigger functions.
+Those source constructs need bounded analysis, not target execution or corpus-specific shortcuts.
+
+The Flask trace MUST retain header precedence and GET-query/POST-form alternatives from
+`_get_user_input`; the FastAPI trace MUST bind the handler's `user_input` query parameter.
+Keep `_execute`'s callback parameter, `_db_reset`'s sqlite3 connection and derived cursor
+provenance, rather than treating a call as value transfer. Constant schema setup/`SELECT_ALL`
+MUST NOT become request-derived SQL findings. Missing unrelated template-content facts must
+remain separate from established request-to-raw-output witnesses; relevant unknowns still block claims.
+Reuse the design's deterministic registration/alternative/context/scan budgets and existing
+flow limits; do not silently raise/remove limits or replace an unreached required trace with a warning.
+
+A single full-checkout scan MUST produce inspectable findings for the required generated routes
+and preserve all previously supported static entries/uses after normalizing identity changes.
+Scoped scans of each registration file provide additional trace evidence. Build the scanner in
+this worktree (never in the target), then run without `--judge` or live credentials:
+
+```sh
+D5_VULNPY_ROOT="${D5_VULNPY_ROOT:-$HOME/Dev/vulnpy}"
+GOTOOLCHAIN=local GOPROXY=off GOCACHE="$PWD/.zazz/ephemeral/go-cache" go build -o .zazz/ephemeral/d5-scan ./cmd/scan
+.zazz/ephemeral/d5-scan --analyze --json --output-dir .zazz/ephemeral/d5-vulnpy/all "$D5_VULNPY_ROOT"
+.zazz/ephemeral/d5-scan --analyze --json --entry src/vulnpy/flask/blueprint.py --output-dir .zazz/ephemeral/d5-vulnpy/flask "$D5_VULNPY_ROOT"
+.zazz/ephemeral/d5-scan --analyze --json --entry src/vulnpy/fastapi/vulnerable.py --output-dir .zazz/ephemeral/d5-vulnpy/fastapi "$D5_VULNPY_ROOT"
+```
+
+Run the full-checkout command before implementation as a baseline and again after implementation;
+each invocation writes a fresh bundle. Export saved fresh JSON offline as HTML/SARIF, inspect route
+labels/locations and trace disclosures, and compare use statuses across all three formats. Record
+exact commands, route/context-to-sink assertions, missing evidence, file/input hashes and artifact
+paths in the D5 log and concise durable results. Automated Go tests use vendored source-only
+fixtures with the MIT notice/provenance and no dependency on a developer's local checkout; actual
+sample acceptance is a separate mandatory check, not a skipped test counted as success.
+
+Preserve the historical six-positive-miss/four-warning baseline and original case inventory.
+Fresh evidence MUST recover `VP-SQL-EXECUTE`, `VP-SQL-EXECUTEMANY`, `VP-SQL-EXECUTESCRIPT`,
+`VP-XSS-FLASK` and `VP-XSS-FASTAPI` with the stronger route/context assertions above.
+`VP-XSS-JINJA` is separate deferred template-binding work; its existing observation MUST remain
+inspectable. Historical warning expectations may cease to apply to resolved fresh registrations:
+explain that delta rather than retaining fake gaps, rewriting labels or claiming the original
+10-case evaluator now proves all acceptance. Other vulnerability families/frameworks remain
+outside the supported finding claim; preserve their inventory/gaps without claiming complete coverage.
 
 Use compact table-driven controls and actual parsed fixtures where adapters are involved.
 Hand-built records prove model/presenter boundaries only; they cannot substitute for actual
@@ -125,10 +234,11 @@ an environment limitation to resolve, not a passing test or a reason to use a pa
 
 First failing test: `TestDynamicHTTPRegistrations` with the observable contract in §6.
 
-1. Start with TestDynamicHTTPContextIsolation on two factory registrations using different closure values/controls.
+1. Start with the failing TestDynamicHTTPRegistrations specified above; then TestDynamicHTTPContextIsolation on two factory registrations using different closure values/controls. Capture the real VulnPy pre-change baseline before Python edits.
 2. Implement finite expansion in deterministic order, sharing existing module binding and HTTP metadata models. Retain existing direct routes and finale persistence semantics.
 3. Carry actual arguments/closure projections into invocation seeds; unsupported capture/mutation cannot acquire a safe status.
-4. Exercise per-site, per-entry and scan budgets and compare existing HTTP sample/control outputs.
+4. Add failing TestDynamicPythonVulnPyTraces using the actual generation/lookup/callback source shape. Implement bounded Python registration/selection, then closure/input/callback-cursor propagation through the existing analysis engine.
+5. Exercise per-site, per-entry and scan budgets; run the §7 real VulnPy scans, report review and existing HTTP/browser/sample regressions. Required dynamic routes must have full trace evidence and findings, not only discovered paths.
 
 Illustrative implementation skeleton; names/bodies may adapt to verified existing code:
 
@@ -138,7 +248,7 @@ Illustrative implementation skeleton; names/bodies may adapt to verified existin
 // Each derived record cites site + literal row/factory call + supported closure binding.
 ```
 
-Recovery checkpoints: Literal table expansion; then factory/closure context and limits.
+Recovery checkpoints: Express literal expansion; factory/closure context and limits; Python source-derived registration/selection; then real VulnPy end-to-end traces, findings and report acceptance.
 A checkpoint MUST leave a coherent runnable state before being called green; otherwise
 record exact partial changes and failing checks, without claiming this deliverable complete.
 
@@ -154,11 +264,11 @@ record exact partial changes and failing checks, without claiming this deliverab
 
 ## 10. Open questions
 
-No deliverable-specific blocker remains beyond user review of the proposed design/scope.
-Node.js GraphQL is first new server support; Apollo and grpc-js are concrete bounded
-implementation choices, adjustable by user steering. The user's future GraphQL test app
-is deferred evaluation, not a dependency. Resolve any materially new choice before its
-dependent code; do not block unrelated earlier deliverables on later evaluation data.
+The user explicitly added VulnPy dynamic-route trace and visible-finding acceptance on
+2026-11-04. This authorizes the specification expansion to bounded Flask/FastAPI generation
+and necessary registry/closure/callback flow; implementation still requires a separate assignment.
+No unresolved target-selection question remains. Python beyond this stated source subset,
+new vulnerability families or wider runtime reflection requires a material scope decision.
 
 ## 11. Run log protocol
 
@@ -177,6 +287,10 @@ worktree. Read AGENTS.md, .zazz/specifications/common-entry-dispatch-05-dynamic-
 its linked design/dependencies, and the deliverable-specific ignored run log. Load spec-driven and
 matched analysis/engineering standards. Work as one agent. Start with the first failing
 acceptance test, keep HTTP/browser regressions green, and verify actual pipeline behavior.
+D5 includes the mandatory real VulnPy acceptance at ~/Dev/vulnpy in §7: recover the
+specified generated Flask/FastAPI routes, source-to-sink traces and offline SQL/raw-XSS
+findings while preserving existing static routes/uses and historical sample artifacts.
+Do not substitute literal-table fixtures or route inventory alone for this acceptance.
 Record context/coverage and exact evidence; use recovery checkpoints to fit the available
 usage window. Do not begin another deliverable automatically when only this one is assigned.
 Preserve sample apps, raw historical answers and user edits. No paid calls, target execution,
@@ -191,3 +305,16 @@ and later application evaluation. Product implementation has not started.
 
 2026-11-03 — User requested one ignored run log per deliverable; updated log paths
 and resume prompts. This changes execution tracking only, with no product/test change.
+
+2026-11-04 — Deliverable Owner requested explicit VulnPy dynamic-route trace acceptance
+and confirmed that a real scan must show findings for generated and existing supported routes.
+Updated §§0–4, 6–8, 10 and 12 with the named `~/Dev/vulnpy` checkout/pinned revision,
+Flask/FastAPI source subset, three SQL trigger variants and raw-XSS response trace matrix,
+actual-checkout commands, Python implementation/test paths and source-integrity controls.
+Retained deferred Jinja/framework/family limits and historical labels/answers. Fixed §8's
+first-failing-test inconsistency. This is specification work only; D5 is not implemented.
+
+2026-11-04 — Reviewed existing Node.js targets and the user-supplied
+`~/Dev/sast-testbench/js-samples` directory. Added §7's Juice Shop generated-Finale and
+returned-handler references, preserving their existing bounded support, and distinguished
+them from the fixed-route JS snippets. Focused table/closure/guard fixtures remain required.

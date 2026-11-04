@@ -176,15 +176,63 @@ reconstruct from Git and tracked acceptance evidence; never infer success from m
 ## 12. Agent implementation prompt
 
 ```text
-Implement only the user-authorized deliverable in the existing common-entry-and-dispatch
-worktree. Read AGENTS.md, .zazz/specifications/common-entry-dispatch-04-browser-events.md,
-its linked design/dependencies, and the deliverable-specific ignored run log. Load spec-driven and
-matched analysis/engineering standards. Work as one agent. Start with the first failing
-acceptance test, keep HTTP/browser regressions green, and verify actual pipeline behavior.
-Record context/coverage and exact evidence; use recovery checkpoints to fit the available
-usage window. Do not begin another deliverable automatically when only this one is assigned.
-Preserve sample apps, raw historical answers and user edits. No paid calls, target execution,
-new worktrees, merge or integration push. Report acceptance results and next checkpoint.
+Implement deliverable 4 only, unattended, in the existing common-entry-and-dispatch
+worktree and branch. This instruction authorizes implementing its specification,
+completing verification, then committing and pushing the completed checkpoint to
+origin/common-entry-and-dispatch. Do not create another worktree or begin deliverable 5.
+
+Deliverable 3 is completed and pushed at db6a796cd374d8179a7aadc4c8a9758f92a50138.
+Read AGENTS.md and orientation, then
+.zazz/specifications/common-entry-dispatch-04-browser-events.md,
+its linked design/dependencies and matching source/tests. Read the latest deliverable 3
+run-log entries at
+.zazz/ephemeral/common-entry-dispatch-03-reporting-selectors-run-log.md,
+and the successful fresh FastAPI follow-up in
+.zazz/ephemeral/common-entry-dispatch-02-consumers-compatibility-run-log.md. Maintain
+deliverable 4's separate append-only ignored log at
+.zazz/ephemeral/common-entry-dispatch-04-browser-events-run-log.md; create it if absent
+and reconstruct predecessor state from Git/contracts if local evidence is unavailable.
+Do not infer passing verification from missing notes.
+
+Verify actual cwd, branch, HEAD, predecessor checkpoint and existing changes before edits.
+Preserve user edits, including any prompt-only preparation in this contract. Record the
+actual start revision and bounded D4 scope. Load spec-driven and matched engineering,
+testing and XSS analysis standards. Work as one agent; do not delegate.
+
+Start with the failing TestBrowserEventDispatch described in §8. Implement only the
+specified bounded DOM/window event registrations, callback bindings and event-source
+propagation. Keep invocation inputs/controls isolated, retain zero-use/unknown/limit gaps,
+and preserve existing script/component, inline-script and HTTP behavior. Verify real
+parsed adapter-to-candidate-to-completeness-to-report behavior; hand-built records alone
+are insufficient. Keep deliverable 3 reporting/selector and existing HTTP/browser
+regressions green. Use source-only fixtures and local model stubs, never target execution.
+
+Continue autonomously through routine implementation choices, failures and rework.
+Stop for a genuine blocker or material scope/public-contract decision; explain the exact
+condition and record a resumable checkpoint. Do not request routine progress approval.
+Use the specification's recovery checkpoints and milestone usage-window policy. Keep
+context, partial state, next action, exact commands/results and coverage current in the
+run log so compaction or an enforced usage interruption does not lose the handoff.
+Do not invent remaining quota, claim partial work complete, or weaken required tests.
+
+Complete all D4 acceptance criteria, scoped tests and affected-package race checks using
+the declared Go toolchain. Run applicable local provider/replay regressions if evidence
+or judgment inputs change. Generate and visually inspect required offline browser-event
+reports, including raw/protected/unknown and zero-use controls; verify JSON/HTML/SARIF
+status and provenance parity. Format only changed Go files. Check git diff --check,
+status and the full D4 slice diff against the recorded start revision. Record exact
+artifact paths/hashes, context/coverage, limitations and acceptance evidence in the D4 log;
+update the owning tracked contract/docs with implemented behavior.
+
+Before publication verify the common-entry-and-dispatch path/branch and zazzcode
+Git/GitHub authentication. Commit and push the verified D4 checkpoint only to
+origin/common-entry-and-dispatch, then verify a clean worktree and remote synchronization.
+Report the commit, acceptance results, remaining limitations and next checkpoint, then stop.
+
+No paid model calls, live-key use, target execution/dependency installation, sample-app
+changes, historical raw-answer edits or stale-answer replay. No new worktrees, PR creation,
+merges, integration pushes or later-deliverable implementation. Local loopback stubs are
+allowed; resolve sandbox socket restrictions through permitted access, never a paid API.
 ```
 
 ## 13. Implementation and review change log
@@ -195,3 +243,8 @@ and later application evaluation. Product implementation has not started.
 
 2026-11-03 — User requested one ignored run log per deliverable; updated log paths
 and resume prompts. This changes execution tracking only, with no product/test change.
+
+2026-11-04 — Prepared §12 as a self-contained unattended implementation prompt for a
+new chat. It names the completed D3 checkpoint, predecessor logs, single-agent scope,
+recovery/verification duties and explicit future D4 commit/push authorization when invoked.
+This edit changes execution instructions only; D4 implementation has not started.

@@ -242,6 +242,16 @@ source-reviewed fixtures supply initial acceptance, with application evaluation 
   and direct local factories with literal arguments and directly returned handlers.
   Retain expansion site, row and factory call/closure bindings. Runtime data, mutation,
   recursion and unresolved wrappers remain gaps. Preserve existing finale persistence models.
+- Python dynamic HTTP: bounded existing Flask/Blueprint `add_url_rule` and generated
+  FastAPI/APIRouter decorators, verified local factory arguments and captured values, and
+  finite local-source registry/member selection. The mandatory target is the pinned
+  [VulnPy trace acceptance](../specifications/common-entry-dispatch-05-dynamic-http.md#vulnpy-acceptance-target-and-required-traces),
+  including imported trigger selection and nested callback/cursor propagation to actual SQL
+  sinks and generated raw HTML responses. Derive finite alternatives from parsed local
+  declarations and evidenced naming/lookup operations; never execute imports/reflection or
+  hardcode the sample's endpoint map. Retain unsupported members, mutation, external/runtime
+  lookup and reached-limit gaps. Other VulnPy frameworks/families and unrelated template
+  hardening are outside this subset. Existing static Python routes/evidence remain intact.
 - GraphQL: verified `@apollo/server` `ApolloServer({typeDefs, resolvers})`, literal SDL
   and literal resolver maps, supported local/imported named resolver functions. Include
   Query/Mutation and explicitly bound object-field resolvers. Support a local literal

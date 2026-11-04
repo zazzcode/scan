@@ -18,7 +18,7 @@ This index owns ordering and milestone-wide verification, not a separate executi
 | 2 | [Existing consumers and compatibility](common-entry-dispatch-02-consumers-compatibility.md) | Implemented: real HTTP/browser contexts, schema3 and saved schemas1/2 compatibility | JS/TS HTTP; Python/browser; judge/report/schema cutover |
 | 3 | [Reports and selectors](common-entry-dispatch-03-reporting-selectors.md) | Entry-specific HTML/text/SARIF; typed checks and entry filters | Presentation/locations; selectors; visual checks |
 | 4 | [Browser events](common-entry-dispatch-04-browser-events.md) | Explicit event/callback entries and event-source flow | Binding; source/control pairs; reports |
-| 5 | [Dynamic HTTP](common-entry-dispatch-05-dynamic-http.md) | Bounded finite registration/factory dispatch | Literal tables; factory/closure contexts; bounds |
+| 5 | [Dynamic HTTP](common-entry-dispatch-05-dynamic-http.md) | Bounded Express/Python registration and dispatch; real VulnPy traces/findings | Literal tables; factory/closure contexts; Python registry/callbacks; sample acceptance |
 | 6 | [Node.js GraphQL](common-entry-dispatch-06-graphql.md) | Schema field/resolver analysis and resolver-specific reports | SDL/binding; input/SQL pairs; exports |
 | 7 | [Node.js gRPC](common-entry-dispatch-07-grpc.md) | Unary service/method handler analysis and gRPC reports | Proto/binding; input/SQL pairs; exports |
 | 8 | [Acceptance and behavior reports](common-entry-dispatch-08-acceptance.md) | Existing regressions verified and improvements demonstrated | Mixed fixture; full checks; report inspection |
