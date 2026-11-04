@@ -1,8 +1,6 @@
 package parse
 
 import (
-	"strings"
-
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	"github.com/zazzcode/zazzles/internal/analysis"
 )
@@ -126,12 +124,7 @@ func (s *moduleSet) chainEvidence(report *analysis.AnalysisReport, check analysi
 }
 
 func fieldDependency(d analysis.Dependency, fields []string) bool {
-	for _, field := range fields {
-		if strings.HasSuffix(d.Source.Text, ".body."+field) || strings.HasSuffix(d.Source.Text, ".query."+field) || strings.HasSuffix(d.Source.Text, ".params."+field) {
-			return true
-		}
-	}
-	return false
+	return analysis.MatchesFields(d, fields)
 }
 
 func evidenceRoles(context []analysis.Evidence) map[string][]analysis.Evidence {

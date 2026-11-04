@@ -5,8 +5,8 @@ Milestone deliverable: 3 of 8. Project and Deliverable Owner: Michael.
 Drafted: 2026-11-03. Execution tracking: deliverable-specific ignored local run log only.
 Coordination: one Contributor Agent working in the assigned worktree; no delegation required.
 Proposed review shape: one milestone draft PR into `stage`, human review/merge.
-The user requested design/specification now and will request implementation later.
-This document does not itself authorize implementation, publishing, paid calls or merging.
+The user authorized deliverable 3 implementation, verification, commit and feature-branch
+push on 2026-11-03. Paid calls, later deliverables, integration pushes and merging remain outside scope.
 
 ## 0. Capability
 
@@ -150,17 +150,17 @@ record exact partial changes and failing checks, without claiming this deliverab
 
 ## 9. Definition of done
 
-- [ ] Required source/standards read and current scope verified.
-- [ ] All acceptance criteria have passing, cited evidence; affected regressions explained.
-- [ ] Scoped tests/race checks and diff checks pass; only changed Go files formatted.
-- [ ] Required offline reports/manual review performed where this slice changes output.
-- [ ] Remaining gaps, exact artifact locations and next checkpoint recorded.
-- [ ] No out-of-scope change, fabricated protection or stale-response replay.
-- [ ] User receives the completed slice and any remaining unchecked acceptance items.
+- [x] Required source/standards read and current scope verified.
+- [x] All acceptance criteria have passing, cited evidence; affected regressions explained.
+- [x] Scoped tests/race checks and diff checks pass; only changed Go files formatted.
+- [x] Required offline reports/manual review performed where this slice changes output.
+- [x] Remaining gaps, exact artifact locations and next checkpoint recorded.
+- [x] No out-of-scope change, fabricated protection or stale-response replay.
+- [x] User receives the completed slice and any remaining unchecked acceptance items.
 
 ## 10. Open questions
 
-No deliverable-specific blocker remains beyond user review of the proposed design/scope.
+No deliverable-specific open scope decision remains.
 Node.js GraphQL is first new server support; Apollo and grpc-js are concrete bounded
 implementation choices, adjustable by user steering. The user's future GraphQL test app
 is deferred evaluation, not a dependency. Resolve any materially new choice before its
@@ -197,3 +197,21 @@ and later application evaluation. Product implementation has not started.
 
 2026-11-03 — User requested one ignored run log per deliverable; updated log paths
 and resume prompts. This changes execution tracking only, with no product/test change.
+
+2026-11-03 — Implemented deliverable 3 only after explicit user authorization. Shared
+entry projection supplies HTTP/browser/GraphQL/gRPC/unknown identities and details to
+HTML/text/SARIF. Canonical sink/related locations and zero-use invocation coverage remain
+separate from security findings. Added intersecting entry-kind/ID filters and normalized
+tagged checks with per-context requirements, match identities/counts and explicit gaps.
+Existing check kinds and HTTP/browser analysis semantics are retained; no new adapter
+is implied by selector/presenter support.
+
+Acceptance evidence: `TestEntrySpecificReports` (including parsed JS/TS/Python/browser
+pipeline coverage), `TestEntrySARIFLocations`, `TestEntrySelectors` in analysis/parse/CLI,
+`TestEntrySelectorsContextIsolation`, and `TestEntryReportStatusParity` pass. Scoped
+packages pass race tests; provider stub/replay and Python decision-to-report pipeline
+regressions pass in `internal/judge`. Mixed-entry and HTTP-only offline HTML were reviewed
+in a browser for labels, disclosure, sorting, keyboard activation and narrow layout.
+Exact commands, artifacts/hashes, sample parity and publication checkpoint are retained
+in the separate ignored deliverable 3 run log. This closes deliverable 3; deliverable 4
+requires a separate assignment.

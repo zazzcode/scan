@@ -1,4 +1,12 @@
 {
+  "check_matches": [
+    {
+      "check_id": "login-input",
+      "entry_id": "entry:v1:a0a8a4f6787db87f0f4b65e7698f7ee9efe745cc909d2eb38463b469369b9b21",
+      "invocation_context_id": "invocation:v1:9df29f853aaae156284a56d6d2a2cd7603bb763569688f5bf872c6dfbd5e7ec8",
+      "use_count": 1
+    }
+  ],
   "schema_version": 3,
   "root": "testdata/string-flow",
   "registrations": [

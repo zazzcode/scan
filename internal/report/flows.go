@@ -2,7 +2,6 @@ package report
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/zazzcode/zazzles/internal/analysis"
 )
@@ -27,12 +26,7 @@ func checkedDependency(d analysis.Dependency, use analysis.CandidateUse) bool {
 	if use.Check == nil {
 		return true
 	}
-	for _, field := range use.Check.Fields {
-		if strings.HasSuffix(d.Source.Text, ".body."+field) || strings.HasSuffix(d.Source.Text, ".query."+field) || strings.HasSuffix(d.Source.Text, ".params."+field) {
-			return true
-		}
-	}
-	return false
+	return analysis.MatchesFields(d, use.Check.Fields)
 }
 
 func codeFlows(report *analysis.AnalysisReport, use analysis.CandidateUse) []any {

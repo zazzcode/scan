@@ -14,7 +14,7 @@ func (s *moduleSet) buildEntryChecks(report *analysis.AnalysisReport, checks []a
 		s.contextFields = check.Fields
 		context, chainGaps := s.chainEvidence(report, check)
 		if len(context) == 0 {
-			report.Gaps = append(report.Gaps, analysis.Gap{Kind: "check_route_missing", Detail: check.ID + ": declared method/path was not resolved"})
+			report.Gaps = append(report.Gaps, analysis.Gap{Kind: "check_context_unresolved", Detail: check.ID + ": selected invocation evidence was not resolved"})
 			continue
 		}
 		if check.Kind == "sql_query" || check.Kind == "nosql_query" {
@@ -288,31 +288,59 @@ func (s *moduleSet) queryBinding(use analysis.CandidateUse) []analysis.Evidence 
 func (s *moduleSet) buildChecks(report *analysis.AnalysisReport, checks []analysis.Check) {
 	selected := []analysis.CandidateUse{}
 	for _, check := range checks {
-		matched := false
 		for _, entry := range report.Entries {
-			if entry.HTTP == nil || entry.HTTP.Method != check.Method || entry.HTTP.Path != check.Path {
+			selector := check.NormalizedSelector()
+			if !selector.Matches(entry) {
 				continue
 			}
-			matched = true
-			scoped := *report
-			scoped.Entries = []analysis.EntryPoint{entry}
-			scoped.Uses = nil
-			scoped.Gaps = nil
-			for _, u := range report.Uses {
-				if u.EntryID == entry.ID {
-					scoped.Uses = append(scoped.Uses, u)
+			contexts := []analysis.InvocationContext{}
+			for _, ctx := range report.InvocationContexts {
+				if ctx.EntryID == entry.ID && selector.MatchesContext(report, ctx) {
+					contexts = append(contexts, ctx)
 				}
 			}
-			s.buildEntryChecks(&scoped, []analysis.Check{check})
-			for _, u := range scoped.Uses {
-				if u.Kind != "input_validation_candidate" {
-					selected = append(selected, u)
+			for _, ctx := range contexts {
+				scoped := *report
+				scopedEntry := entry
+				for _, b := range report.DispatchBindings {
+					if b.ID == ctx.DispatchBindingID {
+						for _, reg := range report.Registrations {
+							if reg.ID == b.RegistrationID {
+								scopedEntry.Location = reg.Origin
+							}
+						}
+					}
 				}
+				scoped.Entries = []analysis.EntryPoint{scopedEntry}
+				scoped.Uses = nil
+				scoped.Gaps = nil
+				for _, u := range report.Uses {
+					if u.EntryID == entry.ID && (u.InvocationContextID == ctx.ID || u.InvocationContextID == "") {
+						scoped.Uses = append(scoped.Uses, u)
+					}
+				}
+				if entry.Kind == "http" {
+					legacy := check
+					legacy.Method = entry.HTTP.Method
+					legacy.Path = entry.HTTP.Path
+					s.buildEntryChecks(&scoped, []analysis.Check{legacy})
+					for i := range scoped.Uses {
+						if scoped.Uses[i].Check != nil && scoped.Uses[i].Check.ID == check.ID {
+							copy := check
+							scoped.Uses[i].Check = &copy
+							scoped.Uses[i].InvocationContextID = ctx.ID
+						}
+					}
+				} else {
+					applyContextCheck(&scoped, check, entry, ctx)
+				}
+				for _, u := range scoped.Uses {
+					if u.Kind != "input_validation_candidate" {
+						selected = append(selected, u)
+					}
+				}
+				report.Gaps = append(report.Gaps, scoped.Gaps...)
 			}
-			report.Gaps = append(report.Gaps, scoped.Gaps...)
-		}
-		if !matched {
-			report.Gaps = append(report.Gaps, analysis.Gap{Kind: "check_route_missing", Detail: check.ID + ": declared method/path was not resolved"})
 		}
 	}
 	for _, u := range report.Uses {
@@ -321,4 +349,53 @@ func (s *moduleSet) buildChecks(report *analysis.AnalysisReport, checks []analys
 		}
 	}
 	report.Uses = selected
+}
+
+// applyContextCheck carries declared requirements onto existing evidence only.
+// Unsupported or zero-use contexts retain coverage gaps rather than invented sinks.
+func applyContextCheck(r *analysis.AnalysisReport, check analysis.Check, entry analysis.EntryPoint, ctx analysis.InvocationContext) {
+	selected := []analysis.CandidateUse{}
+	for _, old := range r.Uses {
+		if old.EntryID != entry.ID || old.InvocationContextID != ctx.ID || old.Kind != check.Kind+"_candidate" {
+			continue
+		}
+		use := old
+		use.ID += "/" + check.ID
+		copy := check
+		use.Check = &copy
+		use.Assessment = analysis.Assessment{Status: "not_run"}
+		if old.Completeness != nil {
+			c := *old.Completeness
+			c.Required = append([]string(nil), c.Required...)
+			c.Blockers = append([]analysis.Gap(nil), c.Blockers...)
+			c.Evidence = map[string][]analysis.Evidence{}
+			for role, items := range old.Completeness.Evidence {
+				c.Evidence[role] = append([]analysis.Evidence(nil), items...)
+			}
+			use.Completeness = &c
+		} else {
+			use.Completeness = &analysis.Completeness{Required: []string{"entry_registration", "dispatch_binding", "invoked_callable", "input_source", "sink_binding"}, Evidence: evidenceRoles(use.Context), Blockers: []analysis.Gap{{Kind: "check_evidence_unresolved", Detail: "operation claim completeness was not established"}}}
+		}
+		sources := []analysis.Evidence{}
+		for _, d := range use.Dependencies {
+			if fieldDependency(d, check.Fields) {
+				sources = append(sources, d.Source)
+			}
+		}
+		use.Completeness.Evidence["input_source"] = sources
+		selected = append(selected, use)
+	}
+	if len(selected) == 0 {
+		r.Gaps = append(r.Gaps, analysis.Gap{Kind: "check_operation_missing", Detail: check.ID + ": no supported operation matched in entry " + entry.ID + " context " + ctx.ID, At: entry.Location.Span})
+	}
+	r.Uses = selected
+}
+
+func checkContextMatches(r *analysis.AnalysisReport, c analysis.Check, u analysis.CandidateUse) bool {
+	for _, ctx := range r.InvocationContexts {
+		if ctx.ID == u.InvocationContextID {
+			return c.NormalizedSelector().MatchesContext(r, ctx)
+		}
+	}
+	return false
 }

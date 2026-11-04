@@ -13,6 +13,7 @@ import (
 	"os"
 	"sort"
 
+	"github.com/zazzcode/zazzles/internal/analysis"
 	"github.com/zazzcode/zazzles/internal/lang"
 	"github.com/zazzcode/zazzles/internal/parse"
 	"github.com/zazzcode/zazzles/internal/walk"
@@ -42,6 +43,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 		list          = flags.Bool("list", false, "list the source files under the target path and exit")
 		routes        = flags.Bool("routes", false, "emit supported route inventories and exit")
 		analyzeMode   = flags.Bool("analyze", false, "analyze bounded route/browser security evidence; add --judge for model assessment")
+		entryKind     = flags.String("entry-kind", "", "select http, browser, graphql or grpc entries for --analyze")
+		entryID       = flags.String("entry-id", "", "select an exact snapshot entry ID for --analyze")
 		routeFilter   = flags.String("route", "", "optional exact route path pattern for --analyze")
 		checksFile    = flags.String("checks", "", "JSON file declaring route/method/field security requirements for --analyze")
 		entry         = flags.String("entry", "", "relative JS/TS/Python registration file for --analyze")
@@ -75,7 +78,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return exitUsage
 	}
 	if *exportFile != "" || *exportHTML != "" {
-		if (*exportFile != "" && *exportHTML != "") || flags.NArg() != 0 || *list || *routes || *analyzeMode || *asJSON || *asSARIF || *entry != "" || *routeFilter != "" || *checksFile != "" || *judgeProvider != "" || *judgeModel != "" {
+		if (*exportFile != "" && *exportHTML != "") || flags.NArg() != 0 || *list || *routes || *analyzeMode || *asJSON || *asSARIF || *entry != "" || *routeFilter != "" || *entryKind != "" || *entryID != "" || *checksFile != "" || *judgeProvider != "" || *judgeModel != "" {
 			flags.Usage()
 			return exitUsage
 		}
@@ -90,13 +93,17 @@ func run(args []string, stdout, stderr io.Writer) int {
 			modes++
 		}
 	}
-	if (*asSARIF && (*asJSON || !*analyzeMode)) || modes != 1 || flags.NArg() != 1 || *judgeLimit < 1 || (!*analyzeMode && (*checksFile != "" || *entry != "" || *routeFilter != "" || *judgeProvider != "" || *judgeModel != "")) || (*judgeProvider == "" && *judgeModel != "") {
+	if (*asSARIF && (*asJSON || !*analyzeMode)) || modes != 1 || flags.NArg() != 1 || *judgeLimit < 1 || (!*analyzeMode && (*checksFile != "" || *entry != "" || *routeFilter != "" || *entryKind != "" || *entryID != "" || *judgeProvider != "" || *judgeModel != "")) || (*judgeProvider == "" && *judgeModel != "") {
 		flags.Usage()
 		return exitUsage
 	}
 
+	if *entryKind != "" && !analysis.KnownEntryKind(*entryKind) {
+		fmt.Fprintln(stderr, "scan: invalid entry kind")
+		return exitUsage
+	}
 	if *analyzeMode {
-		return runAnalysis(flags.Arg(0), *entry, *routeFilter, *checksFile, *judgeProvider, *judgeModel, *judgeLimit, *asJSON, *asSARIF, *outputDir, stdout, stderr)
+		return runAnalysis(flags.Arg(0), *entry, *checksFile, *judgeProvider, *judgeModel, *judgeLimit, *asJSON, *asSARIF, *outputDir, stdout, stderr, analysis.EntrySelection{RegistrationFile: *entry, Route: *routeFilter, Kind: *entryKind, ID: *entryID})
 	}
 	if *routes {
 		return runRoutes(flags.Arg(0), *asJSON, stdout, stderr)

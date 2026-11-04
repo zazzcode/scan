@@ -9,7 +9,7 @@
         for (const item of entry.querySelectorAll('article.finding')) {
           item.hidden = hide && item.dataset.recordType === 'protection';
         }
-        entry.hidden = hide && Number(entry.dataset.findings) === 0 && Number(entry.dataset.review) === 0;
+        entry.hidden = hide && Number(entry.dataset.protected) > 0 && Number(entry.dataset.findings) === 0 && Number(entry.dataset.review) === 0 && Number(entry.dataset.gaps) === 0;
       }
       if (filterStatus) filterStatus.textContent = hide
         ? 'Showing open Findings and Review items. Protected results are hidden; total counts and saved evidence are unchanged.'
@@ -50,8 +50,8 @@
         control.querySelector('.sort-direction').textContent = active ? (direction === 'asc' ? ' ↑' : ' ↓') : ' ↕';
       }
       status.textContent = column === 'findings'
-        ? `Sorted by Findings, then Review, then Protected (${direction === 'desc' ? 'highest' : 'lowest'} first), then route path A–Z and method.`
-        : `Sorted by route path ${direction === 'asc' ? 'A–Z' : 'Z–A'}, then method; unresolved entries last.`;
+        ? `Sorted by Findings, then Review, then Protected (${direction === 'desc' ? 'highest' : 'lowest'} first), then entry label A–Z and method.`
+        : `Sorted by entry label ${direction === 'asc' ? 'A–Z' : 'Z–A'}, then method; unresolved entries last.`;
     });
   }
 })();

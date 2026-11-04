@@ -487,3 +487,137 @@ func gapKind(gaps []analysis.Gap, kind string) bool {
 	}
 	return false
 }
+
+func TestEntrySelectors(t *testing.T) {
+	for _, tc := range []struct{ name, file, source string }{
+		{"http", "app.ts", `import express from 'express';import {Sequelize} from 'sequelize';const db=new Sequelize('sqlite::memory:');const a=express();const b=express();function handler(req,res){db.query('SELECT '+req.query.email)}a.get('/same',handler);b.get('/same',handler);`},
+		{"python", "app.py", "from flask import Flask, request\nimport sqlite3\napp=Flask(__name__)\n@app.route('/same')\ndef view():\n    db=sqlite3.connect('test.db')\n    return db.execute('SELECT '+request.args.get('email')).fetchall()\n"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			root := t.TempDir()
+			writeSource(t, root, tc.file, tc.source)
+			c := analysis.Check{ID: "typed", Selector: &analysis.EntrySelector{Kind: "http", Method: "GET", Path: "/same", RegistrationFile: tc.file}, Kind: "sql_query", Fields: []string{"email", "query.email"}, Validation: "explicit field policy", Protection: "data only"}
+			r, err := AnalyzeWithChecks(root, tc.file, []analysis.Check{c})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(r.CheckMatches) == 0 {
+				t.Fatal("no context selection metadata")
+			}
+			seen := map[string]bool{}
+			for _, u := range r.Uses {
+				if u.Check != nil && u.Check.ID == "typed" {
+					if u.Check.Selector == nil || u.InvocationContextID == "" || seen[u.InvocationContextID] {
+						t.Fatal("lost/duplicated contextual requirement")
+					}
+					seen[u.InvocationContextID] = true
+				}
+			}
+			if len(seen) != len(r.CheckMatches) {
+				t.Fatalf("uses=%d matched contexts=%d gaps=%+v", len(seen), len(r.CheckMatches), r.Gaps)
+			}
+			if tc.name == "http" && len(seen) != 2 {
+				t.Fatal("same callable lost separate app contexts")
+			}
+			second := c
+			second.ID = "second-policy"
+			both, err := AnalyzeWithChecks(root, tc.file, []analysis.Check{c, second})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(both.CheckMatches) != 2*len(r.CheckMatches) {
+				t.Fatal("second check replaced first requirement")
+			}
+			for _, match := range both.CheckMatches {
+				if match.UseCount != 1 {
+					t.Fatalf("context requirement not evaluated independently: %+v", match)
+				}
+			}
+			c.Selector.Path = "/absent"
+			r, err = AnalyzeWithChecks(root, tc.file, []analysis.Check{c})
+			if err != nil {
+				t.Fatal(err)
+			}
+			found := false
+			for _, g := range r.Gaps {
+				found = found || g.Kind == "check_selector_missing"
+			}
+			if !found || len(r.CheckMatches) != 0 {
+				t.Fatal("zero matches hidden")
+			}
+		})
+	}
+	t.Run("browser zero operation", func(t *testing.T) {
+		root := t.TempDir()
+		writeSource(t, root, "browser.js", `document.body.innerHTML=location.hash`)
+		r, err := Analyze(root, "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		var e analysis.EntryPoint
+		for _, entry := range r.Entries {
+			if entry.Kind == "browser" {
+				e = entry
+			}
+		}
+		c := analysis.Check{ID: "browser-check", Selector: &analysis.EntrySelector{Kind: "browser", Category: e.Browser.Category, Name: e.Name}, Kind: "sql_query"}
+		r, err = AnalyzeWithChecks(root, "", []analysis.Check{c})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(r.CheckMatches) != 1 || r.CheckMatches[0].UseCount != 0 {
+			t.Fatalf("missing zero-use context metadata: %+v", r.CheckMatches)
+		}
+		found := false
+		for _, g := range r.Gaps {
+			found = found || g.Kind == "check_operation_missing"
+		}
+		if !found {
+			t.Fatal("missing operation gap hidden")
+		}
+	})
+}
+
+func TestEntrySelectorsContextIsolation(t *testing.T) {
+	for _, kind := range []string{"graphql", "grpc", "browser"} {
+		t.Run(kind, func(t *testing.T) {
+			e := analysis.EntryPoint{ID: "entry", Kind: kind, Name: "Component", GraphQL: nil}
+			sel := analysis.EntrySelector{Kind: kind}
+			switch kind {
+			case "graphql":
+				e.GraphQL = &analysis.GraphQLEntryMetadata{Type: "Query", Field: "search"}
+				sel.Type = "Query"
+				sel.Field = "search"
+			case "grpc":
+				e.GRPC = &analysis.GRPCEntryMetadata{Service: "Search", Method: "Find"}
+				sel.Service = "Search"
+				sel.Method = "Find"
+			case "browser":
+				e.Browser = &analysis.BrowserEntryMetadata{Category: "component"}
+				sel.Category = "component"
+				sel.Name = "Component"
+			}
+			r := &analysis.AnalysisReport{Entries: []analysis.EntryPoint{e}, InvocationContexts: []analysis.InvocationContext{{ID: "a", EntryID: e.ID}, {ID: "b", EntryID: e.ID}}}
+			for _, id := range []string{"a", "b"} {
+				gaps := []analysis.Gap{}
+				if id == "b" {
+					gaps = append(gaps, analysis.Gap{Kind: "unknown_guard"})
+				}
+				r.Uses = append(r.Uses, analysis.CandidateUse{ID: id, EntryID: e.ID, InvocationContextID: id, Kind: "sql_query_candidate", Dependencies: []analysis.Dependency{{Source: analysis.Evidence{Text: "args.email"}}}, Completeness: &analysis.Completeness{Required: []string{"input_source"}, Evidence: map[string][]analysis.Evidence{}, Blockers: gaps}})
+			}
+			s := &moduleSet{}
+			s.buildChecks(r, []analysis.Check{{ID: "typed", Selector: &sel, Kind: "sql_query", Fields: []string{"args.email"}}})
+			if len(r.Uses) != 2 {
+				t.Fatal("not every context evaluated")
+			}
+			for _, u := range r.Uses {
+				if len(u.Completeness.Evidence["input_source"]) != 1 {
+					t.Fatal("source role lost")
+				}
+				if (len(u.Completeness.Blockers) > 0) != (u.InvocationContextID == "b") {
+					t.Fatal("guard crossed contexts")
+				}
+			}
+		})
+	}
+}

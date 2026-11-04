@@ -42,7 +42,7 @@ func (s *moduleSet) automaticQueries(report *analysis.AnalysisReport) {
 			Validation: "Assess only field requirements established by the supplied code; missing business constraints remain uncertain.",
 			Protection: "Untrusted input must remain data and must not change executable query syntax or selector operators. Evaluate actual transformations and enforcing guards separately from construction practice."}
 		tmp := &analysis.AnalysisReport{Entries: []analysis.EntryPoint{entry}, Uses: []analysis.CandidateUse{old}}
-		s.buildChecks(tmp, []analysis.Check{check})
+		s.buildEntryChecks(tmp, []analysis.Check{check})
 		for _, assembled := range tmp.Uses {
 			if assembled.Kind == old.Kind {
 				assembled.ID = old.ID

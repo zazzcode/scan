@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io"
 	"sort"
+	"strings"
 
 	"github.com/zazzcode/zazzles/internal/analysis"
 )
@@ -29,6 +30,8 @@ type htmlRow struct {
 	ID, SourceType, Signature   string
 	Path, Method                string
 	Location                    analysis.Span
+	Details                     []entryDetail
+	Locations                   []analysis.Evidence
 	Items                       []htmlItem
 	Types                       []htmlTypePill
 	Gaps                        []analysis.Gap
@@ -38,34 +41,35 @@ type htmlView struct {
 	SortScript                  template.JS
 	ScriptHash                  string
 	Glossary                    []analysis.FindingType
+	CheckMatches                []analysis.CheckMatch
 	Root                        string
 	Rows                        []*htmlRow
 	ClientRows                  []*htmlRow
 	Gaps                        []analysis.Gap
 	Limitations                 []string
+	EntryCount                  int
 	Findings, Review, Protected int
 }
 
 // HTML renders a standalone snapshot with native disclosure rows and no network resources.
 func HTML(w io.Writer, r *analysis.AnalysisReport) error {
 	Enrich(r)
-	v := htmlView{Glossary: r.FindingTypes, Root: r.Root, Gaps: r.Gaps, Limitations: r.Limitations}
+	v := htmlView{CheckMatches: r.CheckMatches, Glossary: r.FindingTypes, Root: r.Root, Gaps: r.Gaps, Limitations: r.Limitations}
 	hash := sha256.Sum256([]byte(sortSource))
 	v.ScriptHash = base64.StdEncoding.EncodeToString(hash[:])
 	// Trust only the compiled-in script. Report/source values stay escaped in data attributes.
 	v.SortScript = template.JS(sortSource)
 	rows := map[string]*htmlRow{}
 	for _, e := range r.Entries {
-		row := &htmlRow{ID: e.ID, SourceType: e.Kind, Signature: e.Name, Location: e.Location.Span, Gaps: r.EntryGaps(e.ID)}
-		if e.HTTP != nil {
+		view := entryDetails(r, e)
+		row := &htmlRow{ID: e.ID, SourceType: e.Kind, Signature: view.Label, Path: view.Label, Location: e.Location.Span, Gaps: r.EntryGaps(e.ID), Details: view.Details, Locations: view.Locations}
+		if e.Kind == "http" && e.HTTP != nil {
 			row.SourceType = "HTTP route"
 			row.Path = e.HTTP.Path
 			row.Method = e.HTTP.Method
-			row.Signature = e.HTTP.Method + " " + e.HTTP.Path
 		}
-		if e.Browser != nil {
-			row.SourceType = "Browser " + e.Browser.Category
-			row.Path = e.Location.Span.File
+		if e.Kind == "browser" {
+			row.SourceType = "Browser entry"
 		}
 		rows[e.ID] = row
 		v.Rows = append(v.Rows, row)
@@ -75,7 +79,7 @@ func HTML(w io.Writer, r *analysis.AnalysisReport) error {
 
 		row := rows[identity]
 		if row == nil {
-			row = &htmlRow{ID: u.EntryID, SourceType: "Unresolved entry", Signature: "Route association unavailable"}
+			row = &htmlRow{ID: u.EntryID, SourceType: "Unresolved entry", Signature: "Entry association unavailable: " + u.EntryID, Path: u.EntryID}
 			rows[u.EntryID] = row
 			v.Rows = append(v.Rows, row)
 		}
@@ -115,11 +119,15 @@ func HTML(w io.Writer, r *analysis.AnalysisReport) error {
 		if a.Path != b.Path {
 			return a.Path < b.Path
 		}
-		return a.Method < b.Method
+		if a.Method != b.Method {
+			return a.Method < b.Method
+		}
+		return a.ID < b.ID
 	})
+	v.EntryCount = len(v.Rows)
 	serverRows := make([]*htmlRow, 0, len(v.Rows))
 	for _, row := range v.Rows {
-		if len(row.SourceType) >= 8 && row.SourceType[:8] == "Browser " {
+		if strings.HasPrefix(row.SourceType, "Browser ") {
 			v.ClientRows = append(v.ClientRows, row)
 		} else {
 			serverRows = append(serverRows, row)

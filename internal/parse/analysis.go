@@ -20,7 +20,13 @@ func Analyze(root, entry string) (*analysis.AnalysisReport, error) {
 }
 
 // AnalyzeWithChecks assembles security evidence with optional declared requirements.
-func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (*analysis.AnalysisReport, error) {
+func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (result *analysis.AnalysisReport, resultErr error) {
+	defer func() {
+		if resultErr == nil && result != nil {
+			result.RecordCheckMatches(checks)
+		}
+	}()
+
 	entry = filepath.ToSlash(filepath.Clean(entry))
 	if entry == "." {
 		entry = ""

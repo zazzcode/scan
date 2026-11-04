@@ -194,18 +194,19 @@ func (s *pythonSet) linkStorage(out *analysis.AnalysisReport) {
 	}
 }
 func (s *pythonSet) attachChecks(out *analysis.AnalysisReport, checks []analysis.Check) {
-	for _, check := range checks {
-		matched := false
-		for i := range out.Uses {
-			u := &out.Uses[i]
-			if check.Kind != "sql_query" || u.Kind != "sql_query_candidate" {
+	selected := []analysis.CandidateUse{}
+	matched := map[string]bool{}
+	for _, old := range out.Uses {
+		attached := false
+		for _, check := range checks {
+			if check.Kind != "sql_query" || old.Kind != "sql_query_candidate" || !checkContextMatches(out, check, old) {
 				continue
 			}
 			fieldMatch := false
-			for _, d := range u.Dependencies {
+			for _, d := range old.Dependencies {
 				for _, field := range check.Fields {
-					for _, t := range d.Transfers {
-						fieldMatch = fieldMatch || (t.Kind == "field_projection" && t.Text == field)
+					for _, transfer := range d.Transfers {
+						fieldMatch = fieldMatch || (transfer.Kind == "field_projection" && transfer.Text == field)
 					}
 					fieldMatch = fieldMatch || d.Source.Text == field || strings.HasPrefix(d.Source.Text, field+":")
 				}
@@ -213,15 +214,29 @@ func (s *pythonSet) attachChecks(out *analysis.AnalysisReport, checks []analysis
 			if !fieldMatch {
 				continue
 			}
-			for _, e := range out.Entries {
-				if e.HTTPRoute().ID == u.EntryID && e.HTTPRoute().PathPattern == check.Path && (check.Method == "" || strings.EqualFold(check.Method, e.HTTPRoute().Method)) {
+			for _, entry := range out.Entries {
+				if entry.ID == old.EntryID && check.NormalizedSelector().Matches(entry) {
+					use := old
 					copy := check
-					u.Check = &copy
-					matched = true
+					use.Check = &copy
+					use.ID += "/" + check.ID
+					selected = append(selected, use)
+					attached = true
+					matched[check.ID] = true
 				}
 			}
 		}
-		if !matched {
+		if !attached {
+			selected = append(selected, old)
+		}
+	}
+	out.Uses = selected
+	for _, check := range checks {
+		entryMatched := false
+		for _, e := range out.Entries {
+			entryMatched = entryMatched || check.NormalizedSelector().Matches(e)
+		}
+		if entryMatched && !matched[check.ID] {
 			out.Gaps = append(out.Gaps, analysis.Gap{Kind: "python_check_unresolved", Detail: "No supported operation matched check " + check.ID})
 		}
 	}

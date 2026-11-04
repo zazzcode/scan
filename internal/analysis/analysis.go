@@ -62,6 +62,8 @@ type AnalysisReport struct {
 	FindingTypes        []FindingType       `json:"finding_types,omitempty"`
 	PresentationVersion int                 `json:"presentation_version,omitempty"`
 	Findings            []Finding           `json:"findings,omitempty"`
+	SelectedScope       *EntrySelection     `json:"selected_scope,omitempty"`
+	CheckMatches        []CheckMatch        `json:"check_matches,omitempty"`
 	SelectedRoute       string              `json:"selected_route,omitempty"`
 	SchemaVersion       int                 `json:"schema_version"`
 	Root                string              `json:"root"`
@@ -88,13 +90,14 @@ type GuidelinesRef struct {
 
 // Check declares a security requirement independently of the expected test answer.
 type Check struct {
-	ID         string   `json:"id"`
-	Method     string   `json:"method"`
-	Path       string   `json:"path"`
-	Kind       string   `json:"kind"`
-	Fields     []string `json:"fields"`
-	Validation string   `json:"validation"`
-	Protection string   `json:"protection"`
+	Selector   *EntrySelector `json:"selector,omitempty"`
+	ID         string         `json:"id"`
+	Method     string         `json:"method,omitempty"`
+	Path       string         `json:"path,omitempty"`
+	Kind       string         `json:"kind"`
+	Fields     []string       `json:"fields"`
+	Validation string         `json:"validation"`
+	Protection string         `json:"protection"`
 }
 
 // Completeness separates claim blockers from unrelated coverage limitations.

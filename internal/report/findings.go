@@ -9,7 +9,7 @@ import (
 // Enrich adds deterministic display records while preserving raw evidence and assessments.
 // Rebuilding from uses also lets older saved reports use the current presentation guidelines.
 func Enrich(r *analysis.AnalysisReport) {
-	r.PresentationVersion = 5
+	r.PresentationVersion = 6
 	r.FindingTypes = append([]analysis.FindingType(nil), findingTypes...)
 	r.Findings = make([]analysis.Finding, 0, len(r.Uses))
 	for _, u := range r.Uses {

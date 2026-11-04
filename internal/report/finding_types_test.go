@@ -83,7 +83,7 @@ func TestHTMLTypePanelsAndDistinctLocations(t *testing.T) {
 		t.Fatal(err)
 	}
 	html := b.String()
-	for _, want := range []string{`<span>Route location</span>`, `server.ts:3`, `Finding location · </span>handler.ts:11`, `class="type-pill poor-practice"`, `popovertarget="glossary-sql-injection"`, `id="glossary-sql-injection" class="glossary-panel" popover="auto"`, `popovertargetaction="hide"`, `aria-labelledby="glossary-heading-sql-injection"`, `SQL Injection <span class="pill-status">· poor practice`, `Input Validation <span class="pill-status">· review`, `Coverage: bounded server response and template analysis`, `id="finding-glossary"`} {
+	for _, want := range []string{`<span>Declaration location</span>`, `server.ts:3`, `Finding location · </span>handler.ts:11`, `class="type-pill poor-practice"`, `popovertarget="glossary-sql-injection"`, `id="glossary-sql-injection" class="glossary-panel" popover="auto"`, `popovertargetaction="hide"`, `aria-labelledby="glossary-heading-sql-injection"`, `SQL Injection <span class="pill-status">· poor practice`, `Input Validation <span class="pill-status">· review`, `Coverage: bounded server response and template analysis`, `id="finding-glossary"`} {
 		if !strings.Contains(html, want) {
 			t.Fatalf("missing %s", want)
 		}

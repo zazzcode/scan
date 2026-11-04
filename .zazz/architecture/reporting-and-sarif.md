@@ -1,4 +1,4 @@
-# Route-oriented findings and SARIF export
+# Entry-oriented findings and SARIF export
 
 **Design and bounded implementation, 2026-10-31.** Use one versioned internal
 model for route analysis, evidence and findings, with SARIF 2.1.0 as an implemented findings
@@ -50,7 +50,7 @@ label email validation alone a sufficient SQL-injection fix or guarantee an impe
 ## Human-readable finding interpretation
 
 Schema-v1 evidence remains compatible. Additive `presentation_version` and `findings` fields describe
-one result record per use. A record includes `id`, `use_id`, `route_id`, `record_type`, `status`, `title`,
+one result record per use. A record includes `id`, `use_id`, `entry_id`, `invocation_context_id`, `record_type`, `status`, `title`,
 `summary`, separate `input_validation` and `use_protection` explanations, `uncertainty`, and
 `recommendations`. Presentation version 2 adds `type_ids` and the report-level `finding_types`
 [glossary](finding-types.md); risk families remain separate from assessment status. Evidence stays in the referenced use; it is not replaced by generated prose.
@@ -153,3 +153,22 @@ for browser roots. SARIF includes generic entry/context properties and entry-lev
 notifications for unknown dispatch, including zero-use entries. Original historical answers,
 classification and source locations remain preserved during offline export. Richer framework
 presenters are a later deliverable; this migration does not add GraphQL/gRPC detection.
+
+## Typed entry projection and selectors
+
+`internal/report/entries.go` owns typed identity and detail projection for HTTP, browser,
+GraphQL, gRPC and unknown entries. Text/HTML/SARIF reuse it; `findings.go` remains the
+single status interpretation. Presentation version 6 preserves contextual counts and
+zero-use coverage without an entry-wide protection assertion.
+
+SARIF uses sink locations first, declaration fallback only when absent, and registration,
+schema/proto and invoked-callable related locations. Results retain `scan.entryId`,
+`scan.entryKind`, `scan.invocationContextId`, typed `scan.entry` and context/dispatch
+properties. Non-HTTP entries have no manufactured `scan.route`. Invocation properties
+preserve zero-use inventory and gaps; these do not generate security results.
+
+`internal/analysis/selectors.go` owns kind-specific selector validation/matching and common
+CLI filter intersection. Check input normalizes legacy HTTP method/path at decoding;
+context-scoped requirement assembly retains existing analysis semantics. Canonical JSON
+includes `selected_scope` and `check_matches` with per-context use counts. See the
+[CLI contract and examples](../../docs/running-scans.md#common-entry-selection-and-tagged-checks).

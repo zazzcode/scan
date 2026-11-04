@@ -105,3 +105,22 @@ Presentation version 3 introduces this distinction. Older schema-v1 evidence rem
 regenerating HTML/SARIF rebuilds the current interpretation from raw uses. Legacy `observed_pattern`
 is not a new verdict. Saved source evidence and model assessments are preserved; previously generated
 views remain snapshots until regenerated. Independent review and runtime confirmation are separate.
+
+## Entry identities and coverage
+
+HTML, text, JSON findings and SARIF share the same contextual statuses. HTML groups by
+entry ID: HTTP method/path, GraphQL schema coordinate, gRPC service/method, or browser
+component/source identity. Unknown kinds and legacy unresolved associations remain
+inspectable with a fallback label. Declaration locations and registration/dispatch/context
+details are separate from the sensitive operation's finding location.
+
+Zero-use entries and unresolved alternatives remain coverage records. Hiding protected
+results retains rows with coverage gaps. A Protected count names scoped claims; it never
+certifies an entire entry, including its unexamined alternatives. Counts are contextual
+uses, so a shared callable can appear under several independently assessed entries.
+
+SARIF keeps the operation/sink primary, with entry declaration, registration/schema/proto
+and callable locations related. Namespaced properties retain typed entry and invocation
+metadata. Entry/scan gaps without uses appear in invocation metadata/notifications, without
+fabricated security results. Saved report exports preserve raw historical answers and do
+not rerun analysis or transfer those answers onto changed requests.

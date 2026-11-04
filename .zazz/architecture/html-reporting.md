@@ -53,16 +53,18 @@ Saved input is capped at 64 MiB by the shared JSON export reader.
 
 ## Entry grid and disclosure
 
-Show one expandable entry per inventoried source, grouped by route ID rather than path alone. Columns:
-source type, method/path signature, **Route location**, finding count, analysis-review count,
-protected-claim count, and row-end finding-type pills in **Categories**. Route location is the source declaration,
+Show one expandable entry per inventoried source, grouped by entry ID rather than path alone. Columns:
+source type, typed entry identity, **Declaration location**, finding count, analysis-review count,
+protected-claim count, and row-end finding-type pills in **Categories**. Declaration location is the source declaration,
 not a finding location. An unresolved entry displays “Not resolved”; operation locations remain
-in the expanded records labeled **Finding location**. Default to descending Findings, Review, Protected counts, then route path A–Z and method. Two keyboard-accessible header buttons sort route path or
+in the expanded records labeled **Finding location**. Default to descending Findings, Review, Protected counts, then entry label A–Z and method. Two keyboard-accessible header buttons sort entry label or
 the grouped Findings/Review/Protected counts. The grouped descending order compares those three
 counts in that priority, then path A–Z and method, leaving empty rows last. Repeated activation
-reverses the selected order. The count block is one control, not three independent sorts. Keep stable input order for ties and place unresolved entries last. Distinct HTTP methods sharing a path remain separate. Today the source type is
-HTTP route; a use without a matching entry appears under an explicit unresolved entry, never an invented
-route. Other entry types require future detector contracts rather than labels inferred by the viewer.
+reverses the selected order. The count block is one control, not three independent sorts. Keep stable input order for ties and place unresolved entries last. Distinct HTTP methods sharing a path remain separate. Presentation version 6 uses typed HTTP/browser/GraphQL/gRPC labels and generic unknown-kind
+fallbacks from `internal/report/entries.go`. Each entry discloses registration, dispatch alternatives,
+callable locations and invocation bindings. Zero-use coverage gaps remain visible, including while
+hiding protected records. Only final claim-level protection is green. A use without a matching
+entry appears under an explicit unresolved entry. Presenters do not imply adapter support.
 
 Native `details` / `summary` elements use CSS Grid to align row summaries. This is a disclosure list
 with column styling, not an ARIA interactive grid. Keyboard activation, visible focus, and native

@@ -17,7 +17,7 @@ func TestClientResultsHaveSeparateHeadingsAndIdentity(t *testing.T) {
 		t.Fatal(err)
 	}
 	text := html.String()
-	for _, heading := range []string{"Server / API routes", "Browser / client-side", "Component / source", "Source location", "SearchComponent", "search.component.html:5"} {
+	for _, heading := range []string{"Server / API entries", "Browser / client-side", "Component / source", "Source location", "SearchComponent", "search.component.html:5"} {
 		if !strings.Contains(text, heading) {
 			t.Fatalf("missing %s", heading)
 		}

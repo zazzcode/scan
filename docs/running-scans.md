@@ -49,12 +49,12 @@ scanner default. You may keep the variable in your ignored `.env`; load it in th
 because the scanner does not automatically read `.env`. It is a local filesystem path, not a URL.
 
 Open the printed `findings.html` path in your browser (on macOS: `open /path/to/run/findings.html`).
-Route rows start with Findings, then Review, then Protected counts (highest first), followed by
-route path A–Z and method; blank rows appear last. Click
-Route signature to sort by path, or the grouped Findings / Review / Protected header to sort by
+Entry rows start with Findings, then Review, then Protected counts (highest first), followed by
+entry label A–Z and method; blank rows appear last. Click
+Entry to sort by entry label, or the grouped Findings / Review / Protected header to sort by
 those counts together (highest first, then path A–Z; blank rows last). Click again to reverse.
 Expanded rows remain open when reordered.
-The **Route location** column points to the route declaration. Each expanded finding has its own
+The **Declaration location** column points to the route declaration. Each expanded finding has its own
 **Finding location**. Row-end type pills identify review areas such as SQL Injection, NoSQL Injection,
 and Input Validation, alongside their poor-practice/review/protected status. Select a pill to open its
 glossary side panel with a definition, coverage, and remediation guidance. A type label alone does
@@ -218,3 +218,34 @@ converted only when reading saved reports. Original schema provenance is retaine
 `source_schema_version` for converted inputs. Saved sample reports retain their
 original assessments and provenance; changed guideline text or model inputs cannot reuse those
 answers as judgments of a new scan. Consumers reading fresh JSON should use `analysis_guidelines`.
+
+## Common entry selection and tagged checks
+
+`--entry` keeps its registration-file scope. `--route` selects HTTP path patterns only.
+Use `--entry-kind http|browser|graphql|grpc` and `--entry-id <exact-snapshot-id>` with
+`--analyze`; filters intersect and an empty selection exits 1. An invalid kind exits 2.
+IDs identify this source snapshot; portable requirements should use typed identities.
+
+```bash
+./bin/scan --analyze --entry-kind browser --json --output-dir "" /path/to/app
+./bin/scan --analyze --entry server.ts --entry-kind http --route /login --json /path/to/app
+```
+
+Checks remain a top-level array of 1–20 records, capped at 64 KiB. Each record uses
+legacy `method`/`path` or a tagged `selector`, never both. Unknown fields and incompatible
+selector fields are rejected. For example, a portable HTTP check is:
+
+```json
+[{"id":"login-sql","selector":{"kind":"http","method":"POST","path":"/login"},"kind":"sql_query","fields":["email"],"validation":"Apply only the application's declared email requirements","protection":"Keep email separate from SQL syntax"}]
+```
+
+Selector identities are HTTP `method`/`path`, GraphQL `type`/`field`, gRPC fully qualified
+`service`/`method`, or browser `category`/`name` with optional `event`. Optional
+`registration_file` narrows any selector to that relative registration file. Selection
+never creates an adapter or an operation: GraphQL/gRPC discovery remains pending their
+adapter deliverables. Check kinds remain `sql_query`, `nosql_query`, and `account_creation`.
+Field names retain their source roles, such as `args.email` or `request.email`.
+
+Every matched invocation context is evaluated separately. JSON `check_matches` records
+entry/context IDs and use counts; `selected_scope` records CLI filters. Zero matches and
+matched contexts without supported operations remain explicit gaps, never protection.
