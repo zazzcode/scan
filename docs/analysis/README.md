@@ -37,3 +37,7 @@ gates. Unlike the product guides on this page, their text is included in model r
 
 “Poor practice” remains a finding classification for established defects. It is independent of the
 former `Practice` name for guideline documents. See the [architecture terminology](../../.zazz/architecture.md#1-architecture-premise).
+
+The [bounded Apollo GraphQL adapter](../running-scans.md#bounded-apollo-graphql-analysis) adds
+resolver-specific argument sources to these existing analysis rules. Parent/context/info provenance,
+SDL syntax coverage and application policy remain separate from SQL protection and claim status.

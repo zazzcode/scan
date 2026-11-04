@@ -78,6 +78,7 @@ func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (result *ana
 			out.Gaps = append(out.Gaps, analysis.Gap{Kind: "parse_error", Detail: "registration file has syntax errors", At: spanOf(file, m.tree.RootNode())})
 			continue
 		}
+		set.graphqlEntries(out, m)
 		locals := map[string]*sitter.Node{}
 		collectFuncs(m.tree.RootNode(), m.src, locals)
 		walkCalls(m.tree.RootNode(), func(call *sitter.Node) {

@@ -5,8 +5,8 @@ Milestone deliverable: 6 of 8. Project and Deliverable Owner: Michael.
 Drafted: 2026-11-03. Execution tracking: deliverable-specific ignored local run log only.
 Coordination: one Contributor Agent working in the assigned worktree; no delegation required.
 Proposed review shape: one milestone draft PR into `stage`, human review/merge.
-The user requested design/specification now and will request implementation later.
-This document does not itself authorize implementation, publishing, paid calls or merging.
+The user authorized D6 implementation on 2026-11-04, including its verified feature-branch commit/push.
+The active user request authorizes this implementation and checkpoint publication; paid calls, PR creation and merging remain excluded.
 
 ## 0. Capability
 
@@ -147,13 +147,13 @@ record exact partial changes and failing checks, without claiming this deliverab
 
 ## 9. Definition of done
 
-- [ ] Required source/standards read and current scope verified.
-- [ ] All acceptance criteria have passing, cited evidence; affected regressions explained.
-- [ ] Scoped tests/race checks and diff checks pass; only changed Go files formatted.
-- [ ] Required offline reports/manual review performed where this slice changes output.
-- [ ] Remaining gaps, exact artifact locations and next checkpoint recorded.
-- [ ] No out-of-scope change, fabricated protection or stale-response replay.
-- [ ] User receives the completed slice and any remaining unchecked acceptance items.
+- [x] Required source/standards read and current scope verified.
+- [x] All acceptance criteria have passing, cited evidence; affected regressions explained.
+- [x] Scoped tests/race checks and diff checks pass; only changed Go files formatted.
+- [x] Required offline reports/manual review performed where this slice changes output.
+- [x] Remaining gaps, exact artifact locations and next checkpoint recorded.
+- [x] No out-of-scope change, fabricated protection or stale-response replay.
+- [x] User receives the completed slice and any remaining unchecked acceptance items.
 
 ## 10. Open questions
 
@@ -194,3 +194,10 @@ and later application evaluation. Product implementation has not started.
 
 2026-11-03 — User requested one ignored run log per deliverable; updated log paths
 and resume prompts. This changes execution tracking only, with no product/test change.
+
+2026-11-04 — D6 implemented and verified under the explicit user instruction. Acceptance tests,
+source-only JS/typed-TS fixtures, local-stub policy results, exact D5 regression parity and remaining
+limits are recorded in [implementation results](../evaluation/common-entry-dispatch-results.md#d6--bounded-apollo-graphql-resolvers-2026-11-04).
+The ignored per-deliverable log retains RED/green recovery, issues, commands and artifact hashes.
+Browser security policy prevented visual preview; HTML source/export verification passed, without
+a browser-QA claim. D7 and the future GraphQL application evaluation remain unstarted.

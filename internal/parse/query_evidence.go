@@ -22,7 +22,9 @@ func (s *moduleSet) refineQueryEvidence(use *analysis.CandidateUse) {
 			chainSupplied = false
 		}
 	}
-	if chainSupplied && len(s.contextLimits) == 0 {
+	if use.Check != nil && use.Check.Selector != nil && use.Check.Selector.Kind == "graphql" {
+		c.ModelFacts = []string{"Scope is a verified Apollo schema field and its independently bound resolver invocation. Only args values have external provenance; parent/context/info and parent-result transitions remain unknown. SDL scalar/type/directive names establish neither database safety nor application validation policy."}
+	} else if chainSupplied && len(s.contextLimits) == 0 {
 		c.ModelFacts = []string{
 			"Scope is direct Express registrations with syntactically matched earlier middleware and same-route handlers. Matching source bodies or explicit transport/authentication adapter contracts are supplied; unsupported/dynamic chains remain blockers.",
 			"Known express.json/body-parser parsing adapters parse request values and may admit nested JSON objects. They do not enforce an id/email/name field schema or remove query operators from nested fields. A parser call alone is not a validator.",

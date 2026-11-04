@@ -249,3 +249,34 @@ Field names retain their source roles, such as `args.email` or `request.email`.
 Every matched invocation context is evaluated separately. JSON `check_matches` records
 entry/context IDs and use counts; `selected_scope` records CLI filters. Zero matches and
 matched contexts without supported operations remain explicit gaps, never protection.
+
+## Bounded Apollo GraphQL analysis
+
+`--analyze` discovers verified named `ApolloServer` imports from `@apollo/server` in JS/TS,
+with immutable literal `typeDefs`/`resolvers` options and inline, local named or relative-imported
+named resolver functions. Query, Mutation and explicitly bound object-field resolvers have separate
+entries and invocation contexts. Use `--entry-kind graphql`, `--entry-id <snapshot-id>` or a typed
+check selector such as `{"kind":"graphql","type":"Query","field":"search"}`. `--entry` scopes
+registration files; `--route` remains HTTP-only. Reports label fields such as `Query.search`, with
+schema, registration, callable and sink source locations, rather than inventing HTTP routes.
+
+The SDL reader accepts object/input fields, arguments, list/non-null types, scalars, enums and
+comments in unescaped literal strings/templates, or a default import of a local literal `.graphql`
+file. Local SDL imports are read as source bytes inside the selected root, including symlink checks;
+loaders and target code are never executed. Fixtures pin Apollo Server 4, GraphQL 16 and Sequelize 6;
+other versions are unverified compatibility assumptions. No package installation is needed for scans.
+
+Only declared argument projections have external input provenance. Parent, context and info remain
+independent unknown origins; a schema edge does not prove a parent-result transfer. Existing SQL
+library contracts, actual value transfers, completeness and optional judge policy determine each
+claim. SDL type/scalar/directive names establish neither SQL protection nor business validation.
+Offline discovery is unassessed; a local-stub test result is not model accuracy or runtime validation.
+
+Unsupported composition, SDL extensions/directives/default values/descriptions/custom roots,
+subscriptions, federation, executable custom scalars, arbitrary wrappers/loaders, destructured/default
+resolver parameters, additional Apollo options and default resolvers retain explicit gaps. Literal
+maps with mutation, aliases escaping their construction or unresolved calls cannot establish binding.
+Parent-result transitions are not modeled. Limits are 128 schema fields per constructor and a
+conservative 10,000 derived-record budget per scan (five reserved records per field); SDL additionally
+has 32,768 tokens, 4,096 object fields, 16 nested type levels and a 2 MiB source limit. Reached limits
+retain located gaps and unexpanded remainder counts. Existing helper/value-flow limits still apply.

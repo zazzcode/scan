@@ -1,10 +1,53 @@
 # Common entry and dispatch implementation results
 
+## D6 — bounded Apollo GraphQL resolvers, 2026-11-04
+
+Implemented against D5 `7fa55e4d8e4055532993eac4073f9d2c25d59b80` in the existing feature
+worktree. The [D6 contract](../specifications/common-entry-dispatch-06-graphql.md) owns acceptance;
+D7 has not started. No paid calls, target application execution/modification, new worktree or PR.
+The future GraphQL application remains deferred evaluation.
+
+| Acceptance | Passing source-backed evidence |
+| --- | --- |
+| AC1: Apollo/schema/resolver binding | `internal/parse` TestGraphQLResolverBindings and variants: literal SDL, imported/local/inline/method resolvers, independent schema instances, object fields, unresolved/default/composed maps |
+| AC2: independent inputs and SQL transfers | TestGraphQLInputRoles and transfer controls: args to verified Sequelize SQL; parent/context/info unknown; scalar names establish no business policy or protection; calls alone do not establish flow |
+| AC3: real completeness and policy | parse/judge TestGraphQLProtectionContexts: raw/bound/unknown SQL, guarded/open shared sink, unknown applicable guard, contextual controls, local Decisions HTTP stub, exact replay and changed-coordinate rejection |
+| AC4: actual exports, selectors and bounds | parse/report/CLI TestGraphQLPipelineAndBounds variants: real JS and typed TS fixtures, schema3 JSON, resolver-specific HTML/SARIF, zero-use gaps, exact source hashes/spans, typed selectors, root/symlink escapes, shadowed constructors and deterministic budgets |
+| Regression/quality | Scoped suites, full `go test -race ./... -count=1`, `go vet ./...`, `go build ./...`, changed-file formatting and diff review |
+
+Each pinned source-only JS/TS fixture yields nine entries, six SQL candidates and one separate
+argument-validation observation. Offline reports contain five construction-practice findings and
+two Review observations, with every assessment `not_run`. Under the local stub, three SQL contexts
+are confirmed, bound and guarded SQL injection facets are Protected, and the unknown transform
+remains evidence-limited despite a protected stub answer. Construction practice keeps the guarded
+string-built query orange; only the bound record becomes a final green protection record. A separate
+unknown-guard fixture also rejects the stub's protected answer. These tests establish policy and
+transport behavior, not model accuracy or runtime exploitability.
+
+A scanner built from an archive of the exact D5 commit produced identical JSON evidence to D6 for
+six regression sets: JS/TS dynamic dispatch (four entries/four uses each), Python dynamic VulnPy
+(38/31), existing string flow (one/one), and JS/TS browser events (six/four each). No historical report,
+raw answer, golden or target source changed. Saved GraphQL exports preserve input hashes and retain
+JSON/SARIF statuses, invocation identities, actual sink locations and related schema locations.
+
+The [public subset and limits](../../docs/running-scans.md#bounded-apollo-graphql-analysis) describe
+literal named Apollo wiring, supported SDL syntax, independent unknown parent/context/info roles,
+and explicit unsupported composition/default/custom-scalar/wrapper/parent-result behavior. The
+adapter assumes Apollo Server 4 compatibility; installed versions and transport exposure are not
+verified. Reached source/SDL/registration/record/helper limits remain visible gaps, never protection.
+
+Local ignored evidence is under `.zazz/ephemeral/`: the append-only
+`common-entry-dispatch-06-graphql-run-log.md`, `d6-{scoped,race,vet,build}.log`,
+`d6-report-manifest.json`, `d6-regressions/`, and `d6-reports/`. Report verification covers generated
+HTML source, disclosures/sort/filter markup and cross-format evidence/status parity. Browser policy
+blocked the local-file visual preview; no visual browser QA is claimed here. Broader milestone visual
+acceptance remains separate from these D6 adapter/export tests.
+
 ## D5 — bounded dynamic HTTP registration, 2026-11-04
 
 Implemented in `common-entry-and-dispatch` against predecessor `fe11151bcb0a11102592a805e7d160fa57c303a9`.
 The [D5 contract](../specifications/common-entry-dispatch-05-dynamic-http.md) owns scope and acceptance.
-D6 and additional framework/vulnerability families have not started.
+At the D5 checkpoint, D6 and additional framework/vulnerability families had not started.
 
 Finite Express literal tables/for-of loops and direct local literal-argument factories now produce
 source-backed registrations and separate closure/control contexts. Bounded Flask/FastAPI generation

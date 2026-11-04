@@ -75,6 +75,33 @@ func (s *moduleSet) chainEvidence(report *analysis.AnalysisReport, check analysi
 	middlewareFiles := map[string]bool{}
 	seen := map[string]bool{}
 	for _, entry := range report.Entries {
+		if entry.Kind == "graphql" && check.NormalizedSelector().Matches(entry) {
+			for _, u := range report.Uses {
+				if u.EntryID != entry.ID {
+					continue
+				}
+				context = append(context, u.Context...)
+				for _, e := range u.Context {
+					if e.Kind != "handler" {
+						continue
+					}
+					m := s.modules[e.Span.File]
+					if m == nil {
+						continue
+					}
+					body := nodeAt(m.tree.RootNode(), e.Span.StartByte, e.Span.EndByte)
+					if body == nil {
+						continue
+					}
+					params, _ := functionParameters(body.Parent(), m.src)
+					if len(params) > 1 {
+						gaps = append(gaps, s.inputHelperGaps(m, body, params[1].name, check.Fields)...)
+					}
+					s.includeHelpers(m, body, &context, seen, 0)
+				}
+			}
+			continue
+		}
 		r := entry.HTTPRoute()
 		if r.Method != check.Method || r.PathPattern != check.Path {
 			continue

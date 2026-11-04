@@ -40,6 +40,7 @@ func (s *moduleSet) buildEntryChecks(report *analysis.AnalysisReport, checks []a
 					}
 				}
 				controlComplete := false
+				var completeBodies []analysis.Evidence
 				for _, e := range old.Context {
 					if e.Kind != "handler" {
 						continue
@@ -56,6 +57,9 @@ func (s *moduleSet) buildEntryChecks(report *analysis.AnalysisReport, checks []a
 					use.ControlEdges = append(use.ControlEdges, edges...)
 					use.Completeness.Blockers = append(use.Completeness.Blockers, missing...)
 					controlComplete = len(missing) == 0
+					if controlComplete {
+						completeBodies = append(completeBodies, e)
+					}
 					use.Completeness.Evidence["control_flow"] = []analysis.Evidence{e}
 				}
 				binding := s.queryBinding(use)
@@ -87,6 +91,20 @@ func (s *moduleSet) buildEntryChecks(report *analysis.AnalysisReport, checks []a
 					switch g.Kind {
 					case "unsupported_control_flow":
 						if controlComplete {
+							use.Completeness.Coverage = append(use.Completeness.Coverage, g)
+						} else {
+							use.Completeness.Blockers = append(use.Completeness.Blockers, g)
+						}
+					case "branch_exit":
+						covered := false
+						if check.Selector != nil && check.Selector.Kind == "graphql" {
+							for _, body := range completeBodies {
+								if g.At.File == body.Span.File && g.At.StartByte >= body.Span.StartByte && g.At.EndByte <= body.Span.EndByte {
+									covered = true
+								}
+							}
+						}
+						if covered {
 							use.Completeness.Coverage = append(use.Completeness.Coverage, g)
 						} else {
 							use.Completeness.Blockers = append(use.Completeness.Blockers, g)
@@ -173,6 +191,9 @@ func missingSQLSink(report *analysis.AnalysisReport, c analysis.Check, context [
 
 func checkRoute(report *analysis.AnalysisReport, id string, c analysis.Check) bool {
 	for _, e := range report.Entries {
+		if e.ID == id && e.Kind == "graphql" {
+			return c.NormalizedSelector().Matches(e)
+		}
 		if e.HTTPRoute().ID == id {
 			return e.HTTPRoute().Method == c.Method && e.HTTPRoute().PathPattern == c.Path
 		}
@@ -330,6 +351,12 @@ func (s *moduleSet) buildChecks(report *analysis.AnalysisReport, checks []analys
 							scoped.Uses[i].Check = &copy
 							scoped.Uses[i].InvocationContextID = ctx.ID
 						}
+					}
+				} else if entry.Kind == "graphql" && s.modules[entry.Location.Span.File] != nil && (check.Kind == "sql_query" || check.Kind == "nosql_query") {
+					if len(scoped.Uses) == 0 {
+						scoped.Gaps = append(scoped.Gaps, analysis.Gap{Kind: "check_operation_missing", Detail: check.ID + ": no supported operation in " + entry.ID, At: entry.Location.Span})
+					} else {
+						s.buildEntryChecks(&scoped, []analysis.Check{check})
 					}
 				} else {
 					applyContextCheck(&scoped, check, entry, ctx)

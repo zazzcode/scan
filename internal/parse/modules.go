@@ -31,6 +31,7 @@ type sourceModule struct {
 }
 
 type moduleSet struct {
+	graphqlRecords int
 	storageWrites  map[string][]storageWrite
 	producers      []jsonProducer
 	modelEvidence  map[string][]analysis.Evidence

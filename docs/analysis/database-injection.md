@@ -108,3 +108,13 @@ local callback arguments and helper-returned SQLite connection/cursor provenance
 itself is not value flow: the report includes the captured input and actual cursor/SQL-slot witnesses.
 Unresolved or mutated registry/callback bindings remain gaps; schema setup and constant SELECT text
 are not request-derived SQL findings. See the [bounded Python subset](../python-support.md#finite-generated-http-routes).
+
+## GraphQL resolver sources
+
+The bounded Apollo Node adapter binds schema coordinates to separate resolver invocations and
+reuses the existing verified SQL library/API and value-flow rules. Actual `args.email` reads can
+reach SQL text or separated bind operands through aliases and supported helpers. Parent, context
+and info have independent unknown provenance; they are not relabeled as args. Unknown transforms,
+applicable unknown guards, mutation and unsupported projections block definite claims. A guarded
+registration cannot lend protection to another registration of the same resolver. Scalar/type names
+and GraphQL parsing do not parameterize SQL. See [supported source boundaries](../running-scans.md#bounded-apollo-graphql-analysis).

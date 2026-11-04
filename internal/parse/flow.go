@@ -9,6 +9,8 @@ import (
 )
 
 type value struct {
+	graphqlArgs        *analysis.Evidence
+	graphqlTransfers   []analysis.Evidence
 	domNode            bool
 	jqueryNode         bool
 	urlParams          bool
@@ -233,6 +235,17 @@ func (f *flow) branches(n *sitter.Node) {
 			}
 			v = combine(v, branch)
 		}
+		if len(exits) > 0 && exits[0].env[key].graphqlArgs != nil {
+			marker := exits[0].env[key].graphqlArgs
+			unchanged := true
+			for _, e := range exits {
+				unchanged = unchanged && e.env[key].graphqlArgs == marker
+			}
+			if unchanged {
+				v.graphqlArgs = marker
+				v.graphqlTransfers = append([]analysis.Evidence{}, exits[0].env[key].graphqlTransfers...)
+			}
+		}
 		v.gaps = append(v.gaps, f.gap("unknown_control_effect", "value may change across unsupported control flow", n))
 		merged[key] = v
 	}
@@ -256,6 +269,9 @@ func (f *flow) eval(n *sitter.Node) value {
 		return value{gaps: []analysis.Gap{gap}}
 	}
 	src := f.module.src
+	if v, ok := f.graphqlInputValue(n); ok {
+		return v
+	}
 	if f.client != nil {
 		if v, ok := f.clientValue(n); ok {
 			return v
@@ -460,8 +476,15 @@ func (f *flow) children(n *sitter.Node) value {
 
 func (f *flow) transfer(v value, kind string, n *sitter.Node) value {
 	out := v
+	if v.graphqlArgs != nil {
+		out.graphqlTransfers = append(append([]analysis.Evidence{}, v.graphqlTransfers...), f.module.evidence(kind, n))
+		if len(out.graphqlTransfers) > 64 {
+			out.graphqlTransfers = out.graphqlTransfers[:64]
+			out.gaps = append(out.gaps, f.gap("transfer_limit", "GraphQL object exceeds 64 transfer steps", n))
+		}
+	}
 	out.deps = nil
-	out.gaps = append([]analysis.Gap{}, v.gaps...)
+	out.gaps = append([]analysis.Gap{}, out.gaps...)
 	for _, d := range v.deps {
 		if len(d.Transfers) >= 64 {
 			out.gaps = append(out.gaps, f.gap("transfer_limit", "dependency exceeds 64 transfer steps", n))
@@ -633,6 +656,16 @@ func (f *flow) call(n *sitter.Node) value {
 	}
 	// A helper that contains the sink is not a validator of its arguments.
 	if !entered {
+		if f.entry.Kind == "graphql" {
+			for _, v := range values {
+				if len(v.deps) > 0 && !nativeStringOperation(f.module, n) {
+					f.gaps = append(f.gaps, f.gap("input_helper_unresolved", "Unresolved call receives a resolver-derived value before this operation: "+name, n))
+				}
+				if v.graphqlArgs != nil {
+					f.gaps = append(f.gaps, f.gap("graphql_argument_escape", "Argument object reaches an unresolved call: "+name, n))
+				}
+			}
+		}
 		f.noteInputTouch(values, name)
 	}
 	v := value{}

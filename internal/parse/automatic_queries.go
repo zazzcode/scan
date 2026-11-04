@@ -28,11 +28,16 @@ func (s *moduleSet) automaticQueries(report *analysis.AnalysisReport) {
 		}
 		fields := map[string]bool{}
 		for _, d := range old.Dependencies {
+			if entry.Kind == "graphql" {
+				fields[d.Source.Text] = true
+				continue
+			}
 			parts := strings.Split(d.Source.Text, ".")
 			if len(parts) > 2 {
 				fields[parts[len(parts)-1]] = true
 			}
 		}
+
 		names := []string{}
 		for name := range fields {
 			names = append(names, name)
@@ -41,6 +46,10 @@ func (s *moduleSet) automaticQueries(report *analysis.AnalysisReport) {
 		check := analysis.Check{ID: "automatic-query", Method: entry.HTTPRoute().Method, Path: entry.HTTPRoute().PathPattern, Kind: kind, Fields: names,
 			Validation: "Assess only field requirements established by the supplied code; missing business constraints remain uncertain.",
 			Protection: "Untrusted input must remain data and must not change executable query syntax or selector operators. Evaluate actual transformations and enforcing guards separately from construction practice."}
+		if entry.Kind == "graphql" {
+			check.Method, check.Path = "", ""
+			check.Selector = &analysis.EntrySelector{Kind: "graphql", Type: entry.GraphQL.Type, Field: entry.GraphQL.Field}
+		}
 		tmp := &analysis.AnalysisReport{Entries: []analysis.EntryPoint{entry}, Uses: []analysis.CandidateUse{old}}
 		s.buildEntryChecks(tmp, []analysis.Check{check})
 		for _, assembled := range tmp.Uses {
