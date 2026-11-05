@@ -1,0 +1,17 @@
+syntax = "proto3";
+package fixtures.search;
+message Request { string email = 1; string user_name = 2; }
+message Reply { string result = 1; }
+service SearchService {
+ rpc Raw(Request) returns (Reply);
+ rpc Bound(Request) returns (Reply);
+ rpc Unknown(Request) returns (Reply);
+ rpc Guarded(Request) returns (Reply);
+ rpc Open(Request) returns (Reply);
+ rpc UnknownGuard(Request) returns (Reply);
+ rpc Unused(Request) returns (Reply);
+ rpc Absent(Request) returns (Reply);
+ rpc ClientStream(stream Request) returns (Reply);
+ rpc ServerStream(Request) returns (stream Reply);
+ rpc Bidi(stream Request) returns (stream Reply);
+}

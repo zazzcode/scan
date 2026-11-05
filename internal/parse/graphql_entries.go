@@ -151,7 +151,7 @@ func (s *moduleSet) graphqlServer(out *analysis.AnalysisReport, m *sourceModule,
 		return
 	}
 	for i, field := range fields {
-		if i >= 128 || s.graphqlRecords+5 > 10000 {
+		if i >= 128 || s.graphqlRecords+s.grpcRecords+5 > 10000 {
 			out.Gaps = append(out.Gaps, gap("graphql_registration_limit", fmt.Sprintf("128 fields/site or 10000 derived records/scan reached; %d SDL fields unexpanded", len(fields)-i)))
 			break
 		}

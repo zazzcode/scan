@@ -41,3 +41,8 @@ former `Practice` name for guideline documents. See the [architecture terminolog
 The [bounded Apollo GraphQL adapter](../running-scans.md#bounded-apollo-graphql-analysis) adds
 resolver-specific argument sources to these existing analysis rules. Parent/context/info provenance,
 SDL syntax coverage and application policy remain separate from SQL protection and claim status.
+
+The [bounded Node.js gRPC adapter](../running-scans.md#bounded-nodejs-unary-grpc-analysis) joins
+source-visible unary registrations to request-field inputs and existing SQL claims. Proto field
+types/decoding do not establish validation or protection; metadata/context/callback roles remain
+separate. Streaming and unresolved descriptor/handler bindings retain visible coverage gaps.

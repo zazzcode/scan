@@ -32,6 +32,8 @@ type sourceModule struct {
 
 type moduleSet struct {
 	graphqlRecords int
+	grpcRecords    int
+	grpcProtos     map[string]grpcProtoResult
 	storageWrites  map[string][]storageWrite
 	producers      []jsonProducer
 	modelEvidence  map[string][]analysis.Evidence

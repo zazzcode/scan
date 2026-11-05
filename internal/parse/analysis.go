@@ -79,6 +79,7 @@ func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (result *ana
 			continue
 		}
 		set.graphqlEntries(out, m)
+		set.grpcEntries(out, m)
 		locals := map[string]*sitter.Node{}
 		collectFuncs(m.tree.RootNode(), m.src, locals)
 		walkCalls(m.tree.RootNode(), func(call *sitter.Node) {

@@ -242,8 +242,8 @@ selector fields are rejected. For example, a portable HTTP check is:
 Selector identities are HTTP `method`/`path`, GraphQL `type`/`field`, gRPC fully qualified
 `service`/`method`, or browser `category`/`name` with optional `event`. Optional
 `registration_file` narrows any selector to that relative registration file. Selection
-never creates an adapter or an operation: GraphQL/gRPC discovery remains pending their
-adapter deliverables. Check kinds remain `sql_query`, `nosql_query`, and `account_creation`.
+never creates an adapter or an operation: discovery requires the supported source bindings in the
+adapter subsets below. Check kinds remain `sql_query`, `nosql_query`, and `account_creation`.
 Field names retain their source roles, such as `args.email` or `request.email`.
 
 Every matched invocation context is evaluated separately. JSON `check_matches` records
@@ -280,3 +280,43 @@ Parent-result transitions are not modeled. Limits are 128 schema fields per cons
 conservative 10,000 derived-record budget per scan (five reserved records per field); SDL additionally
 has 32,768 tokens, 4,096 object fields, 16 nested type levels and a 2 MiB source limit. Reached limits
 retain located gaps and unexpanded remainder counts. Existing helper/value-flow limits still apply.
+
+## Bounded Node.js unary gRPC analysis
+
+`--analyze` discovers verified `@grpc/grpc-js` Server construction and `addService` calls in
+JS/TS, joined to `@grpc/proto-loader` literal `loadSync` and `loadPackageDefinition` service
+projections. Namespace/default/named imports and literal CommonJS namespace requires are supported.
+Literal maps bind inline, local named or relative-imported named handlers. Original proto method
+keys take precedence; ordinary lower/UpperCamel and snake_case names also support the loader's
+lowerCamel alias. Acronym fallback names remain unresolved; their exact proto spelling is supported.
+Each server instance and registration retains its own invocation context, even with a shared callable.
+
+Use `--entry-kind grpc`, `--entry-id <snapshot-id>` or a tagged check selector such as
+`{"kind":"grpc","service":"fixtures.search.SearchService","method":"Raw"}`. Reports label
+`fixtures.search.SearchService/Raw` with registration, proto, callable and actual sink locations.
+Zero-use and unsupported streaming methods remain visible; HTTP method/path values are not invented.
+
+Proto paths are literal `.proto` paths under the selected root, assuming the application's process
+working directory is that root. Absolute paths, root escapes and escaping symlinks are rejected.
+The bounded syntax reader accepts proto3 packages, services, RPCs, local messages and ordinary
+scalar/message fields, including optional/repeated fields and comments. `keepCase` may be a literal
+boolean; default field projections use protobufjs 7's underscore/lowercase conversion, preserving the first
+character. Colliding converted field names retain an unresolved-message gap. Types and
+decoding establish neither application validation policy nor SQL protection. Only request fields
+have request-data provenance; metadata, context and callback roles remain independent unknowns.
+Supported aliases/helper transfers reuse existing SQL analysis and claim-completeness gates.
+
+Imports/include paths, nested/enum/map/oneof declarations, options, generated stubs, dynamic
+composition, interceptors, arbitrary wrappers and streaming execution retain explicit gaps.
+Unknown mutation/escapes cannot establish immutable descriptor or handler bindings. Limits are
+2 MiB/proto, 32,768 tokens, 4,096 parsed methods, 128 derived methods per registration and a
+conservative 10,000 derived records per scan (five reserved per method, including prior GraphQL
+records in either discovery order). Descriptor/alias expansion stops at 16; reached bounds retain located gaps and remainder
+details. Existing helper depth/count and transfer limits also apply.
+
+The [gRPC Node tutorial](https://grpc.io/docs/languages/node/basics/) describes the underlying API.
+Source-only fixtures declare grpc-js 1.14.0, proto-loader 0.8.0, protobufjs 7.5.3 and Sequelize 6.37.7; installed target
+versions remain unverified assumptions. Scanning never installs dependencies, executes handlers or
+runs generators. Offline discovery remains unassessed; local-stub protection controls prove scanner
+policy behavior, not model accuracy or application runtime behavior. Real gRPC application evaluation
+has not been performed.

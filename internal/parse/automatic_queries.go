@@ -28,7 +28,7 @@ func (s *moduleSet) automaticQueries(report *analysis.AnalysisReport) {
 		}
 		fields := map[string]bool{}
 		for _, d := range old.Dependencies {
-			if entry.Kind == "graphql" {
+			if entry.Kind == "graphql" || entry.Kind == "grpc" {
 				fields[d.Source.Text] = true
 				continue
 			}
@@ -49,6 +49,14 @@ func (s *moduleSet) automaticQueries(report *analysis.AnalysisReport) {
 		if entry.Kind == "graphql" {
 			check.Method, check.Path = "", ""
 			check.Selector = &analysis.EntrySelector{Kind: "graphql", Type: entry.GraphQL.Type, Field: entry.GraphQL.Field}
+		}
+		if entry.Kind == "grpc" {
+			check.Method, check.Path = "", ""
+			service := entry.GRPC.Service
+			if entry.GRPC.Package != "" {
+				service = entry.GRPC.Package + "." + service
+			}
+			check.Selector = &analysis.EntrySelector{Kind: "grpc", Service: service, Method: entry.GRPC.Method}
 		}
 		tmp := &analysis.AnalysisReport{Entries: []analysis.EntryPoint{entry}, Uses: []analysis.CandidateUse{old}}
 		s.buildEntryChecks(tmp, []analysis.Check{check})

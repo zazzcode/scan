@@ -97,7 +97,7 @@ func (s *moduleSet) buildEntryChecks(report *analysis.AnalysisReport, checks []a
 						}
 					case "branch_exit":
 						covered := false
-						if check.Selector != nil && check.Selector.Kind == "graphql" {
+						if check.Selector != nil && (check.Selector.Kind == "graphql" || check.Selector.Kind == "grpc") {
 							for _, body := range completeBodies {
 								if g.At.File == body.Span.File && g.At.StartByte >= body.Span.StartByte && g.At.EndByte <= body.Span.EndByte {
 									covered = true
@@ -191,7 +191,7 @@ func missingSQLSink(report *analysis.AnalysisReport, c analysis.Check, context [
 
 func checkRoute(report *analysis.AnalysisReport, id string, c analysis.Check) bool {
 	for _, e := range report.Entries {
-		if e.ID == id && e.Kind == "graphql" {
+		if e.ID == id && (e.Kind == "graphql" || e.Kind == "grpc") {
 			return c.NormalizedSelector().Matches(e)
 		}
 		if e.HTTPRoute().ID == id {
@@ -352,7 +352,7 @@ func (s *moduleSet) buildChecks(report *analysis.AnalysisReport, checks []analys
 							scoped.Uses[i].InvocationContextID = ctx.ID
 						}
 					}
-				} else if entry.Kind == "graphql" && s.modules[entry.Location.Span.File] != nil && (check.Kind == "sql_query" || check.Kind == "nosql_query") {
+				} else if (entry.Kind == "graphql" || entry.Kind == "grpc") && s.modules[entry.Location.Span.File] != nil && (check.Kind == "sql_query" || check.Kind == "nosql_query") {
 					if len(scoped.Uses) == 0 {
 						scoped.Gaps = append(scoped.Gaps, analysis.Gap{Kind: "check_operation_missing", Detail: check.ID + ": no supported operation in " + entry.ID, At: entry.Location.Span})
 					} else {

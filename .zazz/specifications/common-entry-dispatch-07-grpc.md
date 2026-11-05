@@ -5,8 +5,8 @@ Milestone deliverable: 7 of 8. Project and Deliverable Owner: Michael.
 Drafted: 2026-11-03. Execution tracking: deliverable-specific ignored local run log only.
 Coordination: one Contributor Agent working in the assigned worktree; no delegation required.
 Proposed review shape: one milestone draft PR into `stage`, human review/merge.
-The user requested design/specification now and will request implementation later.
-This document does not itself authorize implementation, publishing, paid calls or merging.
+The user authorized deliverable 7 implementation on 2026-11-05, using fixtures only.
+Publishing, paid calls, target execution, new worktrees, merging and integration pushes are excluded.
 
 ## 0. Capability
 
@@ -50,8 +50,9 @@ an in-place contract revision. Unrelated cleanup is outside scope.
 | --- | --- | --- |
 | `internal/parse/grpc_entries.go, grpc_proto.go, grpc_inputs.go, grpc_test.go` | new | Server/descriptor binding, proto3 subset and request roles |
 | `internal/parse/analysis.go, modules.go, flow.go` | modified | gRPC discovery and language invocation seeding |
+| `internal/parse/automatic_queries.go, check_context.go, checks.go, query_evidence.go, graphql_entries.go` | modified adjacent consumers | Typed gRPC completeness/checks and shared adapter record budget |
 | `internal/parse/testdata/javascript/grpc/; internal/parse/testdata/typescript/grpc/` | new | Source-only proto/service/handler controls |
-| `internal/report/entries.go; internal/judge/*_test.go; cmd/scan/analysis_test.go` | modified | Real adapter policy/report controls |
+| `internal/report/entries.go; internal/report/grpc_test.go; internal/judge/grpc_test.go; cmd/scan/analysis_test.go` | existing presenter reused; tests added/modified | Real adapter policy/report controls |
 | `docs/running-scans.md; docs/analysis/README.md` | modified | Unary coverage and explicit generated/streaming limitations |
 | `.zazz/specifications/common-entry-dispatch-07-grpc.md` | modified if needed | Contract decisions and evidence links |
 | `.zazz/ephemeral/common-entry-dispatch-07-grpc-run-log.md` | ignored local | Append-only execution evidence |
@@ -59,7 +60,7 @@ an in-place contract revision. Unrelated cleanup is outside scope.
 One milestone PR preserves a single canonical migration and removes transitional state
 before human integration. Each deliverable remains a distinct review/evidence unit in
 that PR. Do not create additional worktrees or branches merely to represent checkpoints.
-This proposed review shape remains reviewable by the user before implementation.
+Publication of this review artifact remains user-controlled and is not part of this assignment.
 
 Exclusions: new vulnerability families, authorization engine, queues/jobs/CLI entry adapters,
 new target languages, full IR, graph database, automatic cache, independent LLM reviewer,
@@ -92,10 +93,10 @@ blocker and surface it. Do not weaken tests or drop mandatory coverage to fit a 
 
 ## 6. Acceptance criteria
 
-- **AC1 — TestGRPCServiceBindings.** Verified construction/descriptor chain maps proto3 package/service/rpc declarations and literal implementation keys to actual handlers, accounting for supported method-name mapping with source provenance; separate server instances remain distinct. Verified by `TestGRPCServiceBindings` in the packages named in §7; new test names are planned contracts, not existing results.
-- **AC2 — TestGRPCInputRolesAndControls.** call.request fields reach an existing SQL sink with supported transfers and separate metadata/context/callback roles; raw/bound/unknown controls exercise actual completeness and stub policy, including shared-callable distinct contexts. Verified by `TestGRPCInputRolesAndControls` in the packages named in §7; new test names are planned contracts, not existing results.
-- **AC3 — TestGRPCUnknownAndStreaming.** Streaming, dynamic descriptors, missing/generated stubs, unknown interceptors, imports/include paths, method mismatches, fake addService and parser/expansion limits retain explicit located gaps without invented handlers/protection. Verified by `TestGRPCUnknownAndStreaming` in the packages named in §7; new test names are planned contracts, not existing results.
-- **AC4 — TestGRPCPipeline.** Actual JS/TS unary adapter output reaches JSON/HTML/SARIF and gRPC selectors without method/path/legacy IDs; zero-use and streaming entries remain visible and repeated scans are deterministic. Verified by `TestGRPCPipeline` in the packages named in §7; new test names are planned contracts, not existing results.
+- **AC1 — TestGRPCServiceBindings.** Verified construction/descriptor chain maps proto3 package/service/rpc declarations and literal implementation keys to actual handlers, accounting for supported method-name mapping with source provenance; separate server instances remain distinct. Verified by `TestGRPCServiceBindings` with passing source-fixture evidence recorded below and in the ignored run log.
+- **AC2 — TestGRPCInputRolesAndControls.** call.request fields reach an existing SQL sink with supported transfers and separate metadata/context/callback roles; raw/bound/unknown controls exercise actual completeness and stub policy, including shared-callable distinct contexts. Verified by `TestGRPCInputRolesAndControls` with passing source-fixture evidence recorded below and in the ignored run log.
+- **AC3 — TestGRPCUnknownAndStreaming.** Streaming, dynamic descriptors, missing/generated stubs, unknown interceptors, imports/include paths, method mismatches, fake addService and parser/expansion limits retain explicit located gaps without invented handlers/protection. Verified by `TestGRPCUnknownAndStreaming` with passing source-fixture evidence recorded below and in the ignored run log.
+- **AC4 — TestGRPCPipeline.** Actual JS/TS unary adapter output reaches JSON/HTML/SARIF and gRPC selectors without method/path/legacy IDs; zero-use and streaming entries remain visible and repeated scans are deterministic. Verified by `TestGRPCPipeline` with passing source-fixture evidence recorded below and in the ignored run log.
 - **Scope/checks.** Scoped tests pass and the slice diff contains only relevant approved paths;
   verify with `git diff --check`, `git status --short` and slice-diff inspection.
 
@@ -147,21 +148,23 @@ record exact partial changes and failing checks, without claiming this deliverab
 
 ## 9. Definition of done
 
-- [ ] Required source/standards read and current scope verified.
-- [ ] All acceptance criteria have passing, cited evidence; affected regressions explained.
-- [ ] Scoped tests/race checks and diff checks pass; only changed Go files formatted.
-- [ ] Required offline reports/manual review performed where this slice changes output.
-- [ ] Remaining gaps, exact artifact locations and next checkpoint recorded.
-- [ ] No out-of-scope change, fabricated protection or stale-response replay.
-- [ ] User receives the completed slice and any remaining unchecked acceptance items.
+- [x] Required source/standards read and current scope verified.
+- [x] All acceptance criteria have passing, cited evidence; affected regressions explained.
+- [x] Scoped tests/race checks and diff checks pass; only changed Go files formatted.
+- [x] Required offline reports/manual review performed where this slice changes output.
+- [x] Remaining gaps, exact artifact locations and next checkpoint recorded.
+- [x] No out-of-scope change, fabricated protection or stale-response replay.
+- [x] User receives the completed slice and any remaining unchecked acceptance items.
 
 ## 10. Open questions
 
-No deliverable-specific blocker remains beyond user review of the proposed design/scope.
-Node.js GraphQL is first new server support; Apollo and grpc-js are concrete bounded
-implementation choices, adjustable by user steering. The user's future GraphQL test app
-is deferred evaluation, not a dependency. Resolve any materially new choice before its
-dependent code; do not block unrelated earlier deliverables on later evaluation data.
+No implementation blocker remains. Source-only JS/TS fixtures supply acceptance evidence;
+there is no sample gRPC application, so application-level evaluation remains deferred.
+The supported literal-path subset assumes process cwd equals selected root. Proto options,
+imports/include paths, generated stubs and streaming execution remain explicit limits.
+Original method names take precedence; bounded ordinary camel/snake aliases are supported,
+while acronym fallback mapping remains unresolved. These are implementation-subset choices,
+not runtime or universal framework coverage claims.
 
 ## 11. Run log protocol
 
@@ -194,3 +197,42 @@ and later application evaluation. Product implementation has not started.
 
 2026-11-03 — User requested one ignored run log per deliverable; updated log paths
 and resume prompts. This changes execution tracking only, with no product/test change.
+
+
+### 2026-11-05 — Authorized implementation and acceptance evidence
+
+**Source.** User requested unattended deliverable 7 implementation, fixtures only, in the existing
+feature worktree; no publication or deliverable 8 work.
+
+**Changed Sections.** Authorization header, §3 adjacent consumer paths, §6 evidence descriptions,
+§9 implementation checklist and §10 resolved implementation-subset choices. No new vulnerability
+family, target language, public selector shape or runtime execution capability was added.
+
+**Rationale and summary.** The bounded unary adapter now binds verified source registrations,
+request fields and existing SQL evidence. Literal proto paths assume process cwd equals selected
+root; ordinary method aliases and protobufjs7 field naming are supported conservatively. Generated,
+streaming, dynamic and unsupported schema/API paths remain located gaps. Existing gRPC presenters
+were reused without changing reporting policy.
+
+**Verification impact.** Acceptance uses actual parsed JS/TS fixtures through completeness, local
+judge stubs and report/CLI exports. Stub outcomes establish policy behavior, not model accuracy.
+
+| Criterion | Passing evidence |
+| --- | --- |
+| AC1 | `internal/parse/grpc_test.go`: `TestGRPCServiceBindings` and method-mapping controls; distinct instances/contexts, shared callable, exact proto and source provenance |
+| AC2 | `TestGRPCInputRolesAndControls` in parse/judge, field-name controls and JS/TS fixtures; raw/open, bound, guarded and unknown controls through real SQL completeness, local stub and changed-request replay |
+| AC3 | `TestGRPCUnknownAndStreaming` plus budget/collision controls; located gaps for all streaming shapes, descriptors/stubs/imports/options, fake APIs, mutations, root escapes and reached bounds |
+| AC4 | `TestGRPCPipeline` in parse/report/CLI plus typed-selector controls; 11 entries and 6 SQL uses per language, deterministic scans, zero-use visibility, JSON/HTML/SARIF and immutable saved exports |
+
+Final scoped acceptance, full `go test -race ./... -count=1`, `go vet ./...`, `go build ./...`,
+changed-file formatting and `git diff --check` pass. Commands use `GOTOOLCHAIN=local`,
+`GOPROXY=off` and the ignored local Go cache. Nine existing fixture sets retain exact JSON
+parity against the source-built starting revision, including HTTP, browser, GraphQL and Python.
+The append-only run log names final acceptance/check logs, artifact manifests/hashes and exact paths.
+
+Offline generated and stub-assessed reports were source/status/export audited separately. The
+browser's local-file URL policy blocked rendered preview; no visual/interaction pass is claimed.
+Rendered report review and real gRPC application evaluation remain deferred review evidence, not
+fixture acceptance or runtime-accuracy claims. No sample app, historical answer, paid endpoint,
+new worktree, commit/push, merge or deliverable 8 was used/started. Next checkpoint is human review
+of this deliverable and rendered reports; further deliverables require a separate assignment.

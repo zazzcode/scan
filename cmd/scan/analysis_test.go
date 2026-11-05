@@ -199,3 +199,70 @@ func TestGraphQLPipelineAndBounds(t *testing.T) {
 		})
 	}
 }
+
+func TestGRPCPipeline(t *testing.T) {
+	t.Setenv("SCAN_FINDINGS_DIR", "")
+	for _, language := range []string{"javascript", "typescript"} {
+		t.Run(language, func(t *testing.T) {
+			root := "../../internal/parse/testdata/" + language + "/grpc"
+			var out, stderr bytes.Buffer
+			if code := run([]string{"--analyze", "--json", "--entry-kind", "grpc", root}, &out, &stderr); code != exitOK {
+				t.Fatalf("code=%d stderr=%s", code, stderr.String())
+			}
+			var r analysis.AnalysisReport
+			if err := json.Unmarshal(out.Bytes(), &r); err != nil {
+				t.Fatal(err)
+			}
+			if r.SchemaVersion != 3 || len(r.Entries) != 11 {
+				t.Fatalf("wrong inventory %d", len(r.Entries))
+			}
+			if err := r.ValidateUses(); err != nil {
+				t.Fatal(err)
+			}
+			for _, e := range r.Entries {
+				if e.HTTP != nil || e.Kind != "grpc" {
+					t.Fatal("fake HTTP entry")
+				}
+			}
+			original := append([]byte{}, out.Bytes()...)
+			saved := filepath.Join(t.TempDir(), "grpc.json")
+			if err := os.WriteFile(saved, original, 0600); err != nil {
+				t.Fatal(err)
+			}
+			for _, mode := range []string{"--export-html", "--export-sarif"} {
+				out.Reset()
+				stderr.Reset()
+				if code := run([]string{mode, saved}, &out, &stderr); code != exitOK {
+					t.Fatalf("%s: %s", mode, stderr.String())
+				}
+				if mode == "--export-html" && (!strings.Contains(out.String(), "fixtures.search.SearchService/Raw") || !strings.Contains(out.String(), "fixtures.search.SearchService/Absent")) {
+					t.Fatal("resolver/zero-use presentation missing")
+				}
+				if mode == "--export-sarif" && (!json.Valid(out.Bytes()) || strings.Contains(out.String(), `"scan.route"`)) {
+					t.Fatal("invalid/fake HTTP SARIF")
+				}
+			}
+			after, err := os.ReadFile(saved)
+			if err != nil || !bytes.Equal(after, original) {
+				t.Fatal("saved export changed source evidence")
+			}
+			out.Reset()
+			stderr.Reset()
+			if code := run([]string{"--analyze", "--json", "--entry-kind", "grpc", "--entry-id", r.Entries[0].ID, root}, &out, &stderr); code != exitOK {
+				t.Fatal(stderr.String())
+			}
+			var selected analysis.AnalysisReport
+			if err := json.Unmarshal(out.Bytes(), &selected); err != nil {
+				t.Fatal(err)
+			}
+			if len(selected.Entries) != 1 || selected.Entries[0].ID != r.Entries[0].ID {
+				t.Fatal("entry-id filter mismatch")
+			}
+			out.Reset()
+			stderr.Reset()
+			if code := run([]string{"--analyze", "--route", "GET /grpc", root}, &out, &stderr); code == exitOK {
+				t.Fatal("HTTP-only selector matched gRPC")
+			}
+		})
+	}
+}

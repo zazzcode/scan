@@ -24,6 +24,8 @@ func (s *moduleSet) refineQueryEvidence(use *analysis.CandidateUse) {
 	}
 	if use.Check != nil && use.Check.Selector != nil && use.Check.Selector.Kind == "graphql" {
 		c.ModelFacts = []string{"Scope is a verified Apollo schema field and its independently bound resolver invocation. Only args values have external provenance; parent/context/info and parent-result transitions remain unknown. SDL scalar/type/directive names establish neither database safety nor application validation policy."}
+	} else if use.Check != nil && use.Check.Selector != nil && use.Check.Selector.Kind == "grpc" {
+		c.ModelFacts = []string{"Scope is a verified grpc-js unary service/method with an independently bound handler invocation. Only call.request fields have external request provenance; metadata, context and callback roles remain distinct/unknown. Proto3 field types and decoding do not establish database protection or business validation policy."}
 	} else if chainSupplied && len(s.contextLimits) == 0 {
 		c.ModelFacts = []string{
 			"Scope is direct Express registrations with syntactically matched earlier middleware and same-route handlers. Matching source bodies or explicit transport/authentication adapter contracts are supplied; unsupported/dynamic chains remain blockers.",

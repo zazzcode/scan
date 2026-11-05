@@ -75,7 +75,7 @@ func (s *moduleSet) chainEvidence(report *analysis.AnalysisReport, check analysi
 	middlewareFiles := map[string]bool{}
 	seen := map[string]bool{}
 	for _, entry := range report.Entries {
-		if entry.Kind == "graphql" && check.NormalizedSelector().Matches(entry) {
+		if (entry.Kind == "graphql" || entry.Kind == "grpc") && check.NormalizedSelector().Matches(entry) {
 			for _, u := range report.Uses {
 				if u.EntryID != entry.ID {
 					continue
@@ -94,7 +94,9 @@ func (s *moduleSet) chainEvidence(report *analysis.AnalysisReport, check analysi
 						continue
 					}
 					params, _ := functionParameters(body.Parent(), m.src)
-					if len(params) > 1 {
+					if entry.Kind == "grpc" && len(params) > 0 {
+						gaps = append(gaps, s.inputHelperGaps(m, body, params[0].name, check.Fields)...)
+					} else if len(params) > 1 {
 						gaps = append(gaps, s.inputHelperGaps(m, body, params[1].name, check.Fields)...)
 					}
 					s.includeHelpers(m, body, &context, seen, 0)

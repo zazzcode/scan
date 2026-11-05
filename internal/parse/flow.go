@@ -9,6 +9,8 @@ import (
 )
 
 type value struct {
+	grpcInput          *grpcInput
+	grpcTransfers      []analysis.Evidence
 	graphqlArgs        *analysis.Evidence
 	graphqlTransfers   []analysis.Evidence
 	domNode            bool
@@ -246,6 +248,17 @@ func (f *flow) branches(n *sitter.Node) {
 				v.graphqlTransfers = append([]analysis.Evidence{}, exits[0].env[key].graphqlTransfers...)
 			}
 		}
+		if len(exits) > 0 && exits[0].env[key].grpcInput != nil {
+			marker := exits[0].env[key].grpcInput
+			unchanged := true
+			for _, e := range exits {
+				unchanged = unchanged && e.env[key].grpcInput == marker
+			}
+			if unchanged {
+				v.grpcInput = marker
+				v.grpcTransfers = append([]analysis.Evidence{}, exits[0].env[key].grpcTransfers...)
+			}
+		}
 		v.gaps = append(v.gaps, f.gap("unknown_control_effect", "value may change across unsupported control flow", n))
 		merged[key] = v
 	}
@@ -315,6 +328,9 @@ func (f *flow) eval(n *sitter.Node) value {
 		}
 		obj := n.ChildByFieldName("object")
 		base := f.eval(obj)
+		if v, ok := f.grpcProjection(n, base); ok {
+			return v
+		}
 		v := base
 		segment := "[]"
 		if n.Kind() == "member_expression" {
@@ -476,6 +492,13 @@ func (f *flow) children(n *sitter.Node) value {
 
 func (f *flow) transfer(v value, kind string, n *sitter.Node) value {
 	out := v
+	if v.grpcInput != nil {
+		out.grpcTransfers = append(append([]analysis.Evidence{}, v.grpcTransfers...), f.module.evidence(kind, n))
+		if len(out.grpcTransfers) > 64 {
+			out.grpcTransfers = out.grpcTransfers[:64]
+			out.gaps = append(out.gaps, f.gap("transfer_limit", "gRPC object exceeds 64 transfer steps", n))
+		}
+	}
 	if v.graphqlArgs != nil {
 		out.graphqlTransfers = append(append([]analysis.Evidence{}, v.graphqlTransfers...), f.module.evidence(kind, n))
 		if len(out.graphqlTransfers) > 64 {
@@ -656,10 +679,17 @@ func (f *flow) call(n *sitter.Node) value {
 	}
 	// A helper that contains the sink is not a validator of its arguments.
 	if !entered {
-		if f.entry.Kind == "graphql" {
+		if f.entry.Kind == "graphql" || f.entry.Kind == "grpc" {
 			for _, v := range values {
 				if len(v.deps) > 0 && !nativeStringOperation(f.module, n) {
-					f.gaps = append(f.gaps, f.gap("input_helper_unresolved", "Unresolved call receives a resolver-derived value before this operation: "+name, n))
+					origin := "resolver-derived"
+					if f.entry.Kind == "grpc" {
+						origin = "gRPC request-derived"
+					}
+					f.gaps = append(f.gaps, f.gap("input_helper_unresolved", "Unresolved call receives a "+origin+" value before this operation: "+name, n))
+				}
+				if v.grpcInput != nil {
+					f.gaps = append(f.gaps, f.gap("grpc_argument_escape", "Call/request object reaches unresolved call: "+name, n))
 				}
 				if v.graphqlArgs != nil {
 					f.gaps = append(f.gaps, f.gap("graphql_argument_escape", "Argument object reaches an unresolved call: "+name, n))
