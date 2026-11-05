@@ -90,7 +90,34 @@ func (s *moduleSet) refineQueryEvidence(use *analysis.CandidateUse) {
 		}
 	}
 	c.Blockers = blockers
+	seenHex := map[analysis.Span]bool{}
+	for _, d := range use.Dependencies {
+		for _, e := range d.Transfers {
+			if e.Kind != "native_hash_hex" || seenHex[e.Span] {
+				continue
+			}
+			seenHex[e.Span] = true
+			module := s.modules[e.Span.File]
+			if module == nil {
+				continue
+			}
+			n := nodeAt(module.tree.RootNode(), e.Span.StartByte, e.Span.EndByte)
+			input, evidence := nativeHashHex(module, n)
+			if input == nil {
+				continue
+			}
+			for _, witness := range evidence {
+				c.Evidence[witness.Kind] = append(c.Evidence[witness.Kind], witness)
+			}
+			c.ModelFacts = append(c.ModelFacts, "The exact native crypto expression "+e.Text+" at "+e.Span.File+" returns hexadecimal text [0-9a-f] on normal completion, or throws. Only this expression's output has that alphabet; raw input and sibling alternatives do not inherit it. Trace helper-return and concatenation transfers separately for each input. This does not establish cryptographic strength or business validation and does not parameterize concatenated SQL. Reference: https://nodejs.org/api/crypto.html#hashdigestencoding")
+		}
+	}
+	s.expressContractFacts(use)
+	if use.Kind == "nosql_query_candidate" {
+		c.ModelFacts = append(c.ModelFacts, "For selector-value operator injection, distinguish an object from a primitive string: Mongo-style operators inside an object are interpreted, while text such as $ne inside a primitive string remains data. A dominating typeof field !== string rejection that returns/throws before the sink excludes object-valued input for that field on the continuing path, provided there is no intervening mutation or bypass. A mere type test without enforcing control flow does not constrain the sink. Evaluate every selector field and path independently; a guard on one field cannot protect another, and a string used as executable $where text has different semantics.")
+	}
 	s.conditionalHelpers(use)
+	s.queryConstraintReview(use)
 }
 
 func nativeStringOperation(m *sourceModule, n *sitter.Node) bool {

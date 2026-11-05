@@ -151,8 +151,9 @@ Current use/finding records serialize `entry_id` and `invocation_context_id` as 
 association. Typed entry metadata supplies HTTP/browser labels; no fake HTTP route is used
 for browser roots. SARIF includes generic entry/context properties and entry-level coverage
 notifications for unknown dispatch, including zero-use entries. Original historical answers,
-classification and source locations remain preserved during offline export. Richer framework
-presenters are a later deliverable; this migration does not add GraphQL/gRPC detection.
+classification and source locations remain preserved during offline export. Typed presenters cover HTTP, browser events, GraphQL and gRPC. Their adapters now supply actual
+source-backed entries; the [acceptance results](../evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05)
+separate parsed-source integration, synthetic policy controls and completed bounded localhost rendered inspection.
 
 ## Typed entry projection and selectors
 
@@ -172,3 +173,8 @@ CLI filter intersection. Check input normalizes legacy HTTP method/path at decod
 context-scoped requirement assembly retains existing analysis semantics. Canonical JSON
 includes `selected_scope` and `check_matches` with per-context use counts. See the
 [CLI contract and examples](../../docs/running-scans.md#common-entry-selection-and-tagged-checks).
+
+SQL/NoSQL model answers that conflict with bounded hex-only SQL or relevant selector type-guard
+evidence retain explicit `injection_constraint_review` and remain Review. Raw answers and construction
+practice stay visible; the gate never fabricates a Protected result. See the
+[database analysis rules](../../docs/analysis/database-injection.md).

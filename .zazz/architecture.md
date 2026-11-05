@@ -1,6 +1,6 @@
 # Architecture
 
-**Implemented architecture, updated 2026-11-03.** This document owns package responsibilities,
+**Implemented architecture, updated 2026-11-05.** This document owns package responsibilities,
 terminology and pipeline boundaries. Planned components are labeled explicitly. Product direction
 lives in [project.md](project.md), decisions in the [proposal](project/03-jev-design-proposal.md),
 and delivery order in the [implementation plan](project/implementation-plan.md).
@@ -148,51 +148,31 @@ The shared design separates these concepts:
 | Invocation context | Actual parameter/receiver/closure bindings and applicable controls for a particular dispatch path |
 | Transport | Optional delivery context, such as an HTTP endpoint carrying GraphQL operations |
 
-HTTP handlers and browser entries are the current consumers. Future examples include GraphQL fields,
-message consumers, CLI commands and scheduled jobs. Direct calls, decorator/factory registration,
-lookup tables, schema resolver bindings and event subscriptions are dispatch mechanisms, not entry
-kinds. One entry can have multiple possible targets; a callable can be exposed by multiple entries
-or registrations. Shared bodies MUST NOT lend a guard from one dispatch context to another.
+Implemented consumers include JS/TS HTTP, Python HTTP, browser script/component and explicit
+DOM/window events, finite dynamic HTTP registration, bounded Apollo GraphQL resolvers and Node.js
+unary gRPC handlers. Entry kinds remain independent of language and transport. Shared callable bodies
+never supply a sibling invocation's controls. Message queues, CLI commands and scheduled jobs remain
+outside this milestone.
 
-The common model now serves existing JS/TS HTTP, Python HTTP and browser consumers.
-`AnalysisReport` owns canonical entry/registration/dispatch/callable/context collections;
-candidates and findings refer to `entry_id` and `invocation_context_id`. HTTP method/path,
-receiver, raw source path and mounts are optional HTTP metadata. Route inventory remains
-a separate HTTP-specific schema1 view. Shared callable source never supplies a sibling
-invocation's controls. Current check-file selection remains HTTP-specific; typed selectors
-and richer entry presenters are the next deliverable.
+`AnalysisReport` owns canonical entry/registration/dispatch/callable/context collections; candidates
+and findings refer to `entry_id` and `invocation_context_id`. Method/path/mount data belongs only to
+HTTP metadata. `RouteInventory` remains a separate schema1 HTTP view. Kind-specific selectors and
+presenters use the same identities; saved schemas1/2 convert privately at the input boundary without
+inventing missing invocation facts or changing historical answers.
 
-Browser script/component roots retain their supported static slices and explicit unknown
-runtime-exposure gaps. They do not claim event/callback registration completeness. Supported
-earlier HTTP forwarding stages retain source ordering; unknown applicability remains a gap.
-Saved schemas1/2 convert privately at the input boundary without inventing invocation facts.
-See [design](architecture/common-entry-dispatch.md) and
-[consumer migration evidence](specifications/common-entry-dispatch-02-consumers-compatibility.md#implementation-evidence-and-success-assessment-2026-11-03).
-Dynamic registration, explicit browser event bindings, GraphQL and gRPC adapters remain
-separate bounded follow-up deliverables; the model is not a full repository IR rewrite.
+Browser event input, GraphQL args/parent/context/info and gRPC request/metadata/callback roles remain
+separate. Literal SDL/proto declarations establish supported registration/input bindings, not business
+policy or sink protection. Unknown runtime composition, dispatch, applicable guards and reached limits
+remain explicit gaps, including entries with no candidate. Transport relationships are metadata and
+do not multiply resolver uses. No entry-wide safety label or runtime execution claim is produced.
 
-### Future dynamic routes and GraphQL
-
-**Not implemented:** these adapters build on the entry/dispatch decision above.
-
-| Boundary | Required capability | Existing core to reuse |
-|---|---|---|
-| Dynamic registration | Retain factory/loop/configuration provenance, finite target alternatives and unresolved registrations | Supported helper/value transfers, evidence and claim gates |
-| GraphQL | Connect schema fields/operation kinds to resolvers and nested field transitions; associate transport separately | Sink models and claim-specific judgment/reporting |
-| Input provenance | Distinguish resolver arguments, parent result and context; establish actual coercion and application constraints | Named requirements, API contracts and validation/protection separation |
-| Coverage | Distinguish undiscovered entries/unresolved dispatch from incomplete traces within discovered entries | Explicit gaps and snapshot provenance |
-| Scale | Bound dispatch alternatives and recursive field/helper traversal; retain invocation context and reusable summaries | Deterministic bounded evidence and exact-request identity |
-
-GraphQL executes selected fields through resolvers; a resolver can receive a parent object, field
-arguments and request context. Those are distinct provenance roles. [GraphQL execution](https://graphql.org/learn/execution/)
-Authentication at the transport or a directive name alone does not establish field/object authorization;
-actual enforcement may live in business logic. Authorization remains a separate future claim family.
-[GraphQL authorization](https://graphql.org/learn/authorization/)
-
-Unknown registrations, resolver dispatch, loaders and runtime composition MUST remain gaps rather
-than inferred protection. The selector/check schema and reports will need entry-specific locations
-and requirements; method/path remains HTTP metadata. A shared model does not supply new source,
-flow, authorization or framework semantics automatically.
+The [implemented subsets and limits](../docs/running-scans.md#common-entry-selection-and-tagged-checks)
+and [design](architecture/common-entry-dispatch.md) own the bounded contracts. The
+[acceptance results](evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05)
+record actual adapter-to-claim/report checks and unchanged HTTP/browser evidence. Automated acceptance and bounded localhost rendered interaction/narrow-layout review pass. The
+[SQL/NoSQL closeout](evaluation/common-entry-dispatch-results.md#sqlnosql-only-accuracy-refresh-and-rendered-review)
+records the later accuracy refresh and remaining calibration limits; human review/merge is pending. Broader GraphQL/gRPC application evaluation and a
+full repository IR remain separate work.
 
 ## 4. Normalized representation and graph views
 

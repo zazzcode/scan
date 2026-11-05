@@ -1,14 +1,16 @@
 # Common entry, dispatch, and entry-specific reporting
 
-Proposed architecture, 2026-11-03. This document describes the intended implementation;
-it does not claim the adapters or common model are already implemented.
+Implemented bounded architecture, updated 2026-11-05. The shared model, existing consumers,
+selectors/presenters, explicit browser events, finite dynamic HTTP, Apollo GraphQL and unary Node.js
+gRPC subsets are implemented. [Acceptance evidence and remaining visual review](../evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05)
+distinguish implementation from final milestone completion.
 The [delivery brief](../project/common-entry-dispatch.md#outcome) owns scope;
 the [deliverable contracts](../specifications/common-entry-dispatch.md) own execution.
 
-## 1. Problem and existing boundaries
+## 1. Original problem and migration boundaries
 
 The scanner already separates source evidence, semantic judgment, policy, and reporting.
-The weak boundary is how analysis starts and how the invocation is identified:
+The pre-migration boundary coupled analysis starts and invocation identity to HTTP:
 
 - `internal/analysis/analysis.go`: `Entry.Route`, `CandidateUse.RouteID` / `ClientID`,
   `Check.Method` / `Path`, and separate `AnalysisReport.ClientEntries`.
@@ -76,7 +78,7 @@ contexts, yielding separate use records when applicable.
 Existing shape to replace: `Entry{Route: r, Handler: ...}` plus `RouteID` / `ClientID`
 associations in `internal/analysis/analysis.go`.
 
-### Schema-3 shape to implement
+### Implemented schema-3 shape
 
 The report has `entries`, `registrations`, `dispatch_bindings`, `callables`,
 `invocation_contexts`, `uses`, `gaps`, `files`, `analysis_guidelines` and existing shared
@@ -114,8 +116,7 @@ For example, a new check can select a resolver without HTTP metadata:
 The absence of a business constraint in this example MUST remain unknown/not established
 for validation; that text is not an application policy. HTTP selectors carry method/path;
 gRPC selectors carry service/method; browser selectors carry category/name/event where
-known. Validate kind-specific fields and reject incompatible combinations. All fields
-shown here are proposed new serialization, not claims about existing accepted input.
+known. Validate kind-specific fields and reject incompatible combinations. The tagged selector is accepted input; its policy text alone does not establish an application requirement.
 
 ## 4. Adapter-to-flow boundary
 
@@ -223,7 +224,7 @@ Legacy wire types remain private to compatibility decoding. Remove superseded in
 route/browser identity aliases and duplicate canonical state before milestone completion.
 Intermediate migration checkpoints are not final schema/compatibility acceptance.
 
-## 8. Bounded framework proposals
+## 8. Implemented bounded framework subsets
 
 The user prioritized Node.js GraphQL first and asked for browser event support; exact
 framework targets are flexible. Apollo and grpc-js are the concrete initial subsets chosen
@@ -276,7 +277,7 @@ before implementation and pin fixture dependency declarations; source fixtures a
 
 Initial expansion limits: 128 derived registrations per registration site, 16 target
 alternatives per entry, 64 contexts per entry and 10,000 newly derived entry/binding/context
-records per scan. These are proposed deterministic adapter limits, additional to existing
+records per scan. These are deterministic adapter limits, additional to existing
 flow limits (three helper levels / 24 expansions), file/input and judge limits. At a limit,
 retain a located reached-limit gap including unexpanded remainder; do not silently truncate
 and claim coverage. Sort work before consuming budgets. Preserve existing direct entries;
@@ -317,8 +318,8 @@ and reinterpreting old answers. The phase contracts require direct negative cont
   documents resolver maps and distinct parent/argument/context/info parameters.
 - [gRPC Node basics](https://grpc.io/docs/languages/node/basics/) documents descriptor loading,
   service registration and separate unary/streaming shapes. The bounded support above
-  is a zazzles proposal derived from those APIs, not an upstream completeness guarantee.
+  is a bounded zazzles implementation derived from those APIs, not an upstream completeness guarantee.
 
-After implementation, update the owning architecture/reporting/user guides to describe
-actual behavior and link evaluation evidence. Keep this design for rationale and contracts
-for acceptance; do not copy implementation status into several contradictory documents.
+The owning architecture/reporting/user guides describe the implemented boundaries. The
+[results](../evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05) own measured
+regressions, artifact hashes and outstanding acceptance; contracts own the required checks.

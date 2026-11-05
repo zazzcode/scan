@@ -40,6 +40,32 @@ a MongoDB server or establish support for every MongoDB driver. Unsupported bind
 - A positively constrained scalar selector value can be protected from operator injection.
 - JSON/body parsing is transport handling. It does not establish a per-field scalar schema.
 
+## Bounded Express and Mongoose context
+
+Immutable direct imports of default method-override/upload adapters and literal-data session options
+can supply transport contracts. Custom callbacks/stores, dynamic options, mutation or escaped bindings
+remain unresolved. JSON parsing does not impose a scalar schema. A verified `validator.isEmail` call
+constrains its argument only; it cannot validate a sibling password selector.
+
+Mongoose query claims require the selected model's actual schema. The adapter follows the sink and
+registration modules' direct static imports/requires, with a 24-module bound, and accepts one verified
+`mongoose.model` registration with a literal/default schema constructor. It does not borrow unrelated
+same-name schemas. Ambiguous/missing schemas, unsupported constructors and custom hooks, callbacks,
+mutations or escapes retain blockers or missing required evidence. This is bounded module context,
+not complete model/plugin analysis.
+
+An exact root dependency pin matching the lock-derived version can supply the
+[Mongoose 4.2.4 casting contract](https://github.com/Automattic/mongoose/blob/4.2.4/lib/cast.js).
+Its String paths retain recognized conditional operators such as `$ne`; persistence validation does
+not force scalar equality in query filters. `findById` and ObjectId casting remain distinct from
+String selector fields. Declared dependency evidence does not verify an installed runtime.
+
+A supplied `typeof` guard is evidence to assess against its enforcing branch and subsequent writes.
+The bounded policy conservatively keeps a vulnerable model answer in Review when a relevant selected
+field has preceding type-guard evidence that needs independent bypass review. It does not turn the
+witness into a Protected result. This can leave real vulnerabilities inconclusive when another field
+or path is unsafe; current controls expose that limit explicitly.
+
 ## Conditional values and conversions
 
 Analysis MUST evaluate each output alternative separately. A conversion's guarantee applies only
@@ -67,6 +93,22 @@ scoped to one supported unsafe alternative, with its configuration precondition 
 source proving a branch impossible excludes it; an unknown necessary path fact remains Inconclusive.
 Do not require runtime exploitation to judge a source-supported path, or assume every configuration
 is vulnerable merely because one unsafe path exists.
+
+### Native hexadecimal digest output
+
+A verified immutable namespace/default `crypto` or `node:crypto` import can model the exact chained
+`createHash(literal).update(value[, 'utf8']).digest('hex')` result. The bounded algorithms are md5,
+sha1, sha256, sha384 and sha512. The output on normal completion is hexadecimal text; errors may throw.
+The contract follows helper-return dependencies, with exact import and expression witnesses. It does
+not endorse a hash for password storage. Unknown encodings, constructors, mutation and unsupported
+chains remain unmodeled. See the [Node Hash API](https://nodejs.org/api/crypto.html#hashdigestencoding).
+
+A raw sibling alternative never inherits the digest's alphabet. If every SQL-text dependency carries
+that verified hex transfer, a contradictory vulnerable model answer is conservatively kept in Review
+with `injection_constraint_review`; construction practice and raw answers remain visible. This gate
+cannot establish protection and is not a general proof of final output constraints after arbitrary
+transformations. Fresh calibration found that the current judge can overcall both hex-only SQL and
+scalar-guarded NoSQL, so model agreement alone is not an accuracy pass.
 
 ## Outcomes
 

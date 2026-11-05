@@ -67,5 +67,8 @@ func protocolVersion(u analysis.CandidateUse) string {
 	if u.Kind == "xss_candidate" {
 		return xssQuestionVersion
 	}
+	if u.Kind == "sql_query_candidate" || u.Kind == "nosql_query_candidate" {
+		return injectionQuestionVersion
+	}
 	return questionVersion
 }

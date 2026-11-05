@@ -70,7 +70,7 @@ shared operation/evidence links. Shared helper records can also repeat for multi
 
 ## Locations and evidence
 
-**Route location** points to the route declaration. **Finding location** inside the expanded row
+**Declaration location** points to the entry registration or schema declaration. **Finding location** inside the expanded row
 points to the recorded operation; it can be in another file. Inspect the operation excerpt, inputs,
 transfers, relevant context, guards, and gaps before applying a change. No resolved request dependency
 means external control is unknown, unless there is positive evidence of a constant or trusted source.
@@ -91,7 +91,7 @@ Missing modeled validation alone does not establish that every runtime path lack
 
 Report examples are illustrative, not applied or verified patches. JSON includes `entries`, `uses`,
 `gaps`, `files`, `limitations`, presentation `findings`, `finding_types`, and `presentation_version`.
-Human records reference `use_id` and `route_id`; raw assessments preserve provider/model, answers,
+Human records reference `use_id`, `entry_id` and `invocation_context_id`; raw assessments preserve provider/model, answers,
 completion status, blockers, and scope. HTML and SARIF are offline views of that evidence.
 
 ## Completion and compatibility

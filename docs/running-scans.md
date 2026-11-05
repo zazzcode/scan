@@ -320,3 +320,13 @@ versions remain unverified assumptions. Scanning never installs dependencies, ex
 runs generators. Offline discovery remains unassessed; local-stub protection controls prove scanner
 policy behavior, not model accuracy or application runtime behavior. Real gRPC application evaluation
 has not been performed.
+
+## Cross-entry verification evidence
+
+The [acceptance results](../.zazz/evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05)
+compare existing HTTP/browser samples with source-only event, dynamic HTTP, GraphQL, gRPC and mixed
+fixtures. Fresh full real-judge runs now complete all1146 eligible assessments across seven example
+apps. Paid results, offline discovery, synthetic policy controls and historical answers remain separate
+evidence. Supported source-reference checks and format compatibility pass; model completion does not
+establish exhaustive accuracy or runtime exploitability. Mandatory rendered report review is
+complete through bounded inspection of the user-opened localhost HTTP tab; human review/merge remains pending.

@@ -177,5 +177,9 @@ Existing HTTP and browser rows now project from one canonical entry/context mode
 than separate route/client ID authorities. HTTP presentation remains familiar; browser roots
 remain in their own section. Entry rows include registration, dispatch and invocation gaps
 even when no candidate use exists. Unknown associations retain explicit unresolved rows.
-The template, layout, sorting script and CSS are unchanged by the model migration; richer
-entry-specific details and selectors remain the next deliverable.
+The shared template now presents typed entry labels, declaration/dispatch metadata and common
+selectors without fabricated HTTP fields. JSON/HTML/SARIF status, identity and source-location parity
+is covered by [cross-entry acceptance](../evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05).
+Rendered sorting, disclosures, keyboard focus and390px layout passed bounded inspection through the
+user-opened localhost HTTP tab. The initial file-preview restriction remains historical evidence;
+actual reviewed HTML hashes and screenshots are indexed in the ignored acceptance artifacts.

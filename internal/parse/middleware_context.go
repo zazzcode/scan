@@ -69,6 +69,10 @@ func (s *moduleSet) middlewareContext(m *sourceModule, route analysis.Route) ([]
 		out = append(out, m.evidence("middleware_registration", call))
 		for i := first; i < args.NamedChildCount(); i++ {
 			arg := args.NamedChild(i)
+			if adapter := middlewareAdapterEvidence(m, arg); len(adapter) > 0 {
+				out = append(out, adapter...)
+				continue
+			}
 			if transportMiddleware(m, arg) {
 				continue
 			}

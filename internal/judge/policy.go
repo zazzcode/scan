@@ -39,6 +39,13 @@ func applyPolicy(use analysis.CandidateUse, a *analysis.Assessment) {
 		}
 	}
 	blockers := append([]analysis.Gap{}, c.Blockers...)
+	if c.ClaimKind == "injection" && a.Answers["injection_protection"] == "vulnerable" {
+		for _, role := range []string{"sql_all_inputs_hex", "selector_type_guard"} {
+			if len(c.Evidence[role]) > 0 {
+				blockers = append(blockers, analysis.Gap{Kind: "injection_constraint_review", Detail: "Vulnerable answer requires independent review against supplied " + role + " evidence; no constraint bypass is established by this bounded policy", At: use.Sink.Span})
+			}
+		}
+	}
 	for _, required := range c.Required {
 		if len(c.Evidence[required]) == 0 {
 			blockers = append(blockers, analysis.Gap{Kind: "required_evidence_missing", Detail: required, At: use.Sink.Span})

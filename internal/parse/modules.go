@@ -16,18 +16,19 @@ type importBinding struct {
 	declaration  *sitter.Node
 }
 type sourceModule struct {
-	commentsReady  bool
-	comments       []sourceComment
-	browserGlobals map[string]analysis.Evidence
-	file           string
-	src            []byte
-	hash           string
-	tree           *sitter.Tree
-	funcs          map[string]*sitter.Node
-	exports        map[string]*sitter.Node
-	imports        map[string]importBinding
-	express        map[string]bool
-	receivers      map[string]bool
+	contractBindings map[string]bool
+	commentsReady    bool
+	comments         []sourceComment
+	browserGlobals   map[string]analysis.Evidence
+	file             string
+	src              []byte
+	hash             string
+	tree             *sitter.Tree
+	funcs            map[string]*sitter.Node
+	exports          map[string]*sitter.Node
+	imports          map[string]importBinding
+	express          map[string]bool
+	receivers        map[string]bool
 }
 
 type moduleSet struct {

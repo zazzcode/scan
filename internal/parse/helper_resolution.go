@@ -93,6 +93,12 @@ func (s *moduleSet) inputHelperGaps(m *sourceModule, body *sitter.Node, req stri
 		if !relevant {
 			return
 		}
+		if nativeHashChainCall(m, call) {
+			return
+		}
+		if len(inputPredicateEvidence(m, call)) > 0 {
+			return
+		}
 		if _, helper := s.resolveCall(m, call); helper != nil {
 			return
 		}

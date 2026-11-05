@@ -577,6 +577,16 @@ func (f *flow) call(n *sitter.Node) value {
 		return value{}
 	}
 	name := fn.Utf8Text(f.module.src)
+	if input, evidence := nativeHashHex(f.module, n); input != nil {
+		v := f.eval(input)
+		for _, e := range evidence {
+			f.context = append(f.context, e)
+			if e.Kind == "native_hash_hex" {
+				v = f.transfer(v, e.Kind, n)
+			}
+		}
+		return v
+	}
 	if f.client != nil {
 		if v, handled := f.clientCall(n, fn, args); handled {
 			return v

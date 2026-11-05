@@ -86,6 +86,7 @@ func (s *moduleSet) buildEntryChecks(report *analysis.AnalysisReport, checks []a
 					}
 					use.Context = append(use.Context, binding...)
 					use.Completeness.Evidence["sink_binding"] = binding
+					s.mongooseQueryContext(&use)
 				}
 				for _, g := range use.Gaps {
 					switch g.Kind {
@@ -97,7 +98,7 @@ func (s *moduleSet) buildEntryChecks(report *analysis.AnalysisReport, checks []a
 						}
 					case "branch_exit":
 						covered := false
-						if check.Selector != nil && (check.Selector.Kind == "graphql" || check.Selector.Kind == "grpc") {
+						{
 							for _, body := range completeBodies {
 								if g.At.File == body.Span.File && g.At.StartByte >= body.Span.StartByte && g.At.EndByte <= body.Span.EndByte {
 									covered = true

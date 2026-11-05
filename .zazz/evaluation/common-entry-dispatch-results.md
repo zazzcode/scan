@@ -1,5 +1,183 @@
 # Common entry and dispatch implementation results
 
+
+## Cross-entry acceptance, 2026-11-05
+
+**Original offline/stub acceptance passes; milestone acceptance remains incomplete.** The browser tool rejected
+the local HTML URL and explicitly prohibited workaround or alternate browser surfaces. No rendered
+visual, interaction, keyboard-focus or narrow-layout pass is claimed. Mandatory AC4 remains open; the user subsequently added AC5: fresh full real-judge E2E of all seven
+example apps, Juice Shop first, now passing supported source-reviewed checks;
+The user explicitly approved publishing verified work as a draft with AC4 retained as a pre-merge
+blocker. This is not a rendered-review pass or merge authorization. Human review
+and merge remain separate. No next initiative was started.
+
+Executed as one agent in `common-entry-and-dispatch`, starting from
+`fb8a4012d5426e462d712d2fbac733a22b45a6fd`. Only acceptance tests and owning documentation changed;
+production scanner code, fixture sources, expected labels, goldens and historical raw answers were
+preserved. The original offline checkpoint used no paid calls; the subsequently authorized fresh
+paid E2E results are below. No target execution/dependency installation, new worktree or merge occurred.
+
+| Acceptance | Evidence and result |
+| --- | --- |
+| AC1: mixed adapter pipeline | `cmd/scan/entry_pipeline_test.go`, `TestMixedEntryPipeline`: actual parsed JS DOM events/Apollo/gRPC, TS finite HTTP and Python generated Flask/FastAPI in one selected root; 68 entries, 53 uses, canonical contexts and immutable HTML/SARIF exports. PASS |
+| AC2: scoped protection/coverage | `internal/judge/entry_protection_test.go`, `TestEntryProtectionCoverage`: six actual parsed fixture sets, including mixed, through local HTTP stubs and exact/cross-context replay. Guarded/open shared SQL bodies retain separate outcomes; unknown transforms/guards reject protected answers. PASS |
+| AC2: catalog/report boundary | `internal/report/entry_coverage_test.go`, `TestEntryProtectionCoverage`: actual parsed resolver/handler uses plus explicitly synthetic multiple-target/unresolved-remainder and transport metadata additions. Counts do not multiply; unknown alternatives remain visible. These additions prove the catalog/presenter boundary, not automatic transport discovery. PASS |
+| AC3: regressions/compatibility | Full race/vet/build; both provider local stubs/failures; changed-request replay; ten exact fixture comparisons; seven real sample source scans; original Python 29/29; immutable schema1/2/3 exports. PASS |
+| AC5: real full-judge E2E | User-added requirement:1146 eligible fresh requests across all seven apps, with Juice Shop paid run and full report first, then other apps. PASS1146/1146 eligible completions; no historical replay or stub substitutes for it |
+| AC4: report review | 24 generated offline/stub bundles pass source, canonical identity, HTML badge and SARIF status/location parity audits. Required rendered HTTP/event/GraphQL/gRPC/mixed inspection is BLOCKED, not satisfied by markup checks |
+
+### Source-reviewed expected and observed behavior
+
+Expectations derive from fixture source and its existing independent controls, before inspecting
+current report output. Fixtures are never executed. Python `src` and literal gRPC descriptor paths
+remain at the selected root, preserving the documented import/cwd boundary. An initial fixture
+layout failed those boundaries; corrected source-copy layout required no production change. gRPC's
+seven uses include six SQL candidates and one independent validation observation.
+
+| Source fixture | Entries / uses | Source expectation and observed contextual outcomes |
+| --- | --- | --- |
+| JS browser events | 6 / 4 | Shared raw input/change callback has two separate confirmed stub claims; textContent is Protected; unknown message transform remains evidence-limited; click/missing callback remain zero-use entries |
+| TS finite HTTP | 4 / 4 | Raw factory output confirms under stub; encoded sibling stays Protected; unresolved runtime factory and no-output route remain zero-use entries; validation observations remain Review |
+| JS Apollo | 9 / 7 | Raw/open/object lookup: three confirmed SQL stub claims; bound/guarded injection facets protected; unknown transform evidence-limited. Guarded concatenation still poor practice; only bound SQL is a final green record. Wrapped/absent/constant fields retain coverage |
+| JS unary gRPC | 11 / 7 | Raw/open: two confirmed SQL stub claims; bound/guarded injection facets protected; unknown transform/applicable unknown guard evidence-limited. Guarded construction remains orange; streaming/missing/unused methods retain zero-use inventory |
+| Python generated fixture | 38 / 31 | Actual generated SQL/raw-HTML paths, closure/input binding and independent raw/encoded/unknown controls retained; no sibling protection transfer |
+| Mixed | 68 / 53 | Sum of adapter inventories preserved, with 28 zero-use entries. Stub assesses 36 claim candidates: 22 confirmed, 8 scoped protection, 6 evidence-limited; 17 separate observations remain unassessed |
+
+Final mixed **presentation** records differ intentionally from assessment facets: offline has
+27 poor-practice, 23 Review and 3 Protected records; synthetic assessed has 22 confirmed,
+5 poor-practice, 17 needs-review, 3 needs-evidence and 6 Protected. SQL construction can remain
+orange beside a protected/evidence-limited injection facet. Only final scoped protection gets green;
+no entry-wide safety or runtime exploitability is implied. Stubs prove policy/transport, not model accuracy.
+
+### Before/after compatibility
+
+A source archive of the exact start revision was verified against every Git blob and built offline;
+it is not a worktree. Current versus start JSON is identical for ten fixture sets: string-flow,
+JS/TS events, JS/TS dynamic HTTP, JS/TS GraphQL, JS/TS gRPC and Python generated VulnPy.
+No normalized difference is hidden by ID rewriting. All seven actual applications retain exact
+complete JSON parity with the preserved final D6 current reports, including source/context/status
+facts. There are no unexplained HTTP/browser changes in these bounded comparisons.
+
+| Fresh read-only source scan | Entries / uses | Finding / Review / Protected |
+| --- | --- | --- |
+| ThreatByte | 24 / 56 | 5 / 40 / 11 |
+| Python insecure app | 1 / 2 | 1 / 1 / 0 |
+| Vulnerable Flask App | 19 / 24 | 4 / 20 / 0 |
+| VulnPy | 564 / 827 | 28 / 799 / 0 |
+| Node.js Goof | 19 / 33 | 2 / 29 / 2 |
+| Vulnerable TypeScript app | 19 / 20 | 1 / 19 / 0 |
+| Juice Shop | 167 / 208 | 8 / 200 / 0 |
+
+Every application matched its pinned revision and clean status, including ignored files, before
+and after source scanning. No application was executed or changed. The audit checks 55,553 source
+witnesses across the 24 bundles: 53,452 exact raw excerpts, 2,081 explicitly labeled field projections
+and 20 excerpt-free scope markers. All retain original hashes/spans/line locations. Generated and
+saved-export HTML/SARIF match byte for byte; JSON inputs remain unchanged.
+
+Original saved schema1 Python case commands pass 18 ThreatByte + 3 python-insecure-app +
+8 vulnerable-flask-app = 29/29. VulnPy is separate: its original saved baseline still passes 4/10,
+with the six documented positive misses unchanged. No expected label or old answer was rewritten.
+All seven curated schema1 inputs export unchanged. A synthetic schema2 compatibility input and
+fresh schema3 adapter bundles also export unchanged; synthetic empty schema2 coverage is supplemented
+by the existing compatibility test suite, not presented as historical application accuracy.
+
+### Commands, artifact integrity and remaining review
+
+All Go commands use installed Go1.27.3 darwin/arm64 (module minimum1.27.2), `GOTOOLCHAIN=local`,
+`GOPROXY=off`, and `GOCACHE="$PWD/.zazz/ephemeral/go-cache"` from the assigned worktree.
+
+- `go test -race ./... -count=1` — PASS all eight packages, `d8-final-race.log`; includes final acceptance tests and provider loopback stubs.
+- `go vet ./...` and `go build ./...` — PASS, `d8-final-vet.log`, `d8-final-build.log`.
+- Focused `TestProviders`, invalid/cancel/duplicate answers, exact/changed-request replay and entry/GraphQL/gRPC policy tests — PASS, exact invocation and verbose output in `d8-provider-replay.log` and the run log.
+- `python3 docs/samples/evaluate-python.py <app> docs/samples/<app>/findings.json` — original three apps PASS; separate VulnPy returns expected exit1 for its documented six misses. Exact four commands/output are in `d8-report-manifest.json` / `d8-cli-reports-9med1f6b/case-checks/`.
+- `python3 .zazz/ephemeral/d8-verify-reports.py` — PASS, `d8-report-verification-second.log`; exact scanner CLI/export commands, baseline/source checks, input/output SHA256 hashes and cross-format matrix in `d8-report-manifest.json`.
+- `gofmt -l cmd internal` — empty; `git diff --check` and focused documentation/link/scope review recorded in the run log.
+
+All paths above are relative to ignored `.zazz/ephemeral/`. The review entry point is
+`d8-final-report-index.md`: links to all24 HTML/JSON/SARIF bundles, offline versus stub labels,
+seven fresh sample sets and per-bundle counts. Its manifest anchors the exact output bytes.
+Manifest SHA256: `511a18c60bf5247262fbc7ed9fcfa61d385ddb02a3748db8b0c11423ea5237af`.
+Representative mixed stub HTML SHA256:
+`d1465e25c4a79c05e54c0df91fadddd3e641338e18243465a39eb53266550544`;
+mixed offline HTML:
+`1a44e77a0a11678fd36d62b00f37b84afeda8c9561b0bb2d74946edfdc46f6d1`.
+
+Remaining mandatory review: render HTTP-only, event-only, GraphQL-only, gRPC-only and mixed HTML;
+check typed labels/metadata, source locations/excerpts, counts/statuses, zero-use gaps, sorting,
+native disclosures, keyboard focus and narrow layout. Record actual observations/screenshots and
+hashes; resolve defects and rerun affected checks before completion or conditional publication.
+Broader application-level GraphQL/gRPC evaluation remains deferred. Existing Jinja/framework/flow
+limits and unassessed fresh model judgments remain explicit; these checks do not establish general
+accuracy, universal framework support or independent Findings Review.
+
+
+## Fresh paid full-judge E2E, 2026-11-05
+
+The user expanded final acceptance to all seven real example apps, with the paid Juice Shop full
+report completed and audited first. All1,146 eligible source-backed assessments now complete with
+OpenAI Decisions `gpt-6-luna`. There were1,149 paid attempts: the original calls plus one explicit
+Juice Shop HTTP504 recovery and two VulnPy HTTP503/token-rate429 recoveries. Every original failure
+and raw answer remains preserved. No completed answer was repurchased; every retained answer was
+checked against independently freshly parsed exact request hashes. Twenty-four API-data observations
+remain unassessable without rendering linkage, rather than receiving fabricated judgments.
+
+| Real application | Completed / eligible | Confirmed | Poor practice | Review | Protected |
+| --- | --- | --- | --- | --- | --- |
+| juice-shop | 188 / 188 | 7 | 3 | 198 | 0 |
+| nodejs-goof | 33 / 33 | 2 | 0 | 29 | 2 |
+| vulnerable-typescript-app | 16 / 16 | 2 | 0 | 18 | 0 |
+| ThreatByte | 56 / 56 | 4 | 2 | 16 | 34 |
+| python-insecure-app | 2 / 2 | 1 | 0 | 1 | 0 |
+| vulnerable-flask-app | 24 / 24 | 4 | 0 | 20 | 0 |
+| vulnpy | 827 / 827 | 28 | 0 | 799 | 0 |
+
+Fresh full-judge Python case checks pass29/29 (ThreatByte18, FastAPI3, Erlik8). Source-reference
+checks retain Goof reflected/stored XSS and escaped controls, TypeScript raw search/sensitive logging
+with no invented executed SQL, Juice Shop product-search SQL plus three order/review NoSQL injection
+claims and linked FE/BE raw HTML, and all12 required main-app VulnPy SQL/raw-HTML contexts. VulnPy
+retains28 contextual confirmed positives across its application mounts. The source-reviewed checks
+are in `d8-e2e-source-review.json`; they do not assert exhaustive vulnerability recall.
+
+Juice Shop has7 confirmed findings: one SQL injection, three NoSQL injections, two sensitive request-line
+logging contexts and one cross-tier raw-HTML XSS. Its final contextual outcomes exactly match the
+preserved previously judged D6 report. The prior offline report had no model assessments; that was
+not a model-assessed vulnerability result. Original saved Python29/29 and historical VulnPy4/10
+remain separate immutable baselines; the fresh VulnPy required-context matrix demonstrates the
+supported generated paths without rewriting historical labels. Running the unchanged original
+VulnPy10-case evaluator on the fresh report yields5/10: the three SQL and two framework raw-XSS
+positives are recovered; Jinja is still a genuine positive miss. Its four old warning controls
+(`dynamic_path` at24/32 and `python_registration_unresolved` at33/61) fail because those generated
+registrations are now resolved. They are explained intentional behavior differences, not four new
+missed vulnerabilities. No case file was rewritten; exact output is retained in
+`d8-e2e-fresh-vulnpy-original-cases.json`.
+
+All final paid bundles pass unchanged-source, canonical identity, JSON/HTML/SARIF status/sink-location
+parity and immutable saved-export audits. All targets retain pins, clean status including ignored
+files and reference hashes before/after. Fresh successful answers, exact request/response traces,
+selected final traces, original failures and provider usage are linked from the final report index.
+VulnPy hit the documented2,000,000 TPM provider window; continuation waited for it to clear, then
+used one dispatch/second, max4 in flight, without another rate/funding error. No provider fallback,
+target execution/modification, dependency installation, new worktree or additional initiative occurred.
+
+Provider-reported usage for successful final assessments: `{"input_tokens": 9965521, "output_tokens": 0}`.
+No currency charge or failed-attempt billing is inferred from token counts. Paid manifest:
+`.zazz/ephemeral/d8-paid-e2e-manifest.json`, SHA256 `35239d98f85d28fd02a1723777129658c02cc8bec31710ee22ed0900405bc5b6`.
+Per-app full reports and all HTML/JSON/SARIF views are in the ignored
+`.zazz/ephemeral/d8-final-report-index.md`.
+
+Remaining limits are real: login email SQL is discovered but combined password crypto transfers
+block its injection claim; Goof Mongoose/middleware and stored-origin limits remain; Juice Shop token/
+model-setter/collection/dialog transfers and VulnPy Jinja remain bounded coverage gaps. Source-positive
+cases are not relabeled negative merely because evidence is incomplete. Saved JSON can normalize empty
+invocation gap arrays (`[]` versus `null`); direct rehydration may conservatively reject an otherwise
+unchanged exact replay. Live/recovery requests used fresh parsing and exact hashes; no replay matching
+was weakened and no stale response was accepted. This wire-normalization limitation remains visible
+for review rather than changing the protocol after paid evidence was captured.
+
+AC5 real-provider E2E and the supported source-reviewed outcome checks pass. AC4 rendered visual/
+interaction/keyboard/narrow review remains outstanding under browser policy. Paid model completion
+does not establish universal accuracy, runtime exploitability or independent Findings Review.
+
 ## D6 — bounded Apollo GraphQL resolvers, 2026-11-04
 
 Implemented against D5 `7fa55e4d8e4055532993eac4073f9d2c25d59b80` in the existing feature
@@ -231,3 +409,70 @@ sample baselines. Paths below are relative to the assigned worktree's `.zazz/eph
   `d5-node-persistence-parity.json`: actual Finale persistence parity.
 - `d5-publish-scope-manifest.json`: exact implementation/documentation scope and SHA256 hashes.
 - `d5-visual/`: generated-route and unresolved-control desktop/narrow screenshot evidence.
+
+
+## SQL/NoSQL-only accuracy refresh and rendered review
+
+User-authorized follow-up, 2026-11-05. Broader hardening is deferred until after analysis-pack-mvp;
+no analysis-pack implementation starts here. Earlier checkpoint counts and browser blockers above
+remain historical evidence. The current report index is ignored `d8-final-report-index.md`.
+
+The Goof login selector now carries exact immutable adapter/predicate witnesses, reachable actual
+Mongoose schema registration and pinned4.2.4 casting semantics. Its String password selector can
+retain operators; a username email predicate cannot constrain that sibling field. The login is now
+confirmed NoSQL injection. Two `findById` candidates remain Review rather than inheriting this claim.
+Juice Shop's native password hash now has a bounded hex-output transfer through its helper return;
+that output does not constrain the raw email sibling in SQL. Login email injection is now confirmed.
+
+| Current full-source app | Completed / eligible | Fresh changed requests | Confirmed contextual records |
+| --- | --- | --- | --- |
+| Juice Shop |188/188|21|8|
+| Goof |33/33|3|3|
+| vulnerable TypeScript app |16/16|0|2|
+| ThreatByte |56/56|29|4|
+| python-insecure-app |2/2|0|1|
+| vulnerable Flask app |24/24|1|4|
+| VulnPy |827/827|21|28|
+
+All75 refreshed requests completed without errors;1071 previous requests matched exactly and were
+retained. Twenty-four API-data observations remain unassessable. Source-backed checks18/18 and
+fresh original Python29/29 pass; required VulnPy12 contexts/28 positives remain. Final contextual
+status changes against the previous paid checkpoint are exactly the two recovered login cases.
+Changed evidence may change use IDs; unmatched IDs were compared only under unique entry,
+invocation, candidate kind and exact sink-byte witnesses, never reused for decision replay.
+
+The19 scoped probes exposed real calibration defects: the judge sometimes called hex-only SQL and
+scalar-guarded NoSQL vulnerable despite source constraints. New source witnesses and versioned
+injection questions keep conversion/selector semantics distinct from construction practice. An
+independent conservative gate retains contradictory vulnerable answers as explicit Review, never
+fabricating Protected. Final real controls: hex-only SQL Protected; raw-email sibling confirmed;
+scalar NoSQL Review; unknown helper Review. Earlier wrong answers remain saved. Scalar protection
+recognition is still incomplete; whole-program plugin/type/guard analysis is not claimed. The
+[database rules](../../docs/analysis/database-injection.md) describe actual bounds and false-negative risks.
+
+Actual localhost inspection passed for five report types, including typed labels, declaration versus
+sink location, resolver/request metadata, source transfers, sorting/filtering, zero-use gap disclosure,
+keyboard Enter/Space focus and390px layout without page overflow. AC4's initial `file://` rejection
+is no longer a current blocker after the user-opened authorized HTTP tab. The EJS Markdown advice
+now preserves intended Markdown and recommends sanitizing generated HTML; JS output no longer
+receives Jinja-specific repair text. This is bounded manual QA, not exhaustive accessibility testing.
+
+Exact evidence under ignored `.zazz/ephemeral/`: `d8-db-refresh-plan.json`, `d8-db-refresh-01/`,
+`d8-db-final-manifest.json`, `d8-db-source-review.json`, `d8-html-review.json`,
+`d8-report-narrow-review.jpg`, `d8-db-paid-ledger.json` and final accuracy race/vet/build logs.
+Total session paid attempts1243 =1149 initial +75 refreshed +19 probes;1240 completed and3 original
+failed transient attempts retained. Successful provider-reported input tokens10,948,192/output0;
+currency cost and failed-attempt billing are not inferred. No provider/model fallback, sample changes,
+dependency installs or target execution occurred. Historical curated JSON and raw evidence remain intact.
+
+Final commands: `go test -race ./... -count=1`, `go vet ./...`, `go build -buildvcs=false ./...`
+with local Go1.27.3, `GOTOOLCHAIN=local GOPROXY=off` and ignored local cache; source/report audits,
+original saved-case checks, doc-check and diff/format checks. Local HTTP stub tests require loopback
+permission; the first sandbox listener failure is preserved separately. Human code/design review and
+merge remain pending on the draft milestone PR.
+
+
+Publication verification logs are `d8-publication-race.log`, `d8-publication-vet.log`,
+`d8-publication-build.log` and `d8-publication-doc-check.log`. A final-code offline fresh parse of all
+seven apps exactly matches the assessed source snapshots and all1146 request hashes; no additional
+paid calls were needed. The ignored `d8-current-publication-scope.json` records every staged path/hash.
