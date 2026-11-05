@@ -6,6 +6,35 @@ calendar schedule, or blanket claim of completed functionality. The [capability 
 and delivery list below own current status and ordering; older phase/increment sections are references,
 not instructions to repeat delivered work.
 
+## Product goals and capability boundaries
+
+**2026-11-05 user direction:** organize Zazzles around four goals: **Scan** for source-code security,
+**Inspect** for correctness/maintainability and engineering standards, **Audit** for dependencies,
+and **Fix** for agent remediation and verification across the assessment capabilities.
+
+Scan has bounded implementations, including validation and construction-practice findings that form
+part of Inspect's foundation. A distinct Inspect command/view, broad standards support, Audit and
+automated Fix remain planned. The goals do not establish a public CLI shape or duplicate engines.
+Review remains an unresolved-evidence outcome, not the Inspect capability.
+
+The [project overview](../project.md#four-product-capabilities) owns product responsibilities.
+The [analysis pack proposal](analysis-pack-mvp.md#product-capabilities-and-shared-components)
+records shared component ownership and future domain separation. Inspect claims need separate
+applicability/evidence and should not be mixed into vulnerability counts or automatically treated as
+security defects. Prioritization remains impact-based, with security concerns clearly visible.
+
+**Usage order is independent of delivery order.** Once implemented, Scan, Inspect, Audit and Fix
+can run independently in any order. Fix may begin with an existing report or a user-specified issue.
+The agent feedback loop is optional composition. Each capability retains its required inputs and
+verification. This product requirement does not reorder implementation milestones or make the
+planned capabilities available now.
+
+No new Inspect delivery milestone is inserted into the existing ordered list. Broader quality
+checks, separate presentation, standards selection and automated Fix require bounded contracts and
+an explicit priority decision. The established sequence stays common-entry/dispatch acceptance and
+merge, then the separate SQL-first pack MVP, then command injection. Additional family migrations
+remain incremental. These documentation updates do not authorize implementation.
+
 ## First build
 
 The [route-identification spec](../specifications/tree-sitter-route-identification-mvp.md) is greenlit

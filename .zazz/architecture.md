@@ -41,6 +41,22 @@ novel-repository generalization remain hypotheses until matched independent eval
 - [Analysis pack MVP proposal](project/analysis-pack-mvp.md): planned internal composition/versioning
   of existing analysis knowledge; a separate initiative/worktree after common-entry/dispatch merges.
 
+## Product boundaries and shared engine
+
+The [project goals](project.md#four-product-capabilities) distinguish Scan, Inspect, Audit and Fix.
+The architecture below describes the current bounded Scan engine. It also emits existing validation
+and construction-practice findings. Inspect as a distinct capability, dependency Audit and automated
+Fix are planned. The goals do not imply separate implemented commands or engines.
+
+Scan and future Inspect can share static models, source evidence, semantic judgment and completeness
+policy while retaining claim-specific requirements. Audit retains independent dependency/advisory
+provenance. Fix will consume supported issues from all assessment domains and verify repairs.
+The intended capabilities run independently in any order, with their own inputs and verification.
+An agent loop is an optional composition, and Fix may start from an existing report or a supplied
+issue without fresh runs of every assessment. Future quality presentation and domain-specific policy
+require their own contracts. Review remains
+an unresolved-evidence outcome, not the quality capability.
+
 ## 1. Architecture premise
 
 Tree-sitter extracts syntax. Go adapters resolve supported bindings and establish bounded value/control

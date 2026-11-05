@@ -9,9 +9,46 @@ owns the current provider decision; this document defers to it.
 
 ## Purpose and users
 
-Given a target repository, produce a ranked list of potential security issues with source evidence,
-analysis limits, and a clear account of how each result was reached. Developers inspect the evidence;
-security engineers triage it; CI applies an explicitly configured policy.
+Zazzles aims to help developers and coding agents assess security, quality and dependencies,
+then repair established issues with verification. Current bounded Scan behavior is described in the
+[README](../../README.md#scan-current-implementation). This catalog also records planned functions.
+
+## Four product capabilities
+
+**2026-11-05 direction:** keep Scan, Inspect, Audit and Fix distinct as product responsibilities.
+
+| Capability | Functional goal | Status |
+| --- | --- | --- |
+| Scan | Assess source-backed security vulnerabilities and controls | Bounded current implementation |
+| Inspect | Assess correctness, maintainability, hygiene and defined coding/architecture standards | Planned distinct capability, building on existing validation and construction-practice checks |
+| Audit | Assess dependency/advisory evidence independently of source reachability | Planned |
+| Fix | Help an agent remediate supported issues from all assessment capabilities, test and reassess | Planned |
+
+Inspect and Scan share supported extraction, models, semantic judgment and evidence policy. Inspect
+checks may use a function/module scope rather than a security input-to-sink trace. Each claim needs
+its own applicable requirement, evidence and completeness obligations. No missing standard may be
+invented from a model's preference.
+
+Future presentation SHOULD separate security findings and quality assessments with linked evidence
+for overlapping concerns. A validation defect MUST NOT become an injection vulnerability by label
+alone, and policy compliance MUST NOT become a security certificate. Prioritize by impact within
+clear assessment domains. Linked claims must avoid duplicate issue counts.
+
+Review remains the unresolved-evidence report category. Independent Findings Review remains a
+planned verification stage, not the name of the quality capability. This documentation changes no
+current command, output schema, classification or detector. Broader Inspect and Fix need separate
+contracts. The [analysis pack MVP](analysis-pack-mvp.md) remains an internal SQL-first migration.
+
+### Independent use and optional composition
+
+Scan, Inspect, Audit and Fix MUST support independent use in any order as they are implemented.
+Users can select one capability or compose an agent feedback loop. Fix may start from an existing
+report or a user-specified issue with the required source context. It MUST NOT require fresh runs
+of all assessment capabilities merely to begin a repair.
+
+Each capability still needs its own valid inputs, supported evidence and verification. Independent
+use does not waive tests or scoped reassessment of a repair. Current commands remain unchanged.
+Future command/API details require their own contracts.
 
 ## Detection modes
 
@@ -73,7 +110,7 @@ reliably from an arbitrary code pattern alone; broad coverage of those remains f
 
 OWASP mappings include an explicitly selected edition in the future catalog. CWE mappings and severity
 come from reviewed rule metadata. The old unversioned A01–A10 list is retired rather than carried
-forward as a release commitment. Dependency vulnerability scanning is excluded.
+forward as a release commitment. Dependency vulnerability scanning is outside this initial Scan slice and belongs to the planned Audit capability.
 
 ## Language sequence
 

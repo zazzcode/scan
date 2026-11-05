@@ -32,6 +32,63 @@ transfers and library argument roles still need explicit engineering. Discovery 
 the judge; unresolved claim-relevant facts remain blockers. Reduced false findings and improved
 coverage remain hypotheses to measure alongside false protection, abstention, latency and cost.
 
+## Shared analysis across distinct product goals
+
+The product goals are **Scan** (source security), **Inspect** (correctness and engineering standards),
+**Audit** (dependency/advisory assessment) and **Fix** (verified agent remediation).
+Scan is implemented with bounded coverage. A distinct Inspect capability, Audit and automated Fix
+remain planned. Existing validation and construction-practice findings provide a quality foundation
+inside today's scanner.
+
+The separation is in assessment purpose, claim semantics and future report organization. It does
+not require duplicate engines. Analysis components can support security claims, quality claims or
+both, with the required evidence for each. Fix can consume supported issues from all three assessment
+capabilities while preserving intended behavior and existing controls.
+
+Future reporting should keep security and quality views distinct, link overlapping evidence and
+avoid duplicate issue counts. Priority depends on impact rather than assuming quality defects are
+always minor. Review remains the outcome for unresolved evidence. It is not another capability name.
+These goals do not change the current CLI or report schema.
+
+The intended capabilities are independent and can run in any order once implemented. A user can
+select an assessment or give Fix an existing report or a specific issue. Each operation still needs
+its own evidence and verification. The proposed agent feedback loop is optional composition rather
+than a requirement to run all four capabilities.
+
+## Code quality and engineering hygiene
+
+Zazzles's objectives also include code quality and best practices. Current input-validation and
+selected construction-practice checks already identify defects worth repairing independently of
+exploitability. For example, a missing enforcement step for an established field requirement can
+remain a defect while a separate SQL-binding claim is protected.
+
+The same evidence discipline can support broader standards in future: name the applicable
+requirement, supply the implementation and relevant context, then assess compliance with explicit
+limits. Deterministic checks suit mechanical properties. Semantic judgment is useful for contextual
+questions, but cannot invent an engineering standard or supply missing evidence.
+
+Broader reliability and maintainability coverage remains planned. The
+[analysis pack proposal](../.zazz/project/analysis-pack-mvp.md#security-code-quality-and-engineering-hygiene)
+includes quality claims as future consumers of the modular structure. Inspect compliance and
+security protection must remain distinct. The internal MVP still preserves existing behavior and
+migrates SQL first, without implementing a general quality platform.
+
+The longer-term agent workflow uses team-approved coding and architecture standards as explicit
+assessment requirements. Agents create code, consume security/quality evidence, make repairs, then
+run tests and reassessment before review. Users need not adopt the project's Zazz methodology.
+Zazzles's internal development standards are not automatically loaded as policy for target code.
+
+A model's learned coding knowledge helps interpretation but does not define a team's policy.
+Zazzles already supplies versioned language guidance, claim questions and applicable API contracts.
+Broader quality baselines and optional team standards are planned so users need not author every
+rule. Standard-based findings need an identifiable requirement and evidence. Exploratory suggestions
+must remain distinguishable from established defects and compliance claims.
+
+This complete loop, general standards selection and broader architecture-quality checks remain
+planned. The [pack proposal](../.zazz/project/analysis-pack-mvp.md#standards-driven-agent-workflow)
+defines the intended boundaries. A passing scoped assessment cannot certify all standards or replace
+functional tests and review.
+
 ## The distinctive design choices
 
 The useful distinction is the combination and enforcement of these boundaries. It is not a claim that
