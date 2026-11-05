@@ -12,7 +12,7 @@ func xssClaim(protection string) analysis.CandidateUse {
 	return analysis.CandidateUse{Kind: "xss_candidate", XSS: &analysis.XSSFacts{Type: "reflected", OriginResolved: true, OutputContext: "html_text", Protection: protection},
 		Sink: analysis.Evidence{Span: analysis.Span{File: "views/page.ejs"}}, Context: []analysis.Evidence{{Span: analysis.Span{File: "app.js"}}},
 		APIModel: &analysis.APIModel{ID: "html-output-v1"}, Completeness: &analysis.Completeness{ClaimKind: "xss", Evidence: map[string][]analysis.Evidence{
-			"render_source": {{Kind: "request_source"}}, "render_binding": {{Kind: "render_binding"}}, "render_context": {{Kind: "template_output"}},
+			"render_source": {{Kind: "input_source"}}, "render_binding": {{Kind: "render_binding"}}, "render_context": {{Kind: "template_output"}},
 		}}}
 }
 

@@ -11,9 +11,9 @@ import (
 func TestSARIFStatusAndRouteEvidence(t *testing.T) {
 	for _, tt := range []struct{ status, kind, level string }{{"supported_potential", "review", "note"}, {"protected_for_claim", "pass", "none"}, {"needs_evidence", "review", "note"}} {
 		t.Run(tt.status, func(t *testing.T) {
-			e := analysis.Evidence{Kind: "request_source", Text: "req.body.email", Span: analysis.Span{File: "routes/session handler.ts", StartLine: 4, EndLine: 4, StartByte: 10, EndByte: 24}, SHA256: "snapshot"}
-			use := analysis.CandidateUse{ID: "use", RouteID: "r", Check: &analysis.Check{ID: "email-sql", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"email"}}, Sink: e, Dependencies: []analysis.Dependency{{Source: e, Transfers: []analysis.Evidence{}}}, Context: []analysis.Evidence{e, e}, Assessment: analysis.Assessment{Status: "completed", FindingStatus: tt.status, Protection: "insufficient"}, Completeness: &analysis.Completeness{Evidence: map[string][]analysis.Evidence{"sink_binding": {e}}}}
-			report := &analysis.AnalysisReport{Entries: []analysis.Entry{{Route: analysis.Route{ID: "r", Method: "POST", PathPattern: "/session", Registration: e.Span}}}, Uses: []analysis.CandidateUse{use}, Files: []analysis.Evidence{}}
+			e := analysis.Evidence{Kind: "input_source", Text: "req.body.email", Span: analysis.Span{File: "routes/session handler.ts", StartLine: 4, EndLine: 4, StartByte: 10, EndByte: 24}, SHA256: "snapshot"}
+			use := analysis.CandidateUse{ID: "use", EntryID: "r", Check: &analysis.Check{ID: "email-sql", Method: "POST", Path: "/session", Kind: "sql_query", Fields: []string{"email"}}, Sink: e, Dependencies: []analysis.Dependency{{Source: e, Transfers: []analysis.Evidence{}}}, Context: []analysis.Evidence{e, e}, Assessment: analysis.Assessment{Status: "completed", FindingStatus: tt.status, Protection: "insufficient"}, Completeness: &analysis.Completeness{Evidence: map[string][]analysis.Evidence{"sink_binding": {e}}}}
+			report := &analysis.AnalysisReport{Entries: []analysis.EntryPoint{testHTTPEntry(analysis.Route{ID: "r", Method: "POST", PathPattern: "/session", Registration: e.Span})}, Uses: []analysis.CandidateUse{use}, Files: []analysis.Evidence{}}
 			doc := SARIF(report)
 			runs := doc["runs"].([]any)
 			run := runs[0].(map[string]any)

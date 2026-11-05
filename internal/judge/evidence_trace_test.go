@@ -11,8 +11,8 @@ func TestTraceGraphUsesOnlyDeclaredDependencies(t *testing.T) {
 	ev := func(kind string, start int) analysis.Evidence {
 		return analysis.Evidence{Kind: kind, Text: kind, SHA256: "snapshot", Span: analysis.Span{File: "a.py", StartByte: start, EndByte: start + 1}}
 	}
-	source, param, guard, sink, unrelated := ev("request_source", 1), ev("argument_to_parameter", 2), ev("branch_precondition", 3), ev("operation", 4), ev("helper_definition", 5)
-	u := analysis.CandidateUse{RouteID: "route", Sink: sink, Context: []analysis.Evidence{unrelated}, Dependencies: []analysis.Dependency{{Source: source, Transfers: []analysis.Evidence{param, guard}, SinkSlot: "sql_parameters", StorageKey: "db:users.email"}}}
+	source, param, guard, sink, unrelated := ev("input_source", 1), ev("argument_to_parameter", 2), ev("branch_precondition", 3), ev("operation", 4), ev("helper_definition", 5)
+	u := analysis.CandidateUse{EntryID: "route", Sink: sink, Context: []analysis.Evidence{unrelated}, Dependencies: []analysis.Dependency{{Source: source, Transfers: []analysis.Evidence{param, guard}, SinkSlot: "sql_parameters", StorageKey: "db:users.email"}}}
 	data, err := json.Marshal(wireBundle(u))
 	if err != nil {
 		t.Fatal(err)

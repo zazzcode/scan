@@ -18,6 +18,8 @@ value. It is not a judgment of logging in general; useful operational logs shoul
 
 Analysis MUST identify the logger binding, the argument that carries the value, the value's source,
 the transfers between them, and any reduction or redaction on that path before the call.
+Logger-binding evidence retains the original callee text, hash and byte span. Descriptions such as
+“global console” do not replace the source excerpt; model projections use the standard comment masking.
 
 - **Binding, not name.** `console.log` counts only when `console` is the global console. A logger
   counts when its binding is created by a supported logging library. A local object named `logger`

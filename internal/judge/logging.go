@@ -77,7 +77,7 @@ func applyLogPolicy(use analysis.CandidateUse, a *analysis.Assessment) {
 	}
 	source := false
 	for _, d := range use.Dependencies {
-		source = source || d.Source.Kind == "request_source" || d.Source.Kind == "literal_sensitive_source" || d.Source.Kind == "storage_source"
+		source = source || d.Source.Kind == "input_source" || d.Source.Kind == "literal_sensitive_source" || d.Source.Kind == "storage_source"
 	}
 	if !source {
 		blockers = append(blockers, analysis.Gap{Kind: "log_source_missing", Detail: "request, literal personal-data or verified storage source evidence is required"})

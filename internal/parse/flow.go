@@ -9,6 +9,10 @@ import (
 )
 
 type value struct {
+	grpcInput          *grpcInput
+	grpcTransfers      []analysis.Evidence
+	graphqlArgs        *analysis.Evidence
+	graphqlTransfers   []analysis.Evidence
 	domNode            bool
 	jqueryNode         bool
 	urlParams          bool
@@ -26,13 +30,15 @@ type value struct {
 	gaps          []analysis.Gap
 }
 type flow struct {
+	constants    registrationSeeds
 	client       *clientContext
 	response     string
 	responseType string
 	registration *sourceModule
 	module       *sourceModule
 	set          *moduleSet
-	route        analysis.Route
+	entry        analysis.EntryPoint
+	invocation   analysis.InvocationContext
 	request      string
 	env          map[string]value
 	context      []analysis.Evidence
@@ -78,6 +84,18 @@ func (f *flow) statement(n *sitter.Node) bool {
 	switch n.Kind() {
 	case "statement_block":
 		return f.statements(n)
+	case "if_statement":
+		if yes, known := f.registrationCondition(n.ChildByFieldName("condition")); known {
+			f.context = append(f.context, f.module.evidence("conditional_test", n.ChildByFieldName("condition")))
+			if yes {
+				return f.statement(n.ChildByFieldName("consequence"))
+			}
+			if alt := n.ChildByFieldName("alternative"); alt != nil && alt.NamedChildCount() > 0 {
+				return f.statement(alt.NamedChild(alt.NamedChildCount() - 1))
+			}
+			return false
+		}
+		f.branches(n)
 	case "lexical_declaration", "variable_declaration":
 		for j := uint(0); j < n.NamedChildCount(); j++ {
 			d := n.NamedChild(j)
@@ -219,6 +237,28 @@ func (f *flow) branches(n *sitter.Node) {
 			}
 			v = combine(v, branch)
 		}
+		if len(exits) > 0 && exits[0].env[key].graphqlArgs != nil {
+			marker := exits[0].env[key].graphqlArgs
+			unchanged := true
+			for _, e := range exits {
+				unchanged = unchanged && e.env[key].graphqlArgs == marker
+			}
+			if unchanged {
+				v.graphqlArgs = marker
+				v.graphqlTransfers = append([]analysis.Evidence{}, exits[0].env[key].graphqlTransfers...)
+			}
+		}
+		if len(exits) > 0 && exits[0].env[key].grpcInput != nil {
+			marker := exits[0].env[key].grpcInput
+			unchanged := true
+			for _, e := range exits {
+				unchanged = unchanged && e.env[key].grpcInput == marker
+			}
+			if unchanged {
+				v.grpcInput = marker
+				v.grpcTransfers = append([]analysis.Evidence{}, exits[0].env[key].grpcTransfers...)
+			}
+		}
 		v.gaps = append(v.gaps, f.gap("unknown_control_effect", "value may change across unsupported control flow", n))
 		merged[key] = v
 	}
@@ -242,6 +282,9 @@ func (f *flow) eval(n *sitter.Node) value {
 		return value{gaps: []analysis.Gap{gap}}
 	}
 	src := f.module.src
+	if v, ok := f.graphqlInputValue(n); ok {
+		return v
+	}
 	if f.client != nil {
 		if v, ok := f.clientValue(n); ok {
 			return v
@@ -256,7 +299,7 @@ func (f *flow) eval(n *sitter.Node) value {
 			return v
 		}
 		if f.parts[n.Utf8Text(src)] != "" {
-			source := f.module.evidence("request_source", n)
+			source := f.module.evidence("input_source", n)
 			f.rememberInput(source)
 			return value{deps: []analysis.Dependency{{Source: source, Transfers: []analysis.Evidence{}}}}
 		}
@@ -270,7 +313,7 @@ func (f *flow) eval(n *sitter.Node) value {
 			} else if field := requestFieldNode(n, src, f.request); field != nil {
 				sourceNode = field
 			}
-			source := f.module.evidence("request_source", sourceNode)
+			source := f.module.evidence("input_source", sourceNode)
 			f.rememberInput(source)
 			v := value{deps: []analysis.Dependency{{Source: source, Transfers: []analysis.Evidence{}}}}
 			// A length read directly on the field is a derived fact, not its content.
@@ -285,6 +328,9 @@ func (f *flow) eval(n *sitter.Node) value {
 		}
 		obj := n.ChildByFieldName("object")
 		base := f.eval(obj)
+		if v, ok := f.grpcProjection(n, base); ok {
+			return v
+		}
 		v := base
 		segment := "[]"
 		if n.Kind() == "member_expression" {
@@ -384,6 +430,14 @@ func (f *flow) eval(n *sitter.Node) value {
 	case "number", "string", "true", "false", "null", "undefined", "property_identifier", "type_identifier", "comment", "string_fragment", "escape_sequence":
 		return value{}
 	case "ternary_expression":
+		if yes, known := f.registrationCondition(n.ChildByFieldName("condition")); known {
+			f.context = append(f.context, f.module.evidence("conditional_test", n.ChildByFieldName("condition")))
+			branch := "alternative"
+			if yes {
+				branch = "consequence"
+			}
+			return f.transfer(f.eval(n.ChildByFieldName(branch)), "conditional_value", n)
+		}
 		a := f.eval(n.ChildByFieldName("consequence"))
 		b := f.eval(n.ChildByFieldName("alternative"))
 		v := combine(a, b)
@@ -438,8 +492,22 @@ func (f *flow) children(n *sitter.Node) value {
 
 func (f *flow) transfer(v value, kind string, n *sitter.Node) value {
 	out := v
+	if v.grpcInput != nil {
+		out.grpcTransfers = append(append([]analysis.Evidence{}, v.grpcTransfers...), f.module.evidence(kind, n))
+		if len(out.grpcTransfers) > 64 {
+			out.grpcTransfers = out.grpcTransfers[:64]
+			out.gaps = append(out.gaps, f.gap("transfer_limit", "gRPC object exceeds 64 transfer steps", n))
+		}
+	}
+	if v.graphqlArgs != nil {
+		out.graphqlTransfers = append(append([]analysis.Evidence{}, v.graphqlTransfers...), f.module.evidence(kind, n))
+		if len(out.graphqlTransfers) > 64 {
+			out.graphqlTransfers = out.graphqlTransfers[:64]
+			out.gaps = append(out.gaps, f.gap("transfer_limit", "GraphQL object exceeds 64 transfer steps", n))
+		}
+	}
 	out.deps = nil
-	out.gaps = append([]analysis.Gap{}, v.gaps...)
+	out.gaps = append([]analysis.Gap{}, out.gaps...)
 	for _, d := range v.deps {
 		if len(d.Transfers) >= 64 {
 			out.gaps = append(out.gaps, f.gap("transfer_limit", "dependency exceeds 64 transfer steps", n))
@@ -509,6 +577,16 @@ func (f *flow) call(n *sitter.Node) value {
 		return value{}
 	}
 	name := fn.Utf8Text(f.module.src)
+	if input, evidence := nativeHashHex(f.module, n); input != nil {
+		v := f.eval(input)
+		for _, e := range evidence {
+			f.context = append(f.context, e)
+			if e.Kind == "native_hash_hex" {
+				v = f.transfer(v, e.Kind, n)
+			}
+		}
+		return v
+	}
 	if f.client != nil {
 		if v, handled := f.clientCall(n, fn, args); handled {
 			return v
@@ -594,7 +672,7 @@ func (f *flow) call(n *sitter.Node) value {
 				gaps = append(gaps, f.gap("external_response_unresolved", "remote response and asynchronous continuation are not modeled", n))
 			}
 			context := append([]analysis.Evidence{}, f.context...)
-			f.uses = append(f.uses, analysis.CandidateUse{ID: fmt.Sprintf("use:%s:%s:%d", f.route.ID, f.module.file, n.StartByte()), RouteID: f.route.ID, Kind: kind, Sink: f.module.evidence(kind, n), Dependencies: v.deps, Context: context, Gaps: gaps, Assessment: analysis.Assessment{Status: "not_run"}})
+			f.uses = append(f.uses, analysis.CandidateUse{ID: fmt.Sprintf("use:%s:%s:%d", f.invocation.ID, f.module.file, n.StartByte()), EntryID: f.entry.ID, InvocationContextID: f.invocation.ID, Kind: kind, Sink: f.module.evidence(kind, n), Dependencies: v.deps, Context: context, Gaps: gaps, Assessment: analysis.Assessment{Status: "not_run"}})
 		}
 		// Response values are new external sources, never aliases of request arguments.
 		if modelCall {
@@ -611,6 +689,23 @@ func (f *flow) call(n *sitter.Node) value {
 	}
 	// A helper that contains the sink is not a validator of its arguments.
 	if !entered {
+		if f.entry.Kind == "graphql" || f.entry.Kind == "grpc" {
+			for _, v := range values {
+				if len(v.deps) > 0 && !nativeStringOperation(f.module, n) {
+					origin := "resolver-derived"
+					if f.entry.Kind == "grpc" {
+						origin = "gRPC request-derived"
+					}
+					f.gaps = append(f.gaps, f.gap("input_helper_unresolved", "Unresolved call receives a "+origin+" value before this operation: "+name, n))
+				}
+				if v.grpcInput != nil {
+					f.gaps = append(f.gaps, f.gap("grpc_argument_escape", "Call/request object reaches unresolved call: "+name, n))
+				}
+				if v.graphqlArgs != nil {
+					f.gaps = append(f.gaps, f.gap("graphql_argument_escape", "Argument object reaches an unresolved call: "+name, n))
+				}
+			}
+		}
 		f.noteInputTouch(values, name)
 	}
 	v := value{}

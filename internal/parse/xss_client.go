@@ -18,7 +18,8 @@ type clientInjection struct {
 }
 
 type clientContext struct {
-	entry    analysis.ClientEntry
+	events   *browserEvents
+	entry    analysis.EntryPoint
 	injected map[string]clientInjection
 	methods  map[string]*sitter.Node
 	fields   map[string]*sitter.Node
@@ -44,23 +45,23 @@ func (s *moduleSet) browser(report *analysis.AnalysisReport) error {
 			return err
 		}
 		text := string(m.src)
-		if !strings.Contains(text, "document") && !strings.Contains(text, "location") && !strings.Contains(text, "@angular") && !strings.Contains(text, "react") && !strings.Contains(text, "innerHTML") && !strings.Contains(text, "postMessage") && !strings.Contains(text, "setTimeout") && !strings.Contains(text, "jquery") {
+		if !strings.Contains(text, "document") && !strings.Contains(text, "location") && !strings.Contains(text, "@angular") && !strings.Contains(text, "react") && !strings.Contains(text, "innerHTML") && !strings.Contains(text, "postMessage") && !strings.Contains(text, "setTimeout") && !strings.Contains(text, "jquery") && !strings.Contains(text, "addEventListener") {
 			continue
 		}
 		if m.tree.RootNode().HasError() {
 			report.Gaps = append(report.Gaps, analysis.Gap{Kind: "client_parse_error", Detail: "Browser-relevant source contains syntax errors", At: spanOf(file, m.tree.RootNode())})
 			continue
 		}
-		base := &clientContext{entry: analysis.ClientEntry{ID: "client:" + file, Kind: "script", Name: file, Location: spanOf(file, m.tree.RootNode())},
-			injected: map[string]clientInjection{}, methods: map[string]*sitter.Node{}, fields: map[string]*sitter.Node{}}
+		base := &clientContext{entry: browserEntry(m, m.evidence("browser_source_slice", m.tree.RootNode()), file, "script"),
+			events: newBrowserEvents(report, m), injected: map[string]clientInjection{}, methods: map[string]*sitter.Node{}, fields: map[string]*sitter.Node{}}
 		for _, imp := range m.imports {
 			base.react = base.react || imp.module == "react"
 		}
 		if base.react {
-			base.entry.Framework = "react"
+			base.entry.Browser.Framework = "react"
 		}
 		if strings.HasSuffix(file, ".vue") {
-			base.entry.Framework = "vue"
+			base.entry.Browser.Framework = "vue"
 		}
 		f := newClientFlow(s, m, base)
 		f.statements(m.tree.RootNode())
@@ -82,6 +83,9 @@ func (s *moduleSet) browser(report *analysis.AnalysisReport) error {
 		}
 		collect(m.tree.RootNode())
 		for _, fn := range functions {
+			if base.events.callbacks[fn.StartByte()] {
+				continue
+			}
 			child := newClientFlow(s, m, base)
 			child.env = copyValues(f.env)
 			if params, ok := functionParameters(fn, m.src); ok {
@@ -96,6 +100,7 @@ func (s *moduleSet) browser(report *analysis.AnalysisReport) error {
 		addClientUses(report, base, f.uses)
 		for _, class := range classes {
 			context := s.clientClass(m, class)
+			context.events = base.events
 			flow := newClientFlow(s, m, context)
 			body := class.ChildByFieldName("body")
 			if body == nil {
@@ -128,12 +133,13 @@ func (s *moduleSet) browser(report *analysis.AnalysisReport) error {
 			s.angularOutputs(&flow)
 			addClientUses(report, context, flow.uses)
 		}
+		base.events.unvisited(m)
 	}
 	return nil
 }
 
 func newClientFlow(s *moduleSet, m *sourceModule, client *clientContext) flow {
-	return flow{module: m, set: s, client: client, env: map[string]value{}, helpers: &helperExpansion{budget: 24, stack: map[string]bool{}},
+	return flow{module: m, set: s, client: client, entry: client.entry, invocation: browserInvocation(client.entry), env: map[string]value{}, helpers: &helperExpansion{budget: 24, stack: map[string]bool{}},
 		facts: newInputFacts(), context: append([]analysis.Evidence{}, client.bindings...)}
 }
 
@@ -141,6 +147,25 @@ func addClientUses(report *analysis.AnalysisReport, client *clientContext, uses 
 	if len(uses) == 0 {
 		return
 	}
+	merged := mergeClientUses(uses)
+
+	report.Uses = append(report.Uses, merged...)
+	if len(merged) > 0 {
+		e := client.entry.Location
+		ctx := registerInvocation(report, client.entry, &e, "browser_source_slice", nil, nil)
+		gap := analysis.Gap{Kind: "browser_exposure_unresolved", Detail: "Source slice analysis does not establish runtime event/component exposure", At: e.Span}
+		report.DispatchBindings[len(report.DispatchBindings)-1].Resolution = "partial"
+		report.DispatchBindings[len(report.DispatchBindings)-1].Gaps = []analysis.Gap{gap}
+		report.InvocationContexts[len(report.InvocationContexts)-1].Gaps = []analysis.Gap{gap}
+		for i := len(report.Uses) - len(merged); i < len(report.Uses); i++ {
+			report.Uses[i].EntryID = client.entry.ID
+			report.Uses[i].InvocationContextID = ctx.ID
+			report.Uses[i].EntryKind = "browser"
+		}
+	}
+}
+
+func mergeClientUses(uses []analysis.CandidateUse) []analysis.CandidateUse {
 	// The same sink can be reached from module, function and class flows. Records
 	// are merged so an earlier weak candidate never hides a later stronger one.
 	index := map[string]int{}
@@ -156,10 +181,7 @@ func addClientUses(report *analysis.AnalysisReport, client *clientContext, uses 
 		index[u.ID] = len(merged)
 		merged = append(merged, u)
 	}
-	report.Uses = append(report.Uses, merged...)
-	if len(merged) > 0 {
-		report.ClientEntries = append(report.ClientEntries, client.entry)
-	}
+	return merged
 }
 
 func xssRank(x *analysis.XSSFacts) int {
@@ -253,12 +275,8 @@ func (f *flow) clientRecord(node *sitter.Node, v value, context string, escaped 
 		return
 	}
 	u := &f.uses[len(f.uses)-1]
-	if u.ClientID != "" && v.apiPath != "" {
+	if u.EntryKind == "browser" && v.apiPath != "" {
 		u.XSS.Type, u.XSS.OriginResolved = "cross_tier", false
 		u.XSS.ResponsePath, u.XSS.ResponseMethod, u.XSS.ResponseField = v.apiPath, v.apiMethod, v.responseField
 	}
-}
-
-func clientID(file, name string, offset uint) string {
-	return fmt.Sprintf("client:%s:%s:%d", file, name, offset)
 }

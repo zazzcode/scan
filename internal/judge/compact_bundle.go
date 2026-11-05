@@ -1,0 +1,110 @@
+package judge
+
+import (
+	"encoding/json"
+	"fmt"
+	"sort"
+)
+
+// Compaction changes representation only: record order, roles, source bytes,
+// snapshot identities, gaps and every reference remain recoverable.
+func compactBundle(bundle any) (any, error) {
+	raw, err := json.Marshal(bundle)
+	if err != nil {
+		return nil, err
+	}
+	var out map[string]any
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, err
+	}
+	sources := []any{}
+	sourceIDs := map[string]int{}
+	source := func(file, hash any) int {
+		key := fmt.Sprint(file) + "\x00" + fmt.Sprint(hash)
+		if i, ok := sourceIDs[key]; ok {
+			return i
+		}
+		i := len(sources)
+		sourceIDs[key] = i
+		sources = append(sources, []any{file, hash})
+		return i
+	}
+	span := func(s map[string]any) []any {
+		return []any{s["start_line"], s["end_line"], s["start_byte"], s["end_byte"]}
+	}
+	evidence := []any{}
+	for _, item := range out["evidence"].([]any) {
+		e := item.(map[string]any)
+		s := e["span"].(map[string]any)
+		row := []any{e["kind"], source(s["file"], e["sha256"])}
+		row = append(row, span(s)...)
+		row = append(row, e["text"], e["text_ref"])
+		evidence = append(evidence, row)
+	}
+	out["evidence"] = evidence
+	excerpts := []any{}
+	for _, item := range out["source_excerpts"].([]any) {
+		e := item.(map[string]any)
+		s := e["span"].(map[string]any)
+		row := []any{source(s["file"], e["sha256"])}
+		row = append(row, span(s)...)
+		row = append(row, e["text"])
+		excerpts = append(excerpts, row)
+	}
+	out["source_excerpts"] = excerpts
+	gaps := []any{}
+	gapIDs := map[string]string{}
+	details := []any{}
+	detailIDs := map[string]int{}
+	var visit func(any) any
+	visit = func(value any) any {
+		switch v := value.(type) {
+		case []any:
+			for i := range v {
+				v[i] = visit(v[i])
+			}
+			return v
+		case map[string]any:
+			if len(v) == 3 && v["kind"] != nil && v["detail"] != nil && v["at"] != nil {
+				raw, _ := json.Marshal(v)
+				key := string(raw)
+				if id, ok := gapIDs[key]; ok {
+					return id
+				}
+				detail := v["detail"].(string)
+				di, ok := detailIDs[detail]
+				if !ok {
+					di = len(details)
+					detailIDs[detail] = di
+					details = append(details, detail)
+				}
+				s := v["at"].(map[string]any)
+				row := []any{v["kind"], di, source(s["file"], "")}
+				row = append(row, span(s)...)
+				id := fmt.Sprintf("g%d", len(gaps))
+				gapIDs[key] = id
+				gaps = append(gaps, row)
+				return id
+			}
+			keys := make([]string, 0, len(v))
+			for k := range v {
+				keys = append(keys, k)
+			}
+			sort.Strings(keys)
+			for _, k := range keys {
+				v[k] = visit(v[k])
+			}
+			return v
+		}
+		return value
+	}
+	visit(out)
+	out["compact_wire"] = map[string]any{
+		"sources": sources, "gap_details": details, "gaps": gaps,
+		"evidence_columns": []string{"kind", "source_index", "start_line", "end_line", "start_byte", "end_byte", "text", "text_ref"},
+		"excerpt_columns":  []string{"source_index", "start_line", "end_line", "start_byte", "end_byte", "text"},
+		"gap_columns":      []string{"kind", "detail_index", "source_index", "start_line", "end_line", "start_byte", "end_byte"},
+		"source_columns":   []string{"file", "sha256"},
+	}
+	return out, nil
+}

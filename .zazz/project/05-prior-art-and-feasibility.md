@@ -25,6 +25,7 @@ novelty claim is established by this limited survey. This is not an exhaustive o
 | [Bearer](https://github.com/Bearer/bearer/blob/e3753de6347988bed15bdba80b9ff731bf028c80/README.md) | Go, Tree-sitter, language analyzers, dataflow relationships, declarative rules, reporting | Read source for design ideas; do not assume parity with advanced/commercial analysis |
 | [Semgrep Community Edition](https://docs.semgrep.dev/getting-started/quickstart-ce) | Pattern and intraprocedural taint rules over many languages; local CLI with SARIF/JSON output | Local comparison scanner ([cheat sheet](../../docs/semgrep-ce-cheat-sheet.md)); CE taint is single-file, and registry rules are licensed separately and not copied into zazzles |
 | [CodeQL libraries and queries](https://github.com/github/codeql) | Explicit source/sink models, taint steps, barriers, path queries, and regression cases | MIT repository; the CLI/engine is separately licensed and is not zazzles's planned runtime |
+| [Joern Scan](https://docs.joern.io/scan/) and [Code Property Graph](https://docs.joern.io/code-property-graph/) (documentation reviewed 2026-11-04) | Common typed program representation, graph traversals and predefined security queries | Architecture inspiration only; no Joern execution, benchmark, integration or code reuse is claimed |
 
 These sources show precedent and implementation choices, not verified comparative quality.
 The [Jev capability note](04-jev-validation-research.md) owns sanitizer-specific published results and
@@ -168,3 +169,17 @@ these observations inform its future specs rather than authorizing code now.
 Success means useful evidence-backed findings with a measured precision/recall/review-cost tradeoff.
 It does not require the combination to be unprecedented, and this note makes no prediction of full
 OWASP coverage or production readiness.
+
+## Joern Scan reference review — 2026-11-04
+
+At the user's request, reviewed the official Joern Scan and Code Property Graph documentation as
+additional architecture references alongside the earlier Bearer, Semgrep and CodeQL research.
+Joern Scan documents generation of a CPG followed by execution of predefined security queries and
+reporting of matches. Its common graph representation is relevant to separating Zazzles's language
+adapters from shared semantic records. This is documentation research; no target or Joern scanner
+was executed, no benchmark was added, and no engine/code/rules were adopted.
+
+The [public technical comparison](../../docs/technical-approach.md#relationship-to-joern-scan)
+explains the shared static-analysis principles and the differences: Zazzles's bounded Go evidence
+assembly, explicit entry/invocation contexts, claim-specific decision-model assessment and Go policy
+gates. This is not a claim of equivalent trace coverage, novel algorithms or measured superiority.

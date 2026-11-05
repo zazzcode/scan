@@ -14,17 +14,17 @@ func TestMountedCommonJSRoutesRetainValidationAndNoSQLResults(t *testing.T) {
 			}
 			paths := map[string]string{}
 			for _, e := range r.Entries {
-				if e.Route.PathPattern == "/login" {
+				if e.HTTPRoute().PathPattern == "/login" {
 					t.Fatal("mounted router also reported as an unmounted root")
 				}
-				paths[e.Route.ID] = e.Route.PathPattern
+				paths[e.HTTPRoute().ID] = e.HTTPRoute().PathPattern
 			}
 			nosql, validation := false, false
 			for _, use := range r.Uses {
-				if use.Kind == "nosql_query_candidate" && paths[use.RouteID] == "/users/login" {
+				if use.Kind == "nosql_query_candidate" && paths[use.EntryID] == "/users/login" {
 					nosql = use.APIModel != nil && use.APIModel.Library == "mongoose"
 				}
-				validation = validation || (use.Kind == "input_validation_candidate" && paths[use.RouteID] == "/users")
+				validation = validation || (use.Kind == "input_validation_candidate" && paths[use.EntryID] == "/users")
 			}
 			if !nosql || !validation {
 				t.Fatalf("missing NoSQL=%v validation=%v", nosql, validation)

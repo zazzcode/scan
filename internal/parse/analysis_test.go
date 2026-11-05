@@ -191,7 +191,7 @@ func TestHandlerImportShadowing(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(report.Uses) != 0 || len(report.Entries) != 1 || report.Entries[0].Handler != nil {
+	if len(report.Uses) != 0 || len(report.Entries) != 1 || report.Handler(report.Entries[0].ID) != nil {
 		t.Fatalf("shadowed import resolved: %+v", report)
 	}
 }

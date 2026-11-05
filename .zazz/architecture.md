@@ -1,6 +1,6 @@
 # Architecture
 
-**Implemented architecture, updated 2026-11-02.** This document owns package responsibilities,
+**Implemented architecture, updated 2026-11-05.** This document owns package responsibilities,
 terminology and pipeline boundaries. Planned components are labeled explicitly. Product direction
 lives in [project.md](project.md), decisions in the [proposal](project/03-jev-design-proposal.md),
 and delivery order in the [implementation plan](project/implementation-plan.md).
@@ -38,6 +38,24 @@ novel-repository generalization remain hypotheses until matched independent eval
 - [Reporting and SARIF](architecture/reporting-and-sarif.md): report records and implemented bounded SARIF export.
 - [Standalone HTML](architecture/html-reporting.md): human-facing report and disclosure rows.
 - [SCA follow-on](architecture/sca-design.md): planned dependency auditing.
+- [Analysis pack MVP proposal](project/analysis-pack-mvp.md): planned internal composition/versioning
+  of existing analysis knowledge; a separate initiative/worktree after common-entry/dispatch merges.
+
+## Product boundaries and shared engine
+
+The [project goals](project.md#four-product-capabilities) distinguish Scan, Inspect, Audit and Fix.
+The architecture below describes the current bounded Scan engine. It also emits existing validation
+and construction-practice findings. Inspect as a distinct capability, dependency Audit and automated
+Fix are planned. The goals do not imply separate implemented commands or engines.
+
+Scan and future Inspect can share static models, source evidence, semantic judgment and completeness
+policy while retaining claim-specific requirements. Audit retains independent dependency/advisory
+provenance. Fix will consume supported issues from all assessment domains and verify repairs.
+The intended capabilities run independently in any order, with their own inputs and verification.
+An agent loop is an optional composition, and Fix may start from an existing report or a supplied
+issue without fresh runs of every assessment. Future quality presentation and domain-specific policy
+require their own contracts. Review remains
+an unresolved-evidence outcome, not the quality capability.
 
 ## 1. Architecture premise
 
@@ -56,7 +74,7 @@ scanner binary. Analyzed applications are read as source, never executed by the 
 | Analysis Guidelines | Versioned language documents with secure coding guidance and evidence interpretation instructions |
 | Application requirement | A concrete field or behavior constraint supplied by source or an explicit scan check |
 | API model | A versioned library contract, applicable only with verified binding/provenance |
-| Entry | A logical analysis starting point; currently represented by separate route/handler and browser records |
+| Entry | A logical analysis starting point; represented by common typed entries, registrations, dispatch and invocation records |
 | Candidate use | A value-consuming security operation requiring claim-specific analysis |
 | Claim | A particular question about injection, validation, rendering or logging |
 | Evidence | Source text, span and snapshot hash supporting an observed fact |
@@ -130,45 +148,31 @@ The shared design separates these concepts:
 | Invocation context | Actual parameter/receiver/closure bindings and applicable controls for a particular dispatch path |
 | Transport | Optional delivery context, such as an HTTP endpoint carrying GraphQL operations |
 
-HTTP handlers and browser entries are the current consumers. Future examples include GraphQL fields,
-message consumers, CLI commands and scheduled jobs. Direct calls, decorator/factory registration,
-lookup tables, schema resolver bindings and event subscriptions are dispatch mechanisms, not entry
-kinds. One entry can have multiple possible targets; a callable can be exposed by multiple entries
-or registrations. Shared bodies MUST NOT lend a guard from one dispatch context to another.
+Implemented consumers include JS/TS HTTP, Python HTTP, browser script/component and explicit
+DOM/window events, finite dynamic HTTP registration, bounded Apollo GraphQL resolvers and Node.js
+unary gRPC handlers. Entry kinds remain independent of language and transport. Shared callable bodies
+never supply a sibling invocation's controls. Message queues, CLI commands and scheduled jobs remain
+outside this milestone.
 
-These are design responsibilities, not instructions to scaffold empty adapters. **The current code
-has not yet implemented this common entry/dispatch model:** `Entry` contains `Route`, checks select
-by method/path, and candidates have separate route/browser IDs. The terminology closeout renames
-records without removing those HTTP assumptions. Route inventory remains a useful HTTP-specific
-view, not the future canonical analysis-root abstraction.
+`AnalysisReport` owns canonical entry/registration/dispatch/callable/context collections; candidates
+and findings refer to `entry_id` and `invocation_context_id`. Method/path/mount data belongs only to
+HTTP metadata. `RouteInventory` remains a separate schema1 HTTP view. Kind-specific selectors and
+presenters use the same identities; saved schemas1/2 convert privately at the input boundary without
+inventing missing invocation facts or changing historical answers.
 
-The next entry-model implementation should first use the existing HTTP and browser consumers to
-establish shared entry identity and dispatch bindings, with compatibility for saved reports. Then
-add bounded generated-route and GraphQL adapters. This foundation belongs before additional entry
-frameworks accumulate route-specific assumptions; it does not require a full repository IR rewrite.
+Browser event input, GraphQL args/parent/context/info and gRPC request/metadata/callback roles remain
+separate. Literal SDL/proto declarations establish supported registration/input bindings, not business
+policy or sink protection. Unknown runtime composition, dispatch, applicable guards and reached limits
+remain explicit gaps, including entries with no candidate. Transport relationships are metadata and
+do not multiply resolver uses. No entry-wide safety label or runtime execution claim is produced.
 
-### Future dynamic routes and GraphQL
-
-**Not implemented:** these adapters build on the entry/dispatch decision above.
-
-| Boundary | Required capability | Existing core to reuse |
-|---|---|---|
-| Dynamic registration | Retain factory/loop/configuration provenance, finite target alternatives and unresolved registrations | Supported helper/value transfers, evidence and claim gates |
-| GraphQL | Connect schema fields/operation kinds to resolvers and nested field transitions; associate transport separately | Sink models and claim-specific judgment/reporting |
-| Input provenance | Distinguish resolver arguments, parent result and context; establish actual coercion and application constraints | Named requirements, API contracts and validation/protection separation |
-| Coverage | Distinguish undiscovered entries/unresolved dispatch from incomplete traces within discovered entries | Explicit gaps and snapshot provenance |
-| Scale | Bound dispatch alternatives and recursive field/helper traversal; retain invocation context and reusable summaries | Deterministic bounded evidence and exact-request identity |
-
-GraphQL executes selected fields through resolvers; a resolver can receive a parent object, field
-arguments and request context. Those are distinct provenance roles. [GraphQL execution](https://graphql.org/learn/execution/)
-Authentication at the transport or a directive name alone does not establish field/object authorization;
-actual enforcement may live in business logic. Authorization remains a separate future claim family.
-[GraphQL authorization](https://graphql.org/learn/authorization/)
-
-Unknown registrations, resolver dispatch, loaders and runtime composition MUST remain gaps rather
-than inferred protection. The selector/check schema and reports will need entry-specific locations
-and requirements; method/path remains HTTP metadata. A shared model does not supply new source,
-flow, authorization or framework semantics automatically.
+The [implemented subsets and limits](../docs/running-scans.md#common-entry-selection-and-tagged-checks)
+and [design](architecture/common-entry-dispatch.md) own the bounded contracts. The
+[acceptance results](evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05)
+record actual adapter-to-claim/report checks and unchanged HTTP/browser evidence. Automated acceptance and bounded localhost rendered interaction/narrow-layout review pass. The
+[SQL/NoSQL closeout](evaluation/common-entry-dispatch-results.md#sqlnosql-only-accuracy-refresh-and-rendered-review)
+records the later accuracy refresh and remaining calibration limits; human review/merge is pending. Broader GraphQL/gRPC application evaluation and a
+full repository IR remain separate work.
 
 ## 4. Normalized representation and graph views
 
@@ -239,12 +243,12 @@ product behavior; `.zazz/standards/` governs development. Neither is loaded dyna
 
 ## 7. Evidence bundle contract
 
-The [trace judgment design](architecture/trace-judgment.md) owns evidence-version 2: deduplicated
+The [trace judgment design](architecture/trace-judgment.md) owns evidence-version 3: deduplicated
 source evidence, dependency witnesses, trace/control edges, roles, required evidence, API contracts,
 exact field constraints and remaining blockers. Supplied evidence means present, not complete or
 protective. Source/comments are untrusted data, never model instructions.
 
-Model envelopes use `analysis_guidelines`. The generic question protocol is `candidate-use-v9`;
+Model envelopes use `analysis_guidelines`. The generic question protocol is `candidate-use-v10`;
 claim-specific SQL/XSS/logging/validation questions retain their separate protocols. Renamed guideline
 documents carry new versions because their request text changed. Request identity includes the full
 envelope and guideline body; old responses cannot be replayed on renamed/changed requests.
@@ -321,10 +325,12 @@ Today flow/evidence construction lives in `parse`, claim gates in `judge`, and p
 
 `--analyze` is the documented analysis mode; `--strings` remains an external compatibility alias.
 Internal APIs use `Analyze`, `AnalyzeWithChecks`, `CandidateUse` and `AnalysisReport`, with no obsolete
-Go aliases. Fresh analysis reports use schema 2 and `analysis_guidelines`; route inventory stays
-schema 1. Export accepts schema-1 reports and maps historical `practice` metadata to `GuidelinesRef`.
-New serialization emits only `analysis_guidelines`. Candidate/claim identities and status meanings
-are preserved. Historical command transcripts and source-containing sample artifacts are not rewritten.
+Go aliases. Fresh analysis reports use schema3 and `analysis_guidelines`; route inventory stays
+schema1. Export reads schemas1/2/3 and preserves original schema provenance and raw
+assessments. Private legacy decoding maps `practice` metadata to `GuidelinesRef` and
+legacy route/client associations into one current entry/context association.
+New serialization emits only `analysis_guidelines`. Raw historical candidate IDs and status meanings are preserved; fresh candidate IDs
+include snapshot/context/value witnesses and are not edit-stable finding fingerprints. Historical command transcripts and source-containing sample artifacts are not rewritten.
 
 ## 12. Validation and unresolved decisions
 

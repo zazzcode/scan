@@ -13,6 +13,11 @@ func wireBundle(use analysis.CandidateUse) any {
 	table := []analysis.Evidence{}
 	ids := map[string]string{}
 	ref := func(e analysis.Evidence) string {
+		if e.ModelText != "" && e.Text != "" {
+			e.Text = e.ModelText
+			e.ModelText = ""
+		}
+		e.ModelText = ""
 		key := fmt.Sprintf("%s:%s:%d:%d:%s", e.SHA256, e.Span.File, e.Span.StartByte, e.Span.EndByte, e.Kind)
 		if id := ids[key]; id != "" {
 			return id
@@ -62,7 +67,10 @@ func wireBundle(use analysis.CandidateUse) any {
 		blockers = use.Gaps
 	}
 	augmentRoles(use, roles, ref)
+	invocation := wireInvocation(use, ref)
+	wireTable, excerpts := sharedSourceExcerpts(table)
 	return struct {
+		Invocation      any                 `json:"invocation"`
 		EvidenceVersion int                 `json:"evidence_version"`
 		TraceGraph      traceGraph          `json:"trace_graph"`
 		CoverageLedger  []evidenceCoverage  `json:"evidence_coverage"`
@@ -78,13 +86,14 @@ func wireBundle(use analysis.CandidateUse) any {
 		Blockers        []analysis.Gap      `json:"blocking_gaps"`
 		Coverage        []analysis.Gap      `json:"coverage_gaps"`
 		Scope           string              `json:"scope"`
-		Evidence        []analysis.Evidence `json:"evidence"`
+		Evidence        []wireEvidence      `json:"evidence"`
+		SourceExcerpts  []analysis.Evidence `json:"source_excerpts"`
 		ControlEdges    []map[string]string `json:"control_edges"`
 		ModelFacts      []string            `json:"model_facts,omitempty"`
 		Resolved        []analysis.Gap      `json:"resolved_gaps,omitempty"`
 		APIModel        *analysis.APIModel  `json:"api_model,omitempty"`
 		XSS             *analysis.XSSFacts  `json:"xss,omitempty"`
-	}{2, buildTraceGraph(use, ref), coverageLedger(required, roles), claimKind(use), use.ID, use.Kind, use.Check, sink, context, dependencies, required, roles, blockers, coverage, scope, table, edges, modelFacts(use), resolvedGaps(use), use.APIModel, use.XSS}
+	}{invocation, 6, buildTraceGraph(use, ref), coverageLedger(required, roles), claimKind(use), use.ID, use.Kind, use.Check, sink, context, dependencies, required, roles, blockers, coverage, scope, wireTable, excerpts, edges, modelFacts(use), resolvedGaps(use), use.APIModel, use.XSS}
 }
 
 func modelFacts(use analysis.CandidateUse) []string {

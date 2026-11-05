@@ -37,3 +37,17 @@ gates. Unlike the product guides on this page, their text is included in model r
 
 “Poor practice” remains a finding classification for established defects. It is independent of the
 former `Practice` name for guideline documents. See the [architecture terminology](../../.zazz/architecture.md#1-architecture-premise).
+
+The [bounded Apollo GraphQL adapter](../running-scans.md#bounded-apollo-graphql-analysis) adds
+resolver-specific argument sources to these existing analysis rules. Parent/context/info provenance,
+SDL syntax coverage and application policy remain separate from SQL protection and claim status.
+
+The [bounded Node.js gRPC adapter](../running-scans.md#bounded-nodejs-unary-grpc-analysis) joins
+source-visible unary registrations to request-field inputs and existing SQL claims. Proto field
+types/decoding do not establish validation or protection; metadata/context/callback roles remain
+separate. Streaming and unresolved descriptor/handler bindings retain visible coverage gaps.
+
+The [cross-entry acceptance record](../../.zazz/evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05)
+checks these same claim policies across actual parsed entry adapters. Synthetic local-stub answers
+cannot override unknown guards/transforms, transfer protection between invocations, or turn coverage
+gaps into protection. This verification changes no analysis rule or historical model answer.

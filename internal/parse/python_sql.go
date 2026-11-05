@@ -54,10 +54,10 @@ func (f *pythonFlow) sql(n, object *sitter.Node, values []pythonValue, receiver 
 		}
 		u.Gaps = append(u.Gaps, f.gap(kind, "No complete business-policy enforcement established for "+d.container+"."+d.key, n))
 	}
-	c := &analysis.Completeness{ClaimKind: "injection", Required: []string{"request_source", "sink_binding", "route_handler", "control_flow"}, Evidence: map[string][]analysis.Evidence{"sink_binding": binding, "route_handler": {f.route.module.evidence("route_handler", f.route.fn)}, "control_flow": append([]analysis.Evidence{f.module.evidence("operation", n)}, f.context...)}, Blockers: []analysis.Gap{}, Coverage: append([]analysis.Gap{}, u.Gaps...), Scope: "Bounded Python DB-API source-to-operation flow; SQL text and bound parameters have separate roles."}
+	c := &analysis.Completeness{ClaimKind: "injection", Required: []string{"input_source", "sink_binding", "invoked_callable", "control_flow"}, Evidence: map[string][]analysis.Evidence{"sink_binding": binding, "invoked_callable": {f.route.module.evidence("invoked_callable", f.route.fn)}, "control_flow": append([]analysis.Evidence{f.module.evidence("operation", n)}, f.context...)}, Blockers: []analysis.Gap{}, Coverage: append([]analysis.Gap{}, u.Gaps...), Scope: "Bounded Python DB-API source-to-operation flow; SQL text and bound parameters have separate roles."}
 	for _, d := range all.deps {
-		if d.dep.Source.Kind == "request_source" {
-			c.Evidence["request_source"] = append(c.Evidence["request_source"], d.dep.Source)
+		if d.dep.Source.Kind == "input_source" {
+			c.Evidence["input_source"] = append(c.Evidence["input_source"], d.dep.Source)
 		}
 	}
 	c.Evidence["query_text"] = []analysis.Evidence{f.module.evidence("query_text", pyArgs(n)[0])}
@@ -117,7 +117,7 @@ func (f *pythonFlow) storageWrite(n *sitter.Node, sql string, nodes []*sitter.No
 		}
 		storage := "python-sql:" + table + "." + strings.ToLower(strings.Trim(strings.TrimSpace(key), "`\"[]"))
 		v = pyTransfer(v, f.module.evidence("storage_write", n))
-		f.set.writes[storage] = append(f.set.writes[storage], pythonWrite{v, f.route.route.ID, f.module.evidence("storage_write", n)})
+		f.set.writes[storage] = append(f.set.writes[storage], pythonWrite{v, f.invocation.EntryID, f.module.evidence("storage_write", n)})
 	}
 }
 func (s *pythonSet) linkStorage(out *analysis.AnalysisReport) {
@@ -194,18 +194,19 @@ func (s *pythonSet) linkStorage(out *analysis.AnalysisReport) {
 	}
 }
 func (s *pythonSet) attachChecks(out *analysis.AnalysisReport, checks []analysis.Check) {
-	for _, check := range checks {
-		matched := false
-		for i := range out.Uses {
-			u := &out.Uses[i]
-			if check.Kind != "sql_query" || u.Kind != "sql_query_candidate" {
+	selected := []analysis.CandidateUse{}
+	matched := map[string]bool{}
+	for _, old := range out.Uses {
+		attached := false
+		for _, check := range checks {
+			if check.Kind != "sql_query" || old.Kind != "sql_query_candidate" || !checkContextMatches(out, check, old) {
 				continue
 			}
 			fieldMatch := false
-			for _, d := range u.Dependencies {
+			for _, d := range old.Dependencies {
 				for _, field := range check.Fields {
-					for _, t := range d.Transfers {
-						fieldMatch = fieldMatch || (t.Kind == "field_projection" && t.Text == field)
+					for _, transfer := range d.Transfers {
+						fieldMatch = fieldMatch || (transfer.Kind == "field_projection" && transfer.Text == field)
 					}
 					fieldMatch = fieldMatch || d.Source.Text == field || strings.HasPrefix(d.Source.Text, field+":")
 				}
@@ -213,15 +214,29 @@ func (s *pythonSet) attachChecks(out *analysis.AnalysisReport, checks []analysis
 			if !fieldMatch {
 				continue
 			}
-			for _, e := range out.Entries {
-				if e.Route.ID == u.RouteID && e.Route.PathPattern == check.Path && (check.Method == "" || strings.EqualFold(check.Method, e.Route.Method)) {
+			for _, entry := range out.Entries {
+				if entry.ID == old.EntryID && check.NormalizedSelector().Matches(entry) {
+					use := old
 					copy := check
-					u.Check = &copy
-					matched = true
+					use.Check = &copy
+					use.ID += "/" + check.ID
+					selected = append(selected, use)
+					attached = true
+					matched[check.ID] = true
 				}
 			}
 		}
-		if !matched {
+		if !attached {
+			selected = append(selected, old)
+		}
+	}
+	out.Uses = selected
+	for _, check := range checks {
+		entryMatched := false
+		for _, e := range out.Entries {
+			entryMatched = entryMatched || check.NormalizedSelector().Matches(e)
+		}
+		if entryMatched && !matched[check.ID] {
 			out.Gaps = append(out.Gaps, analysis.Gap{Kind: "python_check_unresolved", Detail: "No supported operation matched check " + check.ID})
 		}
 	}

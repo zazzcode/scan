@@ -47,3 +47,10 @@ The shared trace bundle indexes actual helper/condition evidence and exposes mis
 judge. Presence is not proof of enforcement. A Review recommendation names the missing fact; a
 validation-practice finding names the exact source-declared field constraints and direct-request
 rejection tests. Protected query guidance does not prescribe a speculative validation repair.
+
+GraphQL argument bindings are separate from parent, context and info provenance. The bounded Apollo
+adapter records actual argument reads and supported transfers, but an SDL scalar/type name, non-null
+marker or directive name does not establish an application's business requirement or an enforcing
+validator. SQL binding remains a destination-specific claim. Default/unresolved resolvers and
+unsupported parent-result transitions stay coverage gaps, including when no sensitive operation was
+recovered. See [GraphQL scan limits](../running-scans.md#bounded-apollo-graphql-analysis).

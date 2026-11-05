@@ -4,8 +4,9 @@
 
 ## Implemented evidence contract
 
-`internal/judge/bundle.go` emits `evidence_version: 2` for every language adapter. The
+`internal/judge/bundle.go` emits `evidence_version: 3` for every language adapter. The
 wire format contains a deduplicated source-evidence table, candidate/entry identity,
+explicit invocation identity, typed entry/dispatch metadata, actual input/control bindings,
 ordered dependency witnesses, an explicit trace graph, control edges, evidence-role
 coverage, the exact requirement, library contracts and remaining blockers. Source spans
 and hashes identify the analyzed snapshot. Source is evidence data, never model instructions.
@@ -33,6 +34,14 @@ The model envelope supplies language Analysis Guidelines from `internal/guidelin
 Guideline versions and full text participate in exact-request identity; historical reports remain
 readable without making their old answers reusable for changed inputs. See
 [naming and compatibility](../architecture.md#naming-and-compatibility).
+
+Common source/handler roles are `input_source` and `invoked_callable`. Structural entry
+registration, dispatch and supported invocation-binding roles supplement claim-specific
+requirements; supplied evidence does not establish adequacy. Input witnesses remain distinct
+from caller argument bindings. Browser source-scope markers preserve offsets/hashes without
+uploading entire modules or claiming verified event exposure. The generic protocol is
+`candidate-use-v10`; claim-specific questions retain their versions because their question
+semantics are unchanged. Any changed request context still rejects historical replay.
 
 ## Route and browser slices
 

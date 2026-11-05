@@ -15,6 +15,10 @@ type pythonReceiver struct {
 	uncertain               bool
 }
 type pythonRoute struct {
+	generated     bool
+	instance      string
+	closures      map[string]*pythonStaticValue
+	provenance    []analysis.Evidence
 	route         analysis.Route
 	module        *pythonModule
 	fn, decorator *sitter.Node

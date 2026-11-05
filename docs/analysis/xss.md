@@ -58,13 +58,31 @@ helpers stay unknown, because their conditions may guard content. `a += b` strin
 operands, including DOM `innerHTML +=` sinks.
 
 Browser entries have their own identity, component/source location and sink context. Supported
-bounded patterns include location/URL parameters, message/input events, verified DOM nodes and HTML,
+bounded patterns include location/URL parameters, explicit DOM/window events, verified DOM nodes and HTML,
 text, URL and string-code sinks, imported jQuery, React JSX, Vue single-file script/template output,
 and Angular injected sources/trust APIs with template bindings. An unlinked trust bypass is Review.
 A browser output that reads an API response field is linked to its origin only when exactly one server
 route matches the request method and path pattern and its JSON response provides that field from request
 data, including writes inside promise continuations. Stored or token origins behind a producer, and
 collection/component/dialog aliases, are not yet linked; those records stay Review.
+
+Literal `addEventListener` registrations for `click`, `input`, `change`, `submit` and
+`message` on verified DOM/window bindings have explicit event entries. Inline callbacks and
+immutable local named functions retain registration/callback locations and independent invocation
+contexts, including when a callback is registered twice. Direct `event.target.value` reads and
+`message.data` reads have event-input provenance; location and independent DOM reads retain their
+own origins. A message-origin condition is control evidence and does not establish HTML encoding.
+The report retains registrations with no discovered sink and unresolved callback bindings.
+
+Discovery is bounded to traversed source, with four callback levels, 128 callback expansions per
+file and eight receiver-alias resolution levels. Dynamic/unsupported event names, custom receivers,
+mutated receivers or callbacks, destructured callback parameters and unreached registrations retain
+explicit gaps. Mutated input projections are not seeded; mutable captured values remain unresolved.
+Mutation checks are conservative across same-name lexical bindings. Imported callbacks, event-object
+aliases/destructuring and arbitrary event-property projections are outside the supported binding
+subset. Imported helper registrations are inventoried in their own module with a caller-context
+gap when reached through another module. Existing unbound script/component observations retain their exposure limitations; discovery
+of a registration does not prove the application executes it or a runtime exploit succeeds.
 
 Default Angular protection requires a demonstrated plain-value path, not merely absence of a known
 bypass. Unknown trusted-wrapper transformations remain Review. Whole-object request render locals
@@ -90,3 +108,12 @@ only; canonical JSON/SARIF retain all records. Reusable source-reviewed sample r
 The shared facts use language-neutral source/context/protection/storage/entry fields. The [Python adapter](../python-support.md) supplies those facts for bounded Flask/Jinja/FastAPI
 flows and literal inline browser scripts. Unresolved renderer settings, template constructs and
 storage origins remain Review.
+
+Finite Express table registrations and local literal-argument handler factories retain separate
+closure/control contexts. A factory's encoded branch cannot protect a raw sibling registration.
+Bounded generated Flask/FastAPI handlers also resolve source-backed registry names before evaluating
+supported literal conditions; raw HTML concatenation is associated with its actual generated route.
+An unrelated unknown template-content value does not erase an established raw-output witness, while
+unknown transformations or relevant guards still prevent protection claims. Runtime registration data,
+mutation, unknown wrappers, unresolved callbacks and reached limits remain explicit gaps. See the
+[Python subset and limits](../python-support.md#finite-generated-http-routes).

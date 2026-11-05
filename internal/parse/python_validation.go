@@ -113,7 +113,7 @@ func (f *pythonFlow) validationClaim(u *analysis.CandidateUse, key string, v pyt
 	}
 	context = append(context, policy...)
 	u.Context = context
-	handler := f.route.module.evidence("route_handler", f.route.fn)
+	handler := f.route.module.evidence("invoked_callable", f.route.fn)
 	blockers := append([]analysis.Gap{}, f.gaps...)
 	blockers = append(blockers, v.gaps...)
 	blockers = append(blockers, f.guardGaps(v)...)
@@ -134,5 +134,5 @@ func (f *pythonFlow) validationClaim(u *analysis.CandidateUse, key string, v pyt
 		}
 	}
 	u.Check = &analysis.Check{ID: "source-field-policy", Method: f.route.route.Method, Path: f.route.route.PathPattern, Kind: "validation", Fields: []string{key}, Validation: "The complete policy for " + key + " in this claim is ONLY: " + strings.Join(constraints, "; ") + ". Do not demand password complexity, email syntax on a username, length/type/range restrictions, trimming or other constraints absent from this list. SQL binding, hashing and authorization are separate claims. Judge direct HTTP enforcement before sensitive use; returning a form/error before the operation enforces rejection even with HTTP status 200."}
-	u.Completeness = &analysis.Completeness{ClaimKind: "validation", Required: []string{"request_source", "field_policy", "route_handler", "control_flow"}, Evidence: map[string][]analysis.Evidence{"request_source": {u.Sink}, "field_policy": policy, "route_handler": {handler}, "control_flow": append([]analysis.Evidence{handler}, context...)}, Blockers: blockers, Coverage: []analysis.Gap{}, Scope: "Bounded source-declared form policy and linked handler/helper implementation. Missing enforcement semantics remain blockers; no field-name policy inference."}
+	u.Completeness = &analysis.Completeness{ClaimKind: "validation", Required: []string{"input_source", "field_policy", "invoked_callable", "control_flow"}, Evidence: map[string][]analysis.Evidence{"input_source": {u.Sink}, "field_policy": policy, "invoked_callable": {handler}, "control_flow": append([]analysis.Evidence{handler}, context...)}, Blockers: blockers, Coverage: []analysis.Gap{}, Scope: "Bounded source-declared form policy and linked handler/helper implementation. Missing enforcement semantics remain blockers; no field-name policy inference."}
 }

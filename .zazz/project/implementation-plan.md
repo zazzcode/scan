@@ -1,10 +1,39 @@
 # Proposed phased implementation plan
 
-**Long-term planning, 2026-10-19; capability checklist and delivery order updated 2026-11-02.** Phases 0–13 below are
+**Long-term planning, 2026-10-19; capability checklist updated 2026-11-02; delivery order updated 2026-11-05.** Phases 0–13 below are
 not approved for execution. This is a decomposition for later spec sessions, not a specification,
 calendar schedule, or blanket claim of completed functionality. The [capability checklist](#supported-capability-checklist)
 and delivery list below own current status and ordering; older phase/increment sections are references,
 not instructions to repeat delivered work.
+
+## Product goals and capability boundaries
+
+**2026-11-05 user direction:** organize Zazzles around four goals: **Scan** for source-code security,
+**Inspect** for correctness/maintainability and engineering standards, **Audit** for dependencies,
+and **Fix** for agent remediation and verification across the assessment capabilities.
+
+Scan has bounded implementations, including validation and construction-practice findings that form
+part of Inspect's foundation. A distinct Inspect command/view, broad standards support, Audit and
+automated Fix remain planned. The goals do not establish a public CLI shape or duplicate engines.
+Review remains an unresolved-evidence outcome, not the Inspect capability.
+
+The [project overview](../project.md#four-product-capabilities) owns product responsibilities.
+The [analysis pack proposal](analysis-pack-mvp.md#product-capabilities-and-shared-components)
+records shared component ownership and future domain separation. Inspect claims need separate
+applicability/evidence and should not be mixed into vulnerability counts or automatically treated as
+security defects. Prioritization remains impact-based, with security concerns clearly visible.
+
+**Usage order is independent of delivery order.** Once implemented, Scan, Inspect, Audit and Fix
+can run independently in any order. Fix may begin with an existing report or a user-specified issue.
+The agent feedback loop is optional composition. Each capability retains its required inputs and
+verification. This product requirement does not reorder implementation milestones or make the
+planned capabilities available now.
+
+No new Inspect delivery milestone is inserted into the existing ordered list. Broader quality
+checks, separate presentation, standards selection and automated Fix require bounded contracts and
+an explicit priority decision. The established sequence stays common-entry/dispatch acceptance and
+merge, then the separate SQL-first pack MVP, then command injection. Additional family migrations
+remain incremental. These documentation updates do not authorize implementation.
 
 ## First build
 
@@ -170,13 +199,31 @@ add the selected framework adapters through the shared model. The
 [architecture decision](../architecture.md#multiple-entry-and-dispatch-mechanisms) separates entry
 kind, registration, dispatch, callable, invocation context and optional transport. The next tracked
 contract must name framework/language subsets and explicit coverage limits before implementation.
-Command injection follows this activity and remains the next new vulnerability family.
+After this milestone completes acceptance and merges into `stage`, the separate
+[analysis pack MVP initiative](#analysis-pack-mvp-initiative) follows in its own worktree.
+Command injection follows that MVP and remains the next new vulnerability family.
+
+### Analysis pack MVP initiative
+
+**2026-11-05 user direction:** `analysis-pack-mvp` is its own initiative and future worktree/branch,
+starting after `common-entry-and-dispatch` completes acceptance and merges into `stage`. It precedes
+command injection and remaining vulnerability-family expansion. This planning update does not start
+implementation, create a worktree or add a ninth common-entry/dispatch deliverable.
+
+The [proposal](analysis-pack-mvp.md) defines a small internal manifest/selection/provenance boundary
+for existing analysis models, embedded guidance, API contracts, claim questions and evidence
+obligations. Relevant judgment material accompanies the trace; executable adapters and mandatory
+policy gates remain in the scanner. Use existing cases and local stubs to verify preserved behavior,
+explicit gaps, deterministic applicability and changed-request replay rejection. Public pack loading,
+registries, executable plugins and a new rule language are deferred. A separate bounded implementation
+contract is required after the merge; subsequent vulnerability families should use the accepted structure.
 
 ### Complete delivery list
 
-**Sequence decision, 2026-11-02 (updated user direction):** common entry/dispatch with bounded
-dynamic-route, GraphQL and gRPC support is next after Python support. Command injection and XSS
-hardening follow. Keep the other planned classes. Complete Python NoSQL and API-to-browser XSS
+**Sequence decision, 2026-11-02; pack initiative added by the user on 2026-11-05:** common
+entry/dispatch with bounded dynamic-route, GraphQL and gRPC support follows Python support. After
+that milestone merges, the separate analysis pack MVP precedes command injection and XSS hardening.
+Keep the other planned classes. Complete Python NoSQL and API-to-browser XSS
 linkage coverage immediately before dependency vulnerability scanning (SCA), after the other planned
 vulnerability-type work. Secret scanning follows SCA. Language expansion has no fixed position
 in this sequence; gRPC entry support is independent of source-language support.
@@ -194,6 +241,7 @@ plan edit. Preserve current capabilities and their unresolved coverage while imp
 | [x] | `xss-response` | Delivered bounded reflected, stored, browser and cross-tier analysis; retain hardening gaps rather than claiming universal coverage |
 | [x] | `python-support` | Delivered adapter and shared trace/report guardrails; same claim architecture as JS/TS |
 | [ ] Next | `common-entry-dispatch` | Shared entry/registration/dispatch/callable model; migrate HTTP/browser consumers and add bounded dynamic-route, GraphQL resolver and gRPC handler adapters with explicit unknown controls |
+| [ ] | `analysis-pack-mvp` | Separate initiative/worktree after common-entry/dispatch merges into stage; organize/version existing analysis knowledge, select relevant judge context and record replay/report provenance; [proposal](analysis-pack-mvp.md) |
 | [ ] | `command-injection` | Request-to-process execution and protective patterns in JS/TS and Python; start with TypeScript `/api/ping` and source-reviewed Python sinks |
 | [ ] | `xss-hardening` | General renderer/configuration, factory/helper and cross-tier coverage; retain raw/escaped/unknown controls, including VulnPy's Jinja Environment/template case |
 | [ ] | `path-traversal` | Request-influenced file paths, starting with `/api/files`; include JS/TS/Python containment controls |

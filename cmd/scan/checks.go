@@ -35,10 +35,27 @@ func loadChecks(path string) ([]analysis.Check, error) {
 	if dec.Decode(new(any)) != io.EOF {
 		return nil, errors.New("trailing data in checks file")
 	}
+	var raw []map[string]json.RawMessage
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return nil, err
+	}
 	ids := map[string]bool{}
-	for _, c := range checks {
-		if c.ID == "" || ids[c.ID] || c.Method == "" || !strings.HasPrefix(c.Path, "/") || len(c.Fields) == 0 || c.Validation == "" || c.Protection == "" || (c.Kind != "sql_query" && c.Kind != "nosql_query" && c.Kind != "account_creation") {
-			return nil, errors.New("invalid or duplicate check; require id, method, path, kind, fields and explicit requirements")
+	for i := range checks {
+		c := &checks[i]
+		_, hasMethod := raw[i]["method"]
+		_, hasPath := raw[i]["path"]
+		if c.Selector != nil && (hasMethod || hasPath) {
+			return nil, errors.New("check must use selector or legacy method/path, never both")
+		}
+		selector := c.NormalizedSelector()
+		if err := selector.Validate(); err != nil {
+			return nil, err
+		}
+		c.Selector = &selector
+		c.Method = ""
+		c.Path = ""
+		if c.ID == "" || ids[c.ID] || len(c.Fields) == 0 || c.Validation == "" || c.Protection == "" || (c.Kind != "sql_query" && c.Kind != "nosql_query" && c.Kind != "account_creation") {
+			return nil, errors.New("invalid or duplicate check; require id, a valid selector, kind, fields and explicit requirements")
 		}
 		ids[c.ID] = true
 	}

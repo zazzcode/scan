@@ -42,10 +42,10 @@ func TestBrowserSourceSinkControls(t *testing.T) {
 				}
 				return
 			}
-			if len(uses) != 1 || uses[0].ClientID == "" || uses[0].RouteID != "" || uses[0].XSS.Protection != tt.protection || uses[0].XSS.OutputContext != tt.context {
+			if len(uses) != 1 || uses[0].EntryKind != "browser" || uses[0].EntryID == "" || uses[0].XSS.Protection != tt.protection || uses[0].XSS.OutputContext != tt.context {
 				t.Fatalf("want client %s/%s: %+v", tt.protection, tt.context, uses)
 			}
-			if len(r.ClientEntries) != 1 {
+			if len(testBrowserEntries(r)) != 1 {
 				t.Fatal("browser source has no dedicated entry")
 			}
 		})
@@ -67,7 +67,7 @@ func TestReactAndVueRenderingControls(t *testing.T) {
 				t.Fatal(err)
 			}
 			uses := xssUses(r)
-			if len(uses) != 1 || uses[0].XSS.Protection != tt.protection || len(r.ClientEntries) != 1 {
+			if len(uses) != 1 || uses[0].XSS.Protection != tt.protection || len(testBrowserEntries(r)) != 1 {
 				t.Fatalf("want %s; got %+v", tt.protection, uses)
 			}
 		})
@@ -110,7 +110,7 @@ func TestSameSinkClientRecordsMerge(t *testing.T) {
 		return analysis.Dependency{Source: analysis.Evidence{Kind: "browser_source", Text: text, Span: analysis.Span{File: "c.ts", StartByte: int(at)}}, Transfers: []analysis.Evidence{}}
 	}
 	use := func(kind, protection string, resolved bool, d analysis.Dependency) analysis.CandidateUse {
-		return analysis.CandidateUse{ID: "xss:client:c.ts:1", ClientID: "client:c.ts", Kind: "xss_candidate", Sink: analysis.Evidence{Span: analysis.Span{File: "c.html", StartByte: 9}},
+		return analysis.CandidateUse{ID: "xss:client:c.ts:1", EntryID: "client:c.ts", EntryKind: "browser", Kind: "xss_candidate", Sink: analysis.Evidence{Span: analysis.Span{File: "c.html", StartByte: 9}},
 			Dependencies: []analysis.Dependency{d}, XSS: &analysis.XSSFacts{Type: kind, Protection: protection, OriginResolved: resolved, ResponsePath: map[bool]string{false: "/api/x"}[resolved]}}
 	}
 	tests := []struct {
@@ -129,7 +129,7 @@ func TestSameSinkClientRecordsMerge(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &analysis.AnalysisReport{}
-			addClientUses(r, &clientContext{entry: analysis.ClientEntry{ID: "client:c.ts"}}, tt.uses)
+			addClientUses(r, &clientContext{entry: analysis.EntryPoint{ID: "client:c.ts", Kind: "browser", Browser: &analysis.BrowserEntryMetadata{Category: "script"}}}, tt.uses)
 			if len(r.Uses) != 1 || r.Uses[0].XSS.Protection != tt.protection || r.Uses[0].XSS.Type != tt.typ {
 				t.Fatalf("want one %s %s record: %+v", tt.typ, tt.protection, r.Uses)
 			}

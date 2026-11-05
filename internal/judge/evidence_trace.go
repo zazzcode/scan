@@ -13,21 +13,19 @@ type traceEdge struct {
 	SinkSlot   string `json:"sink_slot,omitempty"`
 }
 type traceGraph struct {
-	Entry     string      `json:"entry"`
-	EntryKind string      `json:"entry_kind"`
-	Sink      string      `json:"sink"`
-	Edges     []traceEdge `json:"edges"`
-	Scope     string      `json:"scope"`
+	InvocationContext string      `json:"invocation_context_id"`
+	Entry             string      `json:"entry"`
+	EntryKind         string      `json:"entry_kind"`
+	Sink              string      `json:"sink"`
+	Edges             []traceEdge `json:"edges"`
+	Scope             string      `json:"scope"`
 }
 
 // buildTraceGraph projects adapter-supplied witnesses into the shared wire analysis.
 // Context proximity alone never creates a call, flow or guard edge.
 func buildTraceGraph(use analysis.CandidateUse, ref func(analysis.Evidence) string) traceGraph {
-	entry, kind := use.RouteID, "http_route"
-	if use.ClientID != "" {
-		entry, kind = use.ClientID, "browser_entry"
-	}
-	result := traceGraph{Entry: entry, EntryKind: kind, Sink: ref(use.Sink), Edges: []traceEdge{}, Scope: "Source-backed static dependency witnesses and supplied control edges; not an executed trace or whole-program completeness proof."}
+	entry, kind := use.EntryID, use.EntryKind
+	result := traceGraph{InvocationContext: use.InvocationContextID, Entry: entry, EntryKind: kind, Sink: ref(use.Sink), Edges: []traceEdge{}, Scope: "Source-backed static dependency witnesses and supplied control edges; not an executed trace or whole-program completeness proof."}
 	for i, d := range use.Dependencies {
 		previous := ref(d.Source)
 		for _, transfer := range d.Transfers {

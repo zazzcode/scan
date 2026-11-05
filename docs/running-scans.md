@@ -49,12 +49,12 @@ scanner default. You may keep the variable in your ignored `.env`; load it in th
 because the scanner does not automatically read `.env`. It is a local filesystem path, not a URL.
 
 Open the printed `findings.html` path in your browser (on macOS: `open /path/to/run/findings.html`).
-Route rows start with Findings, then Review, then Protected counts (highest first), followed by
-route path A–Z and method; blank rows appear last. Click
-Route signature to sort by path, or the grouped Findings / Review / Protected header to sort by
+Entry rows start with Findings, then Review, then Protected counts (highest first), followed by
+entry label A–Z and method; blank rows appear last. Click
+Entry to sort by entry label, or the grouped Findings / Review / Protected header to sort by
 those counts together (highest first, then path A–Z; blank rows last). Click again to reverse.
 Expanded rows remain open when reordered.
-The **Route location** column points to the route declaration. Each expanded finding has its own
+The **Declaration location** column points to the route declaration. Each expanded finding has its own
 **Finding location**. Row-end type pills identify review areas such as SQL Injection, NoSQL Injection,
 and Input Validation, alongside their poor-practice/review/protected status. Select a pill to open its
 glossary side panel with a definition, coverage, and remediation guidance. A type label alone does
@@ -145,7 +145,8 @@ Entry paths are relative to the target repository. Use `server.ts` for Juice Sho
 `src/server.ts` for the vulnerable TypeScript sample. Omit `--entry` to consider all selected JS/TS
 registration files. Explicit selection avoids conflating training snippets with production scope.
 
-The separate schema-v1 evidence report contains `entries`, `uses`, `files`, `gaps` and `limitations`.
+The separate schema3 evidence report contains typed `entries`, `registrations`,
+`dispatch_bindings`, `callables`, `invocation_contexts`, `uses`, `files`, `gaps` and `limitations`.
 Each use identifies its route, source fields, ordered local transfer evidence, candidate sink,
 snapshot hashes and assessment state. Direct named relative ESM imports, imported handler factories,
 local assignment, string expressions and simple object destructuring are supported. Branches,
@@ -209,8 +210,123 @@ is scoped to its exact output and evidence, never the entire route/application.
 `--strings` flag remains a compatibility alias. Both perform the same analysis; add an explicitly
 configured `--judge` for the required model-assessed security workflow.
 
-Fresh analysis JSON uses `schema_version: 2` and `analysis_guidelines` metadata in place of
+Fresh analysis JSON uses `schema_version: 3` and `analysis_guidelines` metadata in place of
 `practice`. Route inventory JSON remains schema 1. HTML/SARIF export accepts saved analysis reports
-from schemas 1 and 2, including historical guideline metadata. Saved sample reports retain their
+from schemas1/2/3, including historical guideline metadata. Current candidate and finding
+associations use `entry_id` and `invocation_context_id`; old route/client associations are
+converted only when reading saved reports. Original schema provenance is retained in
+`source_schema_version` for converted inputs. Saved sample reports retain their
 original assessments and provenance; changed guideline text or model inputs cannot reuse those
 answers as judgments of a new scan. Consumers reading fresh JSON should use `analysis_guidelines`.
+
+## Common entry selection and tagged checks
+
+`--entry` keeps its registration-file scope. `--route` selects HTTP path patterns only.
+Use `--entry-kind http|browser|graphql|grpc` and `--entry-id <exact-snapshot-id>` with
+`--analyze`; filters intersect and an empty selection exits 1. An invalid kind exits 2.
+IDs identify this source snapshot; portable requirements should use typed identities.
+
+```bash
+./bin/scan --analyze --entry-kind browser --json --output-dir "" /path/to/app
+./bin/scan --analyze --entry server.ts --entry-kind http --route /login --json /path/to/app
+```
+
+Checks remain a top-level array of 1–20 records, capped at 64 KiB. Each record uses
+legacy `method`/`path` or a tagged `selector`, never both. Unknown fields and incompatible
+selector fields are rejected. For example, a portable HTTP check is:
+
+```json
+[{"id":"login-sql","selector":{"kind":"http","method":"POST","path":"/login"},"kind":"sql_query","fields":["email"],"validation":"Apply only the application's declared email requirements","protection":"Keep email separate from SQL syntax"}]
+```
+
+Selector identities are HTTP `method`/`path`, GraphQL `type`/`field`, gRPC fully qualified
+`service`/`method`, or browser `category`/`name` with optional `event`. Optional
+`registration_file` narrows any selector to that relative registration file. Selection
+never creates an adapter or an operation: discovery requires the supported source bindings in the
+adapter subsets below. Check kinds remain `sql_query`, `nosql_query`, and `account_creation`.
+Field names retain their source roles, such as `args.email` or `request.email`.
+
+Every matched invocation context is evaluated separately. JSON `check_matches` records
+entry/context IDs and use counts; `selected_scope` records CLI filters. Zero matches and
+matched contexts without supported operations remain explicit gaps, never protection.
+
+## Bounded Apollo GraphQL analysis
+
+`--analyze` discovers verified named `ApolloServer` imports from `@apollo/server` in JS/TS,
+with immutable literal `typeDefs`/`resolvers` options and inline, local named or relative-imported
+named resolver functions. Query, Mutation and explicitly bound object-field resolvers have separate
+entries and invocation contexts. Use `--entry-kind graphql`, `--entry-id <snapshot-id>` or a typed
+check selector such as `{"kind":"graphql","type":"Query","field":"search"}`. `--entry` scopes
+registration files; `--route` remains HTTP-only. Reports label fields such as `Query.search`, with
+schema, registration, callable and sink source locations, rather than inventing HTTP routes.
+
+The SDL reader accepts object/input fields, arguments, list/non-null types, scalars, enums and
+comments in unescaped literal strings/templates, or a default import of a local literal `.graphql`
+file. Local SDL imports are read as source bytes inside the selected root, including symlink checks;
+loaders and target code are never executed. Fixtures pin Apollo Server 4, GraphQL 16 and Sequelize 6;
+other versions are unverified compatibility assumptions. No package installation is needed for scans.
+
+Only declared argument projections have external input provenance. Parent, context and info remain
+independent unknown origins; a schema edge does not prove a parent-result transfer. Existing SQL
+library contracts, actual value transfers, completeness and optional judge policy determine each
+claim. SDL type/scalar/directive names establish neither SQL protection nor business validation.
+Offline discovery is unassessed; a local-stub test result is not model accuracy or runtime validation.
+
+Unsupported composition, SDL extensions/directives/default values/descriptions/custom roots,
+subscriptions, federation, executable custom scalars, arbitrary wrappers/loaders, destructured/default
+resolver parameters, additional Apollo options and default resolvers retain explicit gaps. Literal
+maps with mutation, aliases escaping their construction or unresolved calls cannot establish binding.
+Parent-result transitions are not modeled. Limits are 128 schema fields per constructor and a
+conservative 10,000 derived-record budget per scan (five reserved records per field); SDL additionally
+has 32,768 tokens, 4,096 object fields, 16 nested type levels and a 2 MiB source limit. Reached limits
+retain located gaps and unexpanded remainder counts. Existing helper/value-flow limits still apply.
+
+## Bounded Node.js unary gRPC analysis
+
+`--analyze` discovers verified `@grpc/grpc-js` Server construction and `addService` calls in
+JS/TS, joined to `@grpc/proto-loader` literal `loadSync` and `loadPackageDefinition` service
+projections. Namespace/default/named imports and literal CommonJS namespace requires are supported.
+Literal maps bind inline, local named or relative-imported named handlers. Original proto method
+keys take precedence; ordinary lower/UpperCamel and snake_case names also support the loader's
+lowerCamel alias. Acronym fallback names remain unresolved; their exact proto spelling is supported.
+Each server instance and registration retains its own invocation context, even with a shared callable.
+
+Use `--entry-kind grpc`, `--entry-id <snapshot-id>` or a tagged check selector such as
+`{"kind":"grpc","service":"fixtures.search.SearchService","method":"Raw"}`. Reports label
+`fixtures.search.SearchService/Raw` with registration, proto, callable and actual sink locations.
+Zero-use and unsupported streaming methods remain visible; HTTP method/path values are not invented.
+
+Proto paths are literal `.proto` paths under the selected root, assuming the application's process
+working directory is that root. Absolute paths, root escapes and escaping symlinks are rejected.
+The bounded syntax reader accepts proto3 packages, services, RPCs, local messages and ordinary
+scalar/message fields, including optional/repeated fields and comments. `keepCase` may be a literal
+boolean; default field projections use protobufjs 7's underscore/lowercase conversion, preserving the first
+character. Colliding converted field names retain an unresolved-message gap. Types and
+decoding establish neither application validation policy nor SQL protection. Only request fields
+have request-data provenance; metadata, context and callback roles remain independent unknowns.
+Supported aliases/helper transfers reuse existing SQL analysis and claim-completeness gates.
+
+Imports/include paths, nested/enum/map/oneof declarations, options, generated stubs, dynamic
+composition, interceptors, arbitrary wrappers and streaming execution retain explicit gaps.
+Unknown mutation/escapes cannot establish immutable descriptor or handler bindings. Limits are
+2 MiB/proto, 32,768 tokens, 4,096 parsed methods, 128 derived methods per registration and a
+conservative 10,000 derived records per scan (five reserved per method, including prior GraphQL
+records in either discovery order). Descriptor/alias expansion stops at 16; reached bounds retain located gaps and remainder
+details. Existing helper depth/count and transfer limits also apply.
+
+The [gRPC Node tutorial](https://grpc.io/docs/languages/node/basics/) describes the underlying API.
+Source-only fixtures declare grpc-js 1.14.0, proto-loader 0.8.0, protobufjs 7.5.3 and Sequelize 6.37.7; installed target
+versions remain unverified assumptions. Scanning never installs dependencies, executes handlers or
+runs generators. Offline discovery remains unassessed; local-stub protection controls prove scanner
+policy behavior, not model accuracy or application runtime behavior. Real gRPC application evaluation
+has not been performed.
+
+## Cross-entry verification evidence
+
+The [acceptance results](../.zazz/evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05)
+compare existing HTTP/browser samples with source-only event, dynamic HTTP, GraphQL, gRPC and mixed
+fixtures. Fresh full real-judge runs now complete all1146 eligible assessments across seven example
+apps. Paid results, offline discovery, synthetic policy controls and historical answers remain separate
+evidence. Supported source-reference checks and format compatibility pass; model completion does not
+establish exhaustive accuracy or runtime exploitability. Mandatory rendered report review is
+complete through bounded inspection of the user-opened localhost HTTP tab; human review/merge remains pending.

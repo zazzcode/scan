@@ -15,7 +15,7 @@ import (
 func TestExportHTMLFromSavedReport(t *testing.T) {
 	dir := t.TempDir()
 	file := filepath.Join(dir, "report.json")
-	saved := analysis.AnalysisReport{SchemaVersion: 1, Root: "target-no-longer-present", Entries: []analysis.Entry{{Route: analysis.Route{ID: "r", Method: "POST", PathPattern: "/login"}}}, Uses: []analysis.CandidateUse{{ID: "u", RouteID: "r", Kind: "sql_query_candidate", Sink: analysis.Evidence{Text: "db.query(sql)"}, Assessment: analysis.Assessment{Status: "not_run"}}}}
+	saved := json.RawMessage(`{"schema_version":1,"root":"target-no-longer-present","entries":[{"route":{"id":"r","method":"POST","path_pattern":"/login"}}],"uses":[{"id":"u","route_id":"r","kind":"sql_query_candidate","sink":{"text":"db.query(sql)"},"assessment":{"status":"not_run"}}]}`)
 	data, _ := json.Marshal(saved)
 	if err := os.WriteFile(file, data, 0600); err != nil {
 		t.Fatal(err)

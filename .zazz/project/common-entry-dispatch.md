@@ -4,12 +4,20 @@
 work. Implement the common model using existing HTTP and browser consumers, with bounded support
 for dynamic routes, GraphQL resolvers and gRPC handlers. The exact framework/language subsets and
 coverage limits belong in the next tracked implementation contract. Command injection follows as
-the next new vulnerability family. These capabilities are planned, not currently implemented.
+the next new vulnerability family. The common model, HTTP/browser migration and bounded event/dynamic/GraphQL/gRPC adapters are
+implemented. Final cross-entry acceptance has passing automated and bounded localhost rendered
+report evidence; human review/merge remains pending; see the [results](../evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05).
 
 gRPC handlers are an entry/dispatch capability independent of source language. The model should
 facilitate their registration, callable binding and invocation context without HTTP-route assumptions.
 Language adapters supply their own binding and flow evidence; adding gRPC or the common model
 does not itself implement support for another source language.
+
+The [architecture proposal](../architecture/common-entry-dispatch.md) and
+[eight-deliverable specification set](../specifications/common-entry-dispatch.md) refine this
+brief as of 2026-11-03. They retain HTTP/sample compatibility, make browser events explicit,
+and prioritize Node.js GraphQL before gRPC. The user-built GraphQL application is a later
+evaluation; source-only fixtures support initial adapter acceptance. Deliverables1–7 have implementation evidence in their contracts; deliverable8 remains incomplete until mandatory visual acceptance passes.
 
 ## Governing design
 
@@ -27,8 +35,8 @@ The same callable can serve multiple entries; an entry can have multiple support
 Entry kind does not determine input trust. Multiple registrations and target alternatives MUST retain
 conditions, provenance and unresolved coverage. Source/control/value semantics remain explicit.
 
-Current pressure points are `analysis.Entry.Route`, separate route/browser identities, method/path
-checks, route-handler completeness roles and route-centric report grouping. A struct-only addition
+The migration removes `analysis.Entry.Route` and competing route/browser associations,
+introducing common entry/context identities and evidence roles. Typed check selectors and framework-specific report details are implemented. A struct-only addition
 or an output projection of unchanged route-only internals does not meet the outcome.
 
 ## Bounded implementation
@@ -82,7 +90,14 @@ or an output projection of unchanged route-only internals does not meet the outc
 ## Exclusions
 
 New vulnerability families, a general authorization engine, queue/CLI/scheduler adapters, a full IR
-replacement, graph database, independent reviewer, automatic cache, sample remediation and paid
+replacement, graph database, independent reviewer, automatic cache, sample remediation and unbounded paid
 calibration are outside this activity. Dynamic-route, GraphQL and gRPC support is bounded by the
 selected source/binding/flow contracts and acceptance evidence; unsupported frameworks and runtime
 behavior remain explicit gaps.
+
+
+The user-authorized final SQL/NoSQL-only follow-up recovers Goof login NoSQL and Juice Shop login
+SQL, with full-source reports and conservative negative controls. Five-set localhost rendered review
+now passes; human code/design review and merge remain pending. See the
+[current accuracy closeout](../evaluation/common-entry-dispatch-results.md#sqlnosql-only-accuracy-refresh-and-rendered-review).
+Broader hardening waits until after analysis-pack-mvp; no next-deliverable implementation is included.

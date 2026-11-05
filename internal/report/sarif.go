@@ -44,11 +44,21 @@ func SARIF(report *analysis.AnalysisReport) map[string]any {
 		route := routeName(report, use)
 		finding := report.Findings[i]
 		message := fmt.Sprintf("%s: %s [%s]. %s %s", route, finding.Title, finding.Status, finding.Summary, finding.Protection)
-		props := map[string]any{"scan.finding": report.Findings[i], "scan.route": route, "scan.useId": use.ID, "scan.kind": use.Kind, "scan.assessment": use.Assessment, "scan.reviewStatus": "not_run", "scan.runtimeConfirmation": "not_run", "scan.recommendations": g, "scan.coverageGaps": use.Gaps}
-		if use.ClientID != "" {
-			delete(props, "scan.route")
-			props["scan.clientEntry"] = use.ClientID
-			props["scan.sourceKind"] = "client"
+		props := map[string]any{"scan.finding": report.Findings[i], "scan.useId": use.ID, "scan.kind": use.Kind, "scan.assessment": use.Assessment, "scan.reviewStatus": "not_run", "scan.runtimeConfirmation": "not_run", "scan.recommendations": g, "scan.coverageGaps": use.Gaps}
+		props["scan.entryKind"] = "unknown"
+		props["scan.entryId"] = use.EntryID
+		props["scan.invocationContextId"] = use.InvocationContextID
+		for _, e := range report.Entries {
+			if e.ID == use.EntryID {
+				props["scan.entryKind"] = e.Kind
+				props["scan.entry"] = e
+				if e.Kind == "http" {
+					props["scan.route"] = route
+				}
+				if e.Kind == "browser" {
+					props["scan.sourceKind"] = "client"
+				}
+			}
 		}
 		if use.Check != nil {
 			props["scan.check"] = use.Check
@@ -62,8 +72,8 @@ func SARIF(report *analysis.AnalysisReport) map[string]any {
 		primary := use.Sink.Span
 		if primary.File == "" {
 			for _, e := range report.Entries {
-				if e.Route.ID == use.RouteID {
-					primary = e.Route.Registration
+				if e.ID == use.EntryID {
+					primary = e.Location.Span
 					break
 				}
 			}
@@ -74,7 +84,35 @@ func SARIF(report *analysis.AnalysisReport) map[string]any {
 			loc["logicalLocations"] = []any{map[string]string{"name": route, "fullyQualifiedName": route, "kind": "function"}}
 			result["locations"] = []any{loc}
 		}
-		related := relatedLocations(use)
+		relatedUse := use
+		relatedUse.Context = append([]analysis.Evidence(nil), use.Context...)
+		for _, e := range report.Entries {
+			if e.ID == use.EntryID {
+				relatedUse.Context = append(relatedUse.Context, e.Location)
+			}
+		}
+		for _, reg := range report.Registrations {
+			if reg.EntryID == use.EntryID {
+				relatedUse.Context = append(relatedUse.Context, reg.Origin)
+				relatedUse.Context = append(relatedUse.Context, reg.DerivedFrom...)
+			}
+		}
+		for _, c := range report.InvocationContexts {
+			if c.ID == use.InvocationContextID {
+				props["scan.invocationContext"] = c
+				for _, b := range report.DispatchBindings {
+					if b.ID == c.DispatchBindingID {
+						props["scan.dispatchBinding"] = b
+						for _, fn := range report.Callables {
+							if fn.ID == b.CallableID {
+								relatedUse.Context = append(relatedUse.Context, fn.Definition)
+							}
+						}
+					}
+				}
+			}
+		}
+		related := relatedLocations(relatedUse)
 		if len(related) > 0 {
 			result["relatedLocations"] = related
 		}
@@ -97,11 +135,16 @@ func SARIF(report *analysis.AnalysisReport) map[string]any {
 			notifications = append(notifications, map[string]any{"level": "note", "message": map[string]string{"text": route + ": semantic assessment " + use.Assessment.Status}})
 		}
 	}
+	for _, entry := range report.Entries {
+		for _, g := range report.EntryGaps(entry.ID) {
+			notifications = append(notifications, map[string]any{"level": "warning", "message": map[string]string{"text": EntryLabel(entry) + ": " + g.Kind + ": " + g.Detail}, "properties": map[string]any{"scan.entryId": entry.ID, "scan.coverageGap": g}})
+		}
+	}
 	for _, g := range report.Gaps {
 		successful = false
 		notifications = append(notifications, map[string]any{"level": "warning", "message": map[string]string{"text": g.Kind + ": " + g.Detail}})
 	}
-	invocation := map[string]any{"executionSuccessful": successful}
+	invocation := map[string]any{"executionSuccessful": successful, "properties": map[string]any{"scan.entries": report.Entries, "scan.registrations": report.Registrations, "scan.dispatchBindings": report.DispatchBindings, "scan.invocationContexts": report.InvocationContexts}}
 	if len(notifications) > 0 {
 		invocation["toolExecutionNotifications"] = notifications
 	}
@@ -109,7 +152,7 @@ func SARIF(report *analysis.AnalysisReport) map[string]any {
 	for _, e := range report.Files {
 		artifacts = append(artifacts, map[string]any{"location": map[string]string{"uri": relativeURI(e.Span.File)}, "hashes": map[string]string{"sha-256": e.SHA256}})
 	}
-	run := map[string]any{"tool": map[string]any{"driver": map[string]any{"name": "scan", "informationUri": "https://github.com/zazzcode/zazzles", "rules": rules}}, "results": results, "artifacts": artifacts, "invocations": []any{invocation}, "properties": map[string]any{"scan.findingTypes": report.FindingTypes, "scan.limitations": report.Limitations, "scan.selectedRoute": report.SelectedRoute, "scan.identityPolicy": "snapshot-local use IDs; edit-stable baseline identity is not implemented"}}
+	run := map[string]any{"tool": map[string]any{"driver": map[string]any{"name": "scan", "informationUri": "https://github.com/zazzcode/zazzles", "rules": rules}}, "results": results, "artifacts": artifacts, "invocations": []any{invocation}, "properties": map[string]any{"scan.findingTypes": report.FindingTypes, "scan.limitations": report.Limitations, "scan.selectedRoute": report.SelectedRoute, "scan.selectedScope": report.SelectedScope, "scan.checkMatches": report.CheckMatches, "scan.identityPolicy": "snapshot-local use IDs; edit-stable baseline identity is not implemented"}}
 	return map[string]any{"$schema": SchemaURI, "version": "2.1.0", "runs": []any{run}}
 }
 
@@ -152,24 +195,20 @@ func resultKind(f analysis.Finding) (string, string) {
 }
 
 func routeName(report *analysis.AnalysisReport, use analysis.CandidateUse) string {
-	if use.ClientID != "" {
-		for _, entry := range report.ClientEntries {
-			if entry.ID == use.ClientID {
-				return entry.Name
-			}
+	for _, e := range report.Entries {
+		if e.ID == use.EntryID {
+			return EntryLabel(e)
 		}
-		return use.ClientID
 	}
-	if use.Check != nil {
+	if use.Check != nil && use.Check.Method != "" && use.Check.Path != "" {
+		if use.Check.Selector != nil {
+			return use.EntryID
+		}
 		return use.Check.Method + " " + use.Check.Path
 	}
-	for _, e := range report.Entries {
-		if e.Route.ID == use.RouteID {
-			return e.Route.Method + " " + e.Route.PathPattern
-		}
-	}
-	return use.RouteID
+	return use.EntryID
 }
+
 func relativeURI(path string) string { return (&url.URL{Path: path}).String() }
 func location(span analysis.Span, text string) map[string]any {
 	loc := map[string]any{"message": map[string]string{"text": text}}

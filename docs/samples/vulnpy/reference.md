@@ -11,6 +11,43 @@ it does not protect its already-formatted SQL text.
 
 Reflected XSS is in generated Flask/FastAPI views returning raw HTML, not in the empty do_raw trigger.
 A separate Jinja environment/template path exists in `apps/flask_app.py` and its template uses safe.
-Six current-family source positives remain known scanner misses; four warning controls ensure the
-generated routes are not silently presented as covered. The [case evaluator](../evaluate-python.py)
-retains those failures. Future framework/dispatch work must not relabel them to make tests appear green.
+The published historical baseline has six current-family source-positive misses and four warning
+controls. Its [case evaluator](../evaluate-python.py), case labels and saved reports retain those
+results; the later evidence below does not rewrite that history.
+
+## Findings confirmed by scan and code inspection — D5
+
+Reviewed on 2026-11-04 against the same pinned revision. The full source-only scan used OpenAI
+Decisions `gpt-6-luna`, followed by inspection of the actual registrations, request reads, selected
+functions, callback/cursor bindings and operation operands. These are source-supported static
+vulnerability confirmations, not executed exploits or independent human-review certification.
+VulnPy's README does not supply a formal per-route vulnerability manifest; these expectations are
+derived from its source and tests, not inferred from model agreement or trigger names.
+
+| Case | Generated exposure | Source inspection confirming the flaw | Scan result |
+| --- | --- | --- | --- |
+| VP-SQL-EXECUTE | `/vulnpy/sqli/sqlite3-execute` | Captured request input is formatted into executable SQL at `trigger/sqli.py:36` and passed to the verified SQLite cursor's `execute` at line 37. | Confirmed in Flask GET/POST and FastAPI GET contexts. |
+| VP-SQL-EXECUTEMANY | `/vulnpy/sqli/sqlite3-executemany` | The formatted first value enters SQL text at lines 47–48. The separate parameter operand binds a different value and does not repair the interpolated SQL. | Confirmed in Flask GET/POST and FastAPI GET contexts. |
+| VP-SQL-EXECUTESCRIPT | `/vulnpy/sqli/sqlite3-executescript` | Request text is formatted into the script at lines 58–59; `executescript` executes that text without value binding. | Confirmed in Flask GET/POST and FastAPI GET contexts. |
+| VP-XSS-FLASK | `/vulnpy/xss/raw/`, GET/POST | `_get_user_input` supplies header/query/form input. The resolved `name == "xss"` / `trigger == "raw"` branch concatenates it into HTML at `flask/blueprint.py:55`, returned at line 57 without encoding. | Confirmed in both methods. |
+| VP-XSS-FASTAPI | `/vulnpy/xss/raw`, GET | The generated handler's query parameter is concatenated into HTML at `fastapi/vulnerable.py:42` and wrapped by `HTMLResponse` at line 44 without encoding. | Confirmed in GET. |
+
+All paths in the source column are under `src/vulnpy/`. Flask declares the SQL routes with trailing
+slashes and `strict_slashes=False`; the stem spelling above identifies their matching family.
+Flask retains the `User-Input` header's precedence, then GET query or POST form alternatives.
+FastAPI binds the actual `user_input` query parameter. SQL witnesses retain the selected trigger,
+its captured input, `_execute`'s callback parameter, `_db_reset`'s connection and the derived cursor.
+Constant setup statements and `SELECT_ALL` are not counted as request-derived SQL defects.
+`trigger/xss.py:do_raw` returns an empty string and is not a rendering sink.
+
+The main Flask/FastAPI apps account for 12 required route/method contexts. The separate Flask
+`app1`/`app2` mounts add independently identified exposures, producing 28 contextual findings in the
+full scan: 21 SQL and 7 raw-XSS. These are five source locations, not 28 distinct vulnerabilities.
+All 827 candidate assessments completed; 799 records remain evidence-limited, including the deferred
+Jinja path and observations without an established business-validation policy.
+
+`VP-XSS-JINJA` remains a source-positive coverage gap: its Environment/template binding is separate
+from these generated raw responses. Other frameworks and vulnerability families are not established
+by this D5 result. The original six-positive-miss/four-warning baseline and `cases.json` remain intact.
+Detailed commands, limits, pipeline checks and provenance are recorded in the
+[D5 implementation results](../../../.zazz/evaluation/common-entry-dispatch-results.md).

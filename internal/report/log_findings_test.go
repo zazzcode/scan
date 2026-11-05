@@ -81,9 +81,9 @@ func TestRequestLineOutcomes(t *testing.T) {
 }
 
 func TestRouteRecordsListFindingsFirst(t *testing.T) {
-	r := &analysis.AnalysisReport{SchemaVersion: 1, Entries: []analysis.Entry{{Route: analysis.Route{ID: "r", Method: "GET", PathPattern: "/x"}}}, Uses: []analysis.CandidateUse{
-		{ID: "a", RouteID: "r", Kind: "outbound_http_candidate", Sink: analysis.Evidence{Text: "fetch(first)"}, Assessment: analysis.Assessment{Status: "not_run"}},
-		{ID: "b", RouteID: "r", Kind: "log_sink_candidate", Sink: analysis.Evidence{Text: "use(morgan(second))"}, Gaps: []analysis.Gap{{Kind: "log_request_line_credential"}}, Assessment: analysis.Assessment{Status: "not_run"}},
+	r := &analysis.AnalysisReport{SchemaVersion: 1, Entries: []analysis.EntryPoint{testHTTPEntry(analysis.Route{ID: "r", Method: "GET", PathPattern: "/x"})}, Uses: []analysis.CandidateUse{
+		{ID: "a", EntryID: "r", Kind: "outbound_http_candidate", Sink: analysis.Evidence{Text: "fetch(first)"}, Assessment: analysis.Assessment{Status: "not_run"}},
+		{ID: "b", EntryID: "r", Kind: "log_sink_candidate", Sink: analysis.Evidence{Text: "use(morgan(second))"}, Gaps: []analysis.Gap{{Kind: "log_request_line_credential"}}, Assessment: analysis.Assessment{Status: "not_run"}},
 	}}
 	var b bytes.Buffer
 	if err := HTML(&b, r); err != nil {

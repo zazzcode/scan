@@ -31,7 +31,7 @@ func (f *flow) classifyLogDeps(deps []analysis.Dependency, at *sitter.Node) []an
 		out = append(out, f.gap(kind, detail, at))
 	}
 	for _, d := range deps {
-		if d.Source.Kind != "request_source" {
+		if d.Source.Kind != "input_source" {
 			continue
 		}
 		container, key := requestKey(d)

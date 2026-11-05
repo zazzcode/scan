@@ -85,6 +85,26 @@ func investigationGuidance(u analysis.CandidateUse, at string) Guidance {
 }
 func renderingGuidance(u analysis.CandidateUse, at string) Guidance {
 	g := Guidance{Title: "Repair this HTML output", ExampleStatus: "source-derived candidate; review intended output semantics and test before applying"}
+	for _, e := range u.Context {
+		if e.Kind == "event_registration" && u.XSS.OutputContext == "html_text" {
+			g.Actions = []string{"At " + at + ", replace the raw HTML construction in " + u.Sink.Text + " with DOM node construction and textContent when the intended output is text.", "If HTML is required, use a verified HTML sanitizer appropriate to this output context before inserting the event-derived value. Event names, input validation and message-origin checks do not encode HTML.", "Test the registered callback with HTML-significant event input and assert the intended text or sanitized DOM. Preserve separate tests for each registration of a shared callback."}
+			g.ExampleStatus = "no automatic patch; review intended DOM output and callback semantics"
+			return g
+		}
+	}
+	if filepath.Ext(u.Sink.Span.File) == ".py" && (u.Sink.Kind == "html_return" || u.Sink.Kind == "html_response") && u.XSS.OutputContext == "html_text" {
+		compiled := false
+		for _, d := range u.Dependencies {
+			for _, e := range d.Transfers {
+				compiled = compiled || e.Kind == "template_source" || e.Kind == "template_render" || e.Kind == "template_compile"
+			}
+		}
+		if !compiled {
+			g.Actions = []string{"At " + at + ", HTML-encode the inserted request text before combining it with the returned HTML or HTMLResponse. Use an appropriate text encoder such as Python html.escape; retain the surrounding constant markup.", "If this output moves into a template, pass the value separately to a verified autoescaping template instead of concatenating it into HTML or template source.", "Test HTML-significant input through this generated route and each factory context; assert that the supplied markup is displayed as text. Keep raw, escaped and unresolved callback paths separate."}
+			g.ExampleStatus = "no automatic patch; preserve intended response and output context"
+			return g
+		}
+	}
 	if strings.Contains(u.Sink.Text, "{{") && strings.Contains(u.Sink.Text, "|") && u.XSS.OutputContext != "script" && u.XSS.OutputContext != "url" {
 		replacement := jinjaSafeFilter.ReplaceAllString(u.Sink.Text, "")
 		if replacement != u.Sink.Text {
@@ -96,6 +116,25 @@ func renderingGuidance(u analysis.CandidateUse, at string) Guidance {
 	if match := jqueryListAppend.FindStringSubmatch(u.Sink.Text); len(match) > 0 {
 		g.Actions = []string{"At " + at + ", build the list item as a DOM node and set its text from " + match[2] + ". The current string concatenation feeds that input to jQuery's HTML parser.", "Keep the existing list container and event flow. Test that an input containing an HTML tag is displayed literally and does not create another element."}
 		g.Example = match[1] + ".append($('<li>').text(" + match[2] + "));"
+		return g
+	}
+	ext := filepath.Ext(u.Sink.Span.File)
+	if ext == ".ejs" && strings.Contains(u.Sink.Text, "<%-") {
+		if strings.Contains(u.Sink.Text, "marked(") {
+			g.Actions = []string{"At " + at + ", preserve the intended Markdown rendering, then sanitize the generated HTML with a maintained HTML sanitizer before sending it to the raw EJS output " + u.Sink.Text + ".", "If the output should be plain text, use EJS's escaped <%= ... %> output instead. Sanitizer presence or an old Markdown sanitize option alone does not establish protection; review its version, options and ordering after Markdown rendering.", "Test raw markup and dangerous link URLs against the final rendered HTML. Keep both request-to-storage write paths and escaped edit-form outputs in regression coverage."}
+		} else {
+			g.Actions = []string{"At " + at + ", use EJS's escaped <%= ... %> output when this value is intended as text, rather than raw <%- ... %> output.", "If HTML is required, sanitize it with an appropriate HTML sanitizer before raw output. Preserve the surrounding template and the exact attribute/text context.", "Test quotes, angle brackets, ampersands and any URL scheme constraints relevant to this output context."}
+		}
+		g.ExampleStatus = "no automatic patch; preserve intended template and Markdown semantics"
+		return g
+	}
+	if (ext == ".hbs" || ext == ".handlebars") && strings.Contains(u.Sink.Text, "{{{") {
+		replacement := strings.ReplaceAll(strings.ReplaceAll(u.Sink.Text, "{{{", "{{"), "}}}", "}}")
+		g.Actions = []string{"At " + at + ", use escaped Handlebars output " + replacement + " when the value should be text. Raw triple-brace output requires separately sanitized HTML.", "Retain verified renderer configuration and inspect render options and helpers; escaping one field does not secure request-controlled template configuration.", "Test the exact output context with quotes, angle brackets and ampersands."}
+		return g
+	}
+	if ext != ".py" {
+		g.Actions = []string{"At " + at + ", encode the untrusted value for the established " + u.XSS.OutputContext + " HTML output context before passing it to " + u.Sink.Text + ".", "Use a constant autoescaping template with data passed separately when appropriate. If markup is intentionally allowed, use a verified context-appropriate sanitizer after rendering or transformation.", "Test the final rendered output with HTML-significant input and preserve separate tests for URL, script and attribute contexts; HTML text escaping is not a universal protection."}
 		return g
 	}
 	g.Actions = []string{"At " + at + ", stop placing the source value into the HTML/template source consumed by " + u.Sink.Text + ".", "Use a constant template with the source value as a separate variable and explicitly enable context-appropriate autoescaping. Merely moving a value to Template.render does not enable Jinja autoescape.", "Test the same source-to-output path with HTML-significant input; retain a separate test for template-expression input so fixing template-source injection is not mistaken for fixing XSS."}

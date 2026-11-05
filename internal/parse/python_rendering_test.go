@@ -123,7 +123,7 @@ $(document).ready(function(){
 	}
 	var client []analysis.CandidateUse
 	for _, u := range r.Uses {
-		if u.ClientID != "" {
+		if u.EntryKind == "browser" {
 			client = append(client, u)
 		}
 	}

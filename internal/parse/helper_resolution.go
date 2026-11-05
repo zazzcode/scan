@@ -76,7 +76,7 @@ func (s *moduleSet) inputHelperGaps(m *sourceModule, body *sitter.Node, req stri
 			if n.Kind() == "member_expression" {
 				text := n.Utf8Text(m.src)
 				for _, f := range fields {
-					if text == req+".body."+f || text == req+".query."+f {
+					if text == f || text == req+".body."+f || text == req+".query."+f {
 						relevant = true
 					}
 				}
@@ -91,6 +91,12 @@ func (s *moduleSet) inputHelperGaps(m *sourceModule, body *sitter.Node, req stri
 		}
 		inspect(args)
 		if !relevant {
+			return
+		}
+		if nativeHashChainCall(m, call) {
+			return
+		}
+		if len(inputPredicateEvidence(m, call)) > 0 {
 			return
 		}
 		if _, helper := s.resolveCall(m, call); helper != nil {

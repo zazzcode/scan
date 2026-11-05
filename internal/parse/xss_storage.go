@@ -167,7 +167,7 @@ func (f *flow) recordStorageWrite(call, fn, args *sitter.Node, values []value, r
 			continue
 		}
 		key := receiver.model + "." + field
-		f.set.storageWrites[key] = append(f.set.storageWrites[key], storageWrite{f.route.ID, v, f.module.evidence("storage_write", call)})
+		f.set.storageWrites[key] = append(f.set.storageWrites[key], storageWrite{f.entry.ID, v, f.module.evidence("storage_write", call)})
 	}
 }
 

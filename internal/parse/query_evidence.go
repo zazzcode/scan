@@ -22,7 +22,11 @@ func (s *moduleSet) refineQueryEvidence(use *analysis.CandidateUse) {
 			chainSupplied = false
 		}
 	}
-	if chainSupplied && len(s.contextLimits) == 0 {
+	if use.Check != nil && use.Check.Selector != nil && use.Check.Selector.Kind == "graphql" {
+		c.ModelFacts = []string{"Scope is a verified Apollo schema field and its independently bound resolver invocation. Only args values have external provenance; parent/context/info and parent-result transitions remain unknown. SDL scalar/type/directive names establish neither database safety nor application validation policy."}
+	} else if use.Check != nil && use.Check.Selector != nil && use.Check.Selector.Kind == "grpc" {
+		c.ModelFacts = []string{"Scope is a verified grpc-js unary service/method with an independently bound handler invocation. Only call.request fields have external request provenance; metadata, context and callback roles remain distinct/unknown. Proto3 field types and decoding do not establish database protection or business validation policy."}
+	} else if chainSupplied && len(s.contextLimits) == 0 {
 		c.ModelFacts = []string{
 			"Scope is direct Express registrations with syntactically matched earlier middleware and same-route handlers. Matching source bodies or explicit transport/authentication adapter contracts are supplied; unsupported/dynamic chains remain blockers.",
 			"Known express.json/body-parser parsing adapters parse request values and may admit nested JSON objects. They do not enforce an id/email/name field schema or remove query operators from nested fields. A parser call alone is not a validator.",
@@ -86,7 +90,34 @@ func (s *moduleSet) refineQueryEvidence(use *analysis.CandidateUse) {
 		}
 	}
 	c.Blockers = blockers
+	seenHex := map[analysis.Span]bool{}
+	for _, d := range use.Dependencies {
+		for _, e := range d.Transfers {
+			if e.Kind != "native_hash_hex" || seenHex[e.Span] {
+				continue
+			}
+			seenHex[e.Span] = true
+			module := s.modules[e.Span.File]
+			if module == nil {
+				continue
+			}
+			n := nodeAt(module.tree.RootNode(), e.Span.StartByte, e.Span.EndByte)
+			input, evidence := nativeHashHex(module, n)
+			if input == nil {
+				continue
+			}
+			for _, witness := range evidence {
+				c.Evidence[witness.Kind] = append(c.Evidence[witness.Kind], witness)
+			}
+			c.ModelFacts = append(c.ModelFacts, "The exact native crypto expression "+e.Text+" at "+e.Span.File+" returns hexadecimal text [0-9a-f] on normal completion, or throws. Only this expression's output has that alphabet; raw input and sibling alternatives do not inherit it. Trace helper-return and concatenation transfers separately for each input. This does not establish cryptographic strength or business validation and does not parameterize concatenated SQL. Reference: https://nodejs.org/api/crypto.html#hashdigestencoding")
+		}
+	}
+	s.expressContractFacts(use)
+	if use.Kind == "nosql_query_candidate" {
+		c.ModelFacts = append(c.ModelFacts, "For selector-value operator injection, distinguish an object from a primitive string: Mongo-style operators inside an object are interpreted, while text such as $ne inside a primitive string remains data. A dominating typeof field !== string rejection that returns/throws before the sink excludes object-valued input for that field on the continuing path, provided there is no intervening mutation or bypass. A mere type test without enforcing control flow does not constrain the sink. Evaluate every selector field and path independently; a guard on one field cannot protect another, and a string used as executable $where text has different semantics.")
+	}
 	s.conditionalHelpers(use)
+	s.queryConstraintReview(use)
 }
 
 func nativeStringOperation(m *sourceModule, n *sitter.Node) bool {

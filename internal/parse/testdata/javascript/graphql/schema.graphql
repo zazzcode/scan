@@ -1,0 +1,13 @@
+# Source-only Apollo v4 API fixture; never executed.
+scalar Email
+type Query {
+ raw(email: Email): String
+ bound(email: Email): String
+ unknown(email: Email): String
+ guarded(email: Email): String
+ open(email: Email): String
+ wrapped(email: Email): String
+ absent(email: Email): String
+}
+type Mutation { create(email: String!): String }
+type User { lookup(email: String): String }

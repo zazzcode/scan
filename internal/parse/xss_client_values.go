@@ -8,6 +8,11 @@ import (
 )
 
 func browserGlobal(m *sourceModule, node *sitter.Node, name string) bool {
+	for scope := node.Parent(); scope != nil; scope = scope.Parent() {
+		if param := scope.ChildByFieldName("parameter"); param != nil && param.Kind() == "identifier" && param.Utf8Text(m.src) == name {
+			return false
+		}
+	}
 	return !moduleBinds(m, name) && !shadowed(node, name, m.src)
 }
 
@@ -21,6 +26,9 @@ func (f *flow) clientValue(n *sitter.Node) (value, bool) {
 	}
 	text := n.Utf8Text(f.module.src)
 	if v, ok := f.env[clientKey(text)]; ok {
+		if f.client.entry.Browser.Category == "event" && len(v.deps) > 0 && v.deps[0].Source.Kind == "event_input_binding" {
+			v.deps = []analysis.Dependency{{Source: f.module.evidence("browser_event_source", n), Transfers: []analysis.Evidence{v.deps[0].Source}}}
+		}
 		return v, true
 	}
 	root := strings.Split(strings.Split(text, ".")[0], "[")[0]

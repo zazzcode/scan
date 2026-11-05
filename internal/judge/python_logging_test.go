@@ -23,7 +23,7 @@ func TestLoggingSourceProvenance(t *testing.T) {
 }
 
 func TestUnknownLoggingTransformationCannotBecomeConfirmed(t *testing.T) {
-	u := analysis.CandidateUse{Kind: "log_sink_candidate", Context: []analysis.Evidence{{Kind: "logger_binding"}}, Dependencies: []analysis.Dependency{{Source: analysis.Evidence{Kind: "request_source"}}}, Gaps: []analysis.Gap{{Kind: "log_transform_unresolved"}}}
+	u := analysis.CandidateUse{Kind: "log_sink_candidate", Context: []analysis.Evidence{{Kind: "logger_binding"}}, Dependencies: []analysis.Dependency{{Source: analysis.Evidence{Kind: "input_source"}}}, Gaps: []analysis.Gap{{Kind: "log_transform_unresolved"}}}
 	a := analysis.Assessment{QuestionVersion: logQuestionVersion, Answers: map[string]string{"data_class": "credential", "content_exposure": "yes", "redaction": "no", "log_exposure": "vulnerable"}}
 	applyLogPolicy(u, &a)
 	if a.FindingStatus != "needs_evidence" {

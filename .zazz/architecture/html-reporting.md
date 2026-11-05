@@ -29,7 +29,7 @@ Source analysis → raw uses / assessments → human-readable finding records �
 ```
 
 `--analyze --json` includes additive human-readable `findings` and `presentation_version` fields.
-`--export-html <saved.json>` reads a schema-1 or schema-2 analysis report and renders HTML offline; no target-source
+`--export-html <saved.json>` reads a schema-1, schema-2 or schema-3 analysis report and renders HTML offline; no target-source
 read, key, model request, application execution, or server is needed. `--export-sarif` uses the same
 saved report. `--analyze --output-dir <base>` or `SCAN_FINDINGS_DIR` writes all three formats under
 `<base>/<repo-name>/run-<id>/`. The explicit flag overrides the environment; an empty flag disables file
@@ -53,16 +53,18 @@ Saved input is capped at 64 MiB by the shared JSON export reader.
 
 ## Entry grid and disclosure
 
-Show one expandable entry per inventoried source, grouped by route ID rather than path alone. Columns:
-source type, method/path signature, **Route location**, finding count, analysis-review count,
-protected-claim count, and row-end finding-type pills in **Categories**. Route location is the source declaration,
+Show one expandable entry per inventoried source, grouped by entry ID rather than path alone. Columns:
+source type, typed entry identity, **Declaration location**, finding count, analysis-review count,
+protected-claim count, and row-end finding-type pills in **Categories**. Declaration location is the source declaration,
 not a finding location. An unresolved entry displays “Not resolved”; operation locations remain
-in the expanded records labeled **Finding location**. Default to descending Findings, Review, Protected counts, then route path A–Z and method. Two keyboard-accessible header buttons sort route path or
+in the expanded records labeled **Finding location**. Default to descending Findings, Review, Protected counts, then entry label A–Z and method. Two keyboard-accessible header buttons sort entry label or
 the grouped Findings/Review/Protected counts. The grouped descending order compares those three
 counts in that priority, then path A–Z and method, leaving empty rows last. Repeated activation
-reverses the selected order. The count block is one control, not three independent sorts. Keep stable input order for ties and place unresolved entries last. Distinct HTTP methods sharing a path remain separate. Today the source type is
-HTTP route; a use without a matching entry appears under an explicit unresolved entry, never an invented
-route. Other entry types require future detector contracts rather than labels inferred by the viewer.
+reverses the selected order. The count block is one control, not three independent sorts. Keep stable input order for ties and place unresolved entries last. Distinct HTTP methods sharing a path remain separate. Presentation version 6 uses typed HTTP/browser/GraphQL/gRPC labels and generic unknown-kind
+fallbacks from `internal/report/entries.go`. Each entry discloses registration, dispatch alternatives,
+callable locations and invocation bindings. Zero-use coverage gaps remain visible, including while
+hiding protected records. Only final claim-level protection is green. A use without a matching
+entry appears under an explicit unresolved entry. Presenters do not imply adapter support.
 
 Native `details` / `summary` elements use CSS Grid to align row summaries. This is a disclosure list
 with column styling, not an ARIA interactive grid. Keyboard activation, visible focus, and native
@@ -165,5 +167,19 @@ artifacts; reusable rendering and classification tests belong in Go test sources
 Curated public samples live under [docs/samples](../../docs/samples/README.md), with canonical JSON
 and offline-generated HTML/SARIF. Public root labels replace local absolute target paths.
 
-Current analysis JSON uses schema 2 and `analysis_guidelines`; schema-1 saved reports remain readable.
+Current analysis JSON uses schema3 and `analysis_guidelines`; schemas1/2 remain readable
+through private compatibility decoding, retaining original source/schema/answer provenance.
 See [naming and compatibility](../architecture.md#naming-and-compatibility).
+
+## Common entry associations
+
+Existing HTTP and browser rows now project from one canonical entry/context model rather
+than separate route/client ID authorities. HTTP presentation remains familiar; browser roots
+remain in their own section. Entry rows include registration, dispatch and invocation gaps
+even when no candidate use exists. Unknown associations retain explicit unresolved rows.
+The shared template now presents typed entry labels, declaration/dispatch metadata and common
+selectors without fabricated HTTP fields. JSON/HTML/SARIF status, identity and source-location parity
+is covered by [cross-entry acceptance](../evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05).
+Rendered sorting, disclosures, keyboard focus and390px layout passed bounded inspection through the
+user-opened localhost HTTP tab. The initial file-preview restriction remains historical evidence;
+actual reviewed HTML hashes and screenshots are indexed in the ignored acceptance artifacts.

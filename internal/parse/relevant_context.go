@@ -83,6 +83,10 @@ func (s *moduleSet) inputHelpers(m *sourceModule, n *sitter.Node, out *[]analysi
 		if args == nil || fn == nil || !readsInput(args, m.src, names, s.contextFields) {
 			return
 		}
+		if predicate := inputPredicateEvidence(m, call); len(predicate) > 0 {
+			*out = append(*out, predicate...)
+			return
+		}
 		target, helper := s.resolveCall(m, call)
 		if target == nil || helper == nil {
 			return

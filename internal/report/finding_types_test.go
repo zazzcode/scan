@@ -77,13 +77,13 @@ func TestRowPillsAggregateTypesWithoutUpgradingStatus(t *testing.T) {
 }
 
 func TestHTMLTypePanelsAndDistinctLocations(t *testing.T) {
-	r := &analysis.AnalysisReport{SchemaVersion: 1, Entries: []analysis.Entry{{Route: analysis.Route{ID: "r", Method: "POST", PathPattern: "/search", Registration: analysis.Span{File: "server.ts", StartLine: 3}}}}, Uses: []analysis.CandidateUse{{ID: "u", RouteID: "r", Kind: "sql_query_candidate", Sink: analysis.Evidence{Text: "db.query(sql)", Span: analysis.Span{File: "handler.ts", StartLine: 11}}, Gaps: []analysis.Gap{{Kind: "query_text_interpolated"}, {Kind: "input_validation_absent"}}, Assessment: analysis.Assessment{Status: "not_run"}}}}
+	r := &analysis.AnalysisReport{SchemaVersion: 1, Entries: []analysis.EntryPoint{testHTTPEntry(analysis.Route{ID: "r", Method: "POST", PathPattern: "/search", Registration: analysis.Span{File: "server.ts", StartLine: 3}})}, Uses: []analysis.CandidateUse{{ID: "u", EntryID: "r", Kind: "sql_query_candidate", Sink: analysis.Evidence{Text: "db.query(sql)", Span: analysis.Span{File: "handler.ts", StartLine: 11}}, Gaps: []analysis.Gap{{Kind: "query_text_interpolated"}, {Kind: "input_validation_absent"}}, Assessment: analysis.Assessment{Status: "not_run"}}}}
 	var b bytes.Buffer
 	if err := HTML(&b, r); err != nil {
 		t.Fatal(err)
 	}
 	html := b.String()
-	for _, want := range []string{`<span>Route location</span>`, `server.ts:3`, `Finding location · </span>handler.ts:11`, `class="type-pill poor-practice"`, `popovertarget="glossary-sql-injection"`, `id="glossary-sql-injection" class="glossary-panel" popover="auto"`, `popovertargetaction="hide"`, `aria-labelledby="glossary-heading-sql-injection"`, `SQL Injection <span class="pill-status">· poor practice`, `Input Validation <span class="pill-status">· review`, `Coverage: bounded server response and template analysis`, `id="finding-glossary"`} {
+	for _, want := range []string{`<span>Declaration location</span>`, `server.ts:3`, `Finding location · </span>handler.ts:11`, `class="type-pill poor-practice"`, `popovertarget="glossary-sql-injection"`, `id="glossary-sql-injection" class="glossary-panel" popover="auto"`, `popovertargetaction="hide"`, `aria-labelledby="glossary-heading-sql-injection"`, `SQL Injection <span class="pill-status">· poor practice`, `Input Validation <span class="pill-status">· review`, `Coverage: bounded server response and template analysis`, `id="finding-glossary"`} {
 		if !strings.Contains(html, want) {
 			t.Fatalf("missing %s", want)
 		}

@@ -1,4 +1,4 @@
-# Scan — project overview
+# Zazzles — project overview
 
 **Project definition: proposed direction, 2026-10-19.** This overview owns product purpose, direction,
 and repository state. The [agent orientation](docs/zazzles-agent-orientation.md#documentation-map) routes
@@ -6,9 +6,41 @@ to the detailed documents and defines their responsibilities.
 
 ## Purpose
 
-`scan` is a proposed Go static application security scanner for selected OWASP Top 10 risks. It aims
-to give developers reviewable source evidence, security engineers useful triage context, and CI an
-explicit policy over findings and analysis limits. A clean run is not a security certification.
+Zazzles helps developers and coding agents assess application security, code quality and
+dependencies, then use the evidence to make verified repairs. Its four product goals are Scan,
+Inspect, Audit and Fix. Scan has bounded implementations today. Inspect as a distinct capability,
+Audit and automated Fix remain planned. A completed run is not a security or quality certification.
+
+## Four product capabilities
+
+**2026-11-05 user direction:** the product distinguishes these responsibilities:
+
+| Capability | Responsibility | Current boundary |
+| --- | --- | --- |
+| Scan | Source-code security vulnerabilities and controls | Bounded JS/TS/Python support, also emitting existing validation and construction-practice findings |
+| Inspect | Correctness, maintainability, hygiene and defined engineering standards | Planned capability with existing quality-related checks as its foundation |
+| Audit | Dependency vulnerabilities and advisory evidence | Planned ecosystem-tool integration |
+| Fix | Evidence-backed repairs from Scan, Inspect and Audit, followed by verification | Planned agent workflow and orchestration |
+
+These are product boundaries, not a commitment to four CLI commands or separate engines. Inspect
+will use shared analysis models, evidence, judgment and reporting infrastructure. Current findings
+are not reclassified or moved by this documentation update.
+
+The intended capabilities MUST be usable independently and in any order. Users may run one or
+combine several. Fix can consume an existing assessment or user-specified supported issue without
+requiring a fresh Scan, Inspect or Audit run. Each capability retains its own input, evidence and
+verification obligations. An automated loop is an optional composition, not a mandatory pipeline.
+
+Security and quality assessments SHOULD have separate presentation/filtering and claim semantics.
+Related claims SHOULD link their evidence without double-counting a single issue. Default security
+prioritization MUST NOT imply every quality defect is low impact. A serious correctness defect may
+also be urgent. Severity/priority and future reporting changes require their own contract.
+
+Review remains an unresolved-evidence outcome. Planned independent Findings Review is a separate
+verification role. Neither is the Inspect capability, and Hygiene is part of Inspect rather than a
+fifth product goal. The [functionality catalog](project/01-functionality.md#four-product-capabilities)
+records the functional boundary and the [implementation plan](project/implementation-plan.md#product-goals-and-capability-boundaries)
+owns delivery scope and ordering.
 
 ## Product philosophy and user documentation
 
@@ -21,6 +53,38 @@ result interpretation, glossary, decision-model use, CI, and contributor guidanc
 This internal overview owns planning context, capability state, and product-direction decisions;
 engineering designs and SDLC records remain under `.zazz/`. User-facing guidance MUST NOT be
 maintained solely in internal project documents.
+
+## Security and code-quality objectives
+
+**2026-11-05 user direction:** Zazzles should identify code-quality, engineering-hygiene and
+best-practice defects alongside security vulnerabilities. Input-validation judgments and selected
+construction-practice findings already support this broader purpose. A source-backed requirement
+can be unmet even when an operation is protected against injection.
+
+The planned Inspect capability provides lightweight contextual quality assessment. Broader reliability,
+maintainability and project-standard checks remain planned and need explicit requirements,
+source evidence, independent evaluation and bounded contracts. This is not a claim of a complete
+quality platform or parity with another product.
+
+The [analysis pack proposal](project/analysis-pack-mvp.md#security-code-quality-and-engineering-hygiene)
+covers both security and quality claims under the same modular organization. Each claim retains its
+own applicability, evidence requirements and result semantics. Mechanical checks can remain
+deterministic. Semantic judgment evaluates contextual standards without turning a quality defect
+into a vulnerability or treating policy compliance as general safety. The initial MVP still migrates
+SQL behavior first and does not add broad quality detection.
+
+### Standards-driven agent feedback loop
+
+One optional workflow is agent-authored code, selected Scan/Inspect/Audit assessments,
+evidence-backed Fix proposals, tests and reassessment, followed by review. Users should be able to select their
+own code-structure and architecture standards without adopting Zazz methodology. Explicitly approved
+standards define assessment requirements, while source evidence establishes compliance within scope.
+
+Broader standards selection/ingestion, architecture-quality analysis and automatic repair orchestration
+are planned. The scanner does not currently implement this complete loop or treat arbitrary Markdown
+as trusted policy. The [pack proposal](project/analysis-pack-mvp.md#standards-driven-agent-workflow)
+records the future trust, provenance, evidence and remediation boundaries. The existing SQL-first
+internal MVP remains unchanged in implementation scope.
 
 ## Long-term objectives
 
@@ -150,3 +214,19 @@ The plan includes the cloned OWASP Juice Shop reference and small paired fixture
 [acceptance-target section](project/implementation-plan.md#acceptance-targets) owns their role and setup
 work. Source handling, accuracy, latency, cost, and packaging remain hypotheses to measure rather than
 established product promises.
+
+## Analysis pack initiative
+
+**2026-11-05 user direction:** [analysis-pack-mvp](project/analysis-pack-mvp.md) is a separate
+initiative with its own future worktree/branch after common-entry/dispatch completes acceptance and
+merges into `stage`, before command injection. Current-branch work documents the proposal only;
+implementation requires a separate assignment and bounded contract after the merge.
+
+The MVP will organize existing language/framework models, embedded guidance, verified API contracts,
+claim questions and evidence obligations under explicit versions and applicability. The judge receives
+only relevant interpretation material alongside the source trace; executable adapters and mandatory
+Go evidence gates remain in the scanner. The goal is reusable, auditable analysis knowledge as new
+vulnerability families arrive. Downloadable packs, executable plugins and a new rule language remain
+deferred. The [implementation plan](project/implementation-plan.md#analysis-pack-mvp-initiative)
+owns sequencing; the [technical approach](../docs/technical-approach.md#analysis-knowledge-and-proposed-packs)
+owns the public explanation and evaluation limits.

@@ -1,8 +1,6 @@
 package parse
 
 import (
-	"strings"
-
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	"github.com/zazzcode/zazzles/internal/analysis"
 )
@@ -77,7 +75,36 @@ func (s *moduleSet) chainEvidence(report *analysis.AnalysisReport, check analysi
 	middlewareFiles := map[string]bool{}
 	seen := map[string]bool{}
 	for _, entry := range report.Entries {
-		r := entry.Route
+		if (entry.Kind == "graphql" || entry.Kind == "grpc") && check.NormalizedSelector().Matches(entry) {
+			for _, u := range report.Uses {
+				if u.EntryID != entry.ID {
+					continue
+				}
+				context = append(context, u.Context...)
+				for _, e := range u.Context {
+					if e.Kind != "handler" {
+						continue
+					}
+					m := s.modules[e.Span.File]
+					if m == nil {
+						continue
+					}
+					body := nodeAt(m.tree.RootNode(), e.Span.StartByte, e.Span.EndByte)
+					if body == nil {
+						continue
+					}
+					params, _ := functionParameters(body.Parent(), m.src)
+					if entry.Kind == "grpc" && len(params) > 0 {
+						gaps = append(gaps, s.inputHelperGaps(m, body, params[0].name, check.Fields)...)
+					} else if len(params) > 1 {
+						gaps = append(gaps, s.inputHelperGaps(m, body, params[1].name, check.Fields)...)
+					}
+					s.includeHelpers(m, body, &context, seen, 0)
+				}
+			}
+			continue
+		}
+		r := entry.HTTPRoute()
 		if r.Method != check.Method || r.PathPattern != check.Path {
 			continue
 		}
@@ -95,38 +122,38 @@ func (s *moduleSet) chainEvidence(report *analysis.AnalysisReport, check analysi
 			context = append(context, global...)
 			gaps = append(gaps, missing...)
 		}
-		context = append(context, m.evidence("route_registration", call))
-		args := call.ChildByFieldName("arguments")
-		if args == nil {
-			continue
-		}
-		for i := uint(1); i < args.NamedChildCount(); i++ {
-			arg := args.NamedChild(i)
-			if adapter := s.authenticationAdapter(m, arg); len(adapter) > 0 {
-				context = append(context, adapter...)
+		calls, priorGaps := s.httpPredecessors(m, entry, call)
+		gaps = append(gaps, priorGaps...)
+		calls = append(calls, call)
+		for _, call := range calls {
+			context = append(context, m.evidence("route_registration", call))
+			args := call.ChildByFieldName("arguments")
+			if args == nil {
 				continue
 			}
-			context = append(context, s.wrapperContext(m, arg)...)
-			hm, body, req, more := s.handler(m, arg)
-			gaps = append(gaps, more...)
-			if body == nil {
-				continue
+			for i := uint(1); i < args.NamedChildCount(); i++ {
+				arg := args.NamedChild(i)
+				if adapter := s.authenticationAdapter(m, arg); len(adapter) > 0 {
+					context = append(context, adapter...)
+					continue
+				}
+				context = append(context, s.wrapperContext(m, arg)...)
+				hm, body, req, more := s.handler(m, arg)
+				gaps = append(gaps, more...)
+				if body == nil {
+					continue
+				}
+				context = append(context, hm.evidence("invoked_callable", body))
+				gaps = append(gaps, s.inputHelperGaps(hm, body, req, check.Fields)...)
+				s.includeHelpers(hm, body, &context, seen, 0)
 			}
-			context = append(context, hm.evidence("route_handler", body))
-			gaps = append(gaps, s.inputHelperGaps(hm, body, req, check.Fields)...)
-			s.includeHelpers(hm, body, &context, seen, 0)
 		}
 	}
 	return context, gaps
 }
 
 func fieldDependency(d analysis.Dependency, fields []string) bool {
-	for _, field := range fields {
-		if strings.HasSuffix(d.Source.Text, ".body."+field) || strings.HasSuffix(d.Source.Text, ".query."+field) || strings.HasSuffix(d.Source.Text, ".params."+field) {
-			return true
-		}
-	}
-	return false
+	return analysis.MatchesFields(d, fields)
 }
 
 func evidenceRoles(context []analysis.Evidence) map[string][]analysis.Evidence {

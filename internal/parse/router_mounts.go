@@ -55,19 +55,24 @@ func (s *moduleSet) mountedRoutes(out *analysis.AnalysisReport, selected []strin
 			s.scanMounts(out, m, m, "", 0, map[string]bool{})
 		}
 	}
-	entries := []analysis.Entry{}
+	entries := []analysis.EntryPoint{}
 	for _, entry := range out.Entries {
-		if !s.mountedOrigins[entry.Route.ID] {
+		if !s.mountedOrigins[entry.HTTPRoute().ID] {
 			entries = append(entries, entry)
 		}
 	}
 	uses := []analysis.CandidateUse{}
 	for _, use := range out.Uses {
-		if !s.mountedOrigins[use.RouteID] {
+		if !s.mountedOrigins[use.EntryID] {
 			uses = append(uses, use)
 		}
 	}
 	out.Entries, out.Uses = entries, uses
+	keep := map[string]bool{}
+	for _, e := range entries {
+		keep[e.ID] = true
+	}
+	out.SelectEntries(keep)
 }
 
 func (s *moduleSet) scanMounts(out *analysis.AnalysisReport, m, owner *sourceModule, prefix string, depth int, stack map[string]bool) {
@@ -105,14 +110,14 @@ func (s *moduleSet) scanMounts(out *analysis.AnalysisReport, m, owner *sourceMod
 		}
 		for i := range out.Entries {
 			entry := &out.Entries[i]
-			if entry.Route.Method == "USE" && entry.Route.Registration.File == m.file && entry.Route.Registration.StartByte == int(call.StartByte()) {
+			if entry.HTTPRoute().Method == "USE" && entry.HTTPRoute().Registration.File == m.file && entry.HTTPRoute().Registration.StartByte == int(call.StartByte()) {
 				var gaps []analysis.Gap
 				for _, gap := range entry.Gaps {
 					if gap.Kind != "unresolved_handler" {
 						gaps = append(gaps, gap)
 					}
 				}
-				entry.Gaps = append(gaps, analysis.Gap{Kind: "router_container", Detail: "Imported router endpoints are listed separately; effective middleware remains unresolved.", At: entry.Route.Registration})
+				entry.Gaps = append(gaps, analysis.Gap{Kind: "router_container", Detail: "Imported router endpoints are listed separately; effective middleware remains unresolved.", At: entry.HTTPRoute().Registration})
 			}
 		}
 		fullPrefix := strings.TrimRight(prefix, "/") + path
@@ -128,16 +133,20 @@ func (s *moduleSet) scanMounts(out *analysis.AnalysisReport, m, owner *sourceMod
 			if obj == nil || obj.Utf8Text(target.src) != receiver {
 				return
 			}
+			if s.finiteRoutesAt(out, target, owner, child, receiver, fullPrefix, context) {
+				return
+			}
 			routes, _ := routesFromCall(target.file, target.src, child, locals)
 			for _, route := range routes {
-				s.mountedOrigins[route.ID] = true
+				rawPath := route.PathPattern
+				s.mountedOrigins[httpEntry(route, target.evidence("entry_registration", child), target.file+":"+target.hash+":"+receiver).ID] = true
 				route.PathPattern = strings.TrimRight(fullPrefix, "/") + "/" + strings.TrimLeft(route.PathPattern, "/")
 				route.PathPattern = strings.TrimRight(route.PathPattern, "/")
 				if route.PathPattern == "" {
 					route.PathPattern = "/"
 				}
 				route.ID = fmt.Sprintf("%s:mount:%s:%d:%s", route.ID, m.file, call.StartByte(), fullPrefix)
-				s.analyzeRoute(out, target, owner, route, child, receiver, context)
+				s.analyzeRoute(out, target, owner, route, child, receiver, context, rawPath, fullPrefix)
 			}
 		})
 		s.scanMounts(out, target, owner, fullPrefix, depth+1, stack)

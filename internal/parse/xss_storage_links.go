@@ -24,10 +24,11 @@ func (s *moduleSet) linkStoredXSS(report *analysis.AnalysisReport) {
 			}
 			writes := append([]storageWrite{}, s.storageWrites[read.StorageKey]...)
 			sort.SliceStable(writes, func(i, j int) bool {
-				if writes[i].route != writes[j].route {
-					return writes[i].route < writes[j].route
+				a, b := writes[i].sink.Span, writes[j].sink.Span
+				if a.File != b.File {
+					return a.File < b.File
 				}
-				return writes[i].sink.Span.StartByte < writes[j].sink.Span.StartByte
+				return a.StartByte < b.StartByte
 			})
 			if len(writes) == 0 {
 				resolved = false

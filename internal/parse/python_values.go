@@ -43,7 +43,7 @@ func pyCombine(a, b pythonValue) pythonValue {
 	return a
 }
 func pyEmpty(v pythonValue) bool {
-	return len(v.deps) == 0 && len(v.gaps) == 0 && v.fields == nil && !v.constant && v.binding == "" && len(v.evidence) == 0 && !v.built && !v.rendered && !v.unknown
+	return len(v.deps) == 0 && len(v.gaps) == 0 && v.fields == nil && !v.constant && v.binding == "" && len(v.evidence) == 0 && !v.built && !v.rendered && !v.unknown && v.callable == nil
 }
 func pyMergeDeps(a, b []pythonDep) []pythonDep {
 	out := []pythonDep{}
@@ -93,6 +93,9 @@ func (f *pythonFlow) eval(n *sitter.Node) pythonValue {
 	case "identifier":
 		if v, ok := f.env[pyText(m, n)]; ok {
 			return pyTransfer(v, m.evidence("value_reference", n))
+		}
+		if text, ok := pyStaticString(m, m.vars[pyText(m, n)]); ok {
+			return pythonValue{literal: text, constant: true, evidence: []analysis.Evidence{m.evidence("constant_binding", n)}}
 		}
 		if global := m.vars[pyText(m, n)]; global != nil && global.Kind() == "call" {
 			if q := f.qualified(pyText(m, global.ChildByFieldName("function"))); q == "logging.getLogger" {
@@ -237,7 +240,7 @@ func (f *pythonFlow) projectValue(v pythonValue, key string, n *sitter.Node) pyt
 		}
 	}
 	for _, d := range v.deps {
-		if d.key != "" && d.container != "session" && d.dep.Source.Kind == "request_source" && f.inputs != nil {
+		if d.key != "" && d.container != "session" && d.dep.Source.Kind == "input_source" && f.inputs != nil {
 			f.inputs[d.container+"."+d.key] = pythonValue{deps: []pythonDep{d}}
 		}
 	}

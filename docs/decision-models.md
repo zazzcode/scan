@@ -64,3 +64,18 @@ For authentication/permissions, verify the selected account and key locally with
 For quota/rate failures, inspect that provider's account limits. For an exit-1 JSON report, read the
 assessment reason rather than treating it as an empty or protected scan. Saved HTML/SARIF exports
 need neither credentials nor another model call.
+
+## Model-bound source and request size
+
+The model receives source-backed trace, operand, guard and invocation evidence, not application
+README files or exercise answer keys. Parsed code comments and Python docstrings are masked at their
+original positions in the model-facing projection; executable code, runtime strings and relevant
+template content remain. Canonical local reports retain original source text and snapshot hashes.
+This reduces instruction-like training prose without deleting runtime behavior.
+
+The request builder shares overlapping source excerpts while preserving every evidence role, original
+span, snapshot hash and trace/control reference. Requests that would exceed the existing 64 KiB bound
+use an explicit compact column schema and shared source/gap records. This is lossless representation
+compaction; it does not remove blockers or make missing coverage complete. A request that still
+exceeds the bound remains unassessed. Changed projection/envelope inputs invalidate exact replay;
+raw historical responses remain intact.

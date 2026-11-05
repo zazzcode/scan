@@ -20,7 +20,7 @@ func TestValidationPolicyRequiresIndependentEvidence(t *testing.T) {
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &analysis.Completeness{ClaimKind: "validation", Evidence: map[string][]analysis.Evidence{}}
-			for _, role := range []string{"request_source", "field_policy", "route_handler", "control_flow"} {
+			for _, role := range []string{"input_source", "field_policy", "invoked_callable", "control_flow"} {
 				if role != tt.missing {
 					c.Evidence[role] = []analysis.Evidence{{Kind: role, Text: "source evidence"}}
 				}
@@ -43,7 +43,7 @@ func TestValidationPolicyRequiresIndependentEvidence(t *testing.T) {
 
 func TestValidationRespectsAdditionalRequiredRoles(t *testing.T) {
 	c := &analysis.Completeness{ClaimKind: "validation", Required: []string{"schema_constraints"}, Evidence: map[string][]analysis.Evidence{}}
-	for _, role := range []string{"request_source", "field_policy", "route_handler", "control_flow"} {
+	for _, role := range []string{"input_source", "field_policy", "invoked_callable", "control_flow"} {
 		c.Evidence[role] = []analysis.Evidence{{Kind: role}}
 	}
 	a := analysis.Assessment{QuestionVersion: validationQuestionVersion, Answers: map[string]string{"field_requirement": "established", "validation": "sufficient", "enforcement_coverage": "complete"}}

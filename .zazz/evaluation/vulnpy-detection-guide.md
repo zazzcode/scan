@@ -41,11 +41,11 @@ the query parameter of a dynamically constructed view. SQL trigger names become 
 including a quote-containing invalid input. Those source tests are stronger expected-behavior
 evidence than the mere word “sqli” in a filename. They were inspected, not executed in the target.
 
-- [ ] Resolve generated registration and imported trigger selection without executing project code.
-- [ ] Retain the input captured by the nested callback and the cursor passed by `_execute`.
-- [ ] Keep the SQL-text value separate from executemany's bound value.
-- [ ] Do not label constant schema initialization or SELECT_ALL as user-controlled SQL.
-- [ ] Add protected parameterized counterparts in scanner fixtures/remediation copies.
+- [x] Resolve generated registration and imported trigger selection without executing project code.
+- [x] Retain the input captured by the nested callback and the cursor passed by `_execute`.
+- [x] Keep the SQL-text value separate from executemany's bound value.
+- [x] Do not label constant schema initialization or SELECT_ALL as user-controlled SQL.
+- [x] Add protected parameterized counterparts in scanner fixtures/remediation copies.
 
 ## XSS: required positive paths
 
@@ -59,10 +59,10 @@ evidence than the mere word “sqli” in a filename. They were inspected, not e
 markup is assembled by the framework adapter. The framework tests assert that input appears in
 that output, but their ordinary marker is not itself a browser exploit test.
 
-- [ ] Follow the actual HTML response/renderer rather than inventing a sink in do_raw.
-- [ ] Resolve factory parameters name/trigger before declaring a raw branch feasible.
+- [x] Follow the actual HTML response/renderer rather than inventing a sink in do_raw.
+- [x] Resolve factory parameters name/trigger before declaring a raw branch feasible.
 - [ ] Model the Environment/get_template/render binding and the concrete template trust bypass.
-- [ ] Keep raw versus escaped text counterparts and unknown custom configuration controls.
+- [x] Keep raw versus escaped text counterparts and unknown custom configuration controls.
 - [ ] Extend the same review to other framework adapters as their extraction support is implemented.
 
 ## Validation and logger-leak controls
@@ -76,11 +76,11 @@ Constant diagnostic prints in example routes and trigger lookup errors do not au
 password/email content. A path that logs such content needs independent source/classification and
 emission evidence. No confirmed PII logger-leak answer is invented here merely to fill that family.
 
-- [ ] Keep missing business policy as Review, separately from concrete SQL/XSS defects.
+- [x] Keep missing business policy as Review, separately from concrete SQL/XSS defects.
 - [ ] Require actual sensitive content and logger binding before promoting a leak.
 - [ ] Test password/email leaks and protected logging controls in separate scanner fixtures.
 
-## Current baseline and known coverage work
+## Historical baseline and known coverage work
 
 Baselines used the same clean target revision and pinned local rules without credentials or model
 calls. Zazzles ran on the original read-only checkout; comparison engines parsed copies of tracked
@@ -118,3 +118,19 @@ replace an independent expected result and protected counterpart for each new cl
 - [ ] For each future family, review the actual operation, input contract, tests and framework path.
 - [ ] Keep sink-level defects distinct from the many framework/method instances exposing them.
 - [ ] Preserve target source integrity and avoid running its deliberately unsafe trigger functions.
+
+## D5 confirmation and remaining gaps
+
+The [source reference's confirmed-findings table](../../docs/samples/vulnpy/reference.md#findings-confirmed-by-scan-and-code-inspection--d5)
+records the five SQL/raw-XSS source cases recovered by the full 2026-11-04 scan and then checked
+against actual code. Main-app acceptance covers 12 method/route contexts; separate mounted instances
+produce 28 contextual vulnerability findings across the full checkout. These are static source
+confirmations, not runtime exploit executions. The 827 model assessments completed successfully;
+model choices without necessary source/policy evidence remain Review.
+
+Upstream supplies deliberately vulnerable functions and behavioral tests, rather than a formal
+expected-findings manifest. The SQLite tests establish concrete input/row behavior and framework
+XSS tests establish input inclusion; source review supplies the security reasoning. Evaluation labels
+remain outside scanner/model inputs. Historical saved findings, raw answers, hashes and case labels
+are unchanged. `VP-XSS-JINJA`, other framework adapters and additional families remain separate work.
+Use the [D5 results](common-entry-dispatch-results.md) for checks, artifacts and supported-subset limits.

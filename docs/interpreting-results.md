@@ -70,7 +70,7 @@ shared operation/evidence links. Shared helper records can also repeat for multi
 
 ## Locations and evidence
 
-**Route location** points to the route declaration. **Finding location** inside the expanded row
+**Declaration location** points to the entry registration or schema declaration. **Finding location** inside the expanded row
 points to the recorded operation; it can be in another file. Inspect the operation excerpt, inputs,
 transfers, relevant context, guards, and gaps before applying a change. No resolved request dependency
 means external control is unknown, unless there is positive evidence of a constant or trusted source.
@@ -91,7 +91,7 @@ Missing modeled validation alone does not establish that every runtime path lack
 
 Report examples are illustrative, not applied or verified patches. JSON includes `entries`, `uses`,
 `gaps`, `files`, `limitations`, presentation `findings`, `finding_types`, and `presentation_version`.
-Human records reference `use_id` and `route_id`; raw assessments preserve provider/model, answers,
+Human records reference `use_id`, `entry_id` and `invocation_context_id`; raw assessments preserve provider/model, answers,
 completion status, blockers, and scope. HTML and SARIF are offline views of that evidence.
 
 ## Completion and compatibility
@@ -105,3 +105,22 @@ Presentation version 3 introduces this distinction. Older schema-v1 evidence rem
 regenerating HTML/SARIF rebuilds the current interpretation from raw uses. Legacy `observed_pattern`
 is not a new verdict. Saved source evidence and model assessments are preserved; previously generated
 views remain snapshots until regenerated. Independent review and runtime confirmation are separate.
+
+## Entry identities and coverage
+
+HTML, text, JSON findings and SARIF share the same contextual statuses. HTML groups by
+entry ID: HTTP method/path, GraphQL schema coordinate, gRPC service/method, or browser
+component/source identity. Unknown kinds and legacy unresolved associations remain
+inspectable with a fallback label. Declaration locations and registration/dispatch/context
+details are separate from the sensitive operation's finding location.
+
+Zero-use entries and unresolved alternatives remain coverage records. Hiding protected
+results retains rows with coverage gaps. A Protected count names scoped claims; it never
+certifies an entire entry, including its unexamined alternatives. Counts are contextual
+uses, so a shared callable can appear under several independently assessed entries.
+
+SARIF keeps the operation/sink primary, with entry declaration, registration/schema/proto
+and callable locations related. Namespaced properties retain typed entry and invocation
+metadata. Entry/scan gaps without uses appear in invocation metadata/notifications, without
+fabricated security results. Saved report exports preserve raw historical answers and do
+not rerun analysis or transfer those answers onto changed requests.

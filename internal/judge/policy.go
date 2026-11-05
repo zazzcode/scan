@@ -23,7 +23,7 @@ func applyPolicy(use analysis.CandidateUse, a *analysis.Assessment) {
 			a.Protection = "uncertain"
 			a.FindingStatus = "needs_evidence"
 			a.BlockingGaps = use.Gaps
-			a.Reason = "legacy candidate has no claim-scoped completeness evidence"
+			a.Reason = "candidate has no claim-scoped completeness evidence"
 		}
 		return
 	}
@@ -39,6 +39,13 @@ func applyPolicy(use analysis.CandidateUse, a *analysis.Assessment) {
 		}
 	}
 	blockers := append([]analysis.Gap{}, c.Blockers...)
+	if c.ClaimKind == "injection" && a.Answers["injection_protection"] == "vulnerable" {
+		for _, role := range []string{"sql_all_inputs_hex", "selector_type_guard"} {
+			if len(c.Evidence[role]) > 0 {
+				blockers = append(blockers, analysis.Gap{Kind: "injection_constraint_review", Detail: "Vulnerable answer requires independent review against supplied " + role + " evidence; no constraint bypass is established by this bounded policy", At: use.Sink.Span})
+			}
+		}
+	}
 	for _, required := range c.Required {
 		if len(c.Evidence[required]) == 0 {
 			blockers = append(blockers, analysis.Gap{Kind: "required_evidence_missing", Detail: required, At: use.Sink.Span})
@@ -48,7 +55,7 @@ func applyPolicy(use analysis.CandidateUse, a *analysis.Assessment) {
 		if use.APIModel == nil {
 			blockers = append(blockers, analysis.Gap{Kind: "api_contract_missing", Detail: "verified operation contract is required"})
 		}
-		for _, role := range []string{"request_source", "sink_binding", "route_handler", "control_flow"} {
+		for _, role := range []string{"input_source", "sink_binding", "invoked_callable", "control_flow"} {
 			if len(c.Evidence[role]) == 0 {
 				blockers = append(blockers, analysis.Gap{Kind: "injection_evidence_missing", Detail: role})
 			}

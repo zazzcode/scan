@@ -1,4 +1,4 @@
-# Route-oriented findings and SARIF export
+# Entry-oriented findings and SARIF export
 
 **Design and bounded implementation, 2026-10-31.** Use one versioned internal
 model for route analysis, evidence and findings, with SARIF 2.1.0 as an implemented findings
@@ -14,7 +14,7 @@ detection/policy implementations for JSON, SARIF, and HTML.
 - **Standalone HTML:** the core human-facing CLI report, generated offline from the canonical JSON.
   Show only zazzles's results. Comparator/tool benchmarking belongs in evaluation documents.
 
-All three formats share the same use/route IDs, raw assessments, and report interpretation. None
+All three formats share the same use/entry/context IDs, raw assessments, and report interpretation. None
 runs an additional detector, changes eligibility, or silently upgrades uncertainty to protection.
 
 ## Canonical report
@@ -50,7 +50,7 @@ label email validation alone a sufficient SQL-injection fix or guarantee an impe
 ## Human-readable finding interpretation
 
 Schema-v1 evidence remains compatible. Additive `presentation_version` and `findings` fields describe
-one result record per use. A record includes `id`, `use_id`, `route_id`, `record_type`, `status`, `title`,
+one result record per use. A record includes `id`, `use_id`, `entry_id`, `invocation_context_id`, `record_type`, `status`, `title`,
 `summary`, separate `input_validation` and `use_protection` explanations, `uncertainty`, and
 `recommendations`. Presentation version 2 adds `type_ids` and the report-level `finding_types`
 [glossary](finding-types.md); risk families remain separate from assessment status. Evidence stays in the referenced use; it is not replaced by generated prose.
@@ -141,5 +141,40 @@ finding eligibility, runtime-confirmation state or independent-review policy.
 The [query judgment design](query-judgment.md) owns automatic injection evidence and policy gates.
 Public [analysis rules](../../docs/analysis/README.md) describe SQL/NoSQL and validation semantics.
 
-Current analysis JSON uses schema 2 and `analysis_guidelines`; schema-1 saved reports remain readable.
+Current analysis JSON uses schema3 and `analysis_guidelines`; schemas1/2 remain readable
+through private compatibility decoding, retaining original source/schema/answer provenance.
 See [naming and compatibility](../architecture.md#naming-and-compatibility).
+
+## Common entry migration
+
+Current use/finding records serialize `entry_id` and `invocation_context_id` as their primary
+association. Typed entry metadata supplies HTTP/browser labels; no fake HTTP route is used
+for browser roots. SARIF includes generic entry/context properties and entry-level coverage
+notifications for unknown dispatch, including zero-use entries. Original historical answers,
+classification and source locations remain preserved during offline export. Typed presenters cover HTTP, browser events, GraphQL and gRPC. Their adapters now supply actual
+source-backed entries; the [acceptance results](../evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05)
+separate parsed-source integration, synthetic policy controls and completed bounded localhost rendered inspection.
+
+## Typed entry projection and selectors
+
+`internal/report/entries.go` owns typed identity and detail projection for HTTP, browser,
+GraphQL, gRPC and unknown entries. Text/HTML/SARIF reuse it; `findings.go` remains the
+single status interpretation. Presentation version 6 preserves contextual counts and
+zero-use coverage without an entry-wide protection assertion.
+
+SARIF uses sink locations first, declaration fallback only when absent, and registration,
+schema/proto and invoked-callable related locations. Results retain `scan.entryId`,
+`scan.entryKind`, `scan.invocationContextId`, typed `scan.entry` and context/dispatch
+properties. Non-HTTP entries have no manufactured `scan.route`. Invocation properties
+preserve zero-use inventory and gaps; these do not generate security results.
+
+`internal/analysis/selectors.go` owns kind-specific selector validation/matching and common
+CLI filter intersection. Check input normalizes legacy HTTP method/path at decoding;
+context-scoped requirement assembly retains existing analysis semantics. Canonical JSON
+includes `selected_scope` and `check_matches` with per-context use counts. See the
+[CLI contract and examples](../../docs/running-scans.md#common-entry-selection-and-tagged-checks).
+
+SQL/NoSQL model answers that conflict with bounded hex-only SQL or relevant selector type-guard
+evidence retain explicit `injection_constraint_review` and remain Review. Raw answers and construction
+practice stay visible; the gate never fabricates a Protected result. See the
+[database analysis rules](../../docs/analysis/database-injection.md).
