@@ -150,3 +150,19 @@ The plan includes the cloned OWASP Juice Shop reference and small paired fixture
 [acceptance-target section](project/implementation-plan.md#acceptance-targets) owns their role and setup
 work. Source handling, accuracy, latency, cost, and packaging remain hypotheses to measure rather than
 established product promises.
+
+## Analysis pack initiative
+
+**2026-11-05 user direction:** [analysis-pack-mvp](project/analysis-pack-mvp.md) is a separate
+initiative with its own future worktree/branch after common-entry/dispatch completes acceptance and
+merges into `stage`, before command injection. Current-branch work documents the proposal only;
+implementation requires a separate assignment and bounded contract after the merge.
+
+The MVP will organize existing language/framework models, embedded guidance, verified API contracts,
+claim questions and evidence obligations under explicit versions and applicability. The judge receives
+only relevant interpretation material alongside the source trace; executable adapters and mandatory
+Go evidence gates remain in the scanner. The goal is reusable, auditable analysis knowledge as new
+vulnerability families arrive. Downloadable packs, executable plugins and a new rule language remain
+deferred. The [implementation plan](project/implementation-plan.md#analysis-pack-mvp-initiative)
+owns sequencing; the [technical approach](../docs/technical-approach.md#analysis-knowledge-and-proposed-packs)
+owns the public explanation and evaluation limits.

@@ -38,6 +38,8 @@ novel-repository generalization remain hypotheses until matched independent eval
 - [Reporting and SARIF](architecture/reporting-and-sarif.md): report records and implemented bounded SARIF export.
 - [Standalone HTML](architecture/html-reporting.md): human-facing report and disclosure rows.
 - [SCA follow-on](architecture/sca-design.md): planned dependency auditing.
+- [Analysis pack MVP proposal](project/analysis-pack-mvp.md): planned internal composition/versioning
+  of existing analysis knowledge; a separate initiative/worktree after common-entry/dispatch merges.
 
 ## 1. Architecture premise
 

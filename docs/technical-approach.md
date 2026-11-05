@@ -4,9 +4,10 @@
 
 ## Source-backed analysis with constrained semantic judgment
 
-Zazzles combines bounded static program analysis with a decision model that answers explicit security
-questions about the extracted evidence. The intended output helps a developer or coding agent decide
-what to repair, what protection to preserve and what uncertainty to investigate.
+Zazzles establishes supported code relationships through static analysis, then uses a decision model
+to evaluate whether the demonstrated controls satisfy a specific security requirement. Explicit
+evidence gates constrain the resulting judgment. The intended output helps a developer or coding
+agent decide what to repair, what protection to preserve and what uncertainty to investigate.
 
 The Go scanner reads application source, resolves supported language/framework bindings and follows
 values into security-sensitive operations. Each candidate carries source spans and hashes, relevant
@@ -18,6 +19,18 @@ The model is part of security judgment, rather than only a prose explanation of 
 It does not generate the source relationships or fill missing code with assumptions. Source text is
 evidence data; scanner-supplied guidelines define the interpretation instructions. JSON preserves
 both evidence and raw answers, while HTML and SARIF present the policy-gated result.
+
+A custom validation function illustrates the intended benefit. When its implementation, actual value
+transfers and relevant conditions are supplied within supported paths, the judge can assess whether
+the control is adequate for the operation without requiring a named sanitizer rule for that particular
+function. This is bounded interpretation of supplied evidence, not an ability to discover arbitrary
+missing code or prove every custom validator correct.
+
+**Semantic judgment reduces the need to enumerate every acceptable implementation pattern; it does
+not eliminate the need for analysis models.** Input discovery, handler resolution, supported
+transfers and library argument roles still need explicit engineering. Discovery misses never reach
+the judge; unresolved claim-relevant facts remain blockers. Reduced false findings and improved
+coverage remain hypotheses to measure alongside false protection, abstention, latency and cost.
 
 ## The distinctive design choices
 
@@ -98,6 +111,26 @@ claims: explicit evidence gaps, semantic interpretation of supplied code, preser
 protection and targeted repair guidance for agents. These are implemented design strengths; the size
 of any advantage over another scanner must be measured on matched cases. Mature tools may have
 broader framework coverage, deeper flow models and production workflows that Zazzles does not yet have.
+
+## Analysis knowledge and proposed packs
+
+Today, analysis knowledge ships in the binary: compiled language/framework and flow adapters,
+verified API contracts, embedded versioned Analysis Guidelines, claim questions and Go evidence
+policy. Application `--checks` files supply requirements and selection; they do not add a parser or
+new vulnerability detector. Public analysis guides govern development but are not loaded as prompts
+by editing their Markdown.
+
+The proposed [analysis pack MVP](../.zazz/project/analysis-pack-mvp.md) will organize these existing
+components under explicit IDs, versions, applicability and regression coverage. The static engine
+will use references to supported models and evidence obligations; the judge will receive selected
+interpretation guidance and applicable contracts alongside the candidate's trace. Executable adapters
+remain compiled, and mandatory Go gates remain authoritative. Language, entry framework, library and
+claim components should compose without duplicating a pack for every combination.
+
+This is a separate future initiative/worktree after common-entry/dispatch merges and before command
+injection. No pack loader, public rule language, downloadable registry or third-party plugin system
+is implemented or authorized by this documentation. Changed effective judgment inputs must retain
+exact-request replay protection and cannot inherit historical answers.
 
 ## Evidence for the approach
 

@@ -75,6 +75,40 @@ combination does not establish a unique algorithm or proven accuracy advantage. 
 [research comparison and Joern Scan discussion](docs/technical-approach.md#research-references-and-inspiration)
 explain the ideas studied, our constrained decision-model judgment, and the evaluation limits.
 
+### Technical approach: evidence and semantic judgment
+
+> **Zazzles establishes supported code relationships through static analysis, then uses a decision
+> model to evaluate whether the demonstrated controls satisfy a specific security requirement.
+> Explicit evidence gates constrain the resulting judgment.**
+
+The decision model has a substantive role in security assessment. Within supported paths, Zazzles
+can supply a custom validation function's implementation, actual value transfers and relevant
+conditions so the judge can assess whether that control is adequate for the operation. This reduces
+the need to define a named sanitizer rule for every acceptable custom implementation. A familiar
+function name or a confident model answer cannot substitute for the required source evidence.
+
+This approach supports three practical benefits: interpreting custom controls in context, separating
+business validation from sink-specific protection, and giving developers and agents explicit repair,
+preservation and investigation evidence. For example, safely bound SQL can retain its protection
+claim while a separate unmet application-validation requirement remains a finding. Missing facts
+stay Review; protection applies only to the stated claim and supplied scope.
+
+**Semantic judgment reduces the need to enumerate every acceptable implementation pattern; it does
+not eliminate the need for analysis models.** Zazzles still needs explicit support for input
+discovery, handler resolution, value/control transfers and library argument roles. The judge cannot
+assess a candidate the static engine never discovered or supply a missing relationship.
+
+Traditional SAST scanners also use dataflow and framework/library models; some provide model-assisted
+analysis. Zazzles's distinction is the role of semantic judgment within an evidence-gated claim
+assessment. Better coverage, fewer false findings and lower cost must be established through matched,
+independent evaluation. These are intended advantages, not demonstrated superiority over all SAST tools.
+See the [technical approach and comparison evidence](docs/technical-approach.md).
+
+A separate proposed [analysis pack MVP](.zazz/project/analysis-pack-mvp.md) will organize existing
+models, guidance, claim questions and evidence obligations into versioned internal components. It
+is planned in its own future worktree after common-entry/dispatch merges, before command injection.
+Current analysis knowledge ships in the scanner; downloadable rule packs are not implemented.
+
 ### Entry use cases and delivery status
 
 | Entry/use case | What analysis starts from | Supported now | Planned extension |

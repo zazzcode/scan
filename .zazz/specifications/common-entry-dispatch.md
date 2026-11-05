@@ -135,3 +135,11 @@ Completion requires all eight deliverables' acceptance evidence, no obsolete can
 route/client aliases, documented limits, unchanged historical inputs, passing mandatory
 checks and reviewed entry-specific reports. User application evaluation and human PR
 review/merge remain separate future steps.
+
+## Separate follow-on initiative
+
+The user designated [analysis-pack-mvp](../project/analysis-pack-mvp.md) on 2026-11-05 as a separate
+initiative with its own future worktree/branch, after this milestone completes acceptance and merges
+into `stage`. It precedes command injection in the [project roadmap](../project/implementation-plan.md#analysis-pack-mvp-initiative).
+Proposal and README updates may be prepared on the current branch; pack implementation and worktree
+creation are not part of this eight-deliverable milestone and require a separate assignment.
