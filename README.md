@@ -154,9 +154,12 @@ This preserves existing bounded JavaScript/TypeScript and Python SQL support, Ja
 NoSQL coverage, standalone validation and XSS outcomes. XSS selects rendering-context, protection,
 stored-origin and browser/response material under `xss-components-v1`; JSON-only data stays unassessed.
 Browser fetch attribution uses literal methods or default GET; unresolved methods keep an origin gap.
-It does not add a language adapter (Python NoSQL
-stays unsupported) or certify a helper by name. Other families migrate incrementally. Components ship
-in the binary; external pack loading and arbitrary project standards are not supported.
+Outbound observations also select components, but have no security questionnaire or SSRF verdict.
+Requested outbound assessments return `not_run` without model calls, remain Review and leave the
+scan incomplete. This completes the assigned component migrations; logging remains on its existing
+runtime path pending a separate migration. The refactor adds no language adapter (Python NoSQL stays
+unsupported) and cannot certify a helper by name. Components ship in the binary; external pack
+loading and arbitrary project standards are not supported.
 See the [database analysis guide](docs/analysis/database-injection.md) and
 [technical approach](docs/technical-approach.md#analysis-knowledge-and-components).
 

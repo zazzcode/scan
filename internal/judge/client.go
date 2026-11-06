@@ -240,9 +240,6 @@ type answer struct {
 	Choice string `json:"choice"`
 }
 
-func (c *Client) decode(data []byte) (map[string]string, string, map[string]int64, error) {
-	return c.decodeQuestions(data, questions)
-}
 func (c *Client) decodeQuestions(data []byte, expected []question) (map[string]string, string, map[string]int64, error) {
 	var raw struct {
 		Model   string           `json:"model"`

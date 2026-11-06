@@ -37,7 +37,9 @@ clear assessment domains. Linked claims must avoid duplicate issue counts.
 Review remains the unresolved-evidence report category. Independent Findings Review remains a
 planned verification stage, not the name of the quality capability. This documentation changes no
 current command, output schema, classification or detector. Broader Inspect and Fix need separate
-contracts. The [analysis pack MVP](analysis-pack-mvp.md) remains an internal SQL-first migration.
+contracts. The [analysis component architecture](../architecture/analysis-packs.md) organizes SQL,
+NoSQL, standalone validation, XSS and outbound observations. Logging remains a separate migration;
+this internal organization does not implement general Inspect or Fix capabilities.
 
 ### Independent use and optional composition
 

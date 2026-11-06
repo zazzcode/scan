@@ -1,6 +1,6 @@
 # Proposed phased implementation plan
 
-**Long-term planning, 2026-10-19; capability checklist updated 2026-11-02; delivery order updated 2026-11-05.** Phases 0–13 below are
+**Long-term planning, 2026-10-19; capability checklist updated 2026-11-02; component status updated 2026-11-06.** Phases 0–13 below are
 not approved for execution. This is a decomposition for later spec sessions, not a specification,
 calendar schedule, or blanket claim of completed functionality. The [capability checklist](#supported-capability-checklist)
 and delivery list below own current status and ordering; older phase/increment sections are references,
@@ -223,7 +223,8 @@ Public pack loading, registries, executable plugins, new rule languages, standar
 Inspect/Audit/Fix and expanded detection remain separate work.
 
 After MVP acceptance, command injection MUST use the accepted components in a separate bounded contract.
-The remaining migrations have explicit follow-on tasks; none is hidden cleanup in the SQL MVP:
+The follow-on migrations have separate contracts; sessions 01–03 are now complete, while logging
+remains unassigned. None is hidden cleanup in the SQL MVP:
 
 | Implementation order / session | Boundary | Required acceptance |
 | --- | --- | --- |

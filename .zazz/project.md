@@ -83,8 +83,8 @@ standards define assessment requirements, while source evidence establishes comp
 Broader standards selection/ingestion, architecture-quality analysis and automatic repair orchestration
 are planned. The scanner does not currently implement this complete loop or treat arbitrary Markdown
 as trusted policy. The [pack proposal](project/analysis-pack-mvp.md#standards-driven-agent-workflow)
-records the future trust, provenance, evidence and remediation boundaries. The existing SQL-first
-internal MVP remains unchanged in implementation scope.
+records the future trust, provenance, evidence and remediation boundaries. The implemented
+component migrations organize existing Scan knowledge; they do not implement that broader workflow.
 
 ## Long-term objectives
 
@@ -219,15 +219,19 @@ established product promises.
 
 **2026-11-05 user direction:** [analysis-pack-mvp](project/analysis-pack-mvp.md) is a separate
 initiative following the common-entry/dispatch merge through PR #8. The assigned
-`analysis-pack-mvp` feature tree now implements SQL, NoSQL, standalone validation and XSS
-component consumers; runtime checkpoint `4e0be3e` includes their verified cleanup.
-[Outbound observations](specifications/components-03-outbound.md) are the next planned session;
-logging remains separate. No integration merge or outbound implementation is implied by this checkpoint.
+`analysis-pack-mvp` feature tree now implements SQL, NoSQL, standalone validation, XSS and
+[outbound-observation](specifications/components-03-outbound.md) component consumers, committed at
+`c169a79` after offline verification. This completes the SQL-first MVP and assigned migration
+sessions 01–03. Logging remains on its existing runtime path and requires a separate migration;
+the broader goal of migrating every existing family is not yet complete. Human review and
+integration remain pending.
 
 The delivered consumers organize existing language/framework models, embedded guidance, verified API contracts,
 claim questions and evidence obligations under explicit versions and applicability. The
-[architecture ledger](architecture/analysis-packs.md#session-02-closeout-and-session-03-starting-point)
-records acceptance evidence, limits and the next starting point. The judge receives
+[architecture ledger](architecture/analysis-packs.md#current-implementation-status)
+records acceptance evidence, limits and remaining work. Outbound components describe observations,
+not SSRF protection: requested assessments return `not_run` with zero model calls and leave the scan
+incomplete. The judge receives
 only relevant interpretation material alongside the source trace; executable adapters and mandatory
 Go evidence gates remain in the scanner. The goal is reusable, auditable analysis knowledge as new
 vulnerability families arrive. Downloadable packs, executable plugins and a new rule language remain

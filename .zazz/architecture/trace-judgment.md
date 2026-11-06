@@ -42,7 +42,10 @@ from caller argument bindings. Browser source-scope markers preserve offsets/has
 uploading entire modules or claiming verified event exposure. The generic protocol is
 `candidate-use-v10`; SQL uses `sql-components-v2`, NoSQL `nosql-components-v1`, standalone
 validation `validation-components-v1` and XSS `xss-components-v1`. Logging retains `log-use-v1`;
-outbound still has the generic legacy path pending session03. Selected obligations extend the
+outbound observations select `pack.outbound` but have no model questionnaire or assessment protocol.
+They return `not_run` without a model call, remain Review and leave requested assessment incomplete;
+Preview rejects them without a request body. Logging is the remaining unmigrated existing family.
+Selected obligations extend the
 original source-required roles and mandatory Go gates. Changed request context still rejects replay;
 old question versions remain historical on export.
 

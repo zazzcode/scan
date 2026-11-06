@@ -11,6 +11,46 @@ and NoSQL interpretation, and the [XSS guide](../../docs/analysis/xss.md) owns r
 interpretation; [the implementation plan](../project/implementation-plan.md#analysis-pack-mvp-initiative)
 owns future sequencing.
 
+## Current implementation status
+
+The SQL-first MVP and assigned migration sessions 01–03 are implemented and offline-verified
+at `c169a79` (2026-11-06). SQL, JS/TS NoSQL, standalone validation, XSS and outbound observations
+use the shared embedded catalog, deterministic selection and schema-4 provenance. Outbound is
+observation-only: no model questionnaire, no model calls and no SSRF verdict. The
+[full Juice Shop comparison](#juice-shop-full-e2e-follow-up-2026-11-06) records preserved source/report
+facts and earlier-family requests separately from the intentional assessment-eligibility change.
+
+This completes the assigned migrations, not every family in the long-term design. Logging still
+uses its existing judge-owned questions and `log-use-v1` protocol, outside component selection.
+Its migration needs a separate bounded assignment. Command injection is a new family, while
+complete SSRF assessment, general Inspect, public pack loading and executable plugins remain
+future capabilities. Human review and integration remain pending. Historical checkpoints below
+retain their original baselines and verification limits.
+
+### Merge-readiness recheck, 2026-11-06
+
+A fresh whole-checkout Juice Shop scan after documentation reconciliation and removal of the unused
+`Client.decode` wrapper retains 167 entries (154 HTTP, 13 browser), 208 uses, eight construction
+findings and 200 Review records. It is exactly equal to the original pre-componentization
+`f8b7dbd` report after excluding component selections and the schema3-to-schema4 version change.
+The baseline was built from a temporary Git source archive; no worktree or integration changes
+were made. This checks the whole refactor's static source/report behavior, beyond session03 alone.
+
+Against pre-outbound `dc309cd`, removing only 66 outbound selection records yields exact structural
+equality. Both provider stubs preserve all 117 effective request hashes, 117 exact replays and all
+142 non-outbound full CLI candidate records, including original-source request digests. Each makes
+117 calls with zero outbound calls; two source-reviewed raw XSS controls remain findings. Full CLI
+runs retain the expected exit1 with five binding failures and 86 `not_run` observations. Saved and
+re-exported JSON/HTML/SARIF preserve raw answers, source associations and counts. Stub outcomes
+verify mechanics and preservation, not live-model accuracy or complete security coverage.
+
+Current evidence: `_test-findings/juice-shop-closeout/juice-shop/run-1110679670/`; original-base
+report: `_test-findings/juice-shop-precomponents-closeout/juice-shop/run-503065659/`.
+The pinned target and all 27 source hashes remain clean and unchanged. Full race tests (nine
+packages), vet, build, changed-Go formatting and scoped documentation/link checks pass. The
+duplicate-answer regression now exercises the current decoder directly; no request or policy
+semantics changed. The local report server serves these snapshots for review.
+
 ## Session 02 closeout and session 03 starting point
 
 Runtime checkpoint `4e0be3e` on the existing `analysis-pack-mvp` feature branch includes the

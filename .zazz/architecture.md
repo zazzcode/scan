@@ -1,6 +1,6 @@
 # Architecture
 
-**Implemented architecture, updated 2026-11-05.** This document owns package responsibilities,
+**Implemented architecture, updated 2026-11-06.** This document owns package responsibilities,
 terminology and pipeline boundaries. Planned components are labeled explicitly. Product direction
 lives in [project.md](project.md), decisions in the [proposal](project/03-jev-design-proposal.md),
 and delivery order in the [implementation plan](project/implementation-plan.md).
@@ -38,7 +38,7 @@ novel-repository generalization remain hypotheses until matched independent eval
 - [Reporting and SARIF](architecture/reporting-and-sarif.md): report records and implemented bounded SARIF export.
 - [Standalone HTML](architecture/html-reporting.md): human-facing report and disclosure rows.
 - [SCA follow-on](architecture/sca-design.md): planned dependency auditing.
-- [Analysis components](architecture/analysis-packs.md): SQL/NoSQL/validation/XSS ownership, selection, bounds,
+- [Analysis components](architecture/analysis-packs.md): SQL/NoSQL/validation/XSS and outbound-observation ownership, selection, bounds,
   provenance, compatibility and incremental migration ledger; [original proposal](project/analysis-pack-mvp.md).
 
 ## Product boundaries and shared engine
@@ -257,10 +257,12 @@ protective. Source/comments are untrusted data, never model instructions.
 
 Model envelopes use `analysis_guidelines`. The generic question protocol is `candidate-use-v10`;
 SQL uses `sql-components-v2`, NoSQL `nosql-components-v1`, standalone validation
-`validation-components-v1` and XSS `xss-components-v1`. Logging retains `log-use-v1`;
-outbound observations still use the generic legacy path until session03. JSON-only XSS observations
-are already unassessed. The planned outbound observation-only eligibility must not be confused
-with the current implementation. Renamed guideline documents carry new versions because their request text changed. Request identity includes the full
+`validation-components-v1` and XSS `xss-components-v1`. Logging retains `log-use-v1` and remains
+outside the component catalog pending a separate migration. Outbound observations select
+`pack.outbound` with catalog compatibility `outbound-observation-v1`, but have no model questionnaire
+or assessment protocol. They return `not_run` without model calls and keep a requested scan incomplete;
+Preview rejects them without producing a request body. JSON-only XSS observations also remain
+unassessed. Renamed guideline documents carry new versions because their request text changed. Request identity includes the full
 envelope and guideline body; old responses cannot be replayed on renamed/changed requests.
 
 <a id="8-jev-assessment-and-findings-review"></a>

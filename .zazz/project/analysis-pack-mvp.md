@@ -1,6 +1,6 @@
 # Analysis pack MVP proposal
 
-**Planning decision, 2026-11-05.** `analysis-pack-mvp` is a separate initiative, with its own
+**Original planning decision, 2026-11-05.** `analysis-pack-mvp` is a separate initiative, with its own
 future worktree/branch, after `common-entry-and-dispatch` completes acceptance and merges into
 `stage`. It precedes command injection and the remaining vulnerability-family expansion.
 This proposal authorizes documentation only; implementation needs its own bounded contract and
@@ -9,6 +9,16 @@ explicit assignment. It is not another deliverable in the common-entry/dispatch 
 The [implementation plan](implementation-plan.md#analysis-pack-mvp-initiative) owns sequencing.
 The [technical approach](../../docs/technical-approach.md) owns the public explanation of semantic
 judgment. This proposal owns the proposed pack boundary, MVP scope and evaluation goals.
+
+**Implementation status, 2026-11-06:** the merged common-entry/dispatch foundation is accepted,
+and the existing `analysis-pack-mvp` branch implements the SQL-first MVP plus assigned NoSQL,
+standalone-validation, XSS and outbound-observation migrations at `c169a79`. The
+[component architecture](../architecture/analysis-packs.md#current-implementation-status) owns the
+implemented organization, protocols, verification and remaining limits. Logging is still unmigrated;
+the long-term goal of placing every existing family on this structure remains incomplete. The
+planning decision and proposed scope below preserve the original design rationale rather than
+assigning another implementation session. Public pack loaders and broader standards ingestion
+remain future work.
 
 ## Purpose and architectural distinction
 

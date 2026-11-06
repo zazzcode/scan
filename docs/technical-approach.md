@@ -70,8 +70,8 @@ questions, but cannot invent an engineering standard or supply missing evidence.
 Broader reliability and maintainability coverage remains planned. The
 [analysis pack proposal](../.zazz/project/analysis-pack-mvp.md#security-code-quality-and-engineering-hygiene)
 includes quality claims as future consumers of the modular structure. Inspect compliance and
-security protection must remain distinct. The internal MVP still preserves existing behavior and
-migrates SQL first, without implementing a general quality platform.
+security protection must remain distinct. The implemented component migrations organize existing
+Scan analyses without implementing a general quality platform.
 
 The longer-term agent workflow uses team-approved coding and architecture standards as explicit
 assessment requirements. Agents create code, consume security/quality evidence, make repairs, then
@@ -188,8 +188,9 @@ checks mandatory evidence and consistency gates. A component cannot invent a bin
 certify a custom validator by name.
 
 Fresh reports use schema 4 to preserve per-candidate selection provenance. SQL requests use protocol
-`sql-components-v2`, NoSQL `nosql-components-v1` standalone validation `validation-components-v1` and XSS `xss-components-v1`;
-unmigrated families keep their existing protocols. Exact effective requests bind selected
+`sql-components-v2`, NoSQL `nosql-components-v1`, standalone validation `validation-components-v1`
+and XSS `xss-components-v1`. Logging keeps `log-use-v1` pending its separate component migration;
+outbound observations have no model protocol. Exact effective requests bind selected
 content and provenance, source evidence, questions and model. Changing any of them rejects historical
 answers for fresh replay. Saved reports remain exportable with their original evidence and answers.
 XSS composes one primary rendering contract with context/protection interpretation and source-backed
@@ -270,11 +271,13 @@ evidence without manufacturing a missing edge. This makes reports and selectors 
 types while leaving each adapter responsible for proving its own source relationships.
 
 The common records, existing HTTP/browser consumer migration and typed reports/selectors are
-implemented on the current development branch. Explicit browser-event callback dispatch is next (D4).
-D5 adds bounded Express and Python generated registration, finite lookup and closure/callback flows,
-with real VulnPy trace/finding acceptance and Juice Shop regressions. Node.js Apollo GraphQL (D6) and
-grpc-js unary gRPC (D7) are planned adapters. Typed metadata/presentation support already present
-for GraphQL/gRPC is not a claim that their source discovery or input propagation is implemented.
+implemented in the merged common-entry/dispatch foundation. Supported adapters include explicit
+DOM/window event callbacks, bounded Express and Python generated registrations with finite lookup
+and closure/callback flows, Node.js Apollo resolver maps with literal schemas, and grpc-js unary
+handlers with local proto3 declarations and request-field inputs. Dynamic-route acceptance includes
+real VulnPy traces/findings and Juice Shop regressions. GraphQL and gRPC acceptance uses source
+fixtures; real-application evaluation remains deferred. Dynamic schema composition, subscriptions,
+generated gRPC stubs, interceptors and streaming flow remain unsupported.
 The [README use-case matrix](../README.md#entry-use-cases-and-delivery-status) summarizes supported
 and planned scenarios; the [common-entry design](../.zazz/architecture/common-entry-dispatch.md)
 and [delivery contracts](../.zazz/specifications/common-entry-dispatch.md) own the detailed boundaries.

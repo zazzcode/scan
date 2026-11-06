@@ -271,3 +271,21 @@ no sample edits, no new agents/worktrees, no PR creation and no integration merg
 assessments under both local providers, exact earlier-family requests/replay, source-reviewed XSS
 controls, saved JSON/HTML/SARIF parity and required incomplete exits. Record results and supported
 limits in the [ledger](../architecture/analysis-packs.md#juice-shop-full-e2e-follow-up-2026-11-06).
+
+### 2026-11-06 — Documentation consistency and merge-readiness recheck
+
+**Source.** User requested consistent README/project/architecture documentation, verification of
+component-design completion, another complete Juice Shop baseline comparison and obsolete-code cleanup.
+
+**Scope.** Reconcile current capability and migration status across the README, user documentation
+index/analysis overview/technical approach, project overview/functionality/proposal/plan, architecture
+index/component ledger/trace contract and agent orientation. Preserve historical planning and raw
+reports. Remove only the unused `Client.decode` wrapper and exercise the current decoder directly in
+its duplicate-answer regression. Logging remains a separate migration, not implicit work in this
+closeout. No public behavior, protocol, detection scope or O1–O7 acceptance requirement changes.
+
+**Verification impact.** Repeat full unchanged Juice Shop source/report comparison with accepted
+`dc309cd` and original pre-componentization `f8b7dbd`, both localhost provider probes, exact earlier-family request/replay checks, full CLI and
+saved-export parity, target revision/hash/cleanliness checks, full race/vet/build and scoped docs checks.
+Continue to use the existing feature branch; no paid calls, target execution, sample edits, new
+worktrees/agents, PR creation or integration merge.

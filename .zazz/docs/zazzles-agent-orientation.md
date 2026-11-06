@@ -18,7 +18,7 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 
 **Component refactor, 2026-11-06:** SQL, NoSQL, standalone validation, XSS and outbound observations
 are implemented and offline-verified in the assigned `analysis-pack-mvp` worktree/branch. Outbound
-started from clean `dc309cd`, preserving runtime `4e0be3e` and XSS migration `30fada9`. Read the
+was committed at `c169a79` from clean `dc309cd`, preserving runtime `4e0be3e` and XSS migration `30fada9`. Read the
 [component ledger](../architecture/analysis-packs.md#outbound-observation-verification-2026-11-06)
 for ownership, protocols, source/report parity and remaining limits. Fresh reports use schema4;
 schemas1–4 remain readable with historical answers intact.
@@ -30,10 +30,13 @@ requested scan incomplete. Preview rejects them without a request body. Browser 
 establish server SSRF. Logging migration and complete SSRF/exfiltration/browser-security assessment
 remain future work.
 
-The user assigned full offline Juice Shop E2E validation, fixes if needed, then feature commit/push.
+Full offline Juice Shop E2E validation and feature commit/push completed at `c169a79`.
 The [full E2E ledger](../architecture/analysis-packs.md#juice-shop-full-e2e-follow-up-2026-11-06)
 records actual all-registration scope, unchanged non-outbound requests and conservative incomplete
 assessment behavior. Resume the existing feature worktree and preserve unrelated changes.
+The assigned migrations are complete; logging remains unmigrated, so do not claim every existing
+family uses the catalog. The [current status](../architecture/analysis-packs.md#current-implementation-status)
+distinguishes delivered consumers from future coverage and migration work.
 No paid calls, target execution, sample edits, new agents/worktrees, PR creation or integration merge
 are authorized by this checkpoint. Human review remains pending.
 
@@ -188,6 +191,7 @@ in these files independently of chat attachments.
 | [User documentation](../../docs/README.md) | Product introduction, agent-first philosophy, setup, use, result interpretation and contributor guides |
 | [Project overview](../project.md) | Purpose, [public philosophy](../../docs/philosophy.md), current state, direction |
 | [Architecture](../architecture.md) | Flow diagrams, judge/provider contracts, analysis semantics, package boundaries |
+| [Analysis components](../architecture/analysis-packs.md#current-implementation-status) | Embedded catalog ownership, implemented family selection, provenance, verification and remaining migrations |
 | [Repository graph design](../architecture/repository-graph.md) | Target-repository nodes/edges, inbound/outbound API boundaries, response flow, identity and provenance |
 | [SQL/NoSQL judgment design](../architecture/query-judgment.md) | Automatic query claims, model contracts, conditional output facts and policy gates |
 | [Evidence and claims](../architecture/evidence-and-claims.md) | Source-backed route slices, relevant functions, checked requirements and finding eligibility |
