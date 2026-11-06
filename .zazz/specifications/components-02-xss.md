@@ -64,7 +64,7 @@ No requirement to merge into integration is inferred by this spec; the user assi
 | --- | --- | --- |
 | `internal/analysispacks/` | Add XSS material/registration/tests | Rendering, sanitizer, context and question components |
 | `internal/guidelines/` | Narrow modify | Selected validated XSS/shared guidance with one owner |
-| `internal/judge/{xss,client,components,trace}.go` and tests | Modify | Selected XSS protocol/questions, provenance, existing Go consistency gates |
+| `internal/judge/{xss,client,components,trace,validation}.go` and tests | Modify | Selected XSS protocol/questions, provenance, existing Go consistency gates |
 | `internal/parse/xss_*.go`, `browser_events.go`, Python rendering/template owners and tests | Narrow modify | Attach selections and preserve extraction; bounded fetch-method correction below |
 | `internal/analysis/{components,xss,analysis,json}.go` and tests | Narrow modify if necessary | Existing fact/provenance representation and saved compatibility |
 | `internal/report/`, `cmd/scan/` | Narrow tests/wiring | Cross-format counts, server/browser grouping and coverage preservation |
@@ -244,3 +244,24 @@ private paths, conflict markers and `git diff --check`. No repository doc-lint t
 X1–X8 have evidence; no unmet acceptance criterion is recorded. These offline checks do not claim
 live-model accuracy, runtime exploitation or broader unsupported coverage. No commit, push or PR
 was requested or performed.
+
+
+### 2026-11-05 — User-authorized migration cleanup
+
+**Source.** User requested removal of the two reviewed cleanup remnants and other obsolete
+migration code, followed by a feature commit and push.
+
+**Changed sections.** §3 permits narrow cleanup in the existing protocol selector in
+`internal/judge/validation.go`; no detection or evidence boundary changes.
+
+**Summary.** Remove the unreachable XSS protocol fallback now handled by registered families;
+remove the production historical-validation constant used only by a test (the test retains its
+literal historical protocol); make the shared replay provenance error family-neutral. Active XSS
+question/choice adapters and historical report compatibility remain in use and are retained.
+Commit/push authorization applies to this feature branch; no PR or merge is assigned.
+
+**Verification impact.** Existing protocol/policy/replay/history controls and all nine packages pass
+`go test -race ./... -count=1`; `go vet ./...`, `go build ./...`, `gofmt -l .`,
+`git diff --check` and scoped documentation checks (21 local links) pass. No request bytes, question
+protocols, source facts or successful assessment outcomes change; no new Juice Shop scan or paid
+call is required.

@@ -39,7 +39,7 @@ func (c *Client) Replay(use analysis.CandidateUse, trace DecisionTrace) analysis
 	a.RequestDigest = requestDigest(use, payload)
 	if trace.RequestDigest != "" && trace.RequestDigest != a.RequestDigest || trace.Components != nil && !reflect.DeepEqual(trace.Components, use.Components) {
 		a.Status = "failed"
-		a.Reason = "Saved SQL component provenance does not match current request"
+		a.Reason = "Saved component provenance does not match current request"
 		return a
 	}
 	answers, model, usage, err := c.decodeQuestions(trace.Response, questionsFor(use))

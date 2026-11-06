@@ -18,7 +18,7 @@ func TestValidationPolicyRequiresIndependentEvidence(t *testing.T) {
 		{name: "no policy", validation: "insufficient", coverage: "complete", requirement: "unknown", version: analysispacks.ValidationProtocol, want: "needs_evidence"},
 		{name: "missing role", validation: "sufficient", coverage: "complete", requirement: "established", version: analysispacks.ValidationProtocol, missing: "control_flow", want: "needs_evidence"},
 		{name: "incomplete", validation: "insufficient", coverage: "incomplete", requirement: "established", version: analysispacks.ValidationProtocol, want: "needs_evidence"},
-		{name: "old protocol", validation: "insufficient", coverage: "complete", requirement: "established", version: validationQuestionVersion, want: "needs_evidence"},
+		{name: "old protocol", validation: "insufficient", coverage: "complete", requirement: "established", version: "validation-use-v2", want: "needs_evidence"},
 		{name: "generic protocol", validation: "insufficient", coverage: "complete", requirement: "established", version: questionVersion, want: "needs_evidence"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {

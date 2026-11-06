@@ -5,10 +5,6 @@ import (
 	"github.com/zazzcode/zazzles/internal/analysispacks"
 )
 
-// validationQuestionVersion identifies historical field-policy assessments.
-// Current validation requests use their selected component protocol.
-const validationQuestionVersion = "validation-use-v2"
-
 // validationUse covers standalone field-policy records: Python claims with
 // assembled policy evidence and JS/TS field records that only carry gaps.
 func validationUse(u analysis.CandidateUse) bool {
@@ -62,9 +58,6 @@ func protocolVersion(u analysis.CandidateUse) string {
 	}
 	if logUse(u) {
 		return logQuestionVersion
-	}
-	if u.Kind == "xss_candidate" {
-		return xssQuestionVersion
 	}
 	return questionVersion
 }
