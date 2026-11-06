@@ -79,7 +79,7 @@ versioned language guidance for security assessment. Broader quality baselines a
 profiles are planned. Findings about standards need an identifiable requirement and source evidence,
 not only a model's preference.
 
-The SQL, NoSQL and standalone-validation [analysis components](docs/technical-approach.md#analysis-knowledge-and-components)
+The SQL, NoSQL, standalone-validation and XSS [analysis components](docs/technical-approach.md#analysis-knowledge-and-components)
 organize existing knowledge with explicit versions and applicability. Broader team-standard
 components remain planned under the [standards-workflow design](.zazz/project/analysis-pack-mvp.md#standards-driven-agent-workflow).
 Deterministic checks can handle mechanical requirements. Semantic judgment can assess contextual
@@ -137,7 +137,7 @@ A protected claim applies to the stated operation and scope, not the entire entr
 
 ### Analysis components
 
-SQL injection, JS/TS NoSQL injection and JS/TS/Python standalone input-validation analyses use
+SQL injection, JS/TS NoSQL injection, JS/TS/Python standalone input-validation and supported XSS analyses use
 embedded, versioned components for applicable family guidance, compiled entry/flow capabilities,
 verified database contracts, claim questions and evidence obligations. The static analyzer selects
 components for each supported candidate; the judge uses that selection with the source trace.
@@ -151,7 +151,10 @@ Mandatory Go evidence gates still apply, and validation, SQL construction practi
 protection remain separate judgments.
 
 This preserves existing bounded JavaScript/TypeScript and Python SQL support, JavaScript/TypeScript
-NoSQL coverage and standalone validation outcomes. It does not add a language adapter (Python NoSQL
+NoSQL coverage, standalone validation and XSS outcomes. XSS selects rendering-context, protection,
+stored-origin and browser/response material under `xss-components-v1`; JSON-only data stays unassessed.
+Browser fetch attribution uses literal methods or default GET; unresolved methods keep an origin gap.
+It does not add a language adapter (Python NoSQL
 stays unsupported) or certify a helper by name. Other families migrate incrementally. Components ship
 in the binary; external pack loading and arbitrary project standards are not supported.
 See the [database analysis guide](docs/analysis/database-injection.md) and
@@ -264,7 +267,7 @@ per-language checklist and delivery order.
 - Selected JS/TS API-to-browser XSS links and Python inline-script analysis.
 - Common entry/dispatch records, browser events, finite dynamic routes, GraphQL and unary gRPC.
 - SQL analysis component selection, bounded judge composition and auditable report/replay provenance.
-- NoSQL and standalone-validation component selection with independent claim protocols and replay provenance.
+- NoSQL, standalone-validation and XSS component selection with independent claim protocols and replay provenance.
 
 ### Next and planned work
 
@@ -279,8 +282,8 @@ per-language checklist and delivery order.
 - **Inspect capability:** separately present standards and quality assessments using shared analysis
   components. Broader checks, report separation and their delivery priority remain to be scoped.
 
-Analysis knowledge ships in the scanner. SQL uses the component structure; XSS, standalone validation,
-logging, JS/TS NoSQL and outbound requests have explicit follow-on migrations. Downloadable packs and an external plugin
+Analysis knowledge ships in the scanner. SQL, JS/TS NoSQL, standalone validation and XSS use
+the component structure; logging and outbound requests have explicit follow-on migrations. Downloadable packs and an external plugin
 system remain outside the internal MVP and need their own design.
 
 Future capabilities need vulnerable, protected and unknown controls across applicable supported

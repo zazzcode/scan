@@ -26,11 +26,11 @@ func (c *catalog) selectUse(use analysis.CandidateUse) (*analysis.ComponentSelec
 	if family == nil {
 		return nil, fmt.Errorf("component selection is not registered for candidate kind %q", use.Kind)
 	}
-	language, ok := lang.Detect(use.Sink.Span.File)
+	language, ok := sourceLanguage(use, family)
 	if !ok || !family.supports(language) {
 		return nil, fmt.Errorf("unsupported %s source language", family.Label)
 	}
-	if !family.RequiresAPI && use.APIModel != nil {
+	if family.Name != "xss" && !family.RequiresAPI && use.APIModel != nil {
 		return nil, fmt.Errorf("%s selection must not carry an API contract", family.Label)
 	}
 	var contract *analysis.APIModel
@@ -68,6 +68,13 @@ func (c *catalog) selectUse(use analysis.CandidateUse) (*analysis.ComponentSelec
 	}
 	if contract != nil {
 		roots = append(roots, "api."+contract.ID)
+	}
+	if family.Name == "xss" {
+		extra, err := xssRoots(use)
+		if err != nil {
+			return nil, err
+		}
+		roots = append(roots, extra...)
 	}
 	ids, err := c.closure(roots)
 	if err != nil {

@@ -23,6 +23,13 @@ func descriptors() ([]Component, error) {
 		questions []Question
 		choices   func() map[string][]map[string]string
 	}{
+		"claim.xss": {XSSQuestions(), func() map[string][]map[string]string {
+			choices := map[string][]map[string]string{}
+			for _, q := range XSSQuestions() {
+				choices[q.Name] = XSSChoices(q.Name)
+			}
+			return choices
+		}},
 		"claim.sql": {SQLQuestions(), func() map[string][]map[string]string {
 			return map[string][]map[string]string{"validation": PracticeChoices(), "protection": PracticeChoices(), "injection_protection": SQLInjectionChoices()}
 		}},
@@ -48,8 +55,10 @@ func descriptors() ([]Component, error) {
 		pack.Dependencies = []Requirement{{f.Claim, "1"}, {f.Evidence, "1"}}
 		questions := makeComponent(f.Claim, "claim_questions", "internal/analysispacks", f.Kinds, []string{protocol}, claimPayload(claim.questions, claim.choices()))
 		evidence := makeComponent(f.Evidence, "evidence_obligations", f.PolicyOwner, f.Kinds, []string{protocol}, "")
-		evidence.Dependencies = []Requirement{{"flow.local", "1"}}
+		evidence.Dependencies = []Requirement{{flowID(&f), "1"}}
 		switch f.Name {
+		case "xss":
+			evidence.Required = []string{"render_source", "render_binding", "render_context"}
 		case "sql":
 			evidence.Required = []string{"input_source", "sink_binding", "invoked_callable", "control_flow"}
 		case "nosql":
@@ -125,5 +134,6 @@ func descriptors() ([]Component, error) {
 			out = append(out, v)
 		}
 	}
+	out = append(out, xssDescriptors()...)
 	return out, nil
 }

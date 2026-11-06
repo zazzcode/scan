@@ -14,6 +14,7 @@ const (
 	SQLProtocol        = "sql-components-v2"
 	NoSQLProtocol      = "nosql-components-v1"
 	ValidationProtocol = "validation-components-v1"
+	XSSProtocol        = "xss-components-v1"
 )
 
 // Family registers one claim family's selection contract. Registrations are
@@ -52,11 +53,14 @@ func (f Family) supports(language lang.Language) bool {
 }
 
 func (f Family) rootIDs() []string {
-	ids := []string{f.Pack, f.Claim, f.Evidence, "flow.local"}
+	ids := []string{f.Pack, f.Claim, f.Evidence, flowID(&f)}
 	for _, language := range f.Languages {
 		ids = append(ids, languageID(&f, language))
 	}
 	ids = append(ids, f.Entries...)
+	if f.Name == "xss" {
+		ids = append(ids, "render.html-output-v1", "render.browser-output-v1", "render.python-html-output-v1", "context.xss", "protection.xss", "browser.xss", "storage.xss", "response.xss")
+	}
 	if f.RequiresAPI {
 		for _, id := range contractIDs(&f) {
 			ids = append(ids, "api."+id)
@@ -83,6 +87,7 @@ func languageID(f *Family, language lang.Language) string {
 // Families returns the registered component families in stable order.
 func Families() []Family {
 	return []Family{
+		{Name: "xss", Label: "XSS", Kinds: []string{"xss_candidate"}, QuestionNames: xssQuestionNames(), Languages: []lang.Language{lang.JavaScript, lang.TypeScript, lang.Python}, Pack: "pack.xss", Claim: "claim.xss", Evidence: "evidence.xss", PolicyOwner: "internal/judge/xss.go"},
 		{
 			Name: "sql", Label: "SQL", Kinds: []string{"sql_query_candidate"}, QuestionNames: sqlQuestionNames(),
 			Languages:      []lang.Language{lang.JavaScript, lang.TypeScript, lang.Python},
@@ -134,6 +139,8 @@ func ProtocolFor(kind string) string {
 
 func familyProtocol(name string) string {
 	switch name {
+	case "xss":
+		return XSSProtocol
 	case "sql":
 		return SQLProtocol
 	case "nosql":
@@ -188,4 +195,11 @@ func (c *catalog) claimQuestions(f *Family) ([]Question, map[string][]map[string
 		}
 	}
 	return payload.Questions, payload.Choices, nil
+}
+
+func flowID(f *Family) string {
+	if f.Name == "xss" {
+		return "flow.xss"
+	}
+	return "flow.local"
 }

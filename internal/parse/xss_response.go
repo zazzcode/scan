@@ -8,6 +8,7 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/analysispacks"
 )
 
 func handlerParameter(body *sitter.Node, index uint, src []byte) string {
@@ -219,11 +220,11 @@ func (f *flow) recordXSS(sink analysis.Evidence, v value, context, contentType s
 		Kind: "xss_candidate", Sink: sink, Dependencies: v.deps, Context: ctx, Gaps: gaps,
 		XSS: &analysis.XSSFacts{Type: kind, EntryKind: entryKind, OutputContext: context, OriginResolved: kind == "reflected" || kind == "dom",
 			ContentType: contentType, Protection: protection, ProtectionReason: reason, Paths: paths},
-		APIModel:   &analysis.APIModel{ID: "html-output-v1", Library: "express", Semantics: "Request values reach an HTML rendering operation in the recorded output context.", Reference: "https://expressjs.com/en/api.html#res.send"},
+		APIModel:   analysispacks.XSSContract("html-output-v1", "express"),
 		Assessment: analysis.Assessment{Status: "not_run"},
 	})
 	if f.client != nil {
 		last := &f.uses[len(f.uses)-1]
-		last.APIModel = &analysis.APIModel{ID: "browser-output-v1", Library: f.client.entry.Browser.Framework, Semantics: "Verified browser/framework rendering binding and source flow in the stated context.", Reference: "https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML"}
+		last.APIModel = analysispacks.XSSContract("browser-output-v1", f.client.entry.Browser.Framework)
 	}
 }

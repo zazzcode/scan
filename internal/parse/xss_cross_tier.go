@@ -16,6 +16,9 @@ func (s *moduleSet) linkCrossTierXSS(report *analysis.AnalysisReport) {
 		if u.Kind != "xss_candidate" || x == nil || x.Type != "cross_tier" || x.OriginResolved || x.ResponsePath == "" {
 			continue
 		}
+		if x.ResponseMethod == "" {
+			continue
+		}
 		if x.ResponseField == "" || x.ResponseField == "*" {
 			u.Gaps = append(u.Gaps, analysis.Gap{Kind: "response_field_unresolved", Detail: "The browser value's response field is not a single established JSON path.", At: u.Sink.Span})
 			continue

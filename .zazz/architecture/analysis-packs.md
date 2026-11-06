@@ -21,13 +21,13 @@ transport and mandatory claim gates in `internal/judge`, and presentation in `in
 | --- | --- | --- |
 | JS/TS syntax, Express, dynamic HTTP, GraphQL, unary gRPC, browser entry/flow | `internal/parse/` adapter and flow files | Reference supported compiled subsets and their limits; extraction remains in parse |
 | Python Flask/Blueprint, RESTX, FastAPI, DB-API flow | `internal/parse/python_*.go` | Reference supported compiled subsets; no new Python framework/heap/async support |
-| Language interpretation | `internal/guidelines/javascript.md`, `python.md`, `go.md` | SQL selects relevant existing sections; unmigrated families retain full language documents; Go guidance does not establish Go support |
+| Language interpretation | `internal/guidelines/javascript.md`, `python.md`, `go.md` | Registered families select validated existing sections; unmigrated families retain full language documents; Go guidance does not establish Go support |
 | Sequelize raw SQL | `internal/parse/checks.go` | Catalog owns the verified operation contract; parse still proves receiver/import/slot bindings |
 | Python SQL drivers | `internal/parse/python_dbapi.go` | Catalog owns sqlite3, Psycopg 2/3, PyMySQL and MySQL Connector operation contracts; parse still proves connection/cursor provenance |
 | SQL questions and choices | `internal/judge/client.go`, `injection.go` | SQL components own the selected question/answer material; judge encodes, decodes and applies Go policy |
 | Required SQL evidence | `internal/parse/checks.go`, `python_sql.go`; `internal/judge/policy.go` | Components declare obligations; core input-source, sink-binding, invoked-callable and control-flow roles remain mandatory |
 | NoSQL contracts | `internal/analysispacks/nosql.go` (catalog owner); parse proves collection/model bindings | Migrated: MarsDB collection and Mongoose query/casting contracts are catalog components; selector, `$where`, schema/version and all-path semantics preserved |
-| XSS contracts/questions | `internal/parse/xss_*.go`, `python_templates.go`; `internal/judge/xss.go` | Inventoried, not migrated; retain rendering context, sanitizer and stored-origin semantics |
+| XSS contracts/questions | `internal/analysispacks/xss.go` and `xss_selection.go`; validated guideline projections | Migrated: catalog owns primary rendering contracts, five questions and supplementary context/protection/storage/browser/response material; parse retains source facts and judge retains mandatory gates |
 | Standalone validation | `internal/analysispacks/validation.go` (questions/choices); policy assembly stays in parse; gates in `internal/judge/validation.go` | Migrated: requirement/enforcement questions are catalog components; established/absent policies, enforced/bypassed/missing guards and API-less field claims preserved |
 | Logging | Logger/source extraction in parse; `internal/judge/logging.go` | Inventoried, not migrated; retain sensitive content, emission and redaction gates |
 | Outbound requests | Destination/source extraction in parse; Python HTTP-client API models; existing generic judge/report paths | Inventoried, not migrated; preserve current fetch/axios/Python destination facts; full SSRF assessment is a separate feature |
@@ -35,7 +35,7 @@ transport and mandatory claim gates in `internal/judge`, and presentation in `in
 
 A material item has one runtime owner. Family integration reuses selected shared language sections
 and moves operation/question knowledge rather than creating alternative legacy policy paths.
-Unmigrated families (XSS, logging, outbound) retain their existing behavior until their own migrations.
+Unmigrated families (logging, outbound) retain their existing behavior until their own migrations.
 
 Catalog identities are `pack.<family>`, `claim.<family>`, `evidence.<family>`, `flow.local`,
 `language.javascript`, `language.python`, `language.nosql.javascript`,
@@ -62,7 +62,7 @@ uses supported source facts and scanner configuration. Installed packages, helpe
 comments do not enable trusted contracts or define policy. Unknown application library versions
 retain the contract's bounded assumptions; a scanner contract version is not an installed version.
 
-Static SQL assembly records its selection and effective obligations on the candidate. Existing
+Static registered-family assembly records its selection and effective obligations on the candidate. Existing
 `completeness.required` and source gaps are preserved; `analysis_components.required` records selected
 obligations, and Go judgment validates their union with core/claim roles. Judgment
 validates/consumes that same selection. Mandatory Go obligations are unioned with component roles;
@@ -93,13 +93,13 @@ generalization changed component compatibility metadata and therefore SQL proven
 questions, choices and outcomes are unchanged), NoSQL uses `nosql-components-v1` and standalone
 validation `validation-components-v1`. The accepted foundation used schema 3 with
 `candidate-injection-v1` SQL/NoSQL requests and `validation-use-v2` validation requests; saved
-reports keep those answers but cannot replay onto changed requests. XSS retains `xss-use-v1`,
+reports keep those answers but cannot replay onto changed requests. XSS uses `xss-components-v1`,
 logging `log-use-v1`, and generic candidates `candidate-use-v10`. Evidence-version 3 and
 route-inventory schema 1 are independent contracts.
 
 The candidate's `analysis_components` records pack/component IDs, versions, digests, effective
 required roles, limits and optional `failure` coverage provenance, separately from original source
-gaps. `assessment.request_digest` records the effective request for assessed SQL. Decision traces carry
+gaps. `assessment.request_digest` records the effective request for assessed registered-family claims. Decision traces carry
 `analysis_components` and `request_digest` alongside the exact request/response bodies. Exact effective provider-body matching and protocol checks still gate Replay. Changing
 selected content/metadata, evidence, instructions, questions/choices or model rejects an old response,
 even if someone forgot to bump a material version. No automatic persistent decision cache is added.
@@ -115,7 +115,7 @@ issue counts and status semantics, including a construction-practice concern bes
 | --- | --- | --- |
 | SQL injection with query validation/construction facets | Migrated / offline verification passed | Catalog/selection, request composition, provenance and actual JS/TS/Python pipeline parity; raw, bound, constrained, unknown and context-isolation controls; `sql-components-v2` provenance after family generalization with frozen discovery hashes and outcomes |
 | Command injection | Separate next new family | Add verified process/shell contracts and command-specific questions through accepted components; positive/protected/unknown controls and unchanged other families |
-| XSS | Spec prepared, session 02 / not migrated | Move output-context guidance/contracts/questions; preserve raw/escaped/sanitized controls, stored/cross-tier origins, gaps, counts and changed-request replay |
+| XSS | Migrated / offline verification passed | Selected rendering/context/protection/storage/browser/response material; five unchanged named questions, mandatory origin/context/path gates, JSON-only observations, exact replay and separate bounded fetch-method correction |
 | Standalone validation | Migrated / offline verification passed | Requirement/enforcement questions and field-policy guidance selected per claim; established/absent policies, enforced/bypassed/missing guards, client-only policy, unknown helpers, API-less claims, JS/Python parity and claim isolation; no invented standards |
 | Logging | Inventoried / not migrated | Move sensitive-content/emission/redaction contracts and questions; paired leaks, metadata/constants, redaction and unknowns |
 | JS/TS NoSQL | Migrated / offline verification passed | MarsDB/Mongoose contracts, selector/`$where` guidance and all-path/coverage questions selected per claim; raw selector, constrained scalar, conditional alternatives, Mongoose schema/version, unknown helper/API, shared-caller isolation and replay controls; Python NoSQL stays unsupported |
@@ -125,7 +125,7 @@ The user revised session grouping on 2026-11-05. Implementation order is
 [01 NoSQL plus standalone validation](../specifications/components-01-nosql-validation.md),
 [02 all XSS types including browser](../specifications/components-02-xss.md), then
 [03 outbound observations](../specifications/components-03-outbound.md). Logging remains separate.
-These are prepared contracts with implementation prompts; no follow-on runtime migration is claimed.
+Sessions 01 and 02 are implemented; session 03 remains an unassigned implementation contract.
 XSS uses coordinated server/template, stored and browser/cross-tier checkpoints. The plan tracks
 actual future sequencing; command injection remains the next new vulnerability family.
 
@@ -139,10 +139,10 @@ actual future sequencing; command injection remains the next new vulnerability f
   phrase removal. Projections now declare required named sections; duplicate, renamed or missing
   sections and missing required phrase edits fail before scanning, and the SQL projection's effective
   bytes are frozen by test.
-- [Browser fetch handling](../../internal/parse/xss_client_calls.go) currently passes GET regardless
-  of options. The cross-tier linker matches methods, so a POST/dynamic-method request risks wrong or
-  missing producer attribution. Session 02 isolates a literal-method/default/unknown-method correction
-  with regression evidence. No reproduced exploit or corpus-wide impact is claimed by this review.
+- Resolved by session 02: browser fetch uses actual literal methods/default GET; unresolved options,
+  methods and Request objects keep a gap and cannot select a guessed server producer. The separate
+  before/after table below records the only authorized detection correction. No runtime exploit or
+  corpus-wide accuracy claim is made.
 - [JS/TS outbound discovery](../../internal/parse/flow.go) uses fetch/axios-shaped names and retains
   unverified-binding/response gaps. It combines argument dependencies without the same destination
   precision as the existing Python adapter. Session 03 must retain these limits, never confer a trusted
@@ -269,3 +269,69 @@ No paid calls, sample edits, target execution, feature commit/push or integratio
 performed. JS standalone field records now use the field-policy protocol instead of the generic
 practice pair whose sink-protection question they could not answer; their outcomes remain
 Review/needs_evidence, now for the honest missing-policy reason.
+
+### XSS migration verification, 2026-11-05
+
+Accepted predecessor: clean `7610193`, containing session-01 implementation `9c83a07` and its
+cleanup. The ignored run log records the complete tracked-blob manifest and passing baseline.
+One agent used the existing `analysis-pack-mvp` worktree; no predecessor work was discarded.
+
+`pack.xss`, `claim.xss` and `evidence.xss` register `xss_candidate`. The catalog owns the three
+existing Express, browser and Python rendering contracts and the unchanged five named questions
+and choices. `render.*` is a singleton primary rendering role; `context.xss`, `protection.xss`,
+`storage.xss`, `browser.xss` and `response.xss` are supplementary interpretation roles selected by
+actual rendering/type facts. `flow.xss` references existing compiled extraction without changing
+SQL/NoSQL/validation descriptors or requests. Template sinks retain their actual spans/files;
+rendering contracts identify their source adapter for language selection. The browser contract is
+rendering interpretation, not an invented server API. Data-only JSON records acquire no selection
+and make no decision request. Existing compiled encoder/sanitizer binding/version/options logic,
+independent writing paths and source/coverage limits remain authoritative.
+
+The staged server/template, stored, browser/framework/event/inline-script and cross-tier checks pass:
+
+- `TestXSSComponentSelection`, `TestXSSMaterialBoundsAndConflicts`, `TestXSSComponentInventory`:
+  browser-only selection, required roots, incompatible primary contracts, stale bytes without a
+  version bump, bounds and actual Python/browser fixture inventory.
+- `TestXSSServerComponentParity`, `TestXSSStoredComponentParity`, `TestXSSBrowserComponentParity`,
+  `TestXSSCrossTierComponentParity`: parsed source through both OpenAI/Jev localhost transports
+  to JSON/HTML/SARIF, with independent expected raw/protected/unknown results; EJS/Handlebars/Pug,
+  Jinja, Mongoose/Sequelize, DOM/jQuery, React/Vue/Angular and Python inline scripts.
+- Existing response/template/compile/sanitizer, stored sibling-path, framework, event/limit and
+  Python-inline regression matrices pass. Frozen SQL discovery projections and non-XSS suites pass.
+- `TestXSSComponentPayloadsAndPolicy`, `TestXSSDataOnlyNotAssessed`, `TestXSSComponentFailures`,
+  `TestXSSComponentReplay`: correct selected questions, no unrelated policy/test labels, optimistic
+  answer rejection, required-role union, unresolved origins, zero-call selection/body failures,
+  exact replay and changed method/evidence/material/model/protocol rejection.
+- `TestXSSComponentReportParity`: six real event registrations, four independent use contexts,
+  two raw, one protected and one unknown outcome; JSON/SARIF keep zero-use coverage and HTML
+  keeps browser grouping/source locations. `TestXSSComponentHistory` retains original XSS answers
+  and versions through schema1–4 read/export; fresh reports remain schema4.
+
+The fetch exception is separate from organizational parity. The pre-fix GET-hardcoded control was
+run against the same fixtures and failed; the corrected implementation passes. GET supplies raw
+`req.query.get`, while POST supplies independently constrained `req.body.post` at the same `/item`.
+
+| Browser request | Before | After |
+| --- | --- | --- |
+| Absent/undefined options, `{}`, explicit GET | GET origin; raw | Same GET origin/protection |
+| Literal lower-case `post` | Wrong GET origin; raw | POST origin only; sanitized on its own path |
+| Dynamic method/options or alias | Guessed GET origin; raw | Empty unresolved method; explicit method gap; no linked producer |
+| Spread, duplicate or computed property | Guessed GET origin; raw | Method gap; no linked producer |
+| Request object | Unsupported endpoint; no demonstrated origin | Explicit unresolved method; no guessed producer; rendering record retained |
+
+`TestBrowserFetchMethodIsolation`, `TestBrowserFetchRequestObjectRetainsGap`, `TestPythonInlineFetchMethodGap` and existing
+`TestCrossTierResponseFieldLinks` cover literal/default methods, wrong fields, ambiguous routes and
+unresolved producers. New origin/method evidence cannot reuse a saved request. No other detector
+behavior correction, framework/flow expansion or vulnerability family was introduced.
+
+Measured selected material: reflected JS 8 components / 8,115 bytes; stored Python 9 / 7,394 bytes;
+cross-tier JS/TS 10 / 8,836 bytes, below 32 / 16,384. The 88 measured pipeline/inventory provider bodies
+range from 16,961 to 38,293 bytes, below 65,536; source evidence is never truncated to fit. Local selection benchmark:
+6,437 B/op, 44 allocations/op (Apple M6, Go1.27.3); no timing threshold or scanner-wide speedup claim.
+Test output lives outside the worktree under `_test-findings/components-xss/20261105-offline/`.
+
+Full contributor checks pass: `go test -race ./... -count=1` (nine packages), `go vet ./...`,
+`go build ./...`, `gofmt -l .` (empty), whitespace/conflict and scoped manual documentation/link
+checks. X1–X8 are covered; no unmet criterion remains in this contract. No paid calls, sample edits, target execution, new worktrees/agents, feature
+commit/push, PR creation or integration merge are part of this assignment. Live-model accuracy,
+broader browser security and general Python API-to-browser linkage remain outside this contract.

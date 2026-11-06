@@ -228,16 +228,17 @@ The remaining migrations have explicit follow-on tasks; none is hidden cleanup i
 | Implementation order / session | Boundary | Required acceptance |
 | --- | --- | --- |
 | 1. [NoSQL + standalone input validation](../specifications/components-01-nosql-validation.md) — implemented 2026-11-05, offline verification passed | Generalized family registrations/material/provenance, then migrated JS/TS NoSQL and JS/TS/Python standalone policy/enforcement together (`nosql-components-v1`, `validation-components-v1`; SQL provenance bytes changed, recorded as `sql-components-v2`) | Independent injection/validation outcomes, no API requirement for standalone validation, selected guidance completeness, source/report/replay parity; Python NoSQL stays unsupported; see the [ledger evidence](../architecture/analysis-packs.md#nosql-and-standalone-validation-migration-verification-2026-11-05) |
-| 2. [All XSS types, including browser](../specifications/components-02-xss.md) | Staged server/template, stored, DOM/framework/event/inline-script and cross-tier migration | All current XSS regressions; no borrowed encoding/origin/path protection; explicit bounded browser fetch-method correction and separate before/after evidence |
+| 2. [All XSS types, including browser](../specifications/components-02-xss.md) — implemented 2026-11-05, offline verification passed | Staged server/template, stored, DOM/framework/event/inline-script and cross-tier migration | All current XSS regressions; no borrowed encoding/origin/path protection; explicit bounded browser fetch-method correction and separate before/after evidence |
 | 3. [Outbound observations](../specifications/components-03-outbound.md) | Current destination/response observation components, trusted only to actual supported binding/operand evidence | Browser/server and URL/body/response isolation; no SQL-question fallback or invented SSRF verdict; historical answers and explicit unassessed/incomplete semantics |
 | Later, separately assigned: logging migration | Sensitive-content, emission, redaction and verified logger contracts/questions | Secret/personal data, constant/metadata, redacted and unresolved controls; independent logging gates |
 
 **2026-11-05 follow-on user direction:** NoSQL and standalone input validation share one session.
 The numbered specifications above each contain acceptance criteria, implementation order and a
-paste-ready agent prompt. They are prepared contracts, not completed migrations or an implementation
-assignment. Use the accepted SQL source tree even if it has not yet been committed; do not assume
-`HEAD` contains it or discard work when changing sessions. No new worktree or remote operation is
-needed to author these specs. Actual future checkout/branch and implementation are assigned by the user.
+paste-ready agent prompt. Sessions 01 and 02 are implemented and offline-verified in the assigned feature tree.
+Session 02 accepts clean session-01 commit `7610193`; its source/outcome parity and isolated fetch
+correction are recorded in the [migration ledger](../architecture/analysis-packs.md#xss-migration-verification-2026-11-05).
+Session 03 still needs an implementation assignment. Preserve the actual predecessor tree, including
+uncommitted work, when changing sessions; no integration merge is implied.
 
 The order is based on dependency and risk: validate reuse with two real non-SQL claim types first;
 then handle rendering and browser provenance; finally migrate outbound observations while preserving

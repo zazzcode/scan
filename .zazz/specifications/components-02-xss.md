@@ -8,8 +8,8 @@ DOM/framework and supported API-to-browser paths. Preserve rendering-specific ev
 protection. Include one explicit browser correctness fix: fetch-method provenance must not silently
 turn a POST/dynamic-method request into GET when matching a server JSON producer.
 
-This specification was requested on 2026-11-05. It prepares a later implementation session; no XSS
-implementation is assigned by this documentation turn. [Outbound](components-03-outbound.md) follows.
+This specification was requested on 2026-11-05. The user subsequently assigned this implementation in the existing
+`analysis-pack-mvp` feature worktree on 2026-11-05. [Outbound](components-03-outbound.md) follows.
 Logging remains separate. This is not a general browser-vulnerability detector: CSRF, CORS, browser
 storage/token leaks, clickjacking and new code-injection families need their own evidence contracts.
 Existing browser string-code sinks retain their current XSS semantics.
@@ -183,11 +183,11 @@ judge/xss.go: selected answers -> unchanged context/origin/all-path mandatory po
 
 ## 9. Definition of done
 
-- [ ] X1–X8 have evidence for every currently supported XSS claim type.
-- [ ] The fetch correction is isolated and explained; all other behavior is equivalent.
-- [ ] No browser/server or caller/path protection is borrowed; data-only observations stay observations.
-- [ ] Provenance/replay/history/bounds, both providers and cross-format parity pass.
-- [ ] Full race tests, vet, build, changed-file formatting, docs and ledger updates pass.
+- [x] X1–X8 have evidence for every currently supported XSS claim type.
+- [x] The fetch correction is isolated and explained; all other behavior is equivalent.
+- [x] No browser/server or caller/path protection is borrowed; data-only observations stay observations.
+- [x] Provenance/replay/history/bounds, both providers and cross-format parity pass.
+- [x] Full race tests, vet, build, changed-file formatting, docs and ledger updates pass.
 
 ## 10. Open questions
 
@@ -220,5 +220,27 @@ summaries go in component architecture; a fresh agent resumes from spec, log if 
 
 ## 13. Implementation and review change log
 
-No implementation changes recorded. User requested ordered specs and explicitly asked about browser
-vulnerability code; browser/DOM/framework and API-to-browser XSS are part of this second session.
+### 2026-11-05 — Assigned implementation and compatibility record
+
+**Source.** User assigned §12 after session 01, in the existing feature worktree.
+
+**Changed sections.** §0 records the implementation assignment; the capability and invariants are
+unchanged. Accepted baseline is clean `7610193`, including session-01 `9c83a07` and cleanup.
+
+**Summary.** XSS uses `xss-components-v1`, five unchanged questions/choices, primary rendering and
+supplementary context/protection/storage/browser/response roles. Existing core gates remain active;
+selected obligations are additive. Schema stays4; SQL/NoSQL/validation effective material/protocols
+are unchanged. Historical `xss-use-v1` answers retain their original version during export.
+The fetch literal/default/unknown correction is the sole evidence exception; its before/after
+origin/protection table and acceptance mapping are in the
+[migration ledger](../architecture/analysis-packs.md#xss-migration-verification-2026-11-05).
+
+**Verification impact.** Both local transports, real parsed controls, source/outcome/export parity,
+zero-use coverage, replay, history and bounds are verified by the tests named in the ledger.
+Final checks pass on native Go1.27.3 with offline modules: `go test -race ./... -count=1`
+(all nine packages), `go vet ./...`, `go build ./...`, and `gofmt -l .` (empty).
+Scoped manual doc-check covers eight changed Markdown files and 188 local links, final newlines,
+private paths, conflict markers and `git diff --check`. No repository doc-lint tool is declared.
+X1–X8 have evidence; no unmet acceptance criterion is recorded. These offline checks do not claim
+live-model accuracy, runtime exploitation or broader unsupported coverage. No commit, push or PR
+was requested or performed.

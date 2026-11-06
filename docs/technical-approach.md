@@ -187,17 +187,22 @@ checks mandatory evidence and consistency gates. A component cannot invent a bin
 certify a custom validator by name.
 
 Fresh reports use schema 4 to preserve per-candidate selection provenance. SQL requests use protocol
-`sql-components-v2`, NoSQL `nosql-components-v1` and standalone validation `validation-components-v1`;
+`sql-components-v2`, NoSQL `nosql-components-v1` standalone validation `validation-components-v1` and XSS `xss-components-v1`;
 unmigrated families keep their existing protocols. Exact effective requests bind selected
 content and provenance, source evidence, questions and model. Changing any of them rejects historical
 answers for fresh replay. Saved reports remain exportable with their original evidence and answers.
+XSS composes one primary rendering contract with context/protection interpretation and source-backed
+stored/browser/response capabilities. Its five questions and mandatory origin/context/path gates remain
+independent of database judgments; data-only observations are unassessed. Browser fetch attribution
+uses direct literal methods, defaults to GET for absent/literal method-free options, and leaves
+unsupported methods unresolved. This bounded correction is recorded separately in the migration ledger.
 Explicit component/material bounds complement the existing 64 KiB final request bound; excess material
 remains unresolved rather than being truncated.
 
 The [implementation architecture and migration ledger](../.zazz/architecture/analysis-packs.md)
 records inventory, limits, compatibility and offline verification. SQL detection scope is preserved;
-this reorganization is not evidence of improved live-model accuracy. XSS, standalone validation,
-logging and JS/TS NoSQL have separately scoped follow-on migrations. Command injection is the next
+this reorganization is not evidence of improved live-model accuracy. NoSQL, standalone validation
+and XSS are migrated; logging and outbound observations remain follow-on migrations. Command injection is the next
 new family and will use this structure. Public pack loaders, registries, executable plugins and broad
 standards ingestion remain outside the MVP.
 

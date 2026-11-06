@@ -46,6 +46,11 @@ func ForUse(use analysis.CandidateUse) (*Material, error) {
 		if !reflect.DeepEqual(m.Contract, use.APIModel) {
 			return nil, fmt.Errorf("selected %s contract conflicts with verified operation model", family.Label)
 		}
+	} else if family.Name == "xss" {
+		m.Contract = XSSContract(use.APIModel.ID, use.APIModel.Library)
+		if !reflect.DeepEqual(m.Contract, use.APIModel) {
+			return nil, fmt.Errorf("selected XSS rendering contract conflicts with facts")
+		}
 	} else if m.Contract != nil {
 		return nil, fmt.Errorf("%s selection must not carry an API contract", family.Label)
 	}
@@ -58,6 +63,7 @@ func (c *catalog) material(family *Family, s *analysis.ComponentSelection) (*Mat
 	}
 	m := &Material{Selection: s}
 	size := 0
+	var rendering []string
 	for _, ref := range s.Components {
 		v, ok := c.components[ref.ID]
 		if !ok || ref != c.refs[ref.ID] {
@@ -68,6 +74,8 @@ func (c *catalog) material(family *Family, s *analysis.ComponentSelection) (*Mat
 			return nil, fmt.Errorf("%s interpretation material exceeds %d byte limit", family.Label, MaxMaterialBytes)
 		}
 		switch v.Kind {
+		case "rendering_contract", "xss_interpretation":
+			rendering = append(rendering, v.Material)
 		case "claim_questions":
 			questions, choices, err := c.claimQuestions(family)
 			if err != nil {
@@ -97,6 +105,9 @@ func (c *catalog) material(family *Family, s *analysis.ComponentSelection) (*Mat
 	}
 	if family.RequiresAPI && m.Contract == nil {
 		return nil, fmt.Errorf("%s required operation contract missing", family.Label)
+	}
+	for _, text := range rendering {
+		m.Guidelines.Body += "\n\n" + text
 	}
 	return m, nil
 }

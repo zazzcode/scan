@@ -122,7 +122,7 @@ func describe(u analysis.CandidateUse) analysis.Finding {
 		}
 		switch a.FindingStatus {
 		case "confirmed_vulnerability":
-			if u.Kind == "xss_candidate" && a.QuestionVersion == "xss-use-v1" && len(a.BlockingGaps) == 0 && a.Answers["xss_exposure"] == "vulnerable" && u.XSS != nil && u.XSS.Protection != "unknown" {
+			if u.Kind == "xss_candidate" && (a.QuestionVersion == "xss-use-v1" || a.QuestionVersion == analysispacks.XSSProtocol) && len(a.BlockingGaps) == 0 && a.Answers["xss_exposure"] == "vulnerable" && u.XSS != nil && u.XSS.Protection != "unknown" {
 				f.RecordType, f.Status = "finding", "confirmed_vulnerability"
 				f.Title = "Cross-site scripting supported by source analysis"
 				f.Summary = "A complete rendering claim and consistent XSS-specific assessment establish an unsafe source-to-sink path. This is a static judgment; independent runtime confirmation remains separate."

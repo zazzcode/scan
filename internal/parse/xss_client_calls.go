@@ -28,7 +28,7 @@ func (f *flow) clientCall(n, fn, args *sitter.Node) (value, bool) {
 			return value{}, true
 		}
 		if name == "fetch" && browserGlobal(f.module, n, name) {
-			return f.clientHTTPValue(f.module, n, args.NamedChild(0), "GET", nil), true
+			return f.clientHTTPValue(f.module, n, args.NamedChild(0), f.browserFetchMethod(args), nil), true
 		}
 		return value{}, false
 	}
@@ -213,4 +213,65 @@ func (f *flow) clientMethod(call *sitter.Node, method string, args *sitter.Node)
 		}
 	}
 	return out, true
+}
+
+// browserFetchMethod accepts only a direct literal options object. Object spreads,
+// computed keys, duplicate properties and aliases can override method and remain
+// unresolved. No JavaScript is evaluated to guess a request's producer.
+func (f *flow) browserFetchMethod(args *sitter.Node) string {
+	if args.NamedChildCount() == 0 || f.set.clientURL(f.module, args.NamedChild(0), nil, 0) == "" {
+		return ""
+	}
+	if args.NamedChildCount() == 1 {
+		return "GET"
+	}
+	if args.NamedChildCount() != 2 {
+		return ""
+	}
+	options := args.NamedChild(1)
+	if options.Utf8Text(f.module.src) == "undefined" && (options.Kind() == "undefined" || options.Kind() == "identifier") && browserGlobal(f.module, options, "undefined") {
+		return "GET"
+	}
+	if options.Kind() != "object" {
+		return ""
+	}
+	method := "GET"
+	seen := map[string]bool{}
+	for i := uint(0); i < options.NamedChildCount(); i++ {
+		pair := options.NamedChild(i)
+		if pair.Kind() != "pair" {
+			return ""
+		}
+		key := pair.ChildByFieldName("key")
+		if key == nil {
+			return ""
+		}
+		name := ""
+		if key.Kind() == "property_identifier" {
+			name = key.Utf8Text(f.module.src)
+		} else if key.Kind() == "string" {
+			name, _ = stringLiteral(key, f.module.src)
+		} else {
+			return ""
+		}
+		if name == "" || seen[name] {
+			return ""
+		}
+		seen[name] = true
+		if name == "method" {
+			literal, ok := stringLiteral(pair.ChildByFieldName("value"), f.module.src)
+			if !ok || literal == "" {
+				return ""
+			}
+			// An HTTP token is literal provenance, not an allow-list of methods. Unknown
+			// literal verbs cannot match an unrelated GET route.
+			for _, c := range literal {
+				if !(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || strings.ContainsRune("!#$%&'*+-.^_`|~", c)) {
+					return ""
+				}
+			}
+			method = strings.ToUpper(literal)
+		}
+	}
+	return method
 }

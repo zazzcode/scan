@@ -147,7 +147,7 @@ func (c *catalog) closure(roots []string) ([]string, error) {
 	singletons := map[string]string{}
 	for id := range state {
 		kind := c.components[id].Kind
-		if kind == "language_guidance" || kind == "api_contract" || kind == "claim_questions" {
+		if kind == "language_guidance" || kind == "api_contract" || kind == "claim_questions" || kind == "rendering_contract" {
 			if old := singletons[kind]; old != "" && old != id {
 				return nil, fmt.Errorf("conflicting required %s components", kind)
 			}

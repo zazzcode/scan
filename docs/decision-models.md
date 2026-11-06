@@ -82,11 +82,11 @@ raw historical responses remain intact.
 
 ## Component provenance
 
-SQL, NoSQL and standalone-validation requests compose scanner-owned interpretation material selected
+SQL, NoSQL, standalone-validation and XSS requests compose scanner-owned interpretation material selected
 by the static analyzer from verified source facts. Fresh schema-4 JSON reports identify the selected
 pack/components, versions and digests; a selection alone does not mean a model assessment ran. SQL
 uses `sql-components-v2`, NoSQL `nosql-components-v1` and standalone validation
-`validation-components-v1`; unmigrated families retain their existing protocols. Mandatory evidence
+`validation-components-v1`; XSS uses `xss-components-v1`. Unmigrated families retain their existing protocols. Mandatory evidence
 and consistency gates remain in Go.
 
 Missing required material, conflicting selection or size limits prevent a model request and retain

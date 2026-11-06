@@ -88,6 +88,20 @@ Default Angular protection requires a demonstrated plain-value path, not merely 
 bypass. Unknown trusted-wrapper transformations remain Review. Whole-object request render locals
 can control engine options/layout; escaped field syntax alone cannot make that flow Protected.
 
+## Selected interpretation and method provenance
+
+Supported rendering claims select registered XSS questions, validated language guidance and one
+primary rendering contract, with context/protection and applicable stored/browser/response roles.
+Selected material does not certify a sanitizer or fill a missing source path. JSON-only observations
+remain unassessed. Historical `xss-use-v1` answers retain their original protocol when exported;
+changed material, context, origin or request method rejects replay.
+
+Browser fetch without options, with unshadowed `undefined`, or with a direct method-free literal
+options object uses GET. A direct
+literal `method` uses that method, normalized to uppercase. Dynamic methods/options, Request objects,
+spreads, duplicate/computed properties and unsupported aliases retain a method gap and no guessed
+server producer. GET and POST at the same path cannot exchange origins or protection facts.
+
 ## Outcomes and limits
 
 - **Finding / orange:** a supported source path reaches verified raw output without appropriate
@@ -95,7 +109,7 @@ can control engine options/layout; escaped field syntax alone cannot make that f
 - **Review / blue:** unknown source, context, origin, options, sanitizer or transformation.
 - **Protected / green:** verified output binding, exact context and appropriate protection on every
   modeled path, without relevant unresolved options/transformations. This applies only to that output.
-- **Red:** complete consistent `xss-use-v1` answers and source evidence establish a static XSS claim.
+- **Red:** complete consistent `xss-components-v1` answers and source evidence establish a static XSS claim.
   Runtime confirmation and independent review remain separate.
 
 The protocol asks output context, encoding adequacy, sanitizer effectiveness, path protection and

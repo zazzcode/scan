@@ -163,6 +163,12 @@ func FamilyBody(language lang.Language, family string) (AnalysisGuidelines, erro
 	}
 	var spec projectionSpec
 	switch family {
+	case "xss":
+		title := "Cross-site scripting"
+		if language == lang.Python {
+			title = "Rendering"
+		}
+		spec = projectionSpec{sections: []sectionSpec{{title, []sectionEdit{replace("xss-use-v1", "xss-components-v1")}}, {"Do not claim", nil}}}
 	case "sql":
 		spec = sqlSpec(language)
 	case "nosql":
