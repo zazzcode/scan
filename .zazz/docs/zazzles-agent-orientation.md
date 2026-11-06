@@ -37,8 +37,13 @@ assessment behavior. Resume the existing feature worktree and preserve unrelated
 The assigned migrations are complete; logging remains unmigrated, so do not claim every existing
 family uses the catalog. The [current status](../architecture/analysis-packs.md#current-implementation-status)
 distinguishes delivered consumers from future coverage and migration work.
-No paid calls, target execution, sample edits, new agents/worktrees, PR creation or integration merge
-are authorized by this checkpoint. Human review remains pending.
+The user subsequently authorized fresh paid scans of Juice Shop and VulnPy. All 944 eligible
+OpenAI Decisions `gpt-6-luna` judgments completed and passed fresh-source exact replay; all 35
+historical confirmed source contexts remain confirmed. Read the
+[paid component E2E evidence](../architecture/analysis-packs.md#fresh-paid-component-e2e-2026-11-06)
+for actual results and preserved observation/binding limits. No further paid calls, target execution,
+sample edits, new agents/worktrees, PR creation or integration merge are authorized by this
+checkpoint. Human review remains pending.
 
 **Completed foundation:** the [common entry/dispatch brief](../project/common-entry-dispatch.md)
 records the implemented shared model with bounded dynamic-route, GraphQL resolver and gRPC

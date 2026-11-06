@@ -26,6 +26,52 @@ Its migration needs a separate bounded assignment. Command injection is a new fa
 complete SSRF assessment, general Inspect, public pack loading and executable plugins remain
 future capabilities. Human review and integration remain pending. Historical checkpoints below
 retain their original baselines and verification limits.
+The [fresh paid follow-up](#fresh-paid-component-e2e-2026-11-06) verifies current component requests,
+real model judgments and exact replay for Juice Shop and VulnPy, separately from the offline checks.
+
+### Fresh paid component E2E, 2026-11-06
+
+The user explicitly authorized live OpenAI Decisions `gpt-6-luna` scans of both complete pinned
+checkouts. Current runtime `d33d215` completed all 944 eligible fresh requests with no provider
+failures, retries, fallback or reused historical answers. The runner used the same parse, component,
+judge and report packages as the CLI, preserving exact request/response traces and source snapshots.
+These are live judgments; earlier stub runs remain separately identified offline evidence.
+
+| Application | Entries / uses | Fresh paid completed / eligible | Confirmed / poor practice / Review / Protected |
+| --- | --- | --- | --- |
+| Juice Shop | 167 / 208 | 117 / 117 | 9 / 1 / 198 / 0 |
+| VulnPy | 564 / 827 | 827 / 827 | 28 / 0 / 799 / 0 |
+
+All seven historical Juice Shop and 28 historical VulnPy confirmed source contexts remain confirmed.
+The two additional Juice Shop confirmations are raw email interpolation at `routes/login.ts:34`
+and query input passed through `bypassSecurityTrustHtml` to the search component's `innerHTML` sink
+at template line 11. Both were checked against source; changed model outcomes are not proof of a
+general accuracy gain. VulnPy retains 21 SQL and seven raw-HTML contextual findings, including the
+12 required main-path framework/method combinations. The separate Jinja path remains Review.
+
+Every migrated candidate's paid request carries the same selected pack/components, versions and
+digests as its source evidence, with the correct JS/TS or Python language projection. The 942
+registered-family requests comprise 877 standalone-validation, 23 SQL, 11 NoSQL and 31 XSS
+assessments; two additional logging requests retain the active unmigrated protocol. Target exercise
+comments are absent from model input. Outbound observations make zero model requests. Juice Shop
+still has 66 outbound and 20 JSON-only observations `not_run`, plus five explicit binding failures;
+completing its eligible judgments does not make those coverage limits complete assessments.
+
+Independent fresh-source exact replay passes for all 944 paid responses without additional calls.
+Saved/re-exported HTML and SARIF match, JSON raw answers remain unchanged, and source/entry facts
+match the freshly parsed checkouts. Both targets remain clean with pinned revisions and all 156
+reference hashes verified before/after. Maximum bodies are 64,648 bytes for Juice Shop and 48,332
+for VulnPy, below 65,536. Provider-reported usage totals 8,451,642 input tokens and zero output
+tokens; no currency charge is inferred.
+
+Evidence root: `_test-findings/run-xhndoag7/`, including `audit.json`, `component-audit.json`,
+`baseline-and-exports.json`, integrity manifests and per-candidate raw traces. Live report bundles:
+`juice-shop/assessed/juice-shop/run-3161010206/` and
+`vulnpy/assessed/vulnpy/run-2718109530/`. Historical reports and sample apps were preserved.
+The obsolete test-only `Client.decode` wrapper was removed before this runtime checkpoint; its
+duplicate-answer regression uses the current decoder. No additional unreferenced migration
+functions were identified in the production-reference review. Logging remains active and separately
+scoped; this validation does not authorize another family migration or further paid runs.
 
 ### Merge-readiness recheck, 2026-11-06
 

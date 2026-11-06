@@ -289,3 +289,23 @@ closeout. No public behavior, protocol, detection scope or O1–O7 acceptance re
 saved-export parity, target revision/hash/cleanliness checks, full race/vet/build and scoped docs checks.
 Continue to use the existing feature branch; no paid calls, target execution, sample edits, new
 worktrees/agents, PR creation or integration merge.
+
+### 2026-11-06 — User-authorized paid component verification
+
+**Source.** User explicitly requested paid Decision LLM scans for both Juice Shop and VulnPy,
+clarifying that offline/stub verification did not satisfy the requested live judgment check. The
+central acceptance goal remains working component selection/composition and obsolete-code cleanup.
+
+**Scope.** This one-time authorization supersedes earlier no-paid-call wording for these two full
+pinned checkouts only: OpenAI Decisions `gpt-6-luna`, capped at 117 eligible Juice Shop requests
+and 827 VulnPy requests. Preserve observations, unsupported bindings, historical reports, raw
+responses and source evidence. No new detector, family migration, target execution, sample edits,
+extra agents/worktrees, provider/model fallback or integration action is authorized.
+
+**Verification.** All 944 fresh paid requests completed without retries or provider failures.
+Source/request selections, versions/digests and language guidance match; all 944 independently
+fresh-source exact replays and saved exports pass. Historical confirmed contexts remain, with
+source-reviewed additional Juice Shop login SQL/DOM-search judgments. The
+[paid verification ledger](../architecture/analysis-packs.md#fresh-paid-component-e2e-2026-11-06)
+records results, artifact provenance and remaining limits. No further paid run is needed for this
+acceptance; no product semantics or O1–O7 requirements changed.
