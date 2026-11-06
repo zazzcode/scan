@@ -1,33 +1,32 @@
 # Embedded analysis components
 
-The [SQL-first contract](../specifications/analysis-pack-mvp.md) implements the
-[analysis pack proposal](../project/analysis-pack-mvp.md) on merged common-entry/dispatch base
-`f8b7dbdfe1521d9b914f271fa68b26b01fdec97b` (PR #8); the [NoSQL/validation contract](../specifications/components-01-nosql-validation.md)
-made those families the second and third consumers, followed by the
-[XSS/browser contract](../specifications/components-02-xss.md). This document owns component responsibilities,
-source inventory, compatibility, migration status and acceptance evidence. The
-[public analysis guide](../../docs/analysis/database-injection.md#query-component-selection) owns SQL
-and NoSQL interpretation, and the [XSS guide](../../docs/analysis/xss.md) owns rendering
-interpretation; [the implementation plan](../project/implementation-plan.md#analysis-pack-mvp-initiative)
-owns future sequencing.
+This document owns the implemented component responsibilities, source inventory, compatibility,
+migration status and verification evidence. `internal/analysispacks` provides the shared catalog used
+by static evidence assembly and model judgment. Entry/dispatch records describe the application's
+wiring; analysis components describe the scanner knowledge applicable to a particular candidate.
+
+The [original design](../project/analysis-pack-mvp.md) records rationale; the
+[implementation plan](../project/implementation-plan.md#analysis-pack-mvp-initiative) owns remaining
+work. The [database guide](../../docs/analysis/database-injection.md#query-component-selection) and
+[XSS guide](../../docs/analysis/xss.md) own product interpretation rules.
 
 ## Current implementation status
 
-The SQL-first MVP and assigned migration sessions 01–03 are implemented and offline-verified
-at `c169a79` (2026-11-06). SQL, JS/TS NoSQL, standalone validation, XSS and outbound observations
-use the shared embedded catalog, deterministic selection and schema-4 provenance. Outbound is
-observation-only: no model questionnaire, no model calls and no SSRF verdict. The
-[full Juice Shop comparison](#juice-shop-full-e2e-follow-up-2026-11-06) records preserved source/report
-facts and earlier-family requests separately from the intentional assessment-eligibility change.
+SQL, JS/TS NoSQL, standalone validation, XSS and outbound observations use the shared embedded
+catalog, deterministic selection and schema-4 provenance. Static adapters establish source facts;
+components select relevant guidance, contracts, questions and evidence obligations; Go judgment
+retains mandatory completeness and consistency gates. Outbound is observation-only, with no model
+questionnaire, model calls or SSRF verdict.
 
-This completes the assigned migrations, not every family in the long-term design. Logging still
-uses its existing judge-owned questions and `log-use-v1` protocol, outside component selection.
-Its migration needs a separate bounded assignment. Command injection is a new family, while
-complete SSRF assessment, general Inspect, public pack loading and executable plugins remain
-future capabilities. Human review and integration remain pending. Historical checkpoints below
-retain their original baselines and verification limits.
-The [fresh paid follow-up](#fresh-paid-component-e2e-2026-11-06) verifies current component requests,
-real model judgments and exact replay for Juice Shop and VulnPy, separately from the offline checks.
+The SQL-first MVP and migration sessions 01–03 are implemented. Logging still uses its working
+judge-owned questions and `log-use-v1` protocol outside component selection. It is the remaining
+migration of an existing family. Command injection is a new family; complete SSRF assessment,
+general Inspect, public pack loading and executable plugins remain future capabilities.
+
+The [fresh paid verification](#fresh-paid-component-e2e-2026-11-06) and
+[static baseline comparison](#merge-readiness-recheck-2026-11-06) record actual results and limits.
+Dated checkpoints below preserve implementation history; their former next-session instructions
+do not supersede this status or authorize new work.
 
 ### Fresh paid component E2E, 2026-11-06
 

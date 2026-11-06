@@ -116,6 +116,20 @@ inputs; live model predictions have no assumed byte-stability guarantee.
 There is no general repository IR builder, independent reviewer, persistent cache or severity CI gate
 in this pipeline. Bounded worker pools and richer graph indexes are future architecture choices.
 
+### Shared analysis knowledge
+
+The entry/dispatch model describes how application code is exposed and invoked. The component
+catalog describes which scanner knowledge applies to each potential issue. These responsibilities
+remain separate: a component declaration cannot establish a source binding or value transfer.
+
+`internal/analysispacks` composes language guidance, compiled capability references, verified API
+contracts, claim questions and evidence obligations. Parse records a deterministic selection;
+judge validates that selection and supplies the applicable material alongside source evidence.
+SQL, NoSQL, standalone validation and XSS use it for assessment. Outbound uses it for observations
+without a security questionnaire; logging retains its existing active path pending migration.
+The [component design](architecture/analysis-packs.md#boundary-and-ownership) owns exact boundaries,
+limits, provenance and verification. Packs are embedded, not externally loaded plugins.
+
 ## 3. Parsing and language adapters
 
 `internal/parse` owns Tree-sitter lifetimes, module resolution, framework bindings, bounded flow,
@@ -339,7 +353,7 @@ Today flow/evidence construction lives in `parse`, claim gates in `judge`, and p
 `--analyze` is the documented analysis mode; `--strings` remains an external compatibility alias.
 Internal APIs use `Analyze`, `AnalyzeWithChecks`, `CandidateUse` and `AnalysisReport`, with no obsolete
 Go aliases. Fresh analysis reports use schema4, `analysis_guidelines` and per-candidate component
-provenance for SQL, NoSQL, standalone validation and XSS; route inventory stays
+provenance for SQL, NoSQL, standalone validation, XSS and outbound observations; route inventory stays
 schema1. Export reads schemas1/2/3/4 and preserves original schema provenance and raw
 assessments. Private legacy decoding maps `practice` metadata to `GuidelinesRef` and
 legacy route/client associations into one current entry/context association.

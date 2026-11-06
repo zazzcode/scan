@@ -201,28 +201,23 @@ separate analysis pack MVP; command injection remains the next new vulnerability
 
 ### Analysis pack MVP initiative
 
-**2026-11-05 implementation assignment:** the user authorized the
-[SQL-first contract](../specifications/analysis-pack-mvp.md), SQL injection regression tests, scoped
-cleanup and documentation updates in the existing `analysis-pack-mvp` worktree/branch. Its accepted
-base is merged `stage` revision `f8b7dbdfe1521d9b914f271fa68b26b01fdec97b`.
+**Implemented foundation, updated 2026-11-06:** the [SQL-first contract](../specifications/analysis-pack-mvp.md)
+and migration sessions 01–03 below deliver the shared component architecture. The
+[design rationale](analysis-pack-mvp.md) explains the boundary; the
+[component architecture and verification ledger](../architecture/analysis-packs.md) owns runtime
+responsibilities, compatibility, static baseline comparisons and fresh paid E2E evidence.
 
-The [proposal](analysis-pack-mvp.md) supplies intent; the contract owns implementation acceptance.
-The [component architecture and migration ledger](../architecture/analysis-packs.md) records owners,
-selection, bounds, compatibility and evidence. SQL is the first runtime consumer: existing JS/TS/Python
-models, guidance, API contracts, questions and evidence obligations become explicitly selected and
-versioned. Static adapters and mandatory Go gates remain authoritative. This migration does not add
-new SQL coverage or improve a baseline verdict by removing its blocker.
+SQL, JS/TS NoSQL, standalone validation, XSS and outbound observations use explicit selection and
+versioned provenance. Static adapters and mandatory Go gates remain authoritative. Fresh reports
+use schema 4; historical reports preserve original answers, and changed requests reject stale replay.
+Offline regression checks and all 944 eligible fresh paid Juice Shop/VulnPy judgments passed,
+including exact replay against newly parsed source. Outbound remains observation-only; logging
+remains the next existing-family migration rather than a completed catalog consumer.
 
-Delivery checkpoints are baseline inventory/catalog, working SQL selection and judgment integration,
-then report/replay compatibility and offline regression verification. All three checkpoints now pass
-offline checks; implementation is ready for human review. Fresh report schema 4 and the
-SQL `sql-components-v2` protocol record the changed provenance/envelope (session 01 bumped SQL
-provenance when component compatibility became family-scoped). Historical reports preserve
-their original answers; changed effective requests reject stale replay. No paid evaluation is required.
-Public pack loading, registries, executable plugins, new rule languages, standards ingestion, general
+Public pack loading, executable plugins, new rule languages, standards ingestion, general
 Inspect/Audit/Fix and expanded detection remain separate work.
 
-After MVP acceptance, command injection MUST use the accepted components in a separate bounded contract.
+New command-injection implementation MUST use the accepted components in a separate bounded contract.
 The follow-on migrations have separate contracts; sessions 01–03 are now complete, while logging
 remains unassigned. None is hidden cleanup in the SQL MVP:
 
@@ -233,16 +228,9 @@ remains unassigned. None is hidden cleanup in the SQL MVP:
 | 3. [Outbound observations](../specifications/components-03-outbound.md) — implemented / offline verified 2026-11-06 | Current destination/response observation components, trusted only to actual supported binding/operand evidence | Browser/server and URL/body/response isolation; no SQL-question fallback or invented SSRF verdict; historical answers and explicit unassessed/incomplete semantics |
 | Later, separately assigned: logging migration | Sensitive-content, emission, redaction and verified logger contracts/questions | Secret/personal data, constant/metadata, redacted and unresolved controls; independent logging gates |
 
-**2026-11-05 follow-on user direction:** NoSQL and standalone input validation share one session.
-The numbered specifications above each contain acceptance criteria, implementation order and a
-paste-ready agent prompt. Sessions 01 and 02 are implemented and offline-verified in the assigned feature tree.
-Session 02 accepts clean session-01 commit `7610193`; its source/outcome parity and isolated fetch
-correction are recorded in the [migration ledger](../architecture/analysis-packs.md#xss-migration-verification-2026-11-05).
-Session 03 implemented outbound observation selection from clean `dc309cd`, preserving runtime
-checkpoint `4e0be3e`. The [outbound verification ledger](../architecture/analysis-packs.md#outbound-observation-verification-2026-11-06)
-separates source/report parity from the intentional zero-call eligibility and incomplete-scan exit change.
-Preserve the actual predecessor tree, including
-uncommitted work, when changing sessions; no integration merge is implied.
+The session grouping and accepted predecessor revisions are recorded in the linked contracts and
+verification ledger. NoSQL/validation, XSS and outbound are delivered migrations; their implementation
+prompts are historical execution contracts, not next-step assignments.
 
 The order is based on dependency and risk: validate reuse with two real non-SQL claim types first;
 then handle rendering and browser provenance; finally migrate outbound observations while preserving
@@ -257,17 +245,19 @@ CSRF, CORS, browser storage leakage, clickjacking and new code-injection capabil
 contracts. Complete outbound SSRF, redirects/DNS/network policy, Python NoSQL and general Python
 API-to-browser linkage remain separately scoped coverage work.
 
-The three numbered migrations are implemented and offline-verified; human review remains pending.
+The three numbered migrations are implemented and verified; live model evidence and remaining
+coverage limits are recorded in the component ledger.
 Later migrations require assignment and MUST converge on the shared architecture without a permanent
 alternate policy path. This ordering governs these migration
 sessions; command injection remains the next new vulnerability family and other roadmap scope is
-unchanged. No paid model evaluation or sample changes are implied.
+unchanged. Completed verification does not authorize additional paid calls or sample changes.
 
 ### Complete delivery list
 
 **Sequence decision, 2026-11-02; pack initiative added by the user on 2026-11-05:** common
-entry/dispatch with bounded dynamic-route, GraphQL and gRPC support follows Python support. After
-that milestone merges, the separate analysis pack MVP precedes command injection and XSS hardening.
+entry/dispatch with bounded dynamic-route, GraphQL and gRPC support follows Python support. Both
+that foundation and the component MVP/migration sessions are implemented. Command injection and
+separately scoped XSS hardening remain subsequent work.
 Keep the other planned classes. Complete Python NoSQL and API-to-browser XSS
 linkage coverage immediately before dependency vulnerability scanning (SCA), after the other planned
 vulnerability-type work. Secret scanning follows SCA. Language expansion has no fixed position

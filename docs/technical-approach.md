@@ -202,7 +202,8 @@ Explicit component/material bounds complement the existing 64 KiB final request 
 remains unresolved rather than being truncated.
 
 The [implementation architecture and migration ledger](../.zazz/architecture/analysis-packs.md)
-records inventory, limits, compatibility and offline verification. SQL detection scope is preserved;
+records inventory, limits, compatibility, offline verification and fresh paid-model acceptance.
+SQL detection scope is preserved;
 this reorganization is not evidence of improved live-model accuracy. NoSQL, standalone validation
 and XSS are migrated; outbound observations now select `pack.outbound` with static limits and no
 security questionnaire. JS/TS shape observations keep combined argument dependencies and unverified
@@ -223,8 +224,11 @@ cases. It also records model overclaims that Go policy blocked and the validatio
 to avoid stronger requirements being invented. These examples support the value of explicit policy
 and evidence boundaries; they do not establish general accuracy.
 
-The added VulnPy corpus exposes six known positive coverage misses and four warning controls. Those
-results remain separate from the original 29-case success claim. The [XSS evaluation](../.zazz/evaluation/xss-implementation-results.md)
+The original VulnPy baseline recorded six positive coverage misses and four warning controls.
+Later dynamic-route work recovered generated Flask/FastAPI SQL and raw-HTML traces; the
+[fresh component verification](../.zazz/architecture/analysis-packs.md#fresh-paid-component-e2e-2026-11-06)
+retains their 28 contextual confirmations. The separate Jinja path remains unresolved. Historical
+reports and the original 29-case success claim remain distinct. The [XSS evaluation](../.zazz/evaluation/xss-implementation-results.md)
 and sample answer guides record additional implemented behavior and gaps. Local Semgrep CE/Bearer
 baselines are pinned, scope-specific observations, not full-product rankings. CodeQL and Joern documentation
 here are architecture references, not measured CodeQL/Joern benchmarks.
