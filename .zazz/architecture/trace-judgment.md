@@ -40,9 +40,11 @@ registration, dispatch and supported invocation-binding roles supplement claim-s
 requirements; supplied evidence does not establish adequacy. Input witnesses remain distinct
 from caller argument bindings. Browser source-scope markers preserve offsets/hashes without
 uploading entire modules or claiming verified event exposure. The generic protocol is
-`candidate-use-v10`; SQL, NoSQL and standalone validation use their family component protocols,
-and XSS/logging keep their claim-specific versions until their own migrations. Any changed
-request context still rejects historical replay.
+`candidate-use-v10`; SQL uses `sql-components-v2`, NoSQL `nosql-components-v1`, standalone
+validation `validation-components-v1` and XSS `xss-components-v1`. Logging retains `log-use-v1`;
+outbound still has the generic legacy path pending session03. Selected obligations extend the
+original source-required roles and mandatory Go gates. Changed request context still rejects replay;
+old question versions remain historical on export.
 
 ## Route and browser slices
 
@@ -67,13 +69,14 @@ row or deployment identity. Unresolved origin and configuration facts remain exp
 | Rendering | Source, renderer/sink, context and relevant transformations/paths | Context-appropriate escaping versus raw output versus unknown behavior |
 | Logging | Emitted content, sensitivity and actual log/redaction behavior | Sensitive content exposure versus non-content fact versus unresolved sensitivity |
 
-`validation-use-v2` asks whether a requirement is established, whether enforcement is
+The selected `validation-components-v1` protocol asks whether a requirement is established, whether enforcement is
 sufficient, and whether relevant enforcement coverage is complete. Both canonical evidence
 roles and consistent answers are necessary. An established unmet policy becomes
 `poor_practice`; enforced policy becomes `protected_for_claim`; missing policy, helper,
 path or relevant downstream constraint stays `needs_evidence`. Form attributes can
 establish intended policy but never server enforcement. Field names cannot invent policy.
-This shared protocol can consume any adapter's validation completeness. The Python
+Historical `validation-use-v2` answers remain exportable without being relabeled as fresh
+component assessments. This shared protocol can consume any adapter's validation completeness. The Python
 adapter currently emits named policy claims from matching Flask forms and HTTP methods; this is not
 universal schema/middleware inference across languages.
 

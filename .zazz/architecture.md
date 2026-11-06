@@ -38,7 +38,7 @@ novel-repository generalization remain hypotheses until matched independent eval
 - [Reporting and SARIF](architecture/reporting-and-sarif.md): report records and implemented bounded SARIF export.
 - [Standalone HTML](architecture/html-reporting.md): human-facing report and disclosure rows.
 - [SCA follow-on](architecture/sca-design.md): planned dependency auditing.
-- [Analysis components](architecture/analysis-packs.md): SQL component ownership, selection, bounds,
+- [Analysis components](architecture/analysis-packs.md): SQL/NoSQL/validation/XSS ownership, selection, bounds,
   provenance, compatibility and incremental migration ledger; [original proposal](project/analysis-pack-mvp.md).
 
 ## Product boundaries and shared engine
@@ -97,7 +97,11 @@ flowchart TD
     Repo["Target source files"] --> Walk["walk and lang: selected manifest"]
     Walk --> Parse["parse: Tree-sitter and language/framework adapters"]
     Parse --> Evidence["analysis: entries, candidate uses, evidence and gaps"]
-    Guidelines["guidelines: embedded Analysis Guidelines"] --> Judge
+    Guidelines["guidelines: embedded Analysis Guidelines"] --> Catalog["analysispacks: registered family selection and bounded material"]
+    Parse -->|"Verified applicability facts"| Catalog
+    Catalog -->|"Selection provenance"| Evidence
+    Catalog -->|"Selected interpretation and questions"| Judge
+    Guidelines -->|"Legacy material for unmigrated families"| Judge
     Evidence --> Judge["judge: bounded model requests and typed answers"]
     Judge --> Policy["judge: claim-specific policy gates"]
     Policy --> Report["report: classification, guidance, JSON / HTML / SARIF"]
@@ -171,7 +175,8 @@ and [design](architecture/common-entry-dispatch.md) own the bounded contracts. T
 [acceptance results](evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05)
 record actual adapter-to-claim/report checks and unchanged HTTP/browser evidence. Automated acceptance and bounded localhost rendered interaction/narrow-layout review pass. The
 [SQL/NoSQL closeout](evaluation/common-entry-dispatch-results.md#sqlnosql-only-accuracy-refresh-and-rendered-review)
-records the later accuracy refresh and remaining calibration limits; human review/merge is pending. Broader GraphQL/gRPC application evaluation and a
+records the later accuracy refresh and remaining calibration limits; the common-entry milestone
+merged through PR #8 on 2026-11-05. Broader GraphQL/gRPC application evaluation and a
 full repository IR remain separate work.
 
 ## 4. Normalized representation and graph views
@@ -237,8 +242,9 @@ verdicts are reconciled by Go judgment/reporting code, not by a separate rules-e
 
 Guidelines combine secure coding recommendations with instructions about evidence and uncertainty.
 They are embedded with `go:embed` and selected by language. Report metadata retains their ID/version;
-unmigrated-family model inputs include the full applicable document. SQL selects applicable sections
-through the component catalog and records their digests. The Go document is preparatory guidance and does
+unmigrated-family model inputs include the full applicable document. SQL, NoSQL, standalone
+validation and XSS select validated sections
+through the component catalog and record their digests. The Go document is preparatory guidance and does
 not imply implemented Go source analysis. Root [analysis guides](../docs/analysis/README.md) describe
 product behavior; `.zazz/standards/` governs development. Neither is loaded dynamically by the binary.
 
@@ -251,8 +257,10 @@ protective. Source/comments are untrusted data, never model instructions.
 
 Model envelopes use `analysis_guidelines`. The generic question protocol is `candidate-use-v10`;
 SQL uses `sql-components-v2`, NoSQL `nosql-components-v1`, standalone validation
-`validation-components-v1`; XSS/logging/outbound retain their existing protocols. Renamed guideline
-documents carry new versions because their request text changed. Request identity includes the full
+`validation-components-v1` and XSS `xss-components-v1`. Logging retains `log-use-v1`;
+outbound observations still use the generic legacy path until session03. JSON-only XSS observations
+are already unassessed. The planned outbound observation-only eligibility must not be confused
+with the current implementation. Renamed guideline documents carry new versions because their request text changed. Request identity includes the full
 envelope and guideline body; old responses cannot be replayed on renamed/changed requests.
 
 <a id="8-jev-assessment-and-findings-review"></a>
@@ -328,7 +336,8 @@ Today flow/evidence construction lives in `parse`, claim gates in `judge`, and p
 
 `--analyze` is the documented analysis mode; `--strings` remains an external compatibility alias.
 Internal APIs use `Analyze`, `AnalyzeWithChecks`, `CandidateUse` and `AnalysisReport`, with no obsolete
-Go aliases. Fresh analysis reports use schema4, `analysis_guidelines` and SQL component provenance; route inventory stays
+Go aliases. Fresh analysis reports use schema4, `analysis_guidelines` and per-candidate component
+provenance for SQL, NoSQL, standalone validation and XSS; route inventory stays
 schema1. Export reads schemas1/2/3/4 and preserves original schema provenance and raw
 assessments. Private legacy decoding maps `practice` metadata to `GuidelinesRef` and
 legacy route/client associations into one current entry/context association.

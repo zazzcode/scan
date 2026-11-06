@@ -8,8 +8,9 @@ known library contracts as selected components. Preserve source evidence and exp
 Clearly distinguish server requests, browser request/response origins and rendered browser output.
 Do not turn this packaging migration into complete SSRF, exfiltration, CORS or CSRF assessment.
 
-The user requested ordered specifications with implementation prompts on 2026-11-05. This turn
-prepares the contract; it does not assign outbound implementation. Command injection and complete
+The user requested ordered specifications with implementation prompts on 2026-11-05 and plans
+this as the next implementation session after the completed session02 checkpoint. Outbound remains
+unimplemented; this documentation closeout does not execute that implementation. Command injection and complete
 SSRF judgment remain separately scoped features. Sensitive-data logging remains a separate migration.
 
 ## 1. Required reading
@@ -50,7 +51,16 @@ SSRF judgment remain separately scoped features. Sensitive-data logging remains 
 One deliverable/specification, one assigned feature worktree/branch and one intended draft PR to
 `stage`. Use the accepted predecessor tree and record its commit or full source/diff manifest.
 Preserve uncommitted earlier work; do not reset to a `HEAD` missing component implementation.
-No additional worktree, merge or remote operation is requested by this documentation turn.
+No additional worktree or integration merge is requested by this checkpoint.
+
+**Session03 starting point:** runtime checkpoint `4e0be3e` on `analysis-pack-mvp` contains session01,
+XSS migration `30fada9` and its cleanup. Use the latest committed documentation closeout on that
+same feature branch; record actual starting HEAD/status before implementation. The
+[checkpoint ledger](../architecture/analysis-packs.md#session-02-closeout-and-session-03-starting-point)
+records current protocols, source-backed Juice Shop parity and remaining scope. Do not substitute
+an older checkout missing the component consumers. Current outbound still uses generic legacy
+assessment; observation-only zero-call handling below is work for this session, not accepted baseline
+behavior. Preserve SQL/NoSQL/validation/XSS effective request bytes while adding observation mode.
 
 | Repository-relative path | Change | Purpose |
 | --- | --- | --- |
@@ -224,3 +234,18 @@ present, actual Git state and relevant diffs. No external tracker or separate ex
 No implementation changes recorded. The user requested ordered follow-on specs and asked about
 outbound requests and browser vulnerability code. This third session migrates current observations;
 new security assessment remains a separate capability with its own evidence contract.
+
+
+### 2026-11-05 — Predecessor checkpoint documented
+
+**Source.** User requested architecture/project closeout before the planned outbound session.
+
+**Changed sections.** §0 and §3 identify outbound as the next unimplemented session and record
+runtime predecessor `4e0be3e` plus the latest documentation closeout on the same feature branch.
+
+**Summary.** Link the accepted component protocols, actual Juice Shop preservation checks and
+cleanup evidence. Explicitly distinguish current generic outbound assessment from the planned
+observation-only eligibility correction. O1–O7, scope, limits and review shape remain unchanged.
+
+**Verification impact.** Documentation/link checks only for this closeout. Implementation must still
+freeze its actual starting source/report and legacy-assessment baseline before executing §8.

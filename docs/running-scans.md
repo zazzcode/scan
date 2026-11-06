@@ -145,9 +145,9 @@ Entry paths are relative to the target repository. Use `server.ts` for Juice Sho
 `src/server.ts` for the vulnerable TypeScript sample. Omit `--entry` to consider all selected JS/TS
 registration files. Explicit selection avoids conflating training snippets with production scope.
 
-The separate schema3 evidence report contains typed `entries`, `registrations`,
+The separate schema4 evidence report contains typed `entries`, `registrations`,
 `dispatch_bindings`, `callables`, `invocation_contexts`, `uses`, `files`, `gaps` and `limitations`.
-Each use identifies its route, source fields, ordered local transfer evidence, candidate sink,
+Each use identifies its entry/invocation context, source fields, ordered local transfer evidence, candidate sink,
 snapshot hashes and assessment state. Direct named relative ESM imports, imported handler factories,
 local assignment, string expressions and simple object destructuring are supported. Branches,
 unknown transformations, middleware, receiver ambiguity, unverified library bindings and external

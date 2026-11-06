@@ -3,11 +3,47 @@
 The [SQL-first contract](../specifications/analysis-pack-mvp.md) implements the
 [analysis pack proposal](../project/analysis-pack-mvp.md) on merged common-entry/dispatch base
 `f8b7dbdfe1521d9b914f271fa68b26b01fdec97b` (PR #8); the [NoSQL/validation contract](../specifications/components-01-nosql-validation.md)
-made those families the second and third consumers. This document owns component responsibilities,
+made those families the second and third consumers, followed by the
+[XSS/browser contract](../specifications/components-02-xss.md). This document owns component responsibilities,
 source inventory, compatibility, migration status and acceptance evidence. The
 [public analysis guide](../../docs/analysis/database-injection.md#query-component-selection) owns SQL
-and NoSQL interpretation; [the implementation plan](../project/implementation-plan.md#analysis-pack-mvp-initiative)
+and NoSQL interpretation, and the [XSS guide](../../docs/analysis/xss.md) owns rendering
+interpretation; [the implementation plan](../project/implementation-plan.md#analysis-pack-mvp-initiative)
 owns future sequencing.
+
+## Session 02 closeout and session 03 starting point
+
+Runtime checkpoint `4e0be3e` on the existing `analysis-pack-mvp` feature branch includes the
+session01 foundation (`7610193`), XSS component migration (`30fada9`) and authorized minor cleanup.
+SQL, NoSQL, standalone validation and XSS are working component consumers. Their protocols are
+`sql-components-v2`, `nosql-components-v1`, `validation-components-v1` and `xss-components-v1`;
+report schema4, evidence-version3 and route-inventory schema1 are independent contracts.
+Schemas1–4 still read/export with original historical answers; changed requests reject replay.
+
+The post-push Juice Shop check used clean pinned revision
+`f189f521266f42c6bd05884468292000cee852ed`, with all 27 reference hashes verified before/after.
+Accepted pre-XSS `7610193` and current `30fada9` scans have exact canonical equality after removing
+only the 23 new XSS selection records: 165 entries (152 HTTP, 13 browser), 208 uses, 8 construction
+findings and 200 Review records. DOM search and cross-tier track-order remain the two XSS
+construction findings. Stored/JWT/model-setter/collection/dialog origin gaps remain Review.
+Both provider encoders construct all 23 rendering requests; localhost stubs verify the two
+source-reviewed raw controls plus replay; all 20 JSON-only observations remain unassessed. Largest bodies are
+62,738 bytes (OpenAI) and 62,108 (Jev), below 65,536. These are offline preservation checks, not
+live-model accuracy or resolution of the known coverage misses. Raw report/verification artifacts:
+`_test-findings/juice-shop/run-3290785101/`; accepted pre-XSS run: `run-3975911309`.
+The small cleanup removes an unreachable XSS protocol fallback, a test-only production constant
+and SQL-specific wording in the shared replay error. Full race, vet, build, formatting and docs
+checks passed after cleanup; no source facts, protocols or successful judgments changed.
+
+Next is [session03: outbound observations](../specifications/components-03-outbound.md).
+It has not been implemented. Outbound still uses existing generic legacy assessment; explicit
+observation-only `not_run`, zero model calls and Preview rejection are its planned eligibility
+correction. Freeze that legacy behavior separately from source/report parity before changing it.
+Preserve earlier-family effective requests and browser method/path/field provenance. Logging
+migration and complete SSRF/exfiltration/browser-security assessment remain separate future work.
+Resume the assigned feature tree at actual latest HEAD, including this documentation closeout,
+and preserve uncommitted work. Commit/feature-push delivery was authorized by the user; no PR,
+integration merge, new worktree/agent, paid call or target execution is implied for the next session.
 
 ## Boundary and ownership
 
@@ -332,6 +368,7 @@ Test output lives outside the worktree under `_test-findings/components-xss/2026
 
 Full contributor checks pass: `go test -race ./... -count=1` (nine packages), `go vet ./...`,
 `go build ./...`, `gofmt -l .` (empty), whitespace/conflict and scoped manual documentation/link
-checks. X1–X8 are covered; no unmet criterion remains in this contract. No paid calls, sample edits, target execution, new worktrees/agents, feature
-commit/push, PR creation or integration merge are part of this assignment. Live-model accuracy,
+checks. X1–X8 are covered; no unmet criterion remains in this contract. Subsequent user-authorized
+feature commits/pushes and minor cleanup are recorded in the checkpoint above. No paid calls,
+sample edits, target execution, new worktrees/agents, PR creation or integration merge were performed. Live-model accuracy,
 broader browser security and general Python API-to-browser linkage remain outside this contract.

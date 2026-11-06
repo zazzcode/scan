@@ -178,8 +178,9 @@ contracts, embedded Analysis Guidelines, claim questions and Go evidence policy.
 files supply requirements and selection; they do not add a parser or vulnerability detector. Editing
 a public analysis guide alone does not change the running judge's instructions.
 
-SQL is the first working consumer of an internal component catalog. Language guidance, entry/flow
-capability references, verified operation contracts, SQL questions and evidence obligations have
+SQL, NoSQL, standalone validation and XSS now consume the internal component catalog. Language
+guidance, entry/flow capability references, applicable operation/rendering contracts, family questions
+and evidence obligations have
 explicit identities, versions, digests, applicability and test references. Static assembly selects
 components from supported source facts; the judge uses that selection and receives only applicable
 interpretation material alongside the candidate trace. Executable adapters remain compiled, and Go

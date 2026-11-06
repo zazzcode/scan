@@ -218,15 +218,19 @@ established product promises.
 ## Analysis pack initiative
 
 **2026-11-05 user direction:** [analysis-pack-mvp](project/analysis-pack-mvp.md) is a separate
-initiative with its own future worktree/branch after common-entry/dispatch completes acceptance and
-merges into `stage`, before command injection. Current-branch work documents the proposal only;
-implementation requires a separate assignment and bounded contract after the merge.
+initiative following the common-entry/dispatch merge through PR #8. The assigned
+`analysis-pack-mvp` feature tree now implements SQL, NoSQL, standalone validation and XSS
+component consumers; runtime checkpoint `4e0be3e` includes their verified cleanup.
+[Outbound observations](specifications/components-03-outbound.md) are the next planned session;
+logging remains separate. No integration merge or outbound implementation is implied by this checkpoint.
 
-The MVP will organize existing language/framework models, embedded guidance, verified API contracts,
-claim questions and evidence obligations under explicit versions and applicability. The judge receives
+The delivered consumers organize existing language/framework models, embedded guidance, verified API contracts,
+claim questions and evidence obligations under explicit versions and applicability. The
+[architecture ledger](architecture/analysis-packs.md#session-02-closeout-and-session-03-starting-point)
+records acceptance evidence, limits and the next starting point. The judge receives
 only relevant interpretation material alongside the source trace; executable adapters and mandatory
 Go evidence gates remain in the scanner. The goal is reusable, auditable analysis knowledge as new
 vulnerability families arrive. Downloadable packs, executable plugins and a new rule language remain
 deferred. The [implementation plan](project/implementation-plan.md#analysis-pack-mvp-initiative)
-owns sequencing; the [technical approach](../docs/technical-approach.md#analysis-knowledge-and-proposed-packs)
+owns sequencing; the [technical approach](../docs/technical-approach.md#analysis-knowledge-and-components)
 owns the public explanation and evaluation limits.

@@ -48,7 +48,7 @@ Independent future deliverables may use separate feature worktrees/PRs targeting
 - [Components 02: all XSS types and browser](components-02-xss.md) — implemented and offline-verified
   2026-11-05; selected rendering/stored/browser/cross-tier material, independent context/origin/path
   gates and isolated literal/default/unknown fetch-method attribution.
-- [Components 03: outbound observations](components-03-outbound.md) — later session; source-backed
+- [Components 03: outbound observations](components-03-outbound.md) — next planned session; source-backed
   observation scope, browser/server isolation and explicit boundary before complete SSRF judgment.
 - Other planned specs are not authored yet. Their proposed slices live in the
   [implementation plan](../project/implementation-plan.md); each needs a bounded contract and user authorization.

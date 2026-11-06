@@ -16,18 +16,35 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 
 ## Current work
 
-**Follow-up foundation:** the [common entry/dispatch brief](../project/common-entry-dispatch.md)
-records the next activity: the shared model with bounded dynamic-route, GraphQL resolver and gRPC
-handler support. The shared model and existing HTTP/browser consumers are migrated through
+**Component refactor checkpoint, 2026-11-05:** SQL, NoSQL, standalone validation and XSS are
+implemented and offline-verified in the assigned `analysis-pack-mvp` worktree/branch. Runtime
+checkpoint `4e0be3e` includes XSS migration `30fada9` and its minor cleanup. Read the
+[component ledger](../architecture/analysis-packs.md#session-02-closeout-and-session-03-starting-point)
+for accepted source, protocols, Juice Shop parity and remaining limits. Fresh reports use schema4;
+schemas1–4 remain readable with historical answers intact.
+
+**Next planned session:** [components 03 — outbound observations](../specifications/components-03-outbound.md).
+Resume the existing feature worktree, verify actual HEAD/status and preserve any uncommitted work.
+Outbound and logging are not component-migrated yet. Outbound still has its generic legacy assessment
+path; observation-only zero-call eligibility is required by session03 and is not implemented now.
+No outbound implementation, paid calls, target execution, new agents/worktrees or integration merge
+is authorized by this documentation checkpoint. Future implementation follows the user's assignment.
+
+**Completed foundation:** the [common entry/dispatch brief](../project/common-entry-dispatch.md)
+records the implemented shared model with bounded dynamic-route, GraphQL resolver and gRPC
+handler support, accepted and merged through PR #8. The shared model and existing HTTP/browser
+consumers are migrated through
 [deliverable2](../specifications/common-entry-dispatch-02-consumers-compatibility.md). Fresh
-reports are schema3 with canonical entry/context associations; saved schemas1/2 still export.
-Typed selectors/presenters, explicit events and new framework adapters remain later work.
+reports now use schema4 with canonical entry/context associations and component provenance; saved
+schemas1–4 still export.
+Typed selectors/presenters and bounded DOM/window events are implemented. Additional framework
+adapters remain separately scoped work.
 Use the current reviewed Python/terminology revision as the prerequisite, not the old pre-rename API.
 
 **Architecture/terminology closeout:** embedded documents are **Analysis Guidelines**
 (`internal/guidelines`); shared records live in `internal/analysis` as `CandidateUse`,
 `AnalysisReport` and `RouteInventory`. `--analyze` is canonical; `--strings` remains an external
-alias. Fresh analysis JSON is schema3 with `analysis_guidelines`; schema1/2 saved reports still
+alias. Fresh analysis JSON is schema4 with `analysis_guidelines`; schema1–4 saved reports still
 export. See the [implemented architecture](../architecture.md) and the
 [closeout contract](../specifications/python-support.md#architecture-and-terminology-closeout).
 Historical reports retain their original versions/answers; changed guideline inputs need fresh judgments.
@@ -71,8 +88,10 @@ scanner parity. Cross-tier origin, helper/control-flow and protection completene
 work; unsupported paths stay Review. The [results](../evaluation/xss-implementation-results.md) own
 current details; historical reports may contain superseded protection labels.
 
-**XSS follow-up boundaries:** further XSS hardening uses `xss-response`, one bounded case at a
-time. Preserve all implemented analyzers and compare against independent source references.
+**Historical XSS hardening boundaries:** the earlier `xss-response` work supplied the accepted
+source semantics. Current component work uses the assigned feature tree above; new detector
+hardening still needs its own bounded contract. Preserve all implemented analyzers and compare
+against independent source references.
 Baseline vulnerable apps MUST remain unchanged; remediation uses copies. Five approved Luna calls
 are complete and saved for offline inspection/replay. They authorize no additional paid requests.
 Changed evidence MUST NOT reuse old model answers. The bounded Python adapter is now documented above; remaining vulnerability types follow, then SCA
