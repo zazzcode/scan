@@ -22,6 +22,8 @@ const (
 // path and never falls through to a generic trusted security judgment.
 type Family struct {
 	Name string
+	// ObservationOnly selects static knowledge without a model protocol.
+	ObservationOnly bool
 	// Label names the family in selection-failure messages.
 	Label string
 	// Kinds lists the candidate kinds eligible for this family.
@@ -54,6 +56,9 @@ func (f Family) supports(language lang.Language) bool {
 
 func (f Family) rootIDs() []string {
 	ids := []string{f.Pack, f.Claim, f.Evidence, flowID(&f)}
+	if f.ObservationOnly {
+		ids = append(ids, "api.python-http-destination-v1")
+	}
 	for _, language := range f.Languages {
 		ids = append(ids, languageID(&f, language))
 	}
@@ -87,6 +92,7 @@ func languageID(f *Family, language lang.Language) string {
 // Families returns the registered component families in stable order.
 func Families() []Family {
 	return []Family{
+		{Name: "outbound", Label: "Outbound observation", ObservationOnly: true, Kinds: []string{"outbound_http_candidate"}, Languages: []lang.Language{lang.JavaScript, lang.TypeScript, lang.Python}, Pack: "pack.outbound", Claim: "observation.outbound", Evidence: "evidence.outbound", PolicyOwner: "internal/parse/flow.go + internal/parse/python_frameworks.go"},
 		{Name: "xss", Label: "XSS", Kinds: []string{"xss_candidate"}, QuestionNames: xssQuestionNames(), Languages: []lang.Language{lang.JavaScript, lang.TypeScript, lang.Python}, Pack: "pack.xss", Claim: "claim.xss", Evidence: "evidence.xss", PolicyOwner: "internal/judge/xss.go"},
 		{
 			Name: "sql", Label: "SQL", Kinds: []string{"sql_query_candidate"}, QuestionNames: sqlQuestionNames(),
@@ -131,7 +137,7 @@ func FamFamily(kind string) *Family {
 
 // ProtocolFor returns the request protocol of a registered family kind.
 func ProtocolFor(kind string) string {
-	if f := FamFamily(kind); f != nil {
+	if f := FamFamily(kind); f != nil && !f.ObservationOnly {
 		return familyProtocol(f.Name)
 	}
 	return ""
@@ -139,6 +145,8 @@ func ProtocolFor(kind string) string {
 
 func familyProtocol(name string) string {
 	switch name {
+	case "outbound":
+		return "outbound-observation-v1" // Catalog compatibility only; no assessment protocol.
 	case "xss":
 		return XSSProtocol
 	case "sql":
@@ -198,6 +206,9 @@ func (c *catalog) claimQuestions(f *Family) ([]Question, map[string][]map[string
 }
 
 func flowID(f *Family) string {
+	if f.ObservationOnly {
+		return "flow.outbound"
+	}
 	if f.Name == "xss" {
 		return "flow.xss"
 	}

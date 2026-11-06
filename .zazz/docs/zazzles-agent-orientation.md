@@ -16,19 +16,26 @@ when to load supporting guides. Keep this document under 400 lines; link to deta
 
 ## Current work
 
-**Component refactor checkpoint, 2026-11-05:** SQL, NoSQL, standalone validation and XSS are
-implemented and offline-verified in the assigned `analysis-pack-mvp` worktree/branch. Runtime
-checkpoint `4e0be3e` includes XSS migration `30fada9` and its minor cleanup. Read the
-[component ledger](../architecture/analysis-packs.md#session-02-closeout-and-session-03-starting-point)
-for accepted source, protocols, Juice Shop parity and remaining limits. Fresh reports use schema4;
+**Component refactor, 2026-11-06:** SQL, NoSQL, standalone validation, XSS and outbound observations
+are implemented and offline-verified in the assigned `analysis-pack-mvp` worktree/branch. Outbound
+started from clean `dc309cd`, preserving runtime `4e0be3e` and XSS migration `30fada9`. Read the
+[component ledger](../architecture/analysis-packs.md#outbound-observation-verification-2026-11-06)
+for ownership, protocols, source/report parity and remaining limits. Fresh reports use schema4;
 schemas1–4 remain readable with historical answers intact.
 
-**Next planned session:** [components 03 — outbound observations](../specifications/components-03-outbound.md).
-Resume the existing feature worktree, verify actual HEAD/status and preserve any uncommitted work.
-Outbound and logging are not component-migrated yet. Outbound still has its generic legacy assessment
-path; observation-only zero-call eligibility is required by session03 and is not implemented now.
-No outbound implementation, paid calls, target execution, new agents/worktrees or integration merge
-is authorized by this documentation checkpoint. Future implementation follows the user's assignment.
+[Outbound session03](../specifications/components-03-outbound.md) selects scoped observations.
+JS/TS shapes remain unverified; Python retains its demonstrated URL-operand contract. Requested
+outbound assessments return explicit `not_run` with zero model calls, stay Review and leave a
+requested scan incomplete. Preview rejects them without a request body. Browser requests do not
+establish server SSRF. Logging migration and complete SSRF/exfiltration/browser-security assessment
+remain future work.
+
+The user assigned full offline Juice Shop E2E validation, fixes if needed, then feature commit/push.
+The [full E2E ledger](../architecture/analysis-packs.md#juice-shop-full-e2e-follow-up-2026-11-06)
+records actual all-registration scope, unchanged non-outbound requests and conservative incomplete
+assessment behavior. Resume the existing feature worktree and preserve unrelated changes.
+No paid calls, target execution, sample edits, new agents/worktrees, PR creation or integration merge
+are authorized by this checkpoint. Human review remains pending.
 
 **Completed foundation:** the [common entry/dispatch brief](../project/common-entry-dispatch.md)
 records the implemented shared model with bounded dynamic-route, GraphQL resolver and gRPC

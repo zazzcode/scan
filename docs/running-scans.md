@@ -330,3 +330,9 @@ apps. Paid results, offline discovery, synthetic policy controls and historical 
 evidence. Supported source-reference checks and format compatibility pass; model completion does not
 establish exhaustive accuracy or runtime exploitability. Mandatory rendered report review is
 complete through bounded inspection of the user-opened localhost HTTP tab; human review/merge remains pending.
+
+
+Outbound uses are observations, not security verdicts. A requested model scan keeps them `not_run`
+and in Review, makes no model calls for them, saves the incomplete report and exits 1. The existing
+candidate-position request cap remains conservative. Structural-only scanning completes normally;
+exporting a saved report preserves its historical answers. See [decision-model scope](decision-models.md#outbound-observations).

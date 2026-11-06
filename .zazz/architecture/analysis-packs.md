@@ -35,15 +35,11 @@ The small cleanup removes an unreachable XSS protocol fallback, a test-only prod
 and SQL-specific wording in the shared replay error. Full race, vet, build, formatting and docs
 checks passed after cleanup; no source facts, protocols or successful judgments changed.
 
-Next is [session03: outbound observations](../specifications/components-03-outbound.md).
-It has not been implemented. Outbound still uses existing generic legacy assessment; explicit
-observation-only `not_run`, zero model calls and Preview rejection are its planned eligibility
-correction. Freeze that legacy behavior separately from source/report parity before changing it.
-Preserve earlier-family effective requests and browser method/path/field provenance. Logging
-migration and complete SSRF/exfiltration/browser-security assessment remain separate future work.
-Resume the assigned feature tree at actual latest HEAD, including this documentation closeout,
-and preserve uncommitted work. Commit/feature-push delivery was authorized by the user; no PR,
-integration merge, new worktree/agent, paid call or target execution is implied for the next session.
+This records the historical session02 checkpoint. [Session03](../specifications/components-03-outbound.md)
+subsequently implemented observation-only `not_run`, zero model calls and Preview rejection from
+clean `dc309cd`. The [outbound verification](#outbound-observation-verification-2026-11-06) separates
+that eligibility correction from source/report parity and records the changed requested-scan exit.
+Logging migration and complete SSRF/exfiltration/browser-security assessment remain separate work.
 
 ## Boundary and ownership
 
@@ -66,12 +62,13 @@ transport and mandatory claim gates in `internal/judge`, and presentation in `in
 | XSS contracts/questions | `internal/analysispacks/xss.go` and `xss_selection.go`; validated guideline projections | Migrated: catalog owns primary rendering contracts, five questions and supplementary context/protection/storage/browser/response material; parse retains source facts and judge retains mandatory gates |
 | Standalone validation | `internal/analysispacks/validation.go` (questions/choices); policy assembly stays in parse; gates in `internal/judge/validation.go` | Migrated: requirement/enforcement questions are catalog components; established/absent policies, enforced/bypassed/missing guards and API-less field claims preserved |
 | Logging | Logger/source extraction in parse; `internal/judge/logging.go` | Inventoried, not migrated; retain sensitive content, emission and redaction gates |
-| Outbound requests | Destination/source extraction in parse; Python HTTP-client API models; existing generic judge/report paths | Inventoried, not migrated; preserve current fetch/axios/Python destination facts; full SSRF assessment is a separate feature |
+| Outbound requests | Destination/source extraction in parse; `internal/analysispacks/outbound.go` owns Python contract and observation descriptors | Migrated: JS/TS shapes remain unverified, Python URL/body/response roles preserved; no security questionnaire, model request or SSRF verdict |
 | Findings and exports | `internal/report/`, `cmd/scan/` | Existing presentation counts/statuses remain; canonical JSON carries detailed selection provenance |
 
 A material item has one runtime owner. Family integration reuses selected shared language sections
 and moves operation/question knowledge rather than creating alternative legacy policy paths.
-Unmigrated families (logging, outbound) retain their existing behavior until their own migrations.
+Logging retains its existing behavior until its own migration. Outbound is observation-only, with no
+model protocol; selected scope/limits do not establish a completed security assessment.
 
 Catalog identities are `pack.<family>`, `claim.<family>`, `evidence.<family>`, `flow.local`,
 `language.javascript`, `language.python`, `language.nosql.javascript`,
@@ -155,13 +152,13 @@ issue counts and status semantics, including a construction-practice concern bes
 | Standalone validation | Migrated / offline verification passed | Requirement/enforcement questions and field-policy guidance selected per claim; established/absent policies, enforced/bypassed/missing guards, client-only policy, unknown helpers, API-less claims, JS/Python parity and claim isolation; no invented standards |
 | Logging | Inventoried / not migrated | Move sensitive-content/emission/redaction contracts and questions; paired leaks, metadata/constants, redaction and unknowns |
 | JS/TS NoSQL | Migrated / offline verification passed | MarsDB/Mongoose contracts, selector/`$where` guidance and all-path/coverage questions selected per claim; raw selector, constrained scalar, conditional alternatives, Mongoose schema/version, unknown helper/API, shared-caller isolation and replay controls; Python NoSQL stays unsupported |
-| Outbound requests | Spec prepared, session 03 / not migrated | Move existing destination-contract/guidance material; retain destination/body/response separation, binding/source gaps and current outcomes; do not imply complete SSRF assessment |
+| Outbound requests | Migrated / offline verification passed | Scoped observation components, unchanged source/report projections and Python operand contract; explicit zero-call not_run and incomplete requested scan; no SSRF verdict |
 
 The user revised session grouping on 2026-11-05. Implementation order is
 [01 NoSQL plus standalone validation](../specifications/components-01-nosql-validation.md),
 [02 all XSS types including browser](../specifications/components-02-xss.md), then
 [03 outbound observations](../specifications/components-03-outbound.md). Logging remains separate.
-Sessions 01 and 02 are implemented; session 03 remains an unassigned implementation contract.
+Sessions 01–03 are implemented and offline-verified; human review remains pending.
 XSS uses coordinated server/template, stored and browser/cross-tier checkpoints. The plan tracks
 actual future sequencing; command injection remains the next new vulnerability family.
 
@@ -181,8 +178,8 @@ actual future sequencing; command injection remains the next new vulnerability f
   corpus-wide accuracy claim is made.
 - [JS/TS outbound discovery](../../internal/parse/flow.go) uses fetch/axios-shaped names and retains
   unverified-binding/response gaps. It combines argument dependencies without the same destination
-  precision as the existing Python adapter. Session 03 must retain these limits, never confer a trusted
-  API contract by name, and separate URL/body/response and browser/server evidence.
+  precision as the existing Python adapter. Session 03 retains these limits, confers no trusted
+  API contract by name, and keeps URL/body/response and browser/server evidence separate.
 - Generic SQL construction questions do not establish outbound destination security. Session 03
   makes observation-only model eligibility explicit; full SSRF requires its own later questions,
   evidence gates and evaluation. Client-side requests must not be labeled server SSRF.
@@ -372,3 +369,100 @@ checks. X1–X8 are covered; no unmet criterion remains in this contract. Subseq
 feature commits/pushes and minor cleanup are recorded in the checkpoint above. No paid calls,
 sample edits, target execution, new worktrees/agents, PR creation or integration merge were performed. Live-model accuracy,
 broader browser security and general Python API-to-browser linkage remain outside this contract.
+
+
+### Outbound observation verification, 2026-11-06
+
+Accepted predecessor: clean `dc309cd` in the assigned `analysis-pack-mvp` worktree, preserving
+runtime `4e0be3e` and sessions01/02. The ignored run log retains the tracked-blob manifest and
+baseline experiments. One agent implemented the bounded observation migration; no commits, pushes,
+PRs, extra agents/worktrees, target requests, sample changes, paid calls or integration merges.
+
+`pack.outbound`, `observation.outbound`, `evidence.outbound` and `flow.outbound` describe existing
+observations. JS/TS selections retain combined argument dependencies and unverified binding/response
+gaps, including fake/shadowed fetch/axios. No JS API contract or URL-slot precision is invented.
+Python's unchanged `python-http-destination-v1` has one catalog owner, selected only for existing
+bound supported calls; method-first, positional/keyword URL and fixed-URL/body-only controls pass.
+The source adapter still proves binding and roles. Runtime context comes from entry/binding facts,
+not file names; browser request sources and XSS response producer links remain independent.
+
+Catalog compatibility is `outbound-observation-v1`, with no outbound model protocol and no schema
+change. Schema4 selection provenance describes static capability only. Assess/AssessTrace return
+`not_run` with the reason that outbound security assessment is not implemented, no request digest or
+question version; Preview errors with no body. Missing/malformed catalog roots/material fail explicitly.
+Existing component/material/request bounds remain, without truncation or an outbound payload.
+
+**Eligibility correction, separate from parity:** on the same five-observation synthetic fixture,
+both predecessor provider stubs completed five generic `candidate-use-v10` assessments, five HTTP
+calls and exit0. The new path retains five Review records, returns five explicit `not_run`, makes
+zero HTTP calls and exits1 for requested-assessment incompleteness. This is the intended eligibility
+and exit-result delta, not a new detector or SSRF judgment. Conservative candidate-index scheduling
+is unchanged: observations can occupy capped positions; HTTP calls never exceed the configured cap.
+Structural-only scans still complete normally. Historical generic answers remain intact on export.
+
+Acceptance evidence:
+
+- O1/O2: `TestOutboundComponentSelection`, `TestOutboundBindingScope`, frozen
+  `TestOutboundComponentEvidenceParity` and existing `TestPythonOutboundOperandRoles`,
+  `TestPythonBindingControls`, `TestPythonEvidence`. JS and TS each retain five observations;
+  Python retains three URL-dependent uses, excluding fixed URL/body-only and response-body controls.
+  Removing only outbound selection metadata yields exact accepted enriched-report hashes.
+- O3/O4: `TestOutboundObservationNotAssessed`, `TestOutboundObservationCLI` and
+  `TestMixedAssessmentWithOutboundObservations`: both localhost providers, direct/trace/preview,
+  saved incomplete bundles, all four supported claim families, caps1/3/100, explicit status/reason
+  and exit1. Target fixture hosts never enter transport.
+- O5: `TestBrowserServerRequestIsolation`, unchanged `TestBrowserFetchMethodIsolation`,
+  `TestCrossTierResponseFieldLinks` and browser/Angular/XSS regression matrices retain independent
+  request, body, response, method, field and producer relationships. Browser HTTP is not server SSRF.
+- O6: `TestOutboundComponentReportParity`, `TestOutboundComponentHistory`, saved CLI HTML/SARIF
+  re-export and schema1–4 controls preserve source, gaps, coverage, Review counts, raw answers and
+  provenance. No SSRF/exfiltration/browser-security vulnerability is added.
+- O7: `TestOutboundPredecessorRequests` freezes eight exact provider-body hashes for SQL, NoSQL,
+  validation and XSS, compared with a temporary source snapshot of `dc309cd` (not a Git worktree).
+  All earlier family replay/staleness tests and catalog configuration/bounds controls pass.
+
+Selection measures five components / 351 material bytes for JS/TS and six / 590 for Python;
+provider request bytes are zero. Local benchmark: 2691 ns/op, 4876 B/op, 34 allocations/op
+(Apple M6, Go1.27.3). This is added static selection overhead, not a whole-scan speedup or live-model
+accuracy/cost measurement. Full offline race, vet, build, formatting and scoped manual doc/link
+checks pass. O1–O7 have evidence; no unmet implementation criterion remains. Human acceptance,
+complete SSRF/exfiltration/browser-security analysis and general JS URL-operand verification remain
+outside this bounded delivery.
+
+
+### Juice Shop full E2E follow-up, 2026-11-06
+
+The user authorized full Juice Shop E2E validation, fixes if needed, then commit and push of
+`analysis-pack-mvp`. No scanner defect was found by this comparison. The orientation's obsolete
+next-session pointer was corrected; implementation scope and detector behavior remain unchanged.
+
+Target revision `f189f521266f42c6bd05884468292000cee852ed` is clean including ignored files;
+all 27 reference hashes match before/after. Complete CLI discovery without `--entry` produces
+167 entries (154 HTTP, 13 browser), 208 uses, eight construction findings and 200 Review records.
+The earlier 165-entry report selected `server.ts`; the complete scan additionally retains the
+GET/POST zero-use registrations in `routes/dataErasure.ts`. Current structural bundle
+`_test-findings/juice-shop/run-860097900/` and accepted `dc309cd` source-snapshot bundle
+`run-3156486993/` are exactly canonically equal after removing only 66 new outbound selections.
+
+Both local provider probes cover every candidate and preserve all 117 non-outbound request hashes
+and raw assessments per provider. Predecessor: 183 completed stub calls, including 66 outbound;
+current: 117 completed calls, zero outbound calls, 86 `not_run` (66 outbound, 20 JSON-only), and
+five unchanged failed assessments (two SQL and three NoSQL missing verified binding). Both providers
+replay all 117 current completed answers exactly and retain the two independently source-reviewed
+DOM-search/track-order raw XSS controls. Largest bodies are 64,651 bytes (OpenAI), 64,345 (Jev),
+below 65,536; no source/material is truncated. Unknown stub answers test mechanics, not live accuracy.
+
+Full CLI requested-assessment runs use the same localhost stubs with cap208, preserve all entries,
+source/provenance and expected statuses, make 117 calls per provider, save their incomplete bundles
+and exit1 as required. Saved JSON/HTML/SARIF and independent re-exports retain exact raw answers,
+source associations and counts. Stub-assessed presentation has eight construction findings and
+200 Review records (91 `needs_review`, 109 `needs_evidence`). The existing five binding failures
+and JSON-only/outbound incompleteness are supported limits, not claimed complete security coverage.
+Synthetic cap1/3/100 regressions and the full contributor race/vet/build/doc checks also pass.
+Raw assessment traces, body-hash summaries and CLI bundles are retained under the current run's
+`assessment-checks/` and `cli-verified/`; temporary target-bound probes are retained in ignored
+execution scratch rather than adding external-checkout dependencies to normal unit tests.
+
+No paid provider call, target request/application execution, sample edit, extra agent/worktree,
+PR creation or integration merge was performed. Human review and broader accuracy/coverage work
+remain pending; all outbound migration criteria remain met.

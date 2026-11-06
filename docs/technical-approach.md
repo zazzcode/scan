@@ -203,8 +203,15 @@ remains unresolved rather than being truncated.
 The [implementation architecture and migration ledger](../.zazz/architecture/analysis-packs.md)
 records inventory, limits, compatibility and offline verification. SQL detection scope is preserved;
 this reorganization is not evidence of improved live-model accuracy. NoSQL, standalone validation
-and XSS are migrated; logging and outbound observations remain follow-on migrations. Command injection is the next
-new family and will use this structure. Public pack loaders, registries, executable plugins and broad
+and XSS are migrated; outbound observations now select `pack.outbound` with static limits and no
+security questionnaire. JS/TS shape observations keep combined argument dependencies and unverified
+binding/response gaps; names or package declarations cannot establish a URL operand or trusted API.
+Python's existing bound requests/httpx functions and urllib.request.urlopen retain their separate
+URL/body/response roles. Browser HTTP remains distinct from server request evidence. Observation
+assessments return `not_run` without model requests; Preview rejects them without a body/digest.
+Schema4 remains unchanged, with catalog compatibility `outbound-observation-v1` and no outbound
+model protocol. Historical generic answers remain unchanged on export. Logging remains a follow-on
+migration. Command injection is the next new family and will use this structure. Public pack loaders, registries, executable plugins and broad
 standards ingestion remain outside the MVP.
 
 ## Evidence for the approach

@@ -283,8 +283,13 @@ per-language checklist and delivery order.
   components. Broader checks, report separation and their delivery priority remain to be scoped.
 
 Analysis knowledge ships in the scanner. SQL, JS/TS NoSQL, standalone validation and XSS use
-the component structure; logging and outbound requests have explicit follow-on migrations. Downloadable packs and an external plugin
-system remain outside the internal MVP and need their own design.
+the component structure. Outbound observations also select components: JS/TS fetch/axios shapes retain
+unverified binding/operand/response gaps; Python retains its supported URL-operand contract.
+Outbound security assessment is not implemented: requested observation assessments return `not_run`
+with zero model calls and remain Review. A requested scan containing them remains incomplete (exit 1);
+structural-only scans retain normal completion. Historical answers stay intact on export. Browser
+requests do not establish server SSRF. Logging migration, full SSRF/exfiltration/browser-security
+analysis, downloadable packs and an external plugin system remain separate work.
 
 Future capabilities need vulnerable, protected and unknown controls across applicable supported
 languages. Broader evaluation continues against independent source expectations and pinned comparison

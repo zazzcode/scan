@@ -60,6 +60,9 @@ func (c *Client) Assess(ctx context.Context, use analysis.CandidateUse) analysis
 }
 
 func (c *Client) assess(ctx context.Context, use analysis.CandidateUse, trace *DecisionTrace) analysis.Assessment {
+	if analysispacks.ObservationOnly(use.Kind) {
+		return analysis.Assessment{Status: "not_run", Reason: analysispacks.OutboundNotAssessed}
+	}
 	version := protocolVersion(use)
 	a := analysis.Assessment{Status: "failed", Provider: c.provider, Model: c.model, QuestionVersion: version}
 	if use.Kind == "xss_data_candidate" {
@@ -145,6 +148,9 @@ func (c *Client) assess(ctx context.Context, use analysis.CandidateUse, trace *D
 }
 
 func (c *Client) payload(use analysis.CandidateUse) ([]byte, error) {
+	if analysispacks.ObservationOnly(use.Kind) {
+		return nil, errors.New(analysispacks.OutboundNotAssessed)
+	}
 	payload, err := c.payloadForm(use, false)
 	if err == nil && len(payload) > 64<<10 {
 		return c.payloadForm(use, true)

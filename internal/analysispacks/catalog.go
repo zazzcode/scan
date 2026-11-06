@@ -91,8 +91,15 @@ func newCatalog(items []Component) (*catalog, error) {
 				return nil, fmt.Errorf("required embedded component missing: %s", id)
 			}
 		}
-		if _, _, err := c.claimQuestions(&f); err != nil {
-			return nil, err
+		if f.ObservationOnly {
+			if err := c.validateObservation(&f); err != nil {
+				return nil, err
+			}
+		}
+		if !f.ObservationOnly {
+			if _, _, err := c.claimQuestions(&f); err != nil {
+				return nil, err
+			}
 		}
 		for _, language := range f.Languages {
 			component := c.components[languageID(&f, language)]

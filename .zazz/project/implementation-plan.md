@@ -229,7 +229,7 @@ The remaining migrations have explicit follow-on tasks; none is hidden cleanup i
 | --- | --- | --- |
 | 1. [NoSQL + standalone input validation](../specifications/components-01-nosql-validation.md) — implemented 2026-11-05, offline verification passed | Generalized family registrations/material/provenance, then migrated JS/TS NoSQL and JS/TS/Python standalone policy/enforcement together (`nosql-components-v1`, `validation-components-v1`; SQL provenance bytes changed, recorded as `sql-components-v2`) | Independent injection/validation outcomes, no API requirement for standalone validation, selected guidance completeness, source/report/replay parity; Python NoSQL stays unsupported; see the [ledger evidence](../architecture/analysis-packs.md#nosql-and-standalone-validation-migration-verification-2026-11-05) |
 | 2. [All XSS types, including browser](../specifications/components-02-xss.md) — implemented 2026-11-05, offline verification passed | Staged server/template, stored, DOM/framework/event/inline-script and cross-tier migration | All current XSS regressions; no borrowed encoding/origin/path protection; explicit bounded browser fetch-method correction and separate before/after evidence |
-| 3. [Outbound observations](../specifications/components-03-outbound.md) — next planned session; not implemented | Current destination/response observation components, trusted only to actual supported binding/operand evidence | Browser/server and URL/body/response isolation; no SQL-question fallback or invented SSRF verdict; historical answers and explicit unassessed/incomplete semantics |
+| 3. [Outbound observations](../specifications/components-03-outbound.md) — implemented / offline verified 2026-11-06 | Current destination/response observation components, trusted only to actual supported binding/operand evidence | Browser/server and URL/body/response isolation; no SQL-question fallback or invented SSRF verdict; historical answers and explicit unassessed/incomplete semantics |
 | Later, separately assigned: logging migration | Sensitive-content, emission, redaction and verified logger contracts/questions | Secret/personal data, constant/metadata, redacted and unresolved controls; independent logging gates |
 
 **2026-11-05 follow-on user direction:** NoSQL and standalone input validation share one session.
@@ -237,8 +237,9 @@ The numbered specifications above each contain acceptance criteria, implementati
 paste-ready agent prompt. Sessions 01 and 02 are implemented and offline-verified in the assigned feature tree.
 Session 02 accepts clean session-01 commit `7610193`; its source/outcome parity and isolated fetch
 correction are recorded in the [migration ledger](../architecture/analysis-packs.md#xss-migration-verification-2026-11-05).
-Session 03 is the next planned implementation, starting from runtime checkpoint `4e0be3e` plus
-this documentation closeout. Its contract records the resume boundary; outbound has not yet migrated.
+Session 03 implemented outbound observation selection from clean `dc309cd`, preserving runtime
+checkpoint `4e0be3e`. The [outbound verification ledger](../architecture/analysis-packs.md#outbound-observation-verification-2026-11-06)
+separates source/report parity from the intentional zero-call eligibility and incomplete-scan exit change.
 Preserve the actual predecessor tree, including
 uncommitted work, when changing sessions; no integration merge is implied.
 
@@ -255,8 +256,9 @@ CSRF, CORS, browser storage leakage, clickjacking and new code-injection capabil
 contracts. Complete outbound SSRF, redirects/DNS/network policy, Python NoSQL and general Python
 API-to-browser linkage remain separately scoped coverage work.
 
-All follow-ons remain not implemented until assigned and accepted. They MUST converge on the shared
-architecture without a permanent alternate policy path. This ordering governs these migration
+The three numbered migrations are implemented and offline-verified; human review remains pending.
+Later migrations require assignment and MUST converge on the shared architecture without a permanent
+alternate policy path. This ordering governs these migration
 sessions; command injection remains the next new vulnerability family and other roadmap scope is
 unchanged. No paid model evaluation or sample changes are implied.
 

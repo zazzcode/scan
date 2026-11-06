@@ -49,6 +49,9 @@ func descriptors() ([]Component, error) {
 		}},
 	}
 	for _, f := range Families() {
+		if f.ObservationOnly {
+			continue
+		}
 		protocol := familyProtocol(f.Name)
 		claim := claims[f.Claim]
 		pack := makeComponent(f.Pack, "pack", "internal/analysispacks", f.Kinds, []string{protocol}, "")
@@ -73,6 +76,9 @@ func descriptors() ([]Component, error) {
 	flow := makeComponent("flow.local", "compiled_capability", "internal/parse/query_evidence.go + internal/parse/python_sql.go", allKinds, []string{SQLProtocol, NoSQLProtocol, ValidationProtocol}, "")
 	out = append(out, flow)
 	for _, f := range Families() {
+		if f.ObservationOnly {
+			continue
+		}
 		seen := map[string]bool{}
 		for _, language := range f.Languages {
 			id := languageID(&f, language)
@@ -114,6 +120,9 @@ func descriptors() ([]Component, error) {
 		contractOwners[id] = "internal/parse/checks.go + internal/parse/mongoose_query_context.go"
 	}
 	for _, f := range Families() {
+		if f.ObservationOnly {
+			continue
+		}
 		if !f.RequiresAPI {
 			continue
 		}
@@ -135,5 +144,6 @@ func descriptors() ([]Component, error) {
 		}
 	}
 	out = append(out, xssDescriptors()...)
+	out = append(out, outboundDescriptors()...)
 	return out, nil
 }

@@ -8,10 +8,11 @@ known library contracts as selected components. Preserve source evidence and exp
 Clearly distinguish server requests, browser request/response origins and rendered browser output.
 Do not turn this packaging migration into complete SSRF, exfiltration, CORS or CSRF assessment.
 
-The user requested ordered specifications with implementation prompts on 2026-11-05 and plans
-this as the next implementation session after the completed session02 checkpoint. Outbound remains
-unimplemented; this documentation closeout does not execute that implementation. Command injection and complete
-SSRF judgment remain separately scoped features. Sensitive-data logging remains a separate migration.
+The user requested ordered specifications on 2026-11-05 and assigned this implementation after the
+completed session02 checkpoint. Outbound observation components are implemented and offline-verified
+on 2026-11-06; see the [verification ledger](../architecture/analysis-packs.md#outbound-observation-verification-2026-11-06).
+Command injection and complete SSRF judgment remain separately scoped features. Sensitive-data
+logging remains a separate migration.
 
 ## 1. Required reading
 
@@ -71,7 +72,7 @@ behavior. Preserve SQL/NoSQL/validation/XSS effective request bytes while adding
 | `internal/judge/{client,components,trace}.go` and tests | Narrow modify | Explicit observation-only assessment eligibility; prevent generic SQL-question fallback |
 | `internal/report/`, `cmd/scan/` | Narrow wiring/tests | Preserve destination Review presentation, historical export and incomplete-assessment semantics |
 | `internal/parse/testdata/` | Narrow add | Minimal destination/body/response/context controls |
-| This spec; specification index; component architecture/plan; `README.md`; technical/model/running guides | Narrow modify | Explain observation-only scope and evidence |
+| This spec; specification index; component architecture/plan; orientation; `README.md`; technical/model/running guides | Narrow modify | Explain observation-only scope and evidence |
 
 The diff MUST stay within those paths. No new supported client library, axios.default binding
 expansion, Request-object resolution, arbitrary alias/async analysis, server-to-server service graph,
@@ -134,8 +135,9 @@ Retain existing component/material/request size bounds; no model request is buil
 One Contributor Agent implements the session with local toolchain/offline modules and no delegation
 or external tracker. Use ignored `.zazz/ephemeral/components-outbound-run-log.md` under its storage
 policy for accepted baseline, standards, source inventory, eligibility exception and test evidence.
-Run commands from the assigned root. Preserve unrelated work and sample apps. No commits/pushes/PRs
-are assigned here; later user direction controls them. Agents do not merge into integration.
+Run commands from the assigned root. Preserve unrelated work and sample apps. The user subsequently
+assigned full offline Juice Shop E2E validation, fixes if needed, then a feature commit/push to
+`analysis-pack-mvp`. No PR creation or integration merge is assigned.
 
 Halt for a needed stronger network/receiver/operand claim, changed browser producer attribution,
 unexplained discovery/count/status drift, new protocols pretending to assess SSRF, changed required
@@ -191,11 +193,11 @@ report/CLI: existing Review/incomplete semantics, no invented SSRF finding
 
 ## 9. Definition of done
 
-- [ ] O1–O7 have evidence; no stronger binding/operand/protection claim than the existing source supports.
-- [ ] Eligibility correction is explicit; original source/report parity and historical raw answers survive.
-- [ ] Browser/server/request-body/response distinctions and earlier-family requests remain intact.
-- [ ] No outbound model/target HTTP calls; bounds and mixed-request regressions pass.
-- [ ] Full race suite, vet, build, changed-file formatting, docs and ledger updates pass.
+- [x] O1–O7 have evidence; no stronger binding/operand/protection claim than the existing source supports.
+- [x] Eligibility correction is explicit; original source/report parity and historical raw answers survive.
+- [x] Browser/server/request-body/response distinctions and earlier-family requests remain intact.
+- [x] No outbound model/target HTTP calls; bounds and mixed-request regressions pass.
+- [x] Full race suite, vet, build, changed-file formatting, docs and ledger updates pass.
 
 ## 10. Open questions
 
@@ -231,9 +233,13 @@ present, actual Git state and relevant diffs. No external tracker or separate ex
 
 ## 13. Implementation and review change log
 
-No implementation changes recorded. The user requested ordered follow-on specs and asked about
-outbound requests and browser vulnerability code. This third session migrates current observations;
-new security assessment remains a separate capability with its own evidence contract.
+Implementation completed against this contract on 2026-11-06 from clean `dc309cd`, with no scope
+or acceptance changes. The user assigned the existing feature worktree and prohibited delegation,
+extra worktrees, live calls and integration merges. The [verification ledger](../architecture/analysis-packs.md#outbound-observation-verification-2026-11-06)
+records O1–O7 evidence and the authorized eligibility/exit delta separately from source/report parity.
+Execution attempts and recoveries remain in the ignored run log. New security assessment remains a
+separate capability with its own evidence contract. Initial implementation did not assign commits,
+pushes or PRs; the follow-up delivery assignment is recorded below.
 
 
 ### 2026-11-05 — Predecessor checkpoint documented
@@ -249,3 +255,19 @@ observation-only eligibility correction. O1–O7, scope, limits and review shape
 
 **Verification impact.** Documentation/link checks only for this closeout. Implementation must still
 freeze its actual starting source/report and legacy-assessment baseline before executing §8.
+
+
+### 2026-11-06 — Full Juice Shop E2E and feature delivery assigned
+
+**Source.** User requested full Juice Shop E2E validation, fixes if needed, then commit and push.
+
+**Changed sections.** §3 includes the orientation status pointer; §5 authorizes the feature commit/push.
+
+**Rationale and summary.** Extend validation to the unchanged pinned application's complete static
+entry scope and deliver the reviewed feature diff. Keep localhost model stubs, no paid/target calls,
+no sample edits, no new agents/worktrees, no PR creation and no integration merge.
+
+**Verification impact.** Compare accepted `dc309cd` and current full CLI reports, all 208 candidate
+assessments under both local providers, exact earlier-family requests/replay, source-reviewed XSS
+controls, saved JSON/HTML/SARIF parity and required incomplete exits. Record results and supported
+limits in the [ledger](../architecture/analysis-packs.md#juice-shop-full-e2e-follow-up-2026-11-06).

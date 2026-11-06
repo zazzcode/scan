@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/analysispacks"
 )
 
 // DecisionTrace contains the exact JSON bodies used in one assessment, never
@@ -60,6 +61,9 @@ func (c *Client) Replay(use analysis.CandidateUse, trace DecisionTrace) analysis
 // Preview prepares the exact JSON request without making a network call.
 func (c *Client) Preview(use analysis.CandidateUse) (DecisionTrace, error) {
 	payload, err := c.payload(use)
+	if err != nil && analysispacks.ObservationOnly(use.Kind) {
+		return DecisionTrace{}, err
+	}
 	version := protocolVersion(use)
 	return DecisionTrace{QuestionVersion: version, Request: payload, RequestBytes: len(payload), RequestDigest: requestDigest(use, payload), Components: cloneComponents(use.Components)}, err
 }

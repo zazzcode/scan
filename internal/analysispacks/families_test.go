@@ -21,7 +21,7 @@ func validationSelectionUse(file string, claim bool) analysis.CandidateUse {
 }
 
 func TestFamilyComponentSelection(t *testing.T) {
-	families := map[string][]string{"sql": nil, "nosql": nil, "validation": nil, "xss": nil}
+	families := map[string][]string{"sql": nil, "nosql": nil, "validation": nil, "xss": nil, "outbound": nil}
 	for _, fam := range Families() {
 		if _, ok := families[fam.Name]; !ok {
 			t.Fatalf("unexpected family %s", fam.Name)
@@ -155,7 +155,7 @@ func TestFamilyComponentSelection(t *testing.T) {
 
 	// Unregistered kinds keep their existing runtime paths: no selection is
 	// attached and none is required for their requests.
-	for _, kind := range []string{"xss_data_candidate", "log_sink_candidate", "outbound_http_candidate"} {
+	for _, kind := range []string{"xss_data_candidate", "log_sink_candidate"} {
 		u := analysis.CandidateUse{Kind: kind, Sink: analysis.Evidence{Span: analysis.Span{File: "server.ts"}}}
 		Attach(&u)
 		if u.Components != nil {

@@ -1,6 +1,10 @@
 package analysispacks
 
-import "testing"
+import (
+	"github.com/zazzcode/zazzles/internal/analysis"
+	"strings"
+	"testing"
+)
 
 func catalogItems(t *testing.T) []Component {
 	t.Helper()
@@ -55,5 +59,88 @@ func TestCatalogMissingSelectorRoots(t *testing.T) {
 				t.Fatal("missing selector root accepted as valid embedded configuration")
 			}
 		})
+	}
+}
+
+func TestOutboundCatalogValidation(t *testing.T) {
+	f := FamFamily("outbound_http_candidate")
+	for _, missing := range f.rootIDs() {
+		items := catalogItems(t)
+		filtered := []Component{}
+		for _, v := range items {
+			if v.ID != missing {
+				filtered = append(filtered, v)
+			}
+		}
+		if _, err := newCatalog(filtered); err == nil {
+			t.Fatalf("missing %s accepted", missing)
+		}
+	}
+	items := catalogItems(t)
+	for i := range items {
+		if items[i].ID == f.Claim {
+			items[i].Kind = "claim_questions"
+		}
+	}
+	if _, err := newCatalog(items); err == nil {
+		t.Fatal("observation questionnaire accepted")
+	}
+}
+
+func TestOutboundMaterialBounds(t *testing.T) {
+	for _, bad := range []string{"", "{", `{"id":"trusted-js-fetch"}`} {
+		items := catalogItems(t)
+		for i := range items {
+			if items[i].ID == "api.python-http-destination-v1" {
+				items[i].Material = bad
+			}
+		}
+		if _, err := newCatalog(items); err == nil {
+			t.Fatal("malformed destination contract accepted")
+		}
+	}
+	items := catalogItems(t)
+	for i := range items {
+		if items[i].ID == "observation.outbound" {
+			items[i].Material = strings.Repeat("x", MaxMaterialBytes+1)
+		}
+	}
+	c, err := newCatalog(items)
+	if err != nil {
+		t.Fatal(err)
+	}
+	u := analysis.CandidateUse{Kind: "outbound_http_candidate", Sink: analysis.Evidence{Span: analysis.Span{File: "server.js"}}}
+	s, err := c.selectUse(u)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := c.material(FamFamily(u.Kind), s); err == nil {
+		t.Fatal("oversized observation material accepted")
+	}
+	for _, file := range []string{"server.js", "app.py"} {
+		u.Sink.Span.File = file
+		if file == "app.py" {
+			u.APIModel = OutboundContract("requests")
+			u.Context = []analysis.Evidence{{Kind: "sink_binding"}}
+		}
+		s, err := Select(u)
+		if err != nil {
+			t.Fatal(err)
+		}
+		size := 0
+		for _, ref := range s.Components {
+			size += len(embedded.components[ref.ID].Material)
+		}
+		t.Logf("%s observation components=%d material=%d request=0", file, len(s.Components), size)
+	}
+}
+
+func BenchmarkOutboundComponentSelection(b *testing.B) {
+	u := analysis.CandidateUse{Kind: "outbound_http_candidate", Sink: analysis.Evidence{Span: analysis.Span{File: "server.js"}}}
+	b.ReportAllocs()
+	for b.Loop() {
+		if _, err := Select(u); err != nil {
+			b.Fatal(err)
+		}
 	}
 }

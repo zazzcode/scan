@@ -51,6 +51,13 @@ func ForUse(use analysis.CandidateUse) (*Material, error) {
 		if !reflect.DeepEqual(m.Contract, use.APIModel) {
 			return nil, fmt.Errorf("selected XSS rendering contract conflicts with facts")
 		}
+	} else if family.ObservationOnly {
+		if m.Contract != nil {
+			m.Contract.Library = use.APIModel.Library
+		}
+		if !reflect.DeepEqual(m.Contract, use.APIModel) {
+			return nil, fmt.Errorf("outbound contract conflicts with facts")
+		}
 	} else if m.Contract != nil {
 		return nil, fmt.Errorf("%s selection must not carry an API contract", family.Label)
 	}
@@ -84,6 +91,9 @@ func (c *catalog) material(family *Family, s *analysis.ComponentSelection) (*Mat
 			m.Questions = questions
 			m.Choices = choices
 		case "language_guidance":
+			if family.ObservationOnly {
+				continue
+			}
 			if err := decode(v.Material, &m.Guidelines); err != nil {
 				return nil, err
 			}
@@ -97,6 +107,12 @@ func (c *catalog) material(family *Family, s *analysis.ComponentSelection) (*Mat
 	}
 	// Required material is defined by the registered question protocol, not a
 	// universal count. API contracts belong to query families only.
+	if family.ObservationOnly {
+		if len(m.Questions) != 0 {
+			return nil, fmt.Errorf("observation cannot contain questions")
+		}
+		return m, nil
+	}
 	if m.Guidelines.Body == "" || len(m.Questions) != len(family.QuestionNames) {
 		return nil, fmt.Errorf("%s required material missing", family.Label)
 	}
