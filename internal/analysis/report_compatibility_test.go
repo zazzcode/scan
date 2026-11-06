@@ -28,7 +28,7 @@ func TestReportSchemaCompatibility(t *testing.T) {
 			if err := json.Unmarshal(data, &decoded); err != nil {
 				t.Fatal(err)
 			}
-			if decoded.SchemaVersion != 3 || decoded.SourceSchemaVersion != version || len(decoded.Uses) != 1 || decoded.Handler(decoded.Entries[0].ID) == nil {
+			if decoded.SchemaVersion != analysis.ReportSchemaVersion || decoded.SourceSchemaVersion != version || len(decoded.Uses) != 1 || decoded.Handler(decoded.Entries[0].ID) == nil {
 				t.Fatal("legacy source/association dropped")
 			}
 			if decoded.Callables[0].Definition != evidence || decoded.Uses[0].Sink != evidence || decoded.AnalysisGuidelines[0].Version != "old" {

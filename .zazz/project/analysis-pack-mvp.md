@@ -1,14 +1,16 @@
 # Analysis pack MVP proposal
 
-**Planning decision, 2026-11-05.** `analysis-pack-mvp` is a separate initiative, with its own
-future worktree/branch, after `common-entry-and-dispatch` completes acceptance and merges into
-`stage`. It precedes command injection and the remaining vulnerability-family expansion.
-This proposal authorizes documentation only; implementation needs its own bounded contract and
-explicit assignment. It is not another deliverable in the common-entry/dispatch milestone.
+**Implemented foundation; broader proposal retained, updated 2026-11-06.** The SQL-first MVP and
+NoSQL, standalone-validation, XSS and outbound-observation migrations implement this design's
+internal component boundary. The [component architecture](../architecture/analysis-packs.md#current-implementation-status)
+owns current runtime organization and verification; the [implementation plan](implementation-plan.md#analysis-pack-mvp-initiative)
+owns remaining delivery order. Logging remains a separate migration. Broader Inspect, external pack
+loading and standards ingestion remain proposed capabilities.
 
-The [implementation plan](implementation-plan.md#analysis-pack-mvp-initiative) owns sequencing.
-The [technical approach](../../docs/technical-approach.md) owns the public explanation of semantic
-judgment. This proposal owns the proposed pack boundary, MVP scope and evaluation goals.
+The original 2026-11-05 decision separated this initiative from common-entry/dispatch. That
+foundation and the subsequent component contracts are complete implementations, not instructions
+to create another worktree or repeat the migrations. The remaining proposal sections explain design
+principles and future goals; they do not independently authorize implementation.
 
 ## Purpose and architectural distinction
 
@@ -32,17 +34,19 @@ define sources, propagation, sanitizers and sinks and can produce traces. Zazzle
 decision model within claim judgment, constrained by static evidence and Go policy. This is an
 architectural distinction, not proof of uniqueness, broader coverage or superior accuracy.
 
-## Current foundation and proposed change
+<a id="current-foundation-and-proposed-change"></a>
+
+## Implemented foundation
 
 The current scanner already contains the components below. They ship in the binary and are not
 user-downloadable analysis packs.
 
-| Component | Current owner | Proposed pack role |
+| Component | Current owner | Responsibility |
 | --- | --- | --- |
 | Language/framework discovery and bounded flow | `internal/parse/` | Reference implemented capabilities and their supported subsets; executable adapters stay compiled |
-| Verified library/API contracts | Evidence assembly and candidate API models | Version applicable contract content and associate it with verified bindings |
-| Versioned language Analysis Guidelines | `internal/guidelines/` | Identify embedded guidance and select applicable components explicitly |
-| Claim questions and answer protocols | `internal/judge/` | Reference the question set and interpretation guidance for the named claim |
+| Verified library/API contracts | `internal/analysispacks/`; bindings proved in parse | Select versioned contract content for demonstrated operations |
+| Versioned language Analysis Guidelines | `internal/guidelines/`; family projections selected by the catalog | Embed canonical guidance and select validated applicable sections |
+| Claim questions and answer protocols | Migrated families in `internal/analysispacks/`; transport and gates in judge | Supply questions and interpretation for the named claim; logging remains in judge |
 | Required evidence and consistency gates | Parse completeness and Go judge policy | Declare obligations while retaining mandatory core gates |
 | Positive/protected/unknown controls | Existing fixtures and tests | Identify regression coverage for each declared capability |
 
@@ -255,7 +259,8 @@ structure as new vulnerability families. The goal is one coherent architecture r
 small, verified migrations. A separate architecture used only by new features would leave duplicated
 ownership and policy paths to maintain.
 
-The recommended sequence is:
+The delivered sequence is SQL first, then NoSQL/standalone validation, XSS and outbound observations.
+Logging remains separately scoped. The migration principles are:
 
 - **Inventory first.** Identify API contracts, embedded guidance, claim questions, required evidence
   and reporting policy across existing families. Separate shared responsibilities from language-
@@ -266,9 +271,9 @@ The recommended sequence is:
 - **Implement command injection separately.** Use the accepted component structure to add process
   API contracts, command-specific questions and regression controls. This tests reuse across another
   vulnerability family without hiding new detection work inside the packaging initiative.
-- **Migrate the remaining families incrementally.** Give XSS, validation and logging bounded follow-on
-  migration tasks with acceptance evidence and an explicit status. Do not leave them as unspecified
-  cleanup or require every migration to finish before command-injection work can begin.
+- **Migrate logging separately.** Preserve sensitive-content, emission and redaction semantics with
+  explicit acceptance evidence. The completed family migrations provide the shared structure; logging
+  is an active consumer to migrate, rather than dead code to remove.
 
 Family-specific semantics MUST remain explicit. XSS needs output-context and rendering behavior
 that does not belong in a generic injection abstraction. Shared components SHOULD emerge from
@@ -325,13 +330,9 @@ No broad engine rewrite or unrelated cleanup is part of those checkpoints.
 
 ## Delivery boundary and next step
 
-Finish and merge the eight-deliverable common-entry/dispatch milestone first. Then assign a separate
-`analysis-pack-mvp` contract and create its own worktree/branch from the merged `stage` baseline using
-the repository worktree workflow. Scope that contract around the current implementation, acceptance
-controls, request/report compatibility and recovery points before changing scanner behavior.
-
-The documentation prepared on the common-entry/dispatch branch records this future initiative only.
-It neither starts its implementation nor authorizes creating the new worktree now. Subsequent
-vulnerability-family work should use the accepted pack structure; the rest of the roadmap keeps
-its existing order. External pack distribution can be reconsidered after several families validate
-that the internal boundaries are useful.
+The common-entry/dispatch prerequisite and the SQL-first component MVP plus sessions 01–03 are
+implemented. Their contracts and the [migration ledger](../architecture/analysis-packs.md#migration-ledger)
+record acceptance and remaining limits. Subsequent vulnerability families should use the shared
+component structure. Logging migration and new families need separate bounded assignments; neither
+is implicit cleanup or authorization to create another worktree. External pack distribution can be
+reconsidered after the internal boundaries have further real consumers.

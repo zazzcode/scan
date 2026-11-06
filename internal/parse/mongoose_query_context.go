@@ -8,6 +8,7 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/analysispacks"
 )
 
 // mongooseQueryContext follows only the selected registration's direct static
@@ -58,7 +59,7 @@ func (s *moduleSet) mongooseQueryContext(use *analysis.CandidateUse) {
 		use.Context = append(use.Context, evidence)
 		use.Completeness.Evidence[evidence.Kind] = append(use.Completeness.Evidence[evidence.Kind], evidence)
 		if version == "4.2.4" {
-			use.APIModel = &analysis.APIModel{ID: "mongoose-model-query-v2", Library: "mongoose", Reference: "https://github.com/Automattic/mongoose/blob/4.2.4/lib/cast.js", Semantics: "The selected-root manifest pins Mongoose4.2.4; installed runtime is not verified. Its query caster retains recognized $ operators in filter objects and casts their operands. SchemaString inherits $ne/$eq/$in/$nin conditional handlers, so a String schema path does not itself reject an operator object or force scalar equality. Persistence validation and schema types do not sanitize query filters. Inspect the actual schema, operation/slot and application guards; scalar guards, custom setters/hooks, casts and findById ObjectId behavior must not inherit a different field's conclusions."}
+			use.APIModel = analysispacks.NoSQLContract("mongoose-model-query-v2")
 		}
 	}
 }

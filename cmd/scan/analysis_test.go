@@ -76,7 +76,7 @@ func TestBrowserEventPipeline(t *testing.T) {
 	if err := json.Unmarshal(out.Bytes(), &r); err != nil {
 		t.Fatal(err)
 	}
-	if r.SchemaVersion != 3 || len(r.Entries) != 6 || len(r.Uses) != 4 || len(r.Findings) != 4 {
+	if r.SchemaVersion != analysis.ReportSchemaVersion || len(r.Entries) != 6 || len(r.Uses) != 4 || len(r.Findings) != 4 {
 		t.Fatalf("bad actual event pipeline: %d/%d/%d", len(r.Entries), len(r.Uses), len(r.Findings))
 	}
 	if err := r.ValidateUses(); err != nil {
@@ -146,7 +146,7 @@ func TestGraphQLPipelineAndBounds(t *testing.T) {
 			if err := json.Unmarshal(out.Bytes(), &r); err != nil {
 				t.Fatal(err)
 			}
-			if r.SchemaVersion != 3 || len(r.Entries) != 9 {
+			if r.SchemaVersion != analysis.ReportSchemaVersion || len(r.Entries) != 9 {
 				t.Fatalf("wrong inventory %d", len(r.Entries))
 			}
 			if err := r.ValidateUses(); err != nil {
@@ -213,7 +213,7 @@ func TestGRPCPipeline(t *testing.T) {
 			if err := json.Unmarshal(out.Bytes(), &r); err != nil {
 				t.Fatal(err)
 			}
-			if r.SchemaVersion != 3 || len(r.Entries) != 11 {
+			if r.SchemaVersion != analysis.ReportSchemaVersion || len(r.Entries) != 11 {
 				t.Fatalf("wrong inventory %d", len(r.Entries))
 			}
 			if err := r.ValidateUses(); err != nil {

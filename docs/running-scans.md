@@ -145,9 +145,9 @@ Entry paths are relative to the target repository. Use `server.ts` for Juice Sho
 `src/server.ts` for the vulnerable TypeScript sample. Omit `--entry` to consider all selected JS/TS
 registration files. Explicit selection avoids conflating training snippets with production scope.
 
-The separate schema3 evidence report contains typed `entries`, `registrations`,
+The separate schema4 evidence report contains typed `entries`, `registrations`,
 `dispatch_bindings`, `callables`, `invocation_contexts`, `uses`, `files`, `gaps` and `limitations`.
-Each use identifies its route, source fields, ordered local transfer evidence, candidate sink,
+Each use identifies its entry/invocation context, source fields, ordered local transfer evidence, candidate sink,
 snapshot hashes and assessment state. Direct named relative ESM imports, imported handler factories,
 local assignment, string expressions and simple object destructuring are supported. Branches,
 unknown transformations, middleware, receiver ambiguity, unverified library bindings and external
@@ -330,3 +330,9 @@ apps. Paid results, offline discovery, synthetic policy controls and historical 
 evidence. Supported source-reference checks and format compatibility pass; model completion does not
 establish exhaustive accuracy or runtime exploitability. Mandatory rendered report review is
 complete through bounded inspection of the user-opened localhost HTTP tab; human review/merge remains pending.
+
+
+Outbound uses are observations, not security verdicts. A requested model scan keeps them `not_run`
+and in Review, makes no model calls for them, saves the incomplete report and exits 1. The existing
+candidate-position request cap remains conservative. Structural-only scanning completes normally;
+exporting a saved report preserves its historical answers. See [decision-model scope](decision-models.md#outbound-observations).

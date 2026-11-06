@@ -36,14 +36,14 @@ func (r *AnalysisReport) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("unsupported analysis schema %d", header.SchemaVersion)
 	}
 	var out AnalysisReport
-	if header.SchemaVersion == 3 {
+	if header.SchemaVersion >= 3 {
 		var fields map[string]json.RawMessage
 		if err := json.Unmarshal(data, &fields); err != nil {
 			return err
 		}
 		for _, key := range []string{"client_entries", "practice"} {
 			if _, ok := fields[key]; ok {
-				return fmt.Errorf("schema 3 rejects legacy %s", key)
+				return fmt.Errorf("schema %d rejects legacy %s", header.SchemaVersion, key)
 			}
 		}
 		for _, raw := range header.Uses {
@@ -53,7 +53,7 @@ func (r *AnalysisReport) UnmarshalJSON(data []byte) error {
 			}
 			for _, key := range []string{"route_id", "client_id"} {
 				if _, ok := fields[key]; ok {
-					return fmt.Errorf("schema 3 rejects legacy candidate association %s", key)
+					return fmt.Errorf("schema %d rejects legacy candidate association %s", header.SchemaVersion, key)
 				}
 			}
 		}

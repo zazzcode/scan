@@ -79,3 +79,34 @@ use an explicit compact column schema and shared source/gap records. This is los
 compaction; it does not remove blockers or make missing coverage complete. A request that still
 exceeds the bound remains unassessed. Changed projection/envelope inputs invalidate exact replay;
 raw historical responses remain intact.
+
+## Component provenance
+
+SQL, NoSQL, standalone-validation and XSS requests compose scanner-owned interpretation material selected
+by the static analyzer from verified source facts. Fresh schema-4 JSON reports identify the selected
+pack/components, versions and digests; a selection alone does not mean a model assessment ran. SQL
+uses `sql-components-v2`, NoSQL `nosql-components-v1` and standalone validation
+`validation-components-v1`; XSS uses `xss-components-v1`. Unmigrated families retain their existing protocols. Mandatory evidence
+and consistency gates remain in Go.
+
+Missing required material, conflicting selection or size limits prevent a model request and retain
+an explicit unresolved assessment. No generic guidance fallback supplies missing protection.
+Exact-request replay binds selected content/provenance as well as evidence, questions and model.
+Changed requests need fresh assessment; exporting an older report preserves its historical answers
+and does not assign it new component identities. See the
+[technical approach](technical-approach.md#analysis-knowledge-and-components).
+
+
+## Outbound observations
+
+Outbound observations have no implemented security assessment. Assessing one returns `not_run` with
+an explicit reason, no question version or request digest and zero model HTTP calls. Preview returns
+a non-assessable error without a request body. SQL validation/construction questions cannot establish
+destination security. Static `analysis_components` metadata describes observation scope only.
+
+A requested scan with an unassessed outbound observation remains incomplete and exits 1 while saving
+its Review record. The conservative request-limit schedule still counts candidate positions, including
+observations; it does not promise that every unused HTTP slot will be reassigned. Supported families
+continue under the same cap. Structural-only scans do not request model completion. Saved historical
+generic answers, versions and statuses remain intact on export; they are not rewritten or replayed
+onto new evidence. Full SSRF, exfiltration and browser-security assessment require separate contracts.

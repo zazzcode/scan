@@ -91,7 +91,7 @@ func TestMixedEntryPipeline(t *testing.T) {
 			t.Errorf("%s: entries/uses %d/%d want %d/%d", fixture.name, ne, nu, fixture.entries, fixture.uses)
 		}
 	}
-	if r.SchemaVersion != 3 || len(r.Entries) != 68 || len(r.Uses) != 53 {
+	if r.SchemaVersion != analysis.ReportSchemaVersion || len(r.Entries) != 68 || len(r.Uses) != 53 {
 		t.Fatalf("mixed inventory: schema=%d entries=%d uses=%d", r.SchemaVersion, len(r.Entries), len(r.Uses))
 	}
 	for _, u := range r.Uses {

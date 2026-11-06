@@ -36,10 +36,22 @@ Independent future deliverables may use separate feature worktrees/PRs targeting
   backend responses/templates/storage first, browser results separately, Python adapter boundary preserved.
 - [Common entry and dispatch](common-entry-dispatch.md) — architecture and eight phased
   deliverable contracts requested 2026-11-03 in `common-entry-and-dispatch`; deliverables1–7
-  implemented, final automated and bounded rendered acceptance passing; human review/merge pending. See
+  implemented, accepted and merged through PR #8 on 2026-11-05. See
   [acceptance results](../evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05). Includes HTTP/browser preservation, browser events, bounded
   dynamic HTTP, Node.js GraphQL/gRPC, entry-specific reports and saved-report compatibility.
-- Remaining specs are not authored yet. Their proposed slices live in the
+- [Analysis pack MVP](analysis-pack-mvp.md) — SQL-first embedded component migration; implemented
+  and offline-verified 2026-11-05 in `analysis-pack-mvp` on the merged common-entry/dispatch
+  foundation. Includes applicability, provenance and offline SQL acceptance.
+- [Components 01: NoSQL + input validation](components-01-nosql-validation.md) — implemented and
+  offline-verified 2026-11-05; SQL-only assumptions generalized, NoSQL and standalone validation
+  migrated with independent claim protocols.
+- [Components 02: all XSS types and browser](components-02-xss.md) — implemented and offline-verified
+  2026-11-05; selected rendering/stored/browser/cross-tier material, independent context/origin/path
+  gates and isolated literal/default/unknown fetch-method attribution.
+- [Components 03: outbound observations](components-03-outbound.md) — implemented and offline-verified
+  2026-11-06; scoped observation selections, zero-call `not_run`, browser/server isolation and
+  saved-report parity. Complete SSRF judgment remains separate.
+- Other planned specs are not authored yet. Their proposed slices live in the
   [implementation plan](../project/implementation-plan.md); each needs a bounded contract and user authorization.
 
 See [repository state](../project.md#concept-stage-repository-state) for the current concept stage and

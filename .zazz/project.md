@@ -1,6 +1,6 @@
 # Zazzles — project overview
 
-**Project definition: proposed direction, 2026-10-19.** This overview owns product purpose, direction,
+**Project overview, updated 2026-11-06.** This overview owns product purpose, direction,
 and repository state. The [agent orientation](docs/zazzles-agent-orientation.md#documentation-map) routes
 to the detailed documents and defines their responsibilities.
 
@@ -83,8 +83,8 @@ standards define assessment requirements, while source evidence establishes comp
 Broader standards selection/ingestion, architecture-quality analysis and automatic repair orchestration
 are planned. The scanner does not currently implement this complete loop or treat arbitrary Markdown
 as trusted policy. The [pack proposal](project/analysis-pack-mvp.md#standards-driven-agent-workflow)
-records the future trust, provenance, evidence and remediation boundaries. The existing SQL-first
-internal MVP remains unchanged in implementation scope.
+records the future trust, provenance, evidence and remediation boundaries. The implemented
+component migrations organize existing Scan knowledge; they do not implement that broader workflow.
 
 ## Long-term objectives
 
@@ -126,9 +126,9 @@ SAST rather than assume that using AI improves detection. The
 [phased plan](project/implementation-plan.md) owns delivery order. SCA remains a complementary objective
 after the source-code analysis foundation.
 
-**Languages, 2026-10-31.** The scanner's committed languages are JavaScript, TypeScript, Python,
-and Go. JavaScript and TypeScript are the current implementation. Python, then Go, are later
-adapters. A file extension is not analysis support.
+**Languages, updated 2026-11-06.** JavaScript, TypeScript and Python have implemented bounded
+adapters. Go remains planned; later language expansion has no fixed delivery position. A file
+extension is not analysis support.
 
 **Route report, 2026-10-31.** For each route, identify and report both where protection is sufficient
 and where it is lacking. A sufficient result names the claim, the value, and the sink slot it covers.
@@ -217,16 +217,26 @@ established product promises.
 
 ## Analysis pack initiative
 
-**2026-11-05 user direction:** [analysis-pack-mvp](project/analysis-pack-mvp.md) is a separate
-initiative with its own future worktree/branch after common-entry/dispatch completes acceptance and
-merges into `stage`, before command injection. Current-branch work documents the proposal only;
-implementation requires a separate assignment and bounded contract after the merge.
+The scanner uses embedded analysis components for SQL, JS/TS NoSQL, standalone validation,
+XSS and [outbound observations](specifications/components-03-outbound.md). This implements the
+SQL-first MVP and migration sessions 01–03 from the [analysis-pack design](project/analysis-pack-mvp.md).
+Logging remains on its working runtime path and requires a separate component migration.
 
-The MVP will organize existing language/framework models, embedded guidance, verified API contracts,
-claim questions and evidence obligations under explicit versions and applicability. The judge receives
+Static source/report comparisons and fresh paid OpenAI Decisions scans of Juice Shop and VulnPy
+verify this organization. All 944 eligible paid judgments passed exact replay against freshly parsed
+source; all 35 historical confirmed source contexts remain confirmed. The
+[verification record](architecture/analysis-packs.md#fresh-paid-component-e2e-2026-11-06) distinguishes
+these results from coverage limits and broader accuracy goals.
+
+The delivered consumers organize existing language/framework models, embedded guidance, verified API contracts,
+claim questions and evidence obligations under explicit versions and applicability. The
+[architecture ledger](architecture/analysis-packs.md#current-implementation-status)
+records acceptance evidence, limits and remaining work. Outbound components describe observations,
+not SSRF protection: requested assessments return `not_run` with zero model calls and leave the scan
+incomplete. The judge receives
 only relevant interpretation material alongside the source trace; executable adapters and mandatory
 Go evidence gates remain in the scanner. The goal is reusable, auditable analysis knowledge as new
 vulnerability families arrive. Downloadable packs, executable plugins and a new rule language remain
 deferred. The [implementation plan](project/implementation-plan.md#analysis-pack-mvp-initiative)
-owns sequencing; the [technical approach](../docs/technical-approach.md#analysis-knowledge-and-proposed-packs)
+owns sequencing; the [technical approach](../docs/technical-approach.md#analysis-knowledge-and-components)
 owns the public explanation and evaluation limits.

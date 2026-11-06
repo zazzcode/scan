@@ -48,7 +48,7 @@ func TestSavedDecisionReplayRequiresIdenticalEvidenceAndRetainsScores(t *testing
 		}
 		changed := ""
 		if change == "body" {
-			changed = strings.Replace(input, "# JavaScript and TypeScript analysis guidelines", "# historical guideline text", 1)
+			changed = strings.Replace(input, "## Cross-site scripting", "# historical guideline text", 1)
 		} else {
 			changed = strings.Replace(input, `"analysis_guidelines":`, `"practice":`, 1)
 		}

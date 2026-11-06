@@ -8,6 +8,7 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/analysispacks"
 	"github.com/zazzcode/zazzles/internal/guidelines"
 	"github.com/zazzcode/zazzles/internal/lang"
 	"github.com/zazzcode/zazzles/internal/walk"
@@ -24,9 +25,15 @@ func AnalyzeWithChecks(root, entry string, checks []analysis.Check) (result *ana
 	defer func() {
 		if resultErr == nil && result != nil {
 			result.RecordCheckMatches(checks)
+			for i := range result.Uses {
+				analysispacks.Attach(&result.Uses[i])
+			}
 		}
 	}()
 
+	if err := analysispacks.Validate(); err != nil {
+		return nil, err
+	}
 	entry = filepath.ToSlash(filepath.Clean(entry))
 	if entry == "." {
 		entry = ""

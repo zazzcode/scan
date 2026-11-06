@@ -114,7 +114,7 @@ func TestConfigurationAndCancellation(t *testing.T) {
 
 func TestJevDuplicateAnswers(t *testing.T) {
 	c, _ := New("jev", "test-model", "key")
-	_, _, _, err := c.decode([]byte(`{"model":"m","answers":{"validation":{"type":"choice","choice":"sufficient"},"validation":{"type":"choice","choice":"insufficient"},"protection":{"type":"choice","choice":"uncertain"}}}`))
+	_, _, _, err := c.decodeQuestions([]byte(`{"model":"m","answers":{"validation":{"type":"choice","choice":"sufficient"},"validation":{"type":"choice","choice":"insufficient"},"protection":{"type":"choice","choice":"uncertain"}}}`), questions)
 	if err == nil {
 		t.Fatal("duplicate Jev answer was accepted")
 	}

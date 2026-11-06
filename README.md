@@ -53,54 +53,15 @@ Fix will use evidence from all three assessment capabilities. It should preserve
 and existing protection while producing reviewable repairs. The [remediation philosophy](docs/philosophy.md)
 explains that goal. Inspect, Audit and automated Fix remain planned.
 
-## Goal: an assessment and remediation loop for agents
-
-**One possible planned workflow:** a coding agent writes or revises code, selects Scan, Inspect
-or Audit assessments as needed, then uses Fix to address supported issues. Tests and reassessment
-check the revision before review. This loop is optional, not a required order for the capabilities.
-
-```mermaid
-flowchart LR
-    A[Team requirements and standards] --> B[Agent writes or revises code]
-    B --> C[Choose Scan, Inspect or Audit]
-    C --> D[Fix supported issues]
-    D --> E[Tests and reassessment]
-    E -->|More work| B
-    E -->|Ready for review| F[Human review and approval]
-```
-
-Teams should be able to select their own standards for code structure, architecture, validation
-and other engineering practices. Using Zazzles should not require adopting Zazz methodology.
-The selected standard supplies the requirement. Source evidence shows whether the implementation
-meets it within the supported scope.
-
-Users should not need to write a standards manual to get started. Zazzles already supplies
-versioned language guidance for security assessment. Broader quality baselines and optional team
-profiles are planned. Findings about standards need an identifiable requirement and source evidence,
-not only a model's preference.
-
-The proposed [analysis packs](.zazz/project/analysis-pack-mvp.md#standards-driven-agent-workflow)
-will organize that knowledge into reusable components with explicit versions and applicability.
-Deterministic checks can handle mechanical requirements. Semantic judgment can assess contextual
-requirements using the actual implementation and relevant relationships.
-
-**Available today:** bounded assessments and reviewable reports. **Planned:** general standards
-selection and assessment, plus automated repair orchestration. Zazzles does not currently load
-arbitrary standards documents or run this entire loop.
-
-Passing an assessment covers only its named requirements and analyzed scope. Tests and human
-review still matter. Unsupported standards, missing context and unresolved questions remain visible
-instead of becoming a claim that all code meets a team's standards.
-
 ## Scan: current implementation
 
 Scan reads application source and follows supported input values into security-sensitive operations,
 such as database queries or HTML output. It records the relevant code, value transfers, controls
 and analysis gaps. It does not execute the application.
 
-A decision model assesses specific security questions using that evidence. Go policy then checks
-whether the evidence and answers support the conclusion. Missing facts remain explicit, even when
-the model gives a confident answer.
+A large language model (LLM) assesses specific security questions using that evidence. Go policy
+then checks whether the evidence and answers support the conclusion. Missing facts remain explicit,
+even when the model gives a confident answer.
 
 Development and calibration use the OpenAI Luna Decision API (`gpt-6-luna`). The CLI also implements
 a Jev transport, but transport support does not establish equivalent assessment accuracy.
@@ -133,6 +94,41 @@ flowchart LR
 A function call alone does not prove that an input reaches a sensitive operation. Unresolved
 handlers and entries with no discovered uses remain visible in coverage reporting.
 A protected claim applies to the stated operation and scope, not the entire entry or application.
+
+<a id="analysis-components"></a>
+
+### Analysis packs and reusable components
+
+An **analysis pack** groups reusable knowledge for a type of assessment, such as SQL injection or
+cross-site scripting (XSS). Each pack combines smaller components rather than repeating the same
+knowledge for every language and framework.
+
+| Component | What it contributes |
+|---|---|
+| Language guidance | How to interpret code and supported controls in JavaScript/TypeScript or Python |
+| Framework and flow capabilities | Which entry bindings and value transfers the compiled analyzer supports |
+| Library contracts | How a supported operation uses its arguments, such as SQL text versus bound values |
+| Claim questions and evidence requirements | What the model must assess and what source facts Go requires for the result |
+
+For each potential issue, static analysis selects the relevant components. The Decision LLM receives
+that interpretation material together with the actual source evidence. Go checks the answers against
+mandatory evidence requirements. A missing binding or unresolved path remains a gap.
+
+For example, Python SQLite and TypeScript Sequelize use different library contracts while sharing
+SQL assessment questions. A separate input-validation assessment can check an established field
+requirement without needing a database contract. SQL protection and field validation stay separate.
+
+Reports record component versions and content digests so a judgment can be traced to the knowledge
+used. Saved answers can be replayed only when the exact model request still matches.
+
+SQL, JS/TS NoSQL, standalone validation and supported XSS analyses use this design. Outbound
+observations also select components, but do not yet receive a server-side request forgery (SSRF)
+judgment; they remain Review. Logging analysis works through its existing path and is the remaining
+component migration.
+
+Packs ship inside the binary; downloadable packs and arbitrary project standards remain planned.
+See the [technical approach](docs/technical-approach.md#analysis-knowledge-and-components) for
+ownership, compatibility and coverage details.
 
 ### Technical approach: evidence and semantic judgment
 
@@ -213,7 +209,7 @@ at declared limits. Unresolved behavior remains visible.
 | **NoSQL injection** | Supported JavaScript/TypeScript selectors and executable `$where` expressions |
 | **Input validation** | Source-backed field requirements and enforcing guards, assessed separately from operation protection |
 | **Sensitive-data logging** | Request data and credentials reaching verified loggers |
-| **Outbound requests** | Discovery of request-influenced `fetch`/`axios` destinations. Complete SSRF assessment is planned |
+| **Outbound requests** | Unverified JS/TS `fetch`/`axios` call observations and supported Python URL-operand tracking. Complete SSRF assessment is planned |
 | **Reports** | Source evidence, assessment state and claim results in JSON, standalone HTML and SARIF |
 
 XSS support includes selected EJS, Handlebars, Pug, Jinja, jQuery, React, Vue and Angular patterns.
@@ -240,12 +236,12 @@ per-language checklist and delivery order.
 - Reflected, stored and client-side/framework XSS analysis.
 - Selected JS/TS API-to-browser XSS links and Python inline-script analysis.
 - Common entry/dispatch records, browser events, finite dynamic routes, GraphQL and unary gRPC.
+- SQL analysis component selection, bounded judge composition and auditable report/replay provenance.
+- NoSQL, standalone-validation and XSS component selection with independent claim protocols and replay provenance.
+- Outbound observation components, with request/body/response limits preserved and security assessment left explicit as future work.
 
 ### Next and planned work
 
-- **Analysis pack MVP:** the next initiative, in its own worktree before command injection.
-  It will organize existing analysis knowledge and select relevant
-  guidance and contracts for the judge. [Read the proposal](.zazz/project/analysis-pack-mvp.md).
 - **Command injection:** assess process and shell execution across JS/TS/Python.
 - **XSS hardening:** expand renderer, helper, stored-origin and cross-tier coverage.
 - **Additional security families:** path traversal, code injection, XXE, open redirects, weak
@@ -257,13 +253,60 @@ per-language checklist and delivery order.
 - **Inspect capability:** separately present standards and quality assessments using shared analysis
   components. Broader checks, report separation and their delivery priority remain to be scoped.
 
-Analysis knowledge currently ships in the scanner. Analysis-pack selection, downloadable packs and
-an external plugin system are not implemented. External pack distribution is outside the proposed
-internal MVP and would need its own design.
+Analysis knowledge ships in the scanner. SQL, JS/TS NoSQL, standalone validation and XSS use
+the component structure. Outbound observations also select components: JS/TS fetch/axios shapes retain
+unverified binding/operand/response gaps; Python retains its supported URL-operand contract.
+Outbound security assessment is not implemented: requested observation assessments return `not_run`
+with zero model calls and remain Review. A requested scan containing them remains incomplete (exit 1);
+structural-only scans retain normal completion. Historical answers stay intact on export. Browser
+requests do not establish server SSRF. Logging migration, full SSRF/exfiltration/browser-security
+analysis, downloadable packs and an external plugin system remain separate work.
 
 Future capabilities need vulnerable, protected and unknown controls across applicable supported
 languages. Broader evaluation continues against independent source expectations and pinned comparison
-tools. VulnPy's known SQL/XSS misses remain tracked coverage work.
+tools. VulnPy's generated Flask/FastAPI SQL and raw-HTML paths are now traced and assessed; its
+separate Jinja path remains a coverage gap. The [sample reference](docs/samples/vulnpy/reference.md)
+distinguishes those results from the preserved historical baseline.
+
+## Goal: an assessment and remediation loop for agents
+
+**One possible planned workflow:** a coding agent writes or revises code, selects Scan, Inspect
+or Audit assessments as needed, then uses Fix to address supported issues. Tests and reassessment
+check the revision before review. This loop is optional, not a required order for the capabilities.
+
+```mermaid
+flowchart LR
+    A[Team requirements and standards] --> B[Agent writes or revises code]
+    B --> C[Choose Scan, Inspect or Audit]
+    C --> D[Fix supported issues]
+    D --> E[Tests and reassessment]
+    E -->|More work| B
+    E -->|Ready for review| F[Human review and approval]
+```
+
+Teams should be able to select their own standards for code structure, architecture, validation
+and other engineering practices. Using Zazzles should not require adopting Zazz methodology.
+The selected standard supplies the requirement. Source evidence shows whether the implementation
+meets it within the supported scope.
+
+Users should not need to write a standards manual to get started. Zazzles already supplies
+versioned language guidance for security assessment. Broader quality baselines and optional team
+profiles are planned. Findings about standards need an identifiable requirement and source evidence,
+not only a model's preference.
+
+The SQL, NoSQL, standalone-validation and XSS [analysis components](docs/technical-approach.md#analysis-knowledge-and-components)
+organize existing knowledge with explicit versions and applicability. Broader team-standard
+components remain planned under the [standards-workflow design](.zazz/project/analysis-pack-mvp.md#standards-driven-agent-workflow).
+Deterministic checks can handle mechanical requirements. Semantic judgment can assess contextual
+requirements using the actual implementation and relevant relationships.
+
+**Available today:** bounded assessments and reviewable reports. **Planned:** general standards
+selection and assessment, plus automated repair orchestration. Zazzles does not currently load
+arbitrary standards documents or run this entire loop.
+
+Passing an assessment covers only its named requirements and analyzed scope. Tests and human
+review still matter. Unsupported standards, missing context and unresolved questions remain visible
+instead of becoming a claim that all code meets a team's standards.
 
 ## Agent-first philosophy
 
@@ -381,8 +424,8 @@ CI checks formatting, vet, build and race tests. Work stays on feature branches,
 `stage`, and humans review and merge. Live model calls are separate from offline tests.
 
 Keep this README's implemented capabilities and planned roadmap distinct. When a capability ships,
-update its support, remaining limits and acceptance status. Implementing the analysis pack MVP will
-require another README update. A proposal or recognized file/entry type does not count as delivered support.
+update its support, remaining limits and acceptance status. A proposal or recognized file/entry type
+does not count as delivered support.
 
 Internal engineering material lives under `.zazz/`:
 [architecture](.zazz/architecture.md), [implementation plan](.zazz/project/implementation-plan.md),

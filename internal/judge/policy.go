@@ -46,7 +46,21 @@ func applyPolicy(use analysis.CandidateUse, a *analysis.Assessment) {
 			}
 		}
 	}
-	for _, required := range c.Required {
+	requiredRoles := append([]string{}, c.Required...)
+	if use.Components != nil {
+		for _, role := range use.Components.Required {
+			found := false
+			for _, existing := range requiredRoles {
+				if existing == role {
+					found = true
+				}
+			}
+			if !found {
+				requiredRoles = append(requiredRoles, role)
+			}
+		}
+	}
+	for _, required := range requiredRoles {
 		if len(c.Evidence[required]) == 0 {
 			blockers = append(blockers, analysis.Gap{Kind: "required_evidence_missing", Detail: required, At: use.Sink.Span})
 		}

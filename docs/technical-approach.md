@@ -70,8 +70,8 @@ questions, but cannot invent an engineering standard or supply missing evidence.
 Broader reliability and maintainability coverage remains planned. The
 [analysis pack proposal](../.zazz/project/analysis-pack-mvp.md#security-code-quality-and-engineering-hygiene)
 includes quality claims as future consumers of the modular structure. Inspect compliance and
-security protection must remain distinct. The internal MVP still preserves existing behavior and
-migrates SQL first, without implementing a general quality platform.
+security protection must remain distinct. The implemented component migrations organize existing
+Scan analyses without implementing a general quality platform.
 
 The longer-term agent workflow uses team-approved coding and architecture standards as explicit
 assessment requirements. Agents create code, consume security/quality evidence, make repairs, then
@@ -169,25 +169,52 @@ protection and targeted repair guidance for agents. These are implemented design
 of any advantage over another scanner must be measured on matched cases. Mature tools may have
 broader framework coverage, deeper flow models and production workflows that Zazzles does not yet have.
 
-## Analysis knowledge and proposed packs
+<a id="analysis-knowledge-and-proposed-packs"></a>
 
-Today, analysis knowledge ships in the binary: compiled language/framework and flow adapters,
-verified API contracts, embedded versioned Analysis Guidelines, claim questions and Go evidence
-policy. Application `--checks` files supply requirements and selection; they do not add a parser or
-new vulnerability detector. Public analysis guides govern development but are not loaded as prompts
-by editing their Markdown.
+## Analysis knowledge and components
 
-The proposed [analysis pack MVP](../.zazz/project/analysis-pack-mvp.md) will organize these existing
-components under explicit IDs, versions, applicability and regression coverage. The static engine
-will use references to supported models and evidence obligations; the judge will receive selected
-interpretation guidance and applicable contracts alongside the candidate's trace. Executable adapters
-remain compiled, and mandatory Go gates remain authoritative. Language, entry framework, library and
-claim components should compose without duplicating a pack for every combination.
+Analysis knowledge ships in the binary: compiled language/framework and flow adapters, verified API
+contracts, embedded Analysis Guidelines, claim questions and Go evidence policy. Application `--checks`
+files supply requirements and selection; they do not add a parser or vulnerability detector. Editing
+a public analysis guide alone does not change the running judge's instructions.
 
-This is a separate future initiative/worktree after common-entry/dispatch merges and before command
-injection. No pack loader, public rule language, downloadable registry or third-party plugin system
-is implemented or authorized by this documentation. Changed effective judgment inputs must retain
-exact-request replay protection and cannot inherit historical answers.
+SQL, NoSQL, standalone validation and XSS now consume the internal component catalog. Language
+guidance, entry/flow capability references, applicable operation/rendering contracts, family questions
+and evidence obligations have
+explicit identities, versions, digests, applicability and test references. Static assembly selects
+components from supported source facts; the judge uses that selection and receives only applicable
+interpretation material alongside the candidate trace. Executable adapters remain compiled, and Go
+checks mandatory evidence and consistency gates. A component cannot invent a binding, clear a gap or
+certify a custom validator by name.
+
+Fresh reports use schema 4 to preserve per-candidate selection provenance. SQL requests use protocol
+`sql-components-v2`, NoSQL `nosql-components-v1`, standalone validation `validation-components-v1`
+and XSS `xss-components-v1`. Logging keeps `log-use-v1` pending its separate component migration;
+outbound observations have no model protocol. Exact effective requests bind selected
+content and provenance, source evidence, questions and model. Changing any of them rejects historical
+answers for fresh replay. Saved reports remain exportable with their original evidence and answers.
+XSS composes one primary rendering contract with context/protection interpretation and source-backed
+stored/browser/response capabilities. Its five questions and mandatory origin/context/path gates remain
+independent of database judgments; data-only observations are unassessed. Browser fetch attribution
+uses direct literal methods, defaults to GET for absent/literal method-free options, and leaves
+unsupported methods unresolved. This bounded correction is recorded separately in the migration ledger.
+Explicit component/material bounds complement the existing 64 KiB final request bound; excess material
+remains unresolved rather than being truncated.
+
+The [implementation architecture and migration ledger](../.zazz/architecture/analysis-packs.md)
+records inventory, limits, compatibility, offline verification and fresh paid-model acceptance.
+SQL detection scope is preserved;
+this reorganization is not evidence of improved live-model accuracy. NoSQL, standalone validation
+and XSS are migrated; outbound observations now select `pack.outbound` with static limits and no
+security questionnaire. JS/TS shape observations keep combined argument dependencies and unverified
+binding/response gaps; names or package declarations cannot establish a URL operand or trusted API.
+Python's existing bound requests/httpx functions and urllib.request.urlopen retain their separate
+URL/body/response roles. Browser HTTP remains distinct from server request evidence. Observation
+assessments return `not_run` without model requests; Preview rejects them without a body/digest.
+Schema4 remains unchanged, with catalog compatibility `outbound-observation-v1` and no outbound
+model protocol. Historical generic answers remain unchanged on export. Logging remains a follow-on
+migration. Command injection is the next new family and will use this structure. Public pack loaders, registries, executable plugins and broad
+standards ingestion remain outside the MVP.
 
 ## Evidence for the approach
 
@@ -197,8 +224,11 @@ cases. It also records model overclaims that Go policy blocked and the validatio
 to avoid stronger requirements being invented. These examples support the value of explicit policy
 and evidence boundaries; they do not establish general accuracy.
 
-The added VulnPy corpus exposes six known positive coverage misses and four warning controls. Those
-results remain separate from the original 29-case success claim. The [XSS evaluation](../.zazz/evaluation/xss-implementation-results.md)
+The original VulnPy baseline recorded six positive coverage misses and four warning controls.
+Later dynamic-route work recovered generated Flask/FastAPI SQL and raw-HTML traces; the
+[fresh component verification](../.zazz/architecture/analysis-packs.md#fresh-paid-component-e2e-2026-11-06)
+retains their 28 contextual confirmations. The separate Jinja path remains unresolved. Historical
+reports and the original 29-case success claim remain distinct. The [XSS evaluation](../.zazz/evaluation/xss-implementation-results.md)
 and sample answer guides record additional implemented behavior and gaps. Local Semgrep CE/Bearer
 baselines are pinned, scope-specific observations, not full-product rankings. CodeQL and Joern documentation
 here are architecture references, not measured CodeQL/Joern benchmarks.
@@ -245,11 +275,13 @@ evidence without manufacturing a missing edge. This makes reports and selectors 
 types while leaving each adapter responsible for proving its own source relationships.
 
 The common records, existing HTTP/browser consumer migration and typed reports/selectors are
-implemented on the current development branch. Explicit browser-event callback dispatch is next (D4).
-D5 adds bounded Express and Python generated registration, finite lookup and closure/callback flows,
-with real VulnPy trace/finding acceptance and Juice Shop regressions. Node.js Apollo GraphQL (D6) and
-grpc-js unary gRPC (D7) are planned adapters. Typed metadata/presentation support already present
-for GraphQL/gRPC is not a claim that their source discovery or input propagation is implemented.
+implemented in the merged common-entry/dispatch foundation. Supported adapters include explicit
+DOM/window event callbacks, bounded Express and Python generated registrations with finite lookup
+and closure/callback flows, Node.js Apollo resolver maps with literal schemas, and grpc-js unary
+handlers with local proto3 declarations and request-field inputs. Dynamic-route acceptance includes
+real VulnPy traces/findings and Juice Shop regressions. GraphQL and gRPC acceptance uses source
+fixtures; real-application evaluation remains deferred. Dynamic schema composition, subscriptions,
+generated gRPC stubs, interceptors and streaming flow remain unsupported.
 The [README use-case matrix](../README.md#entry-use-cases-and-delivery-status) summarizes supported
 and planned scenarios; the [common-entry design](../.zazz/architecture/common-entry-dispatch.md)
 and [delivery contracts](../.zazz/specifications/common-entry-dispatch.md) own the detailed boundaries.

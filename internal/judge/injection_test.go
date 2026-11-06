@@ -35,7 +35,7 @@ func TestInjectionPolicySeparatesPracticeAndActualProtection(t *testing.T) {
 }
 
 func TestInjectionQuestionAndStrictDecoding(t *testing.T) {
-	u := analysis.CandidateUse{Kind: "sql_query_candidate"}
+	u := selectedSQLUse(t)
 	c, _ := New("openai", "test-model", "test-key")
 	payload, err := c.payload(u)
 	if err != nil {

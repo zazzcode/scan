@@ -35,8 +35,11 @@ rejected, boundary, protected, and inconclusive cases where relevant.
 
 Validation answers on query records remain facets. Policy-backed standalone field claims use a
 separate validation protocol and can establish an unmet requirement independently of SQL protection.
-Do not add overlapping category pills as independent defects. Complete required evidence and
-consistent policy/enforcement/coverage answers gate a definite field result.
+Standalone field uses select embedded validation components: the claim needs an explicit or
+source-backed requirement and enforcing path, never a database API contract or a sensitive sink, and
+requests carry only selected field-policy guidance and questions. Do not add overlapping category
+pills as independent defects. Complete required evidence and consistent policy/enforcement/coverage
+answers gate a definite field result.
 
 The [Python adapter](../python-support.md) includes relevant handler/helper code, branch preconditions
 and source-backed input constraints from a form posting to the same handler. Client constraints

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/analysispacks"
 )
 
 func (s *moduleSet) buildEntryChecks(report *analysis.AnalysisReport, checks []analysis.Check) {
@@ -68,7 +69,7 @@ func (s *moduleSet) buildEntryChecks(report *analysis.AnalysisReport, checks []a
 				}
 				if len(binding) > 0 {
 					if check.Kind == "nosql_query" {
-						use.APIModel = &analysis.APIModel{ID: "marsdb-collection-v1", Library: "marsdb", Semantics: "MarsDB Collection uses Mongo-style selector matching. $where string values are executable JavaScript predicates, not bound data. A request object in a selector field can introduce matching operators such as $ne. Ordinary scalar values in document data slots are not executable expressions. Review each selector versus update-value slot and constraints separately.", Reference: "https://github.com/c58/marsdb/blob/master/lib/DocumentMatcher.js"}
+						use.APIModel = analysispacks.NoSQLContract("marsdb-collection-v1")
 						if module := s.modules[use.Sink.Span.File]; module != nil {
 							call := nodeAt(module.tree.RootNode(), use.Sink.Span.StartByte, use.Sink.Span.EndByte)
 							if call != nil {
@@ -76,13 +77,13 @@ func (s *moduleSet) buildEntryChecks(report *analysis.AnalysisReport, checks []a
 								if fn != nil {
 									obj := fn.ChildByFieldName("object")
 									if obj != nil && strings.HasPrefix(s.modelIdentity(module, obj.Utf8Text(module.src), 0), "mongoose:") {
-										use.APIModel = &analysis.APIModel{ID: "mongoose-model-query-v1", Library: "mongoose", Semantics: "Mongoose model selectors depend on schema casting, scalar constraints and permitted query operators. Input objects can carry selectors; findById has ObjectId casting semantics. A model binding alone does not establish injection or protection. Inspect the actual operation, schema/version and input constraints.", Reference: "https://mongoosejs.com/docs/tutorials/query_casting.html"}
+										use.APIModel = analysispacks.NoSQLContract("mongoose-model-query-v1")
 									}
 								}
 							}
 						}
 					} else {
-						use.APIModel = &analysis.APIModel{ID: "sequelize-raw-query-v1", Library: "sequelize", Semantics: "Sequelize query takes executable SQL text as its first argument. bind and replacements supply separated data values according to their API. model, plain and result-format options do not parameterize an already-interpolated SQL string.", Reference: "https://sequelize.org/docs/v6/core-concepts/raw-queries/"}
+						use.APIModel = analysispacks.SQLContract("sequelize-raw-query-v1")
 					}
 					use.Context = append(use.Context, binding...)
 					use.Completeness.Evidence["sink_binding"] = binding

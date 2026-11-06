@@ -19,7 +19,11 @@ func (f *flow) clientHTTPValue(m *sourceModule, call, endpoint *sitter.Node, met
 		}
 	}
 	evidence := m.evidence("api_response", call)
-	return value{apiPath: strings.Split(path, "?")[0], apiMethod: method, deps: []analysis.Dependency{{Source: evidence, Transfers: []analysis.Evidence{}}}}
+	v := value{apiPath: strings.Split(path, "?")[0], apiMethod: method, deps: []analysis.Dependency{{Source: evidence, Transfers: []analysis.Evidence{}}}}
+	if method == "" {
+		v.gaps = append(v.gaps, analysis.Gap{Kind: "response_method_unresolved", Detail: "Browser request method is not established by supported literal options; no producer is guessed.", At: evidence.Span})
+	}
+	return v
 }
 
 func (f *flow) clientServiceCall(call *sitter.Node, object, method string) (value, bool) {

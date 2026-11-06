@@ -80,6 +80,11 @@ associations in `internal/analysis/analysis.go`.
 
 ### Implemented schema-3 shape
 
+This section records the common-entry milestone baseline. The later component refactor emits
+schema4 with additive selection/request provenance for migrated families; see the
+[current component compatibility contract](analysis-packs.md#bounds-and-compatibility). Existing
+entry/context identities below remain authoritative. Saved schema3 answers keep their original versions.
+
 The report has `entries`, `registrations`, `dispatch_bindings`, `callables`,
 `invocation_contexts`, `uses`, `gaps`, `files`, `analysis_guidelines` and existing shared
 finding/assessment metadata. Record collections have deterministic ordering. The model
@@ -212,12 +217,12 @@ context separately and report match identities/counts. Zero matches produce a vi
 Check fields retain source roles (`args.email`, `request.email`, etc.); missing application
 requirements remain unknown. Retain current size/count/unknown-field validation limits.
 
-Fresh reports become analysis schema 3 after existing consumers migrate. Route inventory
-schema 1 remains an HTTP view. Read saved schemas 1/2/3 at one input boundary; preserve
+The common-entry migration introduced analysis schema3; the component refactor now emits schema4.
+Route inventory schema1 remains an HTTP view. Read saved schemas1–4 at one input boundary; preserve
 original schema provenance, source/hash facts, uses, raw assessments and guideline metadata.
 Legacy `practice` metadata is decoded only there. Ambiguous legacy associations become
 explicit unresolved entries/contexts; conversion cannot claim dispatch facts never saved.
-A converted report can export schema 3 but cannot silently reuse its answers for changed
+A converted report can export the current schema but cannot silently reuse its answers for changed
 model requests. Export never overwrites the input or reads fresh target source.
 
 Legacy wire types remain private to compatibility decoding. Remove superseded internal

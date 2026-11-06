@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/analysispacks"
 )
 
 // Enrich adds deterministic display records while preserving raw evidence and assessments.
@@ -121,7 +122,7 @@ func describe(u analysis.CandidateUse) analysis.Finding {
 		}
 		switch a.FindingStatus {
 		case "confirmed_vulnerability":
-			if u.Kind == "xss_candidate" && a.QuestionVersion == "xss-use-v1" && len(a.BlockingGaps) == 0 && a.Answers["xss_exposure"] == "vulnerable" && u.XSS != nil && u.XSS.Protection != "unknown" {
+			if u.Kind == "xss_candidate" && (a.QuestionVersion == "xss-use-v1" || a.QuestionVersion == analysispacks.XSSProtocol) && len(a.BlockingGaps) == 0 && a.Answers["xss_exposure"] == "vulnerable" && u.XSS != nil && u.XSS.Protection != "unknown" {
 				f.RecordType, f.Status = "finding", "confirmed_vulnerability"
 				f.Title = "Cross-site scripting supported by source analysis"
 				f.Summary = "A complete rendering claim and consistent XSS-specific assessment establish an unsafe source-to-sink path. This is a static judgment; independent runtime confirmation remains separate."
@@ -145,7 +146,9 @@ func describe(u analysis.CandidateUse) analysis.Finding {
 				f.Uncertainty += " Conditional value paths are present. This static vulnerability judgment is scoped to an unsafe supported path under its configuration/branch precondition, not every runtime configuration; inspect the conditional-expression evidence."
 			}
 		case "poor_practice":
-			if u.Kind == "input_validation_candidate" && a.QuestionVersion == "validation-use-v2" && len(a.BlockingGaps) == 0 && a.Answers["field_requirement"] == "established" && a.Answers["enforcement_coverage"] == "complete" && a.Answers["validation"] == "insufficient" {
+			// Historical field-policy assessments keep their own protocol
+			// version; current ones carry the selected component protocol.
+			if u.Kind == "input_validation_candidate" && (a.QuestionVersion == analysispacks.ValidationProtocol || a.QuestionVersion == "validation-use-v2") && len(a.BlockingGaps) == 0 && a.Answers["field_requirement"] == "established" && a.Answers["enforcement_coverage"] == "complete" && a.Answers["validation"] == "insufficient" {
 				f.RecordType, f.Status = "finding", "poor_practice"
 				f.Title = "Declared field validation is not enforced"
 				f.Summary = "A source-backed requirement for the named field is not enforced on a supported server path. This is a validation-practice defect; exploitability at a downstream operation is assessed separately."

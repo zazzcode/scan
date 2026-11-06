@@ -141,7 +141,7 @@ finding eligibility, runtime-confirmation state or independent-review policy.
 The [query judgment design](query-judgment.md) owns automatic injection evidence and policy gates.
 Public [analysis rules](../../docs/analysis/README.md) describe SQL/NoSQL and validation semantics.
 
-Current analysis JSON uses schema3 and `analysis_guidelines`; schemas1/2 remain readable
+Current analysis JSON uses schema4 and `analysis_guidelines`; schemas1–4 remain readable
 through private compatibility decoding, retaining original source/schema/answer provenance.
 See [naming and compatibility](../architecture.md#naming-and-compatibility).
 

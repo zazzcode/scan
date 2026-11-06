@@ -7,7 +7,7 @@
       "use_count": 1
     }
   ],
-  "schema_version": 3,
+  "schema_version": 4,
   "root": "testdata/string-flow",
   "registrations": [
     {
@@ -209,6 +209,9 @@
   ],
   "uses": [
     {
+      "analysis_components": {
+        "failure": "SQL component selection needs verified API binding"
+      },
       "control_edges": [
         {
           "from": {

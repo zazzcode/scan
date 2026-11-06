@@ -3,6 +3,7 @@ package parse
 import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/analysispacks"
 	"strings"
 )
 
@@ -100,7 +101,7 @@ func (f *pythonFlow) outboundCall(n *sitter.Node, q string, fn *sitter.Node, val
 	if requestDependent {
 		u := f.addUse("outbound_http_candidate", n, destination)
 		u.Context = append(u.Context, m.evidence("sink_binding", fn))
-		u.APIModel = &analysis.APIModel{ID: "python-http-destination-v1", Library: strings.Split(q, ".")[0], Semantics: "The URL/destination operand is separate from request body and response; response data is an independent external source."}
+		u.APIModel = analysispacks.OutboundContract(strings.Split(q, ".")[0])
 	}
 	return pythonValue{binding: "http_response", evidence: []analysis.Evidence{m.evidence("external_exchange", n)}}
 }

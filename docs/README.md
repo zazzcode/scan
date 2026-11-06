@@ -22,7 +22,7 @@ and intended behavior visible so an agent can apply and verify an appropriate ch
 | Guide | What you will learn |
 |---|---|
 | [Sample reports](samples/README.md) | Juice Shop and TypeScript reports; Node.js Goof evaluation setup and Bearer baseline runbook |
-| [Technical approach](technical-approach.md) | Hybrid analysis, design strengths, SAST comparisons and evidence limits |
+| [Technical approach](technical-approach.md) | Hybrid analysis, embedded component organization, SAST comparisons and evidence limits |
 | [Philosophy](philosophy.md) | Remediation-first decisions, supported findings, uncertainty, and preserving protection |
 | [Getting started](getting-started.md) | Go/C prerequisites, compilation, `.env.sample`, and environment loading |
 | [Running scans](running-scans.md) | CLI modes, route scope, report folders, JSON/HTML/SARIF, and current limitations |

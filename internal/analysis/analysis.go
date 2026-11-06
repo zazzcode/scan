@@ -1,7 +1,7 @@
 package analysis
 
-// ReportSchemaVersion identifies analysis reports using analysis_guidelines metadata.
-const ReportSchemaVersion = 3
+// ReportSchemaVersion identifies fresh analysis reports with component provenance.
+const ReportSchemaVersion = 4
 
 // Evidence binds an observed operation to an immutable source file snapshot.
 type Evidence struct {
@@ -23,28 +23,30 @@ type Dependency struct {
 
 // CandidateUse is a security-sensitive value use needing claim-specific analysis.
 type CandidateUse struct {
-	XSS                 *XSSFacts          `json:"xss,omitempty"`
-	APIModel            *APIModel          `json:"api_model,omitempty"`
-	ControlEdges        []ControlEdge      `json:"control_edges,omitempty"`
-	Check               *Check             `json:"check,omitempty"`
-	Completeness        *Completeness      `json:"completeness,omitempty"`
-	ID                  string             `json:"id"`
-	EntryID             string             `json:"entry_id"`
-	InvocationContextID string             `json:"invocation_context_id"`
-	EntryKind           string             `json:"-"`
-	EntryFacts          *EntryPoint        `json:"-"`
-	InvocationFacts     *InvocationContext `json:"-"`
-	DispatchFacts       *DispatchBinding   `json:"-"`
-	Kind                string             `json:"kind"`
-	Sink                Evidence           `json:"sink"`
-	Dependencies        []Dependency       `json:"dependencies"`
-	Context             []Evidence         `json:"context"`
-	Gaps                []Gap              `json:"gaps"`
-	Assessment          Assessment         `json:"assessment"`
+	Components          *ComponentSelection `json:"analysis_components,omitempty"`
+	XSS                 *XSSFacts           `json:"xss,omitempty"`
+	APIModel            *APIModel           `json:"api_model,omitempty"`
+	ControlEdges        []ControlEdge       `json:"control_edges,omitempty"`
+	Check               *Check              `json:"check,omitempty"`
+	Completeness        *Completeness       `json:"completeness,omitempty"`
+	ID                  string              `json:"id"`
+	EntryID             string              `json:"entry_id"`
+	InvocationContextID string              `json:"invocation_context_id"`
+	EntryKind           string              `json:"-"`
+	EntryFacts          *EntryPoint         `json:"-"`
+	InvocationFacts     *InvocationContext  `json:"-"`
+	DispatchFacts       *DispatchBinding    `json:"-"`
+	Kind                string              `json:"kind"`
+	Sink                Evidence            `json:"sink"`
+	Dependencies        []Dependency        `json:"dependencies"`
+	Context             []Evidence          `json:"context"`
+	Gaps                []Gap               `json:"gaps"`
+	Assessment          Assessment          `json:"assessment"`
 }
 
 // Assessment preserves the judge's result independently from structural evidence.
 type Assessment struct {
+	RequestDigest   string                  `json:"request_digest,omitempty"`
 	AnswerDetails   map[string]AnswerDetail `json:"answer_details,omitempty"`
 	FindingStatus   string                  `json:"finding_status,omitempty"`
 	BlockingGaps    []Gap                   `json:"blocking_gaps,omitempty"`

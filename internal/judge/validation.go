@@ -1,44 +1,39 @@
 package judge
 
-import "github.com/zazzcode/zazzles/internal/analysis"
+import (
+	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/analysispacks"
+)
 
-const validationQuestionVersion = "validation-use-v2"
-
-var validationQuestions = []question{
-	{"field_requirement", "Does the supplied source or explicit requirement establish a concrete policy for the named field? established requires actual policy evidence, not a field name or a preference for stricter validation. Client-side form constraints establish intended policy but do not prove server enforcement."},
-	{"validation", "Assess ONLY the complete enumerated constraints in declared_requirement.validation and the named field_policy role. Do not expand the policy from other fields, security preferences, or unrelated handler code. A required-only field with a rejecting missing/empty guard is sufficient even if stronger validation would be desirable. On the supplied source-to-use path, does server-side enforcement meet this precise field policy? sufficient requires the condition/helper and enforced rejection on every relevant path; insufficient requires a supported path bypassing or lacking the established requirement; uncertain requires missing relevant code or semantics. Do not confuse parameter binding or HTML escaping with field validation."},
-	{"enforcement_coverage", "Is enough relevant server implementation present and structurally linked to assess enforcement? complete requires the actual guards/helpers, branch/return behavior and downstream constraints that can enforce this requirement; incomplete means a required definition, dispatch, model constraint or path is missing. Source comments and benchmark descriptions are not evidence of an expected answer."},
-}
-
+// validationUse covers standalone field-policy records: Python claims with
+// assembled policy evidence and JS/TS field records that only carry gaps.
 func validationUse(u analysis.CandidateUse) bool {
-	return u.Kind == "input_validation_candidate" && u.Completeness != nil && u.Completeness.ClaimKind == "validation"
+	return u.Kind == "input_validation_candidate"
 }
-func validationChoices(name string) []map[string]string {
-	switch name {
-	case "field_requirement":
-		return []map[string]string{{"value": "established", "description": "A concrete field policy is source-backed or explicitly supplied."}, {"value": "unknown", "description": "No concrete applicable requirement is established."}, {"value": "not_applicable", "description": "This use has no applicable field requirement."}}
-	case "validation":
-		return choices
-	case "enforcement_coverage":
-		return []map[string]string{{"value": "complete", "description": "Required implementation and path evidence are supplied."}, {"value": "incomplete", "description": "A required definition or path fact is missing."}}
-	}
-	return nil
-}
+
 func applyValidationPolicy(u analysis.CandidateUse, a *analysis.Assessment) {
 	a.FindingStatus, a.Protection = "needs_evidence", "uncertain"
-	blockers := append([]analysis.Gap{}, u.Completeness.Blockers...)
-	roles := append(append([]string{}, u.Completeness.Required...), "input_source", "field_policy", "invoked_callable", "control_flow")
+	blockers := []analysis.Gap{}
+	roles := []string{"input_source", "field_policy", "invoked_callable", "control_flow"}
+	if u.Completeness != nil {
+		blockers = append(blockers, u.Completeness.Blockers...)
+		roles = append(append([]string{}, u.Completeness.Required...), roles...)
+	}
+	if u.Components != nil {
+		// Selected obligations extend, never replace, the adapter's roles.
+		roles = append(roles, u.Components.Required...)
+	}
 	seen := map[string]bool{}
 	for _, role := range roles {
 		if seen[role] {
 			continue
 		}
 		seen[role] = true
-		if len(u.Completeness.Evidence[role]) == 0 {
+		if u.Completeness == nil || len(u.Completeness.Evidence[role]) == 0 {
 			blockers = append(blockers, analysis.Gap{Kind: "validation_evidence_missing", Detail: role, At: u.Sink.Span})
 		}
 	}
-	if a.QuestionVersion != validationQuestionVersion {
+	if a.QuestionVersion != analysispacks.ValidationProtocol {
 		blockers = append(blockers, analysis.Gap{Kind: "validation_protocol_missing"})
 	}
 	a.BlockingGaps = blockers
@@ -58,17 +53,11 @@ func applyValidationPolicy(u analysis.CandidateUse, a *analysis.Assessment) {
 	}
 }
 func protocolVersion(u analysis.CandidateUse) string {
-	if validationUse(u) {
-		return validationQuestionVersion
+	if version := analysispacks.ProtocolFor(u.Kind); version != "" {
+		return version
 	}
 	if logUse(u) {
 		return logQuestionVersion
-	}
-	if u.Kind == "xss_candidate" {
-		return xssQuestionVersion
-	}
-	if u.Kind == "sql_query_candidate" || u.Kind == "nosql_query_candidate" {
-		return injectionQuestionVersion
 	}
 	return questionVersion
 }
