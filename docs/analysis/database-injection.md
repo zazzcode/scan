@@ -160,3 +160,19 @@ and info have independent unknown provenance; they are not relabeled as args. Un
 applicable unknown guards, mutation and unsupported projections block definite claims. A guarded
 registration cannot lend protection to another registration of the same resolver. Scalar/type names
 and GraphQL parsing do not parameterize SQL. See [supported source boundaries](../running-scans.md#bounded-apollo-graphql-analysis).
+
+## Query component selection
+
+Supported SQL and JS/TS NoSQL candidates use an internal embedded component catalog. Static assembly
+associates verified language/entry/flow capabilities and database operation contracts with the claim,
+selects applicable interpretation material, and preserves required evidence obligations. The judge
+consumes the same selection. A declared component does not implement an adapter or establish a source
+edge. Unsupported bindings and unresolved applicability retain gaps instead of borrowing another
+API's contract. Library-version assumptions remain explicit. NoSQL requires a verified collection or
+model contract; Python NoSQL has no adapter and gains no detector.
+
+JSON carries selection IDs, versions and digests; assessed queries also carry request provenance.
+Changed effective component content, questions, evidence or protocol cannot replay an old answer.
+Historical reports preserve their original evidence and judgments. Component composition leaves
+validation, construction practice and injection protection independent and does not broaden existing
+SQL or NoSQL coverage.

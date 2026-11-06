@@ -169,25 +169,37 @@ protection and targeted repair guidance for agents. These are implemented design
 of any advantage over another scanner must be measured on matched cases. Mature tools may have
 broader framework coverage, deeper flow models and production workflows that Zazzles does not yet have.
 
-## Analysis knowledge and proposed packs
+<a id="analysis-knowledge-and-proposed-packs"></a>
 
-Today, analysis knowledge ships in the binary: compiled language/framework and flow adapters,
-verified API contracts, embedded versioned Analysis Guidelines, claim questions and Go evidence
-policy. Application `--checks` files supply requirements and selection; they do not add a parser or
-new vulnerability detector. Public analysis guides govern development but are not loaded as prompts
-by editing their Markdown.
+## Analysis knowledge and components
 
-The proposed [analysis pack MVP](../.zazz/project/analysis-pack-mvp.md) will organize these existing
-components under explicit IDs, versions, applicability and regression coverage. The static engine
-will use references to supported models and evidence obligations; the judge will receive selected
-interpretation guidance and applicable contracts alongside the candidate's trace. Executable adapters
-remain compiled, and mandatory Go gates remain authoritative. Language, entry framework, library and
-claim components should compose without duplicating a pack for every combination.
+Analysis knowledge ships in the binary: compiled language/framework and flow adapters, verified API
+contracts, embedded Analysis Guidelines, claim questions and Go evidence policy. Application `--checks`
+files supply requirements and selection; they do not add a parser or vulnerability detector. Editing
+a public analysis guide alone does not change the running judge's instructions.
 
-This is a separate future initiative/worktree after common-entry/dispatch merges and before command
-injection. No pack loader, public rule language, downloadable registry or third-party plugin system
-is implemented or authorized by this documentation. Changed effective judgment inputs must retain
-exact-request replay protection and cannot inherit historical answers.
+SQL is the first working consumer of an internal component catalog. Language guidance, entry/flow
+capability references, verified operation contracts, SQL questions and evidence obligations have
+explicit identities, versions, digests, applicability and test references. Static assembly selects
+components from supported source facts; the judge uses that selection and receives only applicable
+interpretation material alongside the candidate trace. Executable adapters remain compiled, and Go
+checks mandatory evidence and consistency gates. A component cannot invent a binding, clear a gap or
+certify a custom validator by name.
+
+Fresh reports use schema 4 to preserve per-candidate selection provenance. SQL requests use protocol
+`sql-components-v2`, NoSQL `nosql-components-v1` and standalone validation `validation-components-v1`;
+unmigrated families keep their existing protocols. Exact effective requests bind selected
+content and provenance, source evidence, questions and model. Changing any of them rejects historical
+answers for fresh replay. Saved reports remain exportable with their original evidence and answers.
+Explicit component/material bounds complement the existing 64 KiB final request bound; excess material
+remains unresolved rather than being truncated.
+
+The [implementation architecture and migration ledger](../.zazz/architecture/analysis-packs.md)
+records inventory, limits, compatibility and offline verification. SQL detection scope is preserved;
+this reorganization is not evidence of improved live-model accuracy. XSS, standalone validation,
+logging and JS/TS NoSQL have separately scoped follow-on migrations. Command injection is the next
+new family and will use this structure. Public pack loaders, registries, executable plugins and broad
+standards ingestion remain outside the MVP.
 
 ## Evidence for the approach
 

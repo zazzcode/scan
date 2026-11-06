@@ -79,8 +79,9 @@ versioned language guidance for security assessment. Broader quality baselines a
 profiles are planned. Findings about standards need an identifiable requirement and source evidence,
 not only a model's preference.
 
-The proposed [analysis packs](.zazz/project/analysis-pack-mvp.md#standards-driven-agent-workflow)
-will organize that knowledge into reusable components with explicit versions and applicability.
+The SQL, NoSQL and standalone-validation [analysis components](docs/technical-approach.md#analysis-knowledge-and-components)
+organize existing knowledge with explicit versions and applicability. Broader team-standard
+components remain planned under the [standards-workflow design](.zazz/project/analysis-pack-mvp.md#standards-driven-agent-workflow).
 Deterministic checks can handle mechanical requirements. Semantic judgment can assess contextual
 requirements using the actual implementation and relevant relationships.
 
@@ -133,6 +134,28 @@ flowchart LR
 A function call alone does not prove that an input reaches a sensitive operation. Unresolved
 handlers and entries with no discovered uses remain visible in coverage reporting.
 A protected claim applies to the stated operation and scope, not the entire entry or application.
+
+### Analysis components
+
+SQL injection, JS/TS NoSQL injection and JS/TS/Python standalone input-validation analyses use
+embedded, versioned components for applicable family guidance, compiled entry/flow capabilities,
+verified database contracts, claim questions and evidence obligations. The static analyzer selects
+components for each supported candidate; the judge uses that selection with the source trace.
+Language, entry framework, database library and claim compose independently per family. Standalone
+field-policy claims need an explicit requirement and enforcing path, never a database API contract.
+
+JSON records the selected component IDs, versions and content digests. Assessed results also record
+request provenance; changed guidance, contracts, questions or evidence invalidate saved-answer replay.
+Missing required components or unsupported applicability remain explicit failures or coverage gaps.
+Mandatory Go evidence gates still apply, and validation, SQL construction practice and injection
+protection remain separate judgments.
+
+This preserves existing bounded JavaScript/TypeScript and Python SQL support, JavaScript/TypeScript
+NoSQL coverage and standalone validation outcomes. It does not add a language adapter (Python NoSQL
+stays unsupported) or certify a helper by name. Other families migrate incrementally. Components ship
+in the binary; external pack loading and arbitrary project standards are not supported.
+See the [database analysis guide](docs/analysis/database-injection.md) and
+[technical approach](docs/technical-approach.md#analysis-knowledge-and-components).
 
 ### Technical approach: evidence and semantic judgment
 
@@ -240,12 +263,11 @@ per-language checklist and delivery order.
 - Reflected, stored and client-side/framework XSS analysis.
 - Selected JS/TS API-to-browser XSS links and Python inline-script analysis.
 - Common entry/dispatch records, browser events, finite dynamic routes, GraphQL and unary gRPC.
+- SQL analysis component selection, bounded judge composition and auditable report/replay provenance.
+- NoSQL and standalone-validation component selection with independent claim protocols and replay provenance.
 
 ### Next and planned work
 
-- **Analysis pack MVP:** the next initiative, in its own worktree before command injection.
-  It will organize existing analysis knowledge and select relevant
-  guidance and contracts for the judge. [Read the proposal](.zazz/project/analysis-pack-mvp.md).
 - **Command injection:** assess process and shell execution across JS/TS/Python.
 - **XSS hardening:** expand renderer, helper, stored-origin and cross-tier coverage.
 - **Additional security families:** path traversal, code injection, XXE, open redirects, weak
@@ -257,9 +279,9 @@ per-language checklist and delivery order.
 - **Inspect capability:** separately present standards and quality assessments using shared analysis
   components. Broader checks, report separation and their delivery priority remain to be scoped.
 
-Analysis knowledge currently ships in the scanner. Analysis-pack selection, downloadable packs and
-an external plugin system are not implemented. External pack distribution is outside the proposed
-internal MVP and would need its own design.
+Analysis knowledge ships in the scanner. SQL uses the component structure; XSS, standalone validation,
+logging, JS/TS NoSQL and outbound requests have explicit follow-on migrations. Downloadable packs and an external plugin
+system remain outside the internal MVP and need their own design.
 
 Future capabilities need vulnerable, protected and unknown controls across applicable supported
 languages. Broader evaluation continues against independent source expectations and pinned comparison
@@ -381,8 +403,8 @@ CI checks formatting, vet, build and race tests. Work stays on feature branches,
 `stage`, and humans review and merge. Live model calls are separate from offline tests.
 
 Keep this README's implemented capabilities and planned roadmap distinct. When a capability ships,
-update its support, remaining limits and acceptance status. Implementing the analysis pack MVP will
-require another README update. A proposal or recognized file/entry type does not count as delivered support.
+update its support, remaining limits and acceptance status. A proposal or recognized file/entry type
+does not count as delivered support.
 
 Internal engineering material lives under `.zazz/`:
 [architecture](.zazz/architecture.md), [implementation plan](.zazz/project/implementation-plan.md),

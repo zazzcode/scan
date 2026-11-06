@@ -79,3 +79,19 @@ use an explicit compact column schema and shared source/gap records. This is los
 compaction; it does not remove blockers or make missing coverage complete. A request that still
 exceeds the bound remains unassessed. Changed projection/envelope inputs invalidate exact replay;
 raw historical responses remain intact.
+
+## Component provenance
+
+SQL, NoSQL and standalone-validation requests compose scanner-owned interpretation material selected
+by the static analyzer from verified source facts. Fresh schema-4 JSON reports identify the selected
+pack/components, versions and digests; a selection alone does not mean a model assessment ran. SQL
+uses `sql-components-v2`, NoSQL `nosql-components-v1` and standalone validation
+`validation-components-v1`; unmigrated families retain their existing protocols. Mandatory evidence
+and consistency gates remain in Go.
+
+Missing required material, conflicting selection or size limits prevent a model request and retain
+an explicit unresolved assessment. No generic guidance fallback supplies missing protection.
+Exact-request replay binds selected content/provenance as well as evidence, questions and model.
+Changed requests need fresh assessment; exporting an older report preserves its historical answers
+and does not assign it new component identities. See the
+[technical approach](technical-approach.md#analysis-knowledge-and-components).

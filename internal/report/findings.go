@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/analysispacks"
 )
 
 // Enrich adds deterministic display records while preserving raw evidence and assessments.
@@ -145,7 +146,9 @@ func describe(u analysis.CandidateUse) analysis.Finding {
 				f.Uncertainty += " Conditional value paths are present. This static vulnerability judgment is scoped to an unsafe supported path under its configuration/branch precondition, not every runtime configuration; inspect the conditional-expression evidence."
 			}
 		case "poor_practice":
-			if u.Kind == "input_validation_candidate" && a.QuestionVersion == "validation-use-v2" && len(a.BlockingGaps) == 0 && a.Answers["field_requirement"] == "established" && a.Answers["enforcement_coverage"] == "complete" && a.Answers["validation"] == "insufficient" {
+			// Historical field-policy assessments keep their own protocol
+			// version; current ones carry the selected component protocol.
+			if u.Kind == "input_validation_candidate" && (a.QuestionVersion == analysispacks.ValidationProtocol || a.QuestionVersion == "validation-use-v2") && len(a.BlockingGaps) == 0 && a.Answers["field_requirement"] == "established" && a.Answers["enforcement_coverage"] == "complete" && a.Answers["validation"] == "insufficient" {
 				f.RecordType, f.Status = "finding", "poor_practice"
 				f.Title = "Declared field validation is not enforced"
 				f.Summary = "A source-backed requirement for the named field is not enforced on a supported server path. This is a validation-practice defect; exploitability at a downstream operation is assessed separately."

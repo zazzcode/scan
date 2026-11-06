@@ -23,7 +23,7 @@ func TestCommonEntryExistingConsumers(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if r.SchemaVersion != 3 || len(r.Entries) == 0 || len(r.Registrations) == 0 || len(r.InvocationContexts) == 0 {
+			if r.SchemaVersion != analysis.ReportSchemaVersion || len(r.Entries) == 0 || len(r.Registrations) == 0 || len(r.InvocationContexts) == 0 {
 				t.Fatalf("missing common entry records: %+v", r)
 			}
 			if len(r.Uses) == 0 {

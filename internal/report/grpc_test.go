@@ -21,7 +21,7 @@ func TestGRPCPipeline(t *testing.T) {
 				t.Fatal(err)
 			}
 			saved, html, run := dynamicBundle(t, r)
-			if saved.SchemaVersion != 3 || len(saved.Entries) != 11 {
+			if saved.SchemaVersion != analysis.ReportSchemaVersion || len(saved.Entries) != 11 {
 				t.Fatal("schema/inventory lost")
 			}
 			for _, e := range saved.Entries {

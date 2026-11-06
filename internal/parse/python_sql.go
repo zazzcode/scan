@@ -6,6 +6,7 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	"github.com/zazzcode/zazzles/internal/analysis"
+	"github.com/zazzcode/zazzles/internal/analysispacks"
 )
 
 var pythonSelect = regexp.MustCompile(`(?is)^\s*select\s+.+?\s+from\s+([a-zA-Z_][a-zA-Z0-9_]*)\b`)
@@ -43,7 +44,7 @@ func (f *pythonFlow) sql(n, object *sitter.Node, values []pythonValue, receiver 
 	binding := append([]analysis.Evidence{}, receiver.evidence...)
 	binding = append(binding, f.module.evidence("sink_binding", n.ChildByFieldName("function")))
 	u.Context = append(u.Context, binding...)
-	u.APIModel = pythonDBAPIModel(receiver.driver)
+	u.APIModel = analysispacks.PythonContract(receiver.driver)
 	if text.built {
 		u.Gaps = append(u.Gaps, f.gap("query_text_interpolated", "Python expression constructs executable SQL text; parameter tuple protects only separate value slots", n))
 	}

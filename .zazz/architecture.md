@@ -38,8 +38,8 @@ novel-repository generalization remain hypotheses until matched independent eval
 - [Reporting and SARIF](architecture/reporting-and-sarif.md): report records and implemented bounded SARIF export.
 - [Standalone HTML](architecture/html-reporting.md): human-facing report and disclosure rows.
 - [SCA follow-on](architecture/sca-design.md): planned dependency auditing.
-- [Analysis pack MVP proposal](project/analysis-pack-mvp.md): planned internal composition/versioning
-  of existing analysis knowledge; a separate initiative/worktree after common-entry/dispatch merges.
+- [Analysis components](architecture/analysis-packs.md): SQL component ownership, selection, bounds,
+  provenance, compatibility and incremental migration ledger; [original proposal](project/analysis-pack-mvp.md).
 
 ## Product boundaries and shared engine
 
@@ -237,7 +237,8 @@ verdicts are reconciled by Go judgment/reporting code, not by a separate rules-e
 
 Guidelines combine secure coding recommendations with instructions about evidence and uncertainty.
 They are embedded with `go:embed` and selected by language. Report metadata retains their ID/version;
-model inputs include the full applicable document. The Go document is preparatory guidance and does
+unmigrated-family model inputs include the full applicable document. SQL selects applicable sections
+through the component catalog and records their digests. The Go document is preparatory guidance and does
 not imply implemented Go source analysis. Root [analysis guides](../docs/analysis/README.md) describe
 product behavior; `.zazz/standards/` governs development. Neither is loaded dynamically by the binary.
 
@@ -249,7 +250,8 @@ exact field constraints and remaining blockers. Supplied evidence means present,
 protective. Source/comments are untrusted data, never model instructions.
 
 Model envelopes use `analysis_guidelines`. The generic question protocol is `candidate-use-v10`;
-claim-specific SQL/XSS/logging/validation questions retain their separate protocols. Renamed guideline
+SQL uses `sql-components-v2`, NoSQL `nosql-components-v1`, standalone validation
+`validation-components-v1`; XSS/logging/outbound retain their existing protocols. Renamed guideline
 documents carry new versions because their request text changed. Request identity includes the full
 envelope and guideline body; old responses cannot be replayed on renamed/changed requests.
 
@@ -313,6 +315,7 @@ incremental invalidation. There is no automatic runtime cache implied by saved e
 | `internal/parse` | Tree-sitter, language/framework resolution, bounded flow and evidence assembly |
 | `internal/analysis` | Shared route, candidate, evidence, claim, assessment and report records |
 | `internal/guidelines` | Embedded versioned language Analysis Guidelines |
+| `internal/analysispacks` | Embedded family component catalog, deterministic selection and bounded material |
 | `internal/judge` | Evidence requests, provider transports, typed answers, policy gates and explicit replay |
 | `internal/report` | Presentation classification, guidance and JSON/HTML/SARIF bundles |
 
@@ -325,8 +328,8 @@ Today flow/evidence construction lives in `parse`, claim gates in `judge`, and p
 
 `--analyze` is the documented analysis mode; `--strings` remains an external compatibility alias.
 Internal APIs use `Analyze`, `AnalyzeWithChecks`, `CandidateUse` and `AnalysisReport`, with no obsolete
-Go aliases. Fresh analysis reports use schema3 and `analysis_guidelines`; route inventory stays
-schema1. Export reads schemas1/2/3 and preserves original schema provenance and raw
+Go aliases. Fresh analysis reports use schema4, `analysis_guidelines` and SQL component provenance; route inventory stays
+schema1. Export reads schemas1/2/3/4 and preserves original schema provenance and raw
 assessments. Private legacy decoding maps `practice` metadata to `GuidelinesRef` and
 legacy route/client associations into one current entry/context association.
 New serialization emits only `analysis_guidelines`. Raw historical candidate IDs and status meanings are preserved; fresh candidate IDs

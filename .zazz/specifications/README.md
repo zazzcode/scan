@@ -36,10 +36,19 @@ Independent future deliverables may use separate feature worktrees/PRs targeting
   backend responses/templates/storage first, browser results separately, Python adapter boundary preserved.
 - [Common entry and dispatch](common-entry-dispatch.md) — architecture and eight phased
   deliverable contracts requested 2026-11-03 in `common-entry-and-dispatch`; deliverables1–7
-  implemented, final automated and bounded rendered acceptance passing; human review/merge pending. See
+  implemented, accepted and merged through PR #8 on 2026-11-05. See
   [acceptance results](../evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05). Includes HTTP/browser preservation, browser events, bounded
   dynamic HTTP, Node.js GraphQL/gRPC, entry-specific reports and saved-report compatibility.
-- Remaining specs are not authored yet. Their proposed slices live in the
+- [Analysis pack MVP](analysis-pack-mvp.md) — SQL-first embedded component migration contract;
+  implementation requested 2026-11-05 in `analysis-pack-mvp`, based on the merged
+  common-entry/dispatch foundation. Includes applicability, provenance and offline SQL acceptance.
+- [Components 01: NoSQL + input validation](components-01-nosql-validation.md) — next combined
+  implementation session; generalizes SQL-only assumptions while keeping claim verdicts independent.
+- [Components 02: all XSS types and browser](components-02-xss.md) — second session; staged rendering,
+  stored, DOM/framework and cross-tier migration plus bounded browser fetch-method correction.
+- [Components 03: outbound observations](components-03-outbound.md) — third session; source-backed
+  observation scope, browser/server isolation and explicit boundary before complete SSRF judgment.
+- Other planned specs are not authored yet. Their proposed slices live in the
   [implementation plan](../project/implementation-plan.md); each needs a bounded contract and user authorization.
 
 See [repository state](../project.md#concept-stage-repository-state) for the current concept stage and

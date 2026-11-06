@@ -192,31 +192,70 @@ warning controls; those misses are not passed findings or a claim of complete Py
 
 ### Common entry/dispatch foundation
 
-**2026-11-02 updated user priority:** the next activity is the
-[common entry/dispatch model](common-entry-dispatch.md), including bounded dynamic-route,
-GraphQL resolver and gRPC handler support. Start with current HTTP and browser consumers, then
-add the selected framework adapters through the shared model. The
-[architecture decision](../architecture.md#multiple-entry-and-dispatch-mechanisms) separates entry
-kind, registration, dispatch, callable, invocation context and optional transport. The next tracked
-contract must name framework/language subsets and explicit coverage limits before implementation.
-After this milestone completes acceptance and merges into `stage`, the separate
-[analysis pack MVP initiative](#analysis-pack-mvp-initiative) follows in its own worktree.
-Command injection follows that MVP and remains the next new vulnerability family.
+The [common entry/dispatch model](common-entry-dispatch.md) completed its eight-deliverable
+milestone and merged through PR #8 on 2026-11-05. It supplies common entry, registration, dispatch,
+callable and invocation identities, with bounded browser-event, dynamic HTTP, Node.js GraphQL and
+unary gRPC support. Its [acceptance evidence](../evaluation/common-entry-dispatch-results.md)
+retains unsupported subsets and explicit gaps. The merged foundation is the baseline for the
+separate analysis pack MVP; command injection remains the next new vulnerability family.
 
 ### Analysis pack MVP initiative
 
-**2026-11-05 user direction:** `analysis-pack-mvp` is its own initiative and future worktree/branch,
-starting after `common-entry-and-dispatch` completes acceptance and merges into `stage`. It precedes
-command injection and remaining vulnerability-family expansion. This planning update does not start
-implementation, create a worktree or add a ninth common-entry/dispatch deliverable.
+**2026-11-05 implementation assignment:** the user authorized the
+[SQL-first contract](../specifications/analysis-pack-mvp.md), SQL injection regression tests, scoped
+cleanup and documentation updates in the existing `analysis-pack-mvp` worktree/branch. Its accepted
+base is merged `stage` revision `f8b7dbdfe1521d9b914f271fa68b26b01fdec97b`.
 
-The [proposal](analysis-pack-mvp.md) defines a small internal manifest/selection/provenance boundary
-for existing analysis models, embedded guidance, API contracts, claim questions and evidence
-obligations. Relevant judgment material accompanies the trace; executable adapters and mandatory
-policy gates remain in the scanner. Use existing cases and local stubs to verify preserved behavior,
-explicit gaps, deterministic applicability and changed-request replay rejection. Public pack loading,
-registries, executable plugins and a new rule language are deferred. A separate bounded implementation
-contract is required after the merge; subsequent vulnerability families should use the accepted structure.
+The [proposal](analysis-pack-mvp.md) supplies intent; the contract owns implementation acceptance.
+The [component architecture and migration ledger](../architecture/analysis-packs.md) records owners,
+selection, bounds, compatibility and evidence. SQL is the first runtime consumer: existing JS/TS/Python
+models, guidance, API contracts, questions and evidence obligations become explicitly selected and
+versioned. Static adapters and mandatory Go gates remain authoritative. This migration does not add
+new SQL coverage or improve a baseline verdict by removing its blocker.
+
+Delivery checkpoints are baseline inventory/catalog, working SQL selection and judgment integration,
+then report/replay compatibility and offline regression verification. All three checkpoints now pass
+offline checks; implementation is ready for human review. Fresh report schema 4 and the
+SQL `sql-components-v2` protocol record the changed provenance/envelope (session 01 bumped SQL
+provenance when component compatibility became family-scoped). Historical reports preserve
+their original answers; changed effective requests reject stale replay. No paid evaluation is required.
+Public pack loading, registries, executable plugins, new rule languages, standards ingestion, general
+Inspect/Audit/Fix and expanded detection remain separate work.
+
+After MVP acceptance, command injection MUST use the accepted components in a separate bounded contract.
+The remaining migrations have explicit follow-on tasks; none is hidden cleanup in the SQL MVP:
+
+| Implementation order / session | Boundary | Required acceptance |
+| --- | --- | --- |
+| 1. [NoSQL + standalone input validation](../specifications/components-01-nosql-validation.md) — implemented 2026-11-05, offline verification passed | Generalized family registrations/material/provenance, then migrated JS/TS NoSQL and JS/TS/Python standalone policy/enforcement together (`nosql-components-v1`, `validation-components-v1`; SQL provenance bytes changed, recorded as `sql-components-v2`) | Independent injection/validation outcomes, no API requirement for standalone validation, selected guidance completeness, source/report/replay parity; Python NoSQL stays unsupported; see the [ledger evidence](../architecture/analysis-packs.md#nosql-and-standalone-validation-migration-verification-2026-11-05) |
+| 2. [All XSS types, including browser](../specifications/components-02-xss.md) | Staged server/template, stored, DOM/framework/event/inline-script and cross-tier migration | All current XSS regressions; no borrowed encoding/origin/path protection; explicit bounded browser fetch-method correction and separate before/after evidence |
+| 3. [Outbound observations](../specifications/components-03-outbound.md) | Current destination/response observation components, trusted only to actual supported binding/operand evidence | Browser/server and URL/body/response isolation; no SQL-question fallback or invented SSRF verdict; historical answers and explicit unassessed/incomplete semantics |
+| Later, separately assigned: logging migration | Sensitive-content, emission, redaction and verified logger contracts/questions | Secret/personal data, constant/metadata, redacted and unresolved controls; independent logging gates |
+
+**2026-11-05 follow-on user direction:** NoSQL and standalone input validation share one session.
+The numbered specifications above each contain acceptance criteria, implementation order and a
+paste-ready agent prompt. They are prepared contracts, not completed migrations or an implementation
+assignment. Use the accepted SQL source tree even if it has not yet been committed; do not assume
+`HEAD` contains it or discard work when changing sessions. No new worktree or remote operation is
+needed to author these specs. Actual future checkout/branch and implementation are assigned by the user.
+
+The order is based on dependency and risk: validate reuse with two real non-SQL claim types first;
+then handle rendering and browser provenance; finally migrate outbound observations while preserving
+those browser boundaries. The XSS spec includes only an explicitly bounded fetch-method attribution
+correction. The outbound spec explicitly separates observation eligibility from future SSRF judgment.
+These small behavior corrections require their own before/after evidence, separate from parity.
+
+SQL query validation facets already use the SQL selection. The first follow-on also handles
+standalone field requirements without adding a general quality/standards engine. The second covers
+all currently implemented XSS types; it does not promise all browser vulnerability families. General
+CSRF, CORS, browser storage leakage, clickjacking and new code-injection capabilities need their own
+contracts. Complete outbound SSRF, redirects/DNS/network policy, Python NoSQL and general Python
+API-to-browser linkage remain separately scoped coverage work.
+
+All follow-ons remain not implemented until assigned and accepted. They MUST converge on the shared
+architecture without a permanent alternate policy path. This ordering governs these migration
+sessions; command injection remains the next new vulnerability family and other roadmap scope is
+unchanged. No paid model evaluation or sample changes are implied.
 
 ### Complete delivery list
 
@@ -229,8 +268,8 @@ vulnerability-type work. Secret scanning follows SCA. Language expansion has no 
 in this sequence; gRPC entry support is independent of source-language support.
 This order supersedes earlier sequence notes and the historical language-phase dependencies below.
 
-Each unchecked row is a future bounded contract/worktree, not implementation authorized by this
-plan edit. Preserve current capabilities and their unresolved coverage while implementing new ones.
+The analysis pack MVP is explicitly assigned above. Other unchecked rows require their own bounded
+contract and implementation assignment; this plan does not authorize them. Preserve current capabilities and their unresolved coverage while implementing new ones.
 
 | Status | Branch / capability | Acceptance target or delivered reference |
 |---|---|---|
@@ -240,8 +279,8 @@ plan edit. Preserve current capabilities and their unresolved coverage while imp
 | [x] | `logger-leak` | Explicit sensitive logger calls, access-log URL credentials and logging-specific judgment; see the contract |
 | [x] | `xss-response` | Delivered bounded reflected, stored, browser and cross-tier analysis; retain hardening gaps rather than claiming universal coverage |
 | [x] | `python-support` | Delivered adapter and shared trace/report guardrails; same claim architecture as JS/TS |
-| [ ] Next | `common-entry-dispatch` | Shared entry/registration/dispatch/callable model; migrate HTTP/browser consumers and add bounded dynamic-route, GraphQL resolver and gRPC handler adapters with explicit unknown controls |
-| [ ] | `analysis-pack-mvp` | Separate initiative/worktree after common-entry/dispatch merges into stage; organize/version existing analysis knowledge, select relevant judge context and record replay/report provenance; [proposal](analysis-pack-mvp.md) |
+| [x] | `common-entry-dispatch` | Shared entry/registration/dispatch/callable model; migrate HTTP/browser consumers and add bounded dynamic-route, GraphQL resolver and gRPC handler adapters with explicit unknown controls |
+| [x] | `analysis-pack-mvp` | SQL-first embedded selection, bounded judge composition, report provenance and exact-request replay; [contract](../specifications/analysis-pack-mvp.md), [architecture/ledger](../architecture/analysis-packs.md) |
 | [ ] | `command-injection` | Request-to-process execution and protective patterns in JS/TS and Python; start with TypeScript `/api/ping` and source-reviewed Python sinks |
 | [ ] | `xss-hardening` | General renderer/configuration, factory/helper and cross-tier coverage; retain raw/escaped/unknown controls, including VulnPy's Jinja Environment/template case |
 | [ ] | `path-traversal` | Request-influenced file paths, starting with `/api/files`; include JS/TS/Python containment controls |
