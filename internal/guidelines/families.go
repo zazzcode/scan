@@ -63,7 +63,7 @@ func applyEdits(body string, edits []sectionEdit) (string, error) {
 // project selects the required sections of one canonical language document.
 // A missing, renamed or duplicated required section is an error, never a
 // silently smaller projection.
-func project(language lang.Language, raw string, spec projectionSpec) (string, error) {
+func project(raw string, spec projectionSpec) (string, error) {
 	sections := strings.Split(raw, "\n## ")
 	var selected []string
 	for _, line := range strings.Split(sections[0], "\n") {
@@ -179,7 +179,7 @@ func FamilyBody(language lang.Language, family string) (AnalysisGuidelines, erro
 	default:
 		return AnalysisGuidelines{}, fmt.Errorf("unknown guidance family %q", family)
 	}
-	body, err := project(language, item.Body, spec)
+	body, err := project(item.Body, spec)
 	if err != nil {
 		return AnalysisGuidelines{}, err
 	}

@@ -7,7 +7,7 @@ type ComponentRef struct {
 	Digest  string `json:"digest"`
 }
 
-// ComponentSelection records the SQL interpretation selected for one invocation.
+// ComponentSelection records the family interpretation selected for one invocation.
 // Failure is retained without dropping an unsupported candidate or inventing protection.
 type ComponentSelection struct {
 	Pack       ComponentRef   `json:"pack,omitzero"`

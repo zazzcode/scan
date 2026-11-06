@@ -39,14 +39,15 @@ Independent future deliverables may use separate feature worktrees/PRs targeting
   implemented, accepted and merged through PR #8 on 2026-11-05. See
   [acceptance results](../evaluation/common-entry-dispatch-results.md#cross-entry-acceptance-2026-11-05). Includes HTTP/browser preservation, browser events, bounded
   dynamic HTTP, Node.js GraphQL/gRPC, entry-specific reports and saved-report compatibility.
-- [Analysis pack MVP](analysis-pack-mvp.md) — SQL-first embedded component migration contract;
-  implementation requested 2026-11-05 in `analysis-pack-mvp`, based on the merged
-  common-entry/dispatch foundation. Includes applicability, provenance and offline SQL acceptance.
-- [Components 01: NoSQL + input validation](components-01-nosql-validation.md) — next combined
-  implementation session; generalizes SQL-only assumptions while keeping claim verdicts independent.
-- [Components 02: all XSS types and browser](components-02-xss.md) — second session; staged rendering,
+- [Analysis pack MVP](analysis-pack-mvp.md) — SQL-first embedded component migration; implemented
+  and offline-verified 2026-11-05 in `analysis-pack-mvp` on the merged common-entry/dispatch
+  foundation. Includes applicability, provenance and offline SQL acceptance.
+- [Components 01: NoSQL + input validation](components-01-nosql-validation.md) — implemented and
+  offline-verified 2026-11-05; SQL-only assumptions generalized, NoSQL and standalone validation
+  migrated with independent claim protocols.
+- [Components 02: all XSS types and browser](components-02-xss.md) — next session; staged rendering,
   stored, DOM/framework and cross-tier migration plus bounded browser fetch-method correction.
-- [Components 03: outbound observations](components-03-outbound.md) — third session; source-backed
+- [Components 03: outbound observations](components-03-outbound.md) — later session; source-backed
   observation scope, browser/server isolation and explicit boundary before complete SSRF judgment.
 - Other planned specs are not authored yet. Their proposed slices live in the
   [implementation plan](../project/implementation-plan.md); each needs a bounded contract and user authorization.

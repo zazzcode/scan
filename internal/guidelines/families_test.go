@@ -82,19 +82,19 @@ func TestFamilyGuidanceCompleteness(t *testing.T) {
 	// instead of silently omitting interpretation while still producing a digest.
 	js, _ := ForLanguage(lang.JavaScript)
 	renamed := strings.Replace(js.Body, "## Free text", "## Free-form text", 1)
-	if _, err := project(lang.JavaScript, renamed, validationSpec()); err == nil {
+	if _, err := project(renamed, validationSpec()); err == nil {
 		t.Fatal("renamed required section accepted")
 	}
-	if _, err := project(lang.JavaScript, strings.Replace(js.Body, "## Do not claim", "## Removed", 1), validationSpec()); err == nil {
+	if _, err := project(strings.Replace(js.Body, "## Do not claim", "## Removed", 1), validationSpec()); err == nil {
 		t.Fatal("missing required section accepted")
 	}
 	duplicated := js.Body + "\n## Posture\n\nDuplicate posture section.\n"
-	if _, err := project(lang.JavaScript, duplicated, noSQLSpec()); err == nil {
+	if _, err := project(duplicated, noSQLSpec()); err == nil {
 		t.Fatal("duplicate required section accepted")
 	}
 	// A canonical-document edit that removes a phrase a family projection must
 	// rewrite is a completeness failure, not a silent content change.
-	if _, err := project(lang.JavaScript, strings.Replace(js.Body, "Logging a SQL-looking string is not a query. ", "", 1), noSQLSpec()); err == nil {
+	if _, err := project(strings.Replace(js.Body, "Logging a SQL-looking string is not a query. ", "", 1), noSQLSpec()); err == nil {
 		t.Fatal("missing required nosql phrase edit accepted")
 	}
 }

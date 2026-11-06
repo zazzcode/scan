@@ -94,27 +94,15 @@ func descriptors() ([]Component, error) {
 		v.Limits = append(v.Limits, "verified registration/dispatch/invocation only; context-specific effects")
 		out = append(out, v)
 	}
-	contractOwners := map[string]struct {
-		owner   string
-		library bool
-	}{}
+	contractOwners := map[string]string{}
 	for _, id := range sqlContractIDs {
-		contractOwners[id] = struct {
-			owner   string
-			library bool
-		}{"internal/parse/checks.go", true}
+		contractOwners[id] = "internal/parse/checks.go"
 	}
 	for _, id := range sqlContractIDs[1:] {
-		contractOwners[id] = struct {
-			owner   string
-			library bool
-		}{"internal/parse/python_sql.go", true}
+		contractOwners[id] = "internal/parse/python_sql.go"
 	}
 	for _, id := range noSQLContractIDs {
-		contractOwners[id] = struct {
-			owner   string
-			library bool
-		}{"internal/parse/checks.go + internal/parse/mongoose_query_context.go", false}
+		contractOwners[id] = "internal/parse/checks.go + internal/parse/mongoose_query_context.go"
 	}
 	for _, f := range Families() {
 		if !f.RequiresAPI {
@@ -123,8 +111,7 @@ func descriptors() ([]Component, error) {
 		for _, id := range contractIDs(&f) {
 			model := familyContract(&f, id)
 			v := makeComponent("api."+id, "api_contract", "internal/analysispacks", []string{model.Library}, []string{familyProtocol(f.Name)}, encoded(model))
-			owner := contractOwners[id]
-			v.CompiledOwner = owner.owner
+			v.CompiledOwner = contractOwners[id]
 			v.Tests = []string{"TestFamilyComponentSelection"}
 			if f.Name == "sql" {
 				v.Tests = append(v.Tests, "TestSQLComponentPipelineParity")

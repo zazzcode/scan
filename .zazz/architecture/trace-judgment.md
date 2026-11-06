@@ -40,8 +40,9 @@ registration, dispatch and supported invocation-binding roles supplement claim-s
 requirements; supplied evidence does not establish adequacy. Input witnesses remain distinct
 from caller argument bindings. Browser source-scope markers preserve offsets/hashes without
 uploading entire modules or claiming verified event exposure. The generic protocol is
-`candidate-use-v10`; claim-specific questions retain their versions because their question
-semantics are unchanged. Any changed request context still rejects historical replay.
+`candidate-use-v10`; SQL, NoSQL and standalone validation use their family component protocols,
+and XSS/logging keep their claim-specific versions until their own migrations. Any changed
+request context still rejects historical replay.
 
 ## Route and browser slices
 
